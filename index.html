@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f8fb" />
+    <meta
+      name="description"
+      content="Rumo Concursos — flashcards para concursos públicos."
+    />
+    <title>Rumo Concursos — Flashcards</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar" aria-label="Barra principal">
+        <div class="brand-lockup">
+          <a class="brand" href="#" aria-label="Rumo Concursos — início">rumo</a>
+          <span class="brand-context">TRT4 · AJAJ</span>
+        </div>
+
+        <label class="deck-picker">
+          <span class="sr-only">Selecionar baralho</span>
+          <select id="deck-select" aria-label="Selecionar baralho"></select>
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="m7 9.5 5 5 5-5" />
+          </svg>
+        </label>
+
+        <button class="shuffle-button" id="shuffle-button" type="button">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+          </svg>
+          <span>Embaralhar</span>
+        </button>
+      </header>
+
+      <section class="study-area" aria-live="polite">
+        <div class="progress-heading">
+          <span id="progress-label">1 de 8</span>
+          <span class="session-score" id="session-score">0 estudados</span>
+        </div>
+        <div class="progress-track" id="progress-track" aria-label="Progresso do baralho"></div>
+
+        <aside class="session-progress" aria-label="Progresso atual">
+          <span>Progresso</span>
+          <div class="session-dots" id="session-dots" aria-hidden="true"></div>
+          <strong id="session-count">1 de 8</strong>
+        </aside>
+
+        <div class="card-stage">
+          <button class="nav-arrow previous" id="previous-button" type="button" aria-label="Cartão anterior">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+
+          <button class="flashcard" id="flashcard" type="button" aria-label="Virar cartão">
+            <span class="flashcard-inner">
+              <span class="card-face card-front">
+                <span class="card-label">ENUNCIADO</span>
+                <span class="card-term" id="card-front">serendipity</span>
+                <span class="card-divider" aria-hidden="true"></span>
+                <span class="card-hint">
+                  <svg aria-hidden="true" viewBox="0 0 24 24">
+                    <path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z" />
+                    <circle cx="12" cy="12" r="2.6" />
+                  </svg>
+                  Toque para revelar o gabarito
+                </span>
+              </span>
+              <span class="card-face card-back">
+                <span class="card-label">GABARITO</span>
+                <span class="card-answer" id="card-back">descoberta feliz e inesperada</span>
+                <span class="card-example" id="card-example"></span>
+                <span class="card-divider" aria-hidden="true"></span>
+                <span class="card-hint">Toque para ver o enunciado</span>
+              </span>
+            </span>
+          </button>
+
+          <button class="nav-arrow next" id="next-button" type="button" aria-label="Próximo cartão">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="actions" aria-label="Ações de estudo">
+          <button class="action-button forgot" id="forgot-button" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
+            Não lembrei
+          </button>
+          <button class="action-button reveal" id="reveal-button" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z" />
+              <circle cx="12" cy="12" r="2.6" />
+            </svg>
+            <span>Ver resposta</span>
+          </button>
+          <button class="action-button remembered" id="remembered-button" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" /></svg>
+            Lembrei
+          </button>
+        </div>
+
+        <p class="keyboard-hint">
+          <kbd>Espaço</kbd> para virar <span>·</span> <kbd>←</kbd> <kbd>→</kbd> para navegar
+        </p>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="decks.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
