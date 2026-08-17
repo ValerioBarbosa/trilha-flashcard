@@ -20,7 +20,7 @@ const elements = {
   toast: document.querySelector("#toast"),
 };
 
-const savedState = JSON.parse(localStorage.getItem("rumo-concursos-state") || "null");
+const savedState = JSON.parse(localStorage.getItem("trilha-flashcard-state") || "null");
 const state = {
   deckId: savedState?.deckId && decks.some((deck) => deck.id === savedState.deckId) ? savedState.deckId : decks[0].id,
   index: Number.isInteger(savedState?.index) ? savedState.index : 0,
@@ -40,7 +40,7 @@ function currentCard() {
 }
 
 function saveProgress() {
-  localStorage.setItem("rumo-concursos-state", JSON.stringify({ deckId: state.deckId, index: state.index }));
+  localStorage.setItem("trilha-flashcard-state", JSON.stringify({ deckId: state.deckId, index: state.index }));
 }
 
 function renderDeckOptions() {

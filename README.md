@@ -1,4 +1,4 @@
-# Rumo Concursos — Flashcards para concursos públicos
+# Trilha Flashcard — Estudos para concursos públicos
 
 Um leitor de flashcards local, responsivo e sem instalação, personalizado para o primeiro concurso TRT4 - Analista Judiciário, Área Judiciária. O app inclui:
 
