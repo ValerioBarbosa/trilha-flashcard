@@ -36,12 +36,27 @@
           </svg>
         </label>
 
-        <button class="shuffle-button" id="shuffle-button" type="button">
-          <svg aria-hidden="true" viewBox="0 0 24 24">
-            <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
-          </svg>
-          <span>Embaralhar</span>
-        </button>
+        <div class="topbar-actions">
+          <button
+            class="shuffle-button"
+            id="dashboard-button"
+            type="button"
+            aria-label="Abrir painel de desempenho"
+            aria-haspopup="dialog"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M4 19V9M10 19V5M16 19v-7M22 19V3" />
+            </svg>
+            <span>Desempenho</span>
+          </button>
+
+          <button class="shuffle-button" id="shuffle-button" type="button" aria-label="Embaralhar cartões">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+            </svg>
+            <span>Embaralhar</span>
+          </button>
+        </div>
       </header>
 
       <section class="study-area" aria-live="polite">
@@ -49,7 +64,13 @@
           <span id="progress-label">1 de 8</span>
           <span class="session-score" id="session-score">0 estudados</span>
         </div>
-        <div class="progress-track" id="progress-track" aria-label="Progresso do baralho"></div>
+        <div
+          class="progress-track"
+          id="progress-track"
+          role="progressbar"
+          aria-label="Progresso do baralho"
+          aria-valuemin="0"
+        ></div>
 
         <aside class="session-progress" aria-label="Progresso atual">
           <span>Progresso</span>
@@ -118,6 +139,66 @@
         </p>
       </section>
     </main>
+
+    <dialog class="dashboard-dialog" id="dashboard-dialog" aria-labelledby="dashboard-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div>
+            <span class="dashboard-kicker">SEU RITMO DE ESTUDO</span>
+            <h2 id="dashboard-title">Desempenho</h2>
+          </div>
+          <button class="dashboard-close" id="dashboard-close" type="button" aria-label="Fechar painel">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
+          </button>
+        </header>
+
+        <p class="dashboard-intro" id="dashboard-summary">
+          Seu histórico fica salvo neste navegador e alimenta as próximas revisões.
+        </p>
+
+        <section class="metric-grid" aria-label="Resumo do desempenho">
+          <article class="metric-card">
+            <span>Cartões revisados</span>
+            <strong id="metric-reviewed">0</strong>
+            <small id="metric-total">de 75 cartões</small>
+          </article>
+          <article class="metric-card">
+            <span>Taxa de acerto</span>
+            <strong id="metric-accuracy">0%</strong>
+            <small>em todas as tentativas</small>
+          </article>
+          <article class="metric-card">
+            <span>Revisar hoje</span>
+            <strong id="metric-due">0</strong>
+            <small id="metric-next-review">comece avaliando um cartão</small>
+          </article>
+          <article class="metric-card">
+            <span>Sequência</span>
+            <strong id="metric-streak">0 dias</strong>
+            <small>de estudo ativo</small>
+          </article>
+        </section>
+
+        <section class="review-plan" aria-labelledby="review-plan-title">
+          <div>
+            <span class="review-plan-label">REVISÃO ESPAÇADA</span>
+            <h3 id="review-plan-title">1 dia <span>→</span> 7 dias <span>→</span> 30 dias</h3>
+            <p>Ao avaliar um cartão, a Trilha agenda automaticamente a próxima revisão.</p>
+          </div>
+          <button class="review-due-button" id="review-due-button" type="button" disabled>
+            Nenhuma revisão pendente
+          </button>
+        </section>
+
+        <section class="deck-performance-section" aria-labelledby="deck-performance-title">
+          <div class="deck-performance-title-row">
+            <h3 id="deck-performance-title">Progresso por disciplina</h3>
+            <span>cartões únicos revisados</span>
+          </div>
+          <div class="deck-performance" id="deck-performance"></div>
+        </section>
+      </div>
+    </dialog>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="decks.js"></script>

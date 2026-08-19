@@ -72,6 +72,13 @@ button {
   margin: 0 auto;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 10px;
+}
+
 .brand {
   justify-self: start;
   display: inline-flex;
@@ -556,6 +563,227 @@ kbd {
   transform: translate(-50%, 0);
 }
 
+.dashboard-dialog {
+  width: min(780px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  border: 0;
+  border-radius: 24px;
+  background: #fbfcff;
+  color: var(--ink);
+  padding: 0;
+  box-shadow: 0 32px 90px rgba(11, 27, 64, 0.28);
+}
+
+.dashboard-dialog::backdrop {
+  background: rgba(11, 27, 64, 0.46);
+  backdrop-filter: blur(5px);
+}
+
+.dashboard-content {
+  padding: 30px;
+}
+
+.dashboard-header,
+.deck-performance-title-row,
+.deck-performance-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.dashboard-kicker,
+.review-plan-label {
+  color: var(--blue);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+.dashboard-header h2 {
+  margin: 4px 0 0;
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.dashboard-close {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+}
+
+.dashboard-close svg {
+  width: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.9;
+}
+
+.dashboard-intro {
+  margin: 16px 0 22px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.metric-card {
+  min-width: 0;
+  border: 1px solid #e2e6ee;
+  border-radius: 16px;
+  background: white;
+  padding: 16px;
+  box-shadow: 0 7px 24px rgba(18, 28, 55, 0.05);
+}
+
+.metric-card > span,
+.metric-card small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.metric-card strong {
+  display: block;
+  margin: 8px 0 5px;
+  color: var(--ink);
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.review-plan {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #edf3ff, #f6f9ff);
+  padding: 20px;
+}
+
+.review-plan h3 {
+  margin: 5px 0 6px;
+  font-size: 1.2rem;
+}
+
+.review-plan h3 span {
+  color: var(--blue);
+  padding: 0 4px;
+}
+
+.review-plan p {
+  max-width: 430px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.review-due-button {
+  flex: 0 0 auto;
+  min-height: 46px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--blue);
+  color: white;
+  padding: 0 17px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.review-due-button:disabled {
+  background: #d8deea;
+  color: #7b8498;
+  cursor: default;
+}
+
+.deck-performance-section {
+  margin-top: 24px;
+}
+
+.deck-performance-title-row {
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.deck-performance-title-row h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.deck-performance-title-row > span {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.deck-performance {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px 18px;
+}
+
+.deck-performance-row {
+  min-width: 0;
+  border-top: 1px solid #e5e8ef;
+  padding-top: 10px;
+}
+
+.deck-performance-heading {
+  align-items: baseline;
+  gap: 10px;
+}
+
+.deck-performance-heading span {
+  overflow: hidden;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deck-performance-heading strong {
+  flex: 0 0 auto;
+  font-size: 0.74rem;
+}
+
+.deck-performance-track {
+  height: 5px;
+  margin: 7px 0 5px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #e1e5ed;
+}
+
+.deck-performance-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--blue);
+}
+
+.deck-performance-row small {
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
 @media (max-width: 1420px) {
   .session-progress {
     display: none;
@@ -608,6 +836,12 @@ kbd {
     grid-row: 1;
   }
 
+  .topbar-actions {
+    grid-column: 2;
+    grid-row: 1;
+    gap: 7px;
+  }
+
   .brand-context {
     margin-top: 2px;
     font-size: 0.58rem;
@@ -630,8 +864,6 @@ kbd {
   }
 
   .shuffle-button {
-    grid-column: 2;
-    grid-row: 1;
     min-width: 48px;
     min-height: 48px;
     padding: 0 12px;
@@ -728,6 +960,47 @@ kbd {
 
   .toast {
     bottom: 14px;
+  }
+
+  .dashboard-dialog {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+    border-radius: 20px;
+  }
+
+  .dashboard-content {
+    padding: 22px 18px;
+  }
+
+  .dashboard-intro {
+    margin-bottom: 18px;
+    font-size: 0.86rem;
+  }
+
+  .metric-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .metric-card {
+    padding: 14px;
+  }
+
+  .review-plan {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .review-due-button {
+    width: 100%;
+  }
+
+  .deck-performance-title-row > span {
+    display: none;
+  }
+
+  .deck-performance {
+    grid-template-columns: 1fr;
   }
 }
 

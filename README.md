@@ -7,8 +7,11 @@ Um leitor de flashcards local, responsivo e sem instalação, personalizado para
 - virada animada do cartão;
 - navegação por botões ou teclado;
 - marcação “Lembrei” e “Não lembrei”;
-- progresso da sessão e embaralhamento;
-- retomada automática do último cartão usando `localStorage`.
+- progresso por disciplina e embaralhamento;
+- retomada automática do último cartão usando `localStorage`;
+- histórico persistente de tentativas e taxa de acerto;
+- revisão espaçada em 1, 7 e 30 dias;
+- painel de desempenho com sequência de estudos e revisões pendentes.
 
 ## Como abrir
 
