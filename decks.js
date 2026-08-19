@@ -140,4 +140,440 @@ const trt4Decks = [
       { front: "Quais eixos temáticos aparecem como treino?", back: "Trabalho e tecnologia, acesso à Justiça, saúde no trabalho, diversidade, sustentabilidade e democracia/informação.", example: "Use os eixos para repertório e prática, sem inventar dados." },
     ],
   },
+  {
+    id: "labor-justice-organs",
+    title: "Justiça do Trabalho · CF/88 e CLT",
+    sourceNote: "Fonte oficial: Constituição Federal e CLT — Planalto. Texto vigente consultado em 17/08/2026.",
+    cards: [
+  {
+    "tag": "CF/88 · art. 111",
+    "topic": "Órgãos da Justiça do Trabalho",
+    "front": "Quais são os órgãos da Justiça do Trabalho?",
+    "back": "1. Tribunal Superior do Trabalho (TST)\n2. Tribunais Regionais do Trabalho (TRTs)\n3. Juízes do Trabalho",
+    "complement": "A Constituição não inclui Ministério Público do Trabalho, sindicatos ou CSJT no rol do art. 111.",
+    "pitfall": "Varas do Trabalho não aparecem nominalmente no rol do art. 111; aparecem os Juízes do Trabalho.",
+    "mnemonic": "TST → TRT → Juiz"
+  },
+  {
+    "tag": "CF/88 · art. 111-A",
+    "topic": "Composição do TST",
+    "front": "Quantos Ministros compõem o Tribunal Superior do Trabalho?",
+    "back": "27 Ministros.",
+    "complement": "O número é fixado diretamente pela Constituição.",
+    "pitfall": "Não é 'no mínimo 27'. São exatamente 27."
+  },
+  {
+    "tag": "CF/88 · art. 111-A",
+    "topic": "Idade para Ministro do TST",
+    "front": "Qual é a faixa etária constitucional para Ministro do TST?",
+    "back": "Mais de 35 anos e menos de 70 anos.",
+    "complement": "A redação atual decorre da EC 122/2022.",
+    "pitfall": "35 anos exatos não basta; 70 anos exatos ultrapassa o limite. A CF usa 'mais de 35' e 'menos de 70'."
+  },
+  {
+    "tag": "CF/88 · art. 111-A",
+    "topic": "Requisitos pessoais do TST",
+    "front": "Além da idade, quais requisitos pessoais são exigidos para Ministro do TST?",
+    "back": "Ser brasileiro; possuir notável saber jurídico; possuir reputação ilibada."
+  },
+  {
+    "tag": "CF/88 · art. 111-A",
+    "topic": "Nomeação dos Ministros do TST",
+    "front": "Quem nomeia os Ministros do TST e qual aprovação é exigida?",
+    "back": "O Presidente da República nomeia, após aprovação pela maioria absoluta do Senado Federal.",
+    "pitfall": "A Constituição exige maioria absoluta do Senado, não maioria simples."
+  },
+  {
+    "tag": "CF/88 · art. 111-A, I",
+    "topic": "Quinto constitucional no TST",
+    "front": "Como é formado 1/5 das vagas do TST?",
+    "back": "Um quinto é composto por:\n- advogados com mais de 10 anos de efetiva atividade profissional;\n- membros do Ministério Público do Trabalho com mais de 10 anos de efetivo exercício.",
+    "complement": "Deve ser observado o art. 94 da Constituição."
+  },
+  {
+    "tag": "CF/88 · art. 111-A, II",
+    "topic": "Demais vagas do TST",
+    "front": "De onde vêm os demais Ministros do TST?",
+    "back": "Dos juízes dos Tribunais Regionais do Trabalho, oriundos da magistratura de carreira.",
+    "complement": "São indicados pelo próprio Tribunal Superior do Trabalho."
+  },
+  {
+    "tag": "CF/88 · art. 111-A, § 1º",
+    "topic": "Competência do TST",
+    "front": "Quem estabelece a competência do Tribunal Superior do Trabalho?",
+    "back": "A lei."
+  },
+  {
+    "tag": "CF/88 · art. 111-A, § 2º",
+    "topic": "Órgãos que funcionam junto ao TST",
+    "front": "Quais instituições funcionam junto ao TST?",
+    "back": "1. ENAMAT - Escola Nacional de Formação e Aperfeiçoamento de Magistrados do Trabalho.\n2. CSJT - Conselho Superior da Justiça do Trabalho.",
+    "mnemonic": "ENAMAT + CSJT"
+  },
+  {
+    "tag": "CF/88 · art. 111-A, § 2º, I",
+    "topic": "ENAMAT",
+    "front": "Qual função da ENAMAT aparece expressamente na Constituição?",
+    "back": "Regulamentar os cursos oficiais para ingresso e promoção na carreira da magistratura do trabalho, entre outras funções.",
+    "pitfall": "A ENAMAT está vinculada à formação da magistratura, não à formação geral dos servidores."
+  },
+  {
+    "tag": "CF/88 · art. 111-A, § 2º, II",
+    "topic": "CSJT",
+    "front": "O que o Conselho Superior da Justiça do Trabalho supervisiona?",
+    "back": "A Justiça do Trabalho de primeiro e segundo graus, nas áreas administrativa, orçamentária, financeira e patrimonial.",
+    "complement": "O CSJT atua como órgão central do sistema.",
+    "pitfall": "Suas decisões têm efeito vinculante."
+  },
+  {
+    "tag": "CF/88 · art. 111-A, § 3º",
+    "topic": "Reclamação originária no TST",
+    "front": "O TST possui competência originária para reclamação constitucional?",
+    "back": "Sim. Compete originariamente ao TST processar e julgar reclamação destinada a preservar sua competência e garantir a autoridade de suas decisões."
+  },
+  {
+    "tag": "CF/88 · art. 112",
+    "topic": "Criação das Varas do Trabalho",
+    "front": "Quem cria as Varas da Justiça do Trabalho?",
+    "back": "A lei.",
+    "complement": "A Constituição determina que a lei criará Varas da Justiça do Trabalho."
+  },
+  {
+    "tag": "CF/88 · art. 112",
+    "topic": "Comarca sem Vara do Trabalho",
+    "front": "Quem pode exercer jurisdição trabalhista em comarca não abrangida por Vara do Trabalho?",
+    "back": "Juiz de Direito, desde que a jurisdição trabalhista lhe seja atribuída na forma legal."
+  },
+  {
+    "tag": "CF/88 · art. 112",
+    "topic": "Recurso quando atua Juiz de Direito",
+    "front": "Se o Juiz de Direito exercer jurisdição trabalhista, para onde será dirigido o recurso?",
+    "back": "Para o respectivo Tribunal Regional do Trabalho (TRT).",
+    "mnemonic": "Sem Vara → Juiz de Direito → TRT"
+  },
+  {
+    "tag": "CF/88 · art. 113",
+    "topic": "Disciplina legal da Justiça do Trabalho",
+    "front": "Sobre quais aspectos dos órgãos da Justiça do Trabalho a lei disporá?",
+    "back": "Constituição, investidura, jurisdição, competência, garantias e condições de exercício.",
+    "mnemonic": "CIJCGC"
+  },
+  {
+    "tag": "CF/88 · art. 114, caput",
+    "topic": "Regra central de competência",
+    "front": "Qual é a expressão utilizada pelo art. 114 para definir a função da Justiça do Trabalho?",
+    "back": "Compete à Justiça do Trabalho processar e julgar as matérias enumeradas constitucionalmente."
+  },
+  {
+    "tag": "CF/88 · art. 114, I",
+    "topic": "Relação de trabalho",
+    "front": "A competência constitucional da Justiça do Trabalho limita-se às relações de emprego?",
+    "back": "Não. O art. 114, I, utiliza a expressão 'relação de trabalho'.",
+    "complement": "Relação de trabalho é expressão mais ampla do que relação de emprego.",
+    "pitfall": "Não reduza o texto constitucional a vínculo empregatício."
+  },
+  {
+    "tag": "CF/88 · art. 114, I",
+    "topic": "Entes públicos no inciso I",
+    "front": "Quais entes públicos são mencionados expressamente no art. 114, I?",
+    "back": "Entes de direito público externo e a Administração Pública direta e indireta da União, dos Estados, do Distrito Federal e dos Municípios.",
+    "complement": "Para prova, diferencie a literalidade constitucional das limitações fixadas pela jurisprudência do STF para vínculos jurídico-administrativos."
+  },
+  {
+    "tag": "CF/88 · art. 114, II",
+    "topic": "Direito de greve",
+    "front": "Quem processa e julga ações que envolvam o exercício do direito de greve?",
+    "back": "A Justiça do Trabalho."
+  },
+  {
+    "tag": "CF/88 · art. 114, III",
+    "topic": "Representação sindical",
+    "front": "Quais conflitos de representação sindical estão expressamente previstos no art. 114?",
+    "back": "- entre sindicatos;\n- entre sindicatos e trabalhadores;\n- entre sindicatos e empregadores."
+  },
+  {
+    "tag": "CF/88 · art. 114, IV",
+    "topic": "Remédios constitucionais",
+    "front": "Quais remédios constitucionais podem ser julgados pela Justiça do Trabalho?",
+    "back": "Mandado de segurança, habeas corpus e habeas data, quando o ato questionado envolver matéria sujeita à jurisdição trabalhista.",
+    "mnemonic": "MS + HC + HD"
+  },
+  {
+    "tag": "CF/88 · art. 114, V",
+    "topic": "Conflitos de competência",
+    "front": "A Justiça do Trabalho julga conflitos de competência?",
+    "back": "Sim, os conflitos de competência entre órgãos com jurisdição trabalhista.",
+    "complement": "Há ressalva ao disposto no art. 102, I, 'o', da Constituição."
+  },
+  {
+    "tag": "CF/88 · art. 114, VI",
+    "topic": "Dano moral e patrimonial",
+    "front": "Quem julga ação de indenização por dano moral ou patrimonial decorrente da relação de trabalho?",
+    "back": "A Justiça do Trabalho.",
+    "pitfall": "O dano deve ser decorrente da relação de trabalho."
+  },
+  {
+    "tag": "CF/88 · art. 114, VII",
+    "topic": "Penalidades administrativas",
+    "front": "Quem julga ações relativas às penalidades administrativas impostas aos empregadores pelos órgãos de fiscalização das relações de trabalho?",
+    "back": "A Justiça do Trabalho."
+  },
+  {
+    "tag": "CF/88 · art. 114, VIII",
+    "topic": "Execução de contribuições sociais",
+    "front": "A Justiça do Trabalho executa contribuições sociais de ofício?",
+    "back": "Sim. Executa, de ofício, as contribuições previstas no art. 195, I, 'a', e II, e seus acréscimos legais, decorrentes das sentenças que proferir.",
+    "pitfall": "A expressão constitucional é 'de ofício'."
+  },
+  {
+    "tag": "CF/88 · art. 114, IX",
+    "topic": "Outras controvérsias",
+    "front": "O rol do art. 114 termina apenas nas hipóteses especificamente descritas nos incisos anteriores?",
+    "back": "Não. O inciso IX também prevê outras controvérsias decorrentes da relação de trabalho, na forma da lei."
+  },
+  {
+    "tag": "CF/88 · art. 114, § 1º",
+    "topic": "Arbitragem coletiva",
+    "front": "Frustrada a negociação coletiva, o que as partes podem fazer?",
+    "back": "Podem eleger árbitros."
+  },
+  {
+    "tag": "CF/88 · art. 114, § 2º",
+    "topic": "Dissídio coletivo de natureza econômica",
+    "front": "Recusada a negociação coletiva ou a arbitragem, como pode ser ajuizado dissídio coletivo de natureza econômica?",
+    "back": "As partes podem ajuizá-lo de comum acordo.",
+    "complement": "A Justiça do Trabalho poderá decidir o conflito, respeitadas as disposições mínimas legais de proteção ao trabalho e as anteriormente convencionadas.",
+    "pitfall": "Pegadinha clássica: a expressão é 'de comum acordo'."
+  },
+  {
+    "tag": "CF/88 · art. 114, § 3º",
+    "topic": "Greve em atividade essencial",
+    "front": "Quem pode ajuizar dissídio coletivo em caso de greve em atividade essencial com possibilidade de lesão do interesse público?",
+    "back": "O Ministério Público do Trabalho (MPT).",
+    "complement": "Compete à Justiça do Trabalho decidir o conflito."
+  },
+  {
+    "tag": "CF/88 · art. 114, I a IX",
+    "topic": "Mapa mental dos 9 incisos",
+    "front": "Quais são, em ordem, os nove grandes temas do art. 114?",
+    "back": "1. Relação de trabalho\n2. Greve\n3. Representação sindical\n4. MS, HC e HD\n5. Conflitos de competência\n6. Dano moral/patrimonial\n7. Penalidades administrativas\n8. Contribuições sociais\n9. Outras controvérsias trabalhistas",
+    "mnemonic": "Treine recitar os 9 itens sem olhar."
+  },
+  {
+    "tag": "CF/88 · art. 115, caput",
+    "topic": "Composição do TRT",
+    "front": "Quantos juízes compõem um Tribunal Regional do Trabalho?",
+    "back": "No mínimo 7 juízes.",
+    "pitfall": "O número não é fixo. A Constituição diz 'no mínimo'."
+  },
+  {
+    "tag": "CF/88 · art. 115, caput",
+    "topic": "Idade para membro do TRT",
+    "front": "Qual é a faixa etária constitucional para integrar um TRT?",
+    "back": "Mais de 30 anos e menos de 70 anos.",
+    "pitfall": "30 anos exatos não basta; a Constituição usa 'mais de 30'."
+  },
+  {
+    "tag": "CF/88 · art. 115, caput",
+    "topic": "Recrutamento e nomeação no TRT",
+    "front": "Como são recrutados e nomeados os membros dos TRTs?",
+    "back": "São recrutados, quando possível, na respectiva região, e nomeados pelo Presidente da República.",
+    "pitfall": "Atenção à expressão 'quando possível'."
+  },
+  {
+    "tag": "CF/88 · art. 115, I",
+    "topic": "Quinto constitucional no TRT",
+    "front": "Existe quinto constitucional nos Tribunais Regionais do Trabalho?",
+    "back": "Sim. Um quinto das vagas é destinado a advogados com mais de 10 anos de efetiva atividade profissional e membros do MPT com mais de 10 anos de efetivo exercício, observado o art. 94 da CF."
+  },
+  {
+    "tag": "CF/88 · art. 115, II",
+    "topic": "Demais vagas do TRT",
+    "front": "Como são preenchidas as vagas do TRT que não pertencem ao quinto constitucional?",
+    "back": "Por promoção de juízes do trabalho, alternadamente por antiguidade e merecimento.",
+    "mnemonic": "antiguidade ↔ merecimento"
+  },
+  {
+    "tag": "CF/88 · art. 115, § 1º",
+    "topic": "Justiça itinerante",
+    "front": "Os TRTs podem ou devem instalar Justiça itinerante?",
+    "back": "Devem. A Constituição determina que os TRTs instalarão a Justiça itinerante.",
+    "pitfall": "É comando obrigatório ('instalarão')."
+  },
+  {
+    "tag": "CF/88 · art. 115, § 1º",
+    "topic": "Funcionamento da Justiça itinerante",
+    "front": "Onde e como atua a Justiça itinerante trabalhista?",
+    "back": "Atua nos limites territoriais da respectiva jurisdição do TRT, realizando audiências e demais funções jurisdicionais, podendo servir-se de equipamentos públicos e comunitários."
+  },
+  {
+    "tag": "CF/88 · art. 115, § 2º",
+    "topic": "Câmaras regionais",
+    "front": "Os TRTs devem constituir Câmaras regionais?",
+    "back": "Não. Podem funcionar descentralizadamente, constituindo Câmaras regionais para assegurar pleno acesso do jurisdicionado à Justiça em todas as fases do processo.",
+    "pitfall": "Compare: Justiça itinerante → instalarão; Câmaras regionais → poderão."
+  },
+  {
+    "tag": "CF/88 · art. 116",
+    "topic": "Jurisdição nas Varas do Trabalho",
+    "front": "Quem exerce a jurisdição nas Varas do Trabalho?",
+    "back": "Um juiz singular.",
+    "mnemonic": "VARA = 1 JUIZ"
+  },
+  {
+    "tag": "CLT · art. 643, caput",
+    "topic": "Competência básica da Justiça do Trabalho",
+    "front": "Segundo o art. 643 da CLT, quem dirime os dissídios oriundos das relações entre empregados e empregadores e entre trabalhadores avulsos e seus tomadores de serviços?",
+    "back": "A Justiça do Trabalho, de acordo com o Título VIII da CLT e na forma estabelecida pelo processo judiciário do trabalho."
+  },
+  {
+    "tag": "CLT · art. 643, § 2º",
+    "topic": "Acidentes do trabalho — literalidade da CLT",
+    "front": "Segundo a literalidade do art. 643, § 2º, da CLT, as questões referentes a acidentes do trabalho ficam submetidas a qual Justiça?",
+    "back": "À justiça ordinária.",
+    "complement": "Atenção: o dispositivo conserva redação histórica. Em questões de prova, diferencie a literalidade do artigo da jurisprudência constitucional sobre competências relacionadas a acidente do trabalho."
+  },
+  {
+    "tag": "CLT · art. 643, § 3º",
+    "topic": "Trabalhadores portuários",
+    "front": "Quem julga ações entre trabalhadores portuários e operadores portuários ou OGMO decorrentes da relação de trabalho?",
+    "back": "A Justiça do Trabalho."
+  },
+  {
+    "tag": "CLT · art. 651, caput",
+    "topic": "Regra geral da competência territorial",
+    "front": "Qual é a regra geral de competência territorial na Justiça do Trabalho?",
+    "back": "A competência é determinada pela localidade onde o empregado, reclamante ou reclamado, prestar serviços ao empregador.",
+    "complement": "A regra vale ainda que o empregado tenha sido contratado em outro local ou no estrangeiro.",
+    "mnemonic": "651 = ONDE TRABALHOU?"
+  },
+  {
+    "tag": "CLT · art. 651, caput",
+    "topic": "Contratação em outro local",
+    "front": "Se o empregado foi contratado em outra cidade, muda a regra geral do art. 651?",
+    "back": "Não. Em regra, permanece competente a localidade da prestação dos serviços, ainda que a contratação tenha ocorrido em outro local ou no estrangeiro."
+  },
+  {
+    "tag": "CLT · art. 651, § 1º",
+    "topic": "Agente ou viajante comercial",
+    "front": "Qual é a regra territorial quando for parte de dissídio agente ou viajante comercial?",
+    "back": "É competente a localidade em que a empresa tenha agência ou filial e a esta o empregado esteja subordinado."
+  },
+  {
+    "tag": "CLT · art. 651, § 1º",
+    "topic": "Agente ou viajante sem agência/filial",
+    "front": "E se não houver agência ou filial aplicável ao agente ou viajante comercial?",
+    "back": "Será competente a localidade em que o empregado tenha domicílio ou a localidade mais próxima."
+  },
+  {
+    "tag": "CLT · art. 651, § 2º",
+    "topic": "Dissídio ocorrido no exterior",
+    "front": "A competência trabalhista brasileira pode alcançar dissídio ocorrido em agência ou filial no estrangeiro?",
+    "back": "Sim, desde que o empregado seja brasileiro e não haja convenção internacional dispondo em contrário."
+  },
+  {
+    "tag": "CLT · art. 651, § 3º",
+    "topic": "Atividades fora do local do contrato",
+    "front": "Se o empregador promove atividades fora do lugar do contrato de trabalho, onde o empregado pode apresentar reclamação?",
+    "back": "No foro da celebração do contrato OU no foro da prestação dos respectivos serviços.",
+    "pitfall": "Aqui a CLT oferece alternativa entre dois foros."
+  },
+  {
+    "tag": "CLT · art. 652",
+    "topic": "Regra principal das Varas",
+    "front": "O que disciplina o art. 652 da CLT?",
+    "back": "A competência das Varas do Trabalho.",
+    "mnemonic": "651 = ONDE julga; 652 = O QUE a Vara julga."
+  },
+  {
+    "tag": "CLT · art. 652, 'a', I",
+    "topic": "Reconhecimento da estabilidade",
+    "front": "A Vara do Trabalho pode conciliar e julgar dissídio em que se pretenda o reconhecimento da estabilidade de empregado?",
+    "back": "Sim."
+  },
+  {
+    "tag": "CLT · art. 652, 'a', II",
+    "topic": "Remuneração, férias e rescisão",
+    "front": "Quais três matérias aparecem juntas no art. 652, 'a', II?",
+    "back": "Remuneração; férias; indenizações por motivo de rescisão do contrato individual de trabalho."
+  },
+  {
+    "tag": "CLT · art. 652, 'a', III",
+    "topic": "Contrato de empreitada",
+    "front": "Todo contrato de empreitada é expressamente abrangido pelo art. 652?",
+    "back": "Não. A CLT menciona os dissídios resultantes de contratos de empreitada em que o empreiteiro seja operário ou artífice.",
+    "pitfall": "Não é qualquer empreiteiro."
+  },
+  {
+    "tag": "CLT · art. 652, 'a', IV",
+    "topic": "Demais dissídios individuais",
+    "front": "A Vara do Trabalho julga apenas as hipóteses específicas enumeradas nos primeiros incisos do art. 652?",
+    "back": "Não. Também concilia e julga os demais dissídios concernentes ao contrato individual de trabalho."
+  },
+  {
+    "tag": "CLT · art. 652, 'a', V",
+    "topic": "Portuários e OGMO",
+    "front": "As Varas do Trabalho julgam ações entre trabalhadores portuários e operadores portuários ou OGMO?",
+    "back": "Sim, quando decorrentes da relação de trabalho."
+  },
+  {
+    "tag": "CLT · art. 652, 'b'",
+    "topic": "Inquérito para apuração de falta grave",
+    "front": "Quem processa e julga os inquéritos para apuração de falta grave?",
+    "back": "As Varas do Trabalho."
+  },
+  {
+    "tag": "CLT · art. 652, 'c'",
+    "topic": "Embargos às próprias decisões",
+    "front": "A Vara do Trabalho pode julgar embargos opostos às suas próprias decisões?",
+    "back": "Sim."
+  },
+  {
+    "tag": "CLT · art. 652, 'd'",
+    "topic": "Multas e penalidades",
+    "front": "A Vara do Trabalho pode impor multas e demais penalidades?",
+    "back": "Sim, quando relativas a atos de sua competência."
+  },
+  {
+    "tag": "CLT · art. 652, 'f'",
+    "topic": "Homologação de acordo extrajudicial",
+    "front": "Quem decide quanto à homologação de acordo extrajudicial em matéria trabalhista?",
+    "back": "A Vara do Trabalho, quando se tratar de matéria de competência da Justiça do Trabalho."
+  },
+  {
+    "tag": "CLT · art. 652, parágrafo único",
+    "topic": "Preferência de julgamento",
+    "front": "Quais dissídios têm preferência para julgamento segundo o parágrafo único do art. 652?",
+    "back": "1. Dissídios sobre pagamento de salário.\n2. Dissídios derivados da falência do empregador.",
+    "pitfall": "Detalhe pequeno, mas típico de cobrança literal."
+  },
+  {
+    "tag": "Revisão rápida",
+    "topic": "Mapa dos artigos constitucionais",
+    "front": "111 / 111-A / 114 / 115 / 116 significam o quê?",
+    "back": "111 → órgãos da Justiça do Trabalho\n111-A → TST\n114 → competência da Justiça do Trabalho\n115 → TRT\n116 → juiz singular nas Varas do Trabalho"
+  },
+  {
+    "tag": "Revisão rápida",
+    "topic": "TST x TRT — composição e idade",
+    "front": "Compare TST e TRT quanto à composição e à idade constitucional.",
+    "back": "TST: 27 Ministros; mais de 35 e menos de 70 anos.\nTRT: no mínimo 7 juízes; mais de 30 e menos de 70 anos.\nQuinto constitucional: existe em ambos.",
+    "mnemonic": "TST = 27 / +35 / −70 | TRT = mínimo 7 / +30 / −70"
+  },
+  {
+    "tag": "Revisão rápida",
+    "topic": "Diferença entre CLT 651 e 652",
+    "front": "Qual é a diferença essencial entre os arts. 651 e 652 da CLT?",
+    "back": "Art. 651 → competência TERRITORIAL: ONDE a ação será julgada.\nArt. 652 → competência das VARAS: O QUE compete às Varas do Trabalho.",
+    "mnemonic": "651 = ONDE? | 652 = O QUÊ?"
+  },
+  {
+    "tag": "Revisão rápida",
+    "topic": "Sequência do art. 114",
+    "front": "Qual sequência você deve conseguir recitar de cabeça sobre os nove incisos do art. 114 da CF?",
+    "back": "Trabalho → Greve → Sindicato → MS/HC/HD → Conflito → Dano → Fiscalização → Contribuição → Outras controvérsias.",
+    "complement": "Use a sequência como mapa mental e depois reconstrua o conteúdo de cada inciso."
+  }
+],
+  },
 ];

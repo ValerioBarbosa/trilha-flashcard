@@ -3,7 +3,7 @@
 Um leitor de flashcards local, responsivo e sem instalação, personalizado para o primeiro concurso TRT4 - Analista Judiciário, Área Judiciária. O app inclui:
 
 - um baralho inicial com formato histórico, prioridades e alerta pré-edital;
-- dez baralhos por disciplina, seguindo o edital verticalizado fornecido;
+- dez baralhos por disciplina, seguindo o edital verticalizado fornecido, mais um baralho extra "Justiça do Trabalho · CF/88 e CLT" com 64 cartões (complemento, pegadinha e macete por cartão);
 - virada animada do cartão;
 - navegação por botões ou teclado;
 - marcação “Lembrei” e “Não lembrei”;

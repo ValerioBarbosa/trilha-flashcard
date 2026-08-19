@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f7f8fb" />
+    <meta name="theme-color" content="#fbfcff" />
     <meta
       name="description"
       content="Trilha Flashcard — estudos e revisão para concursos públicos."
     />
     <title>Trilha Flashcard — Concursos Públicos</title>
+    <link rel="icon" href="data:," />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -88,7 +89,9 @@
           <button class="flashcard" id="flashcard" type="button" aria-label="Virar cartão">
             <span class="flashcard-inner">
               <span class="card-face card-front">
+                <span class="card-tag" id="card-tag-front"></span>
                 <span class="card-label">ENUNCIADO</span>
+                <span class="card-topic" id="card-topic"></span>
                 <span class="card-term" id="card-front">serendipity</span>
                 <span class="card-divider" aria-hidden="true"></span>
                 <span class="card-hint">
@@ -100,11 +103,25 @@
                 </span>
               </span>
               <span class="card-face card-back">
-                <span class="card-label">GABARITO</span>
-                <span class="card-answer" id="card-back">descoberta feliz e inesperada</span>
-                <span class="card-example" id="card-example"></span>
-                <span class="card-divider" aria-hidden="true"></span>
-                <span class="card-hint">Toque para ver o enunciado</span>
+                <span class="card-back-scroll">
+                  <span class="card-tag" id="card-tag-back"></span>
+                  <span class="card-label">GABARITO</span>
+                  <span class="card-answer" id="card-back">descoberta feliz e inesperada</span>
+                  <span class="card-example" id="card-example"></span>
+                  <span class="card-callout card-callout-complement" id="card-complement">
+                    <span class="card-callout-label">Complemento</span>
+                    <span class="card-callout-text" id="card-complement-text"></span>
+                  </span>
+                  <span class="card-callout card-callout-pitfall" id="card-pitfall">
+                    <span class="card-callout-label">⚠ Pegadinha</span>
+                    <span class="card-callout-text" id="card-pitfall-text"></span>
+                  </span>
+                  <span class="card-callout card-callout-mnemonic" id="card-mnemonic">
+                    <span class="card-callout-label">💡 Macete</span>
+                    <span class="card-callout-text" id="card-mnemonic-text"></span>
+                  </span>
+                  <span class="card-hint">Toque para ver o enunciado</span>
+                </span>
               </span>
             </span>
           </button>
@@ -137,6 +154,7 @@
         <p class="keyboard-hint">
           <kbd>Espaço</kbd> para virar <span>·</span> <kbd>←</kbd> <kbd>→</kbd> para navegar
         </p>
+        <p class="deck-source-note" id="deck-source-note"></p>
       </section>
     </main>
 

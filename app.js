@@ -13,6 +13,16 @@ const elements = {
   front: document.querySelector("#card-front"),
   back: document.querySelector("#card-back"),
   example: document.querySelector("#card-example"),
+  tagFront: document.querySelector("#card-tag-front"),
+  tagBack: document.querySelector("#card-tag-back"),
+  topic: document.querySelector("#card-topic"),
+  complement: document.querySelector("#card-complement"),
+  complementText: document.querySelector("#card-complement-text"),
+  pitfall: document.querySelector("#card-pitfall"),
+  pitfallText: document.querySelector("#card-pitfall-text"),
+  mnemonic: document.querySelector("#card-mnemonic"),
+  mnemonicText: document.querySelector("#card-mnemonic-text"),
+  deckSourceNote: document.querySelector("#deck-source-note"),
   previous: document.querySelector("#previous-button"),
   next: document.querySelector("#next-button"),
   shuffle: document.querySelector("#shuffle-button"),
@@ -194,14 +204,26 @@ function renderProgress() {
     .join("");
 }
 
+function fillCallout(wrapper, textEl, value) {
+  const hasValue = Boolean(value);
+  textEl.textContent = value || "";
+  wrapper.classList.toggle("is-empty", !hasValue);
+}
+
 function renderCard() {
   const card = currentCard();
   elements.front.textContent = card.front;
   elements.back.textContent = card.back;
   elements.example.textContent = card.example || "";
+  elements.tagFront.textContent = card.tag || "";
+  elements.tagBack.textContent = card.tag || "";
+  elements.topic.textContent = card.topic || "";
+  fillCallout(elements.complement, elements.complementText, card.complement);
+  fillCallout(elements.pitfall, elements.pitfallText, card.pitfall);
+  fillCallout(elements.mnemonic, elements.mnemonicText, card.mnemonic);
   elements.front.classList.toggle("is-medium", card.front.length > 34 && card.front.length <= 76);
   elements.front.classList.toggle("is-long", card.front.length > 76);
-  elements.back.classList.toggle("is-long", card.back.length > 105);
+  elements.back.classList.toggle("is-long", card.back.length > 105 || Boolean(card.complement || card.pitfall || card.mnemonic));
   elements.flashcard.classList.toggle("is-flipped", state.flipped);
   elements.flashcard.setAttribute("aria-label", state.flipped ? "Mostrar enunciado" : "Revelar gabarito");
   elements.reveal.querySelector("span").textContent = state.flipped ? "Ver enunciado" : "Ver gabarito";
@@ -267,6 +289,7 @@ function renderDashboard() {
 function render() {
   state.index = Math.min(Math.max(state.index, 0), currentDeck().cards.length - 1);
   elements.deckSelect.value = state.deckId;
+  elements.deckSourceNote.textContent = currentDeck().sourceNote || "";
   renderProgress();
   renderCard();
   renderDashboard();
