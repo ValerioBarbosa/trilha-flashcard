@@ -729,6 +729,14 @@ button:focus-visible {
   transform: translateY(0) scale(0.98);
 }
 
+.action-button:disabled,
+.flashcard:disabled,
+.nav-arrow:disabled {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
 .action-button.forgot {
   background: var(--coral);
   color: white;
