@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Trilha Flashcard" />
     <meta name="theme-color" content="#fbfcff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
     <meta
@@ -19,7 +23,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260820-1" />
+    <link rel="stylesheet" href="styles.css?v=20260820-2" />
     <script>
       try {
         const savedTheme = localStorage.getItem("trilha-flashcard-theme");
@@ -49,6 +53,19 @@
         </label>
 
         <div class="topbar-actions">
+          <button
+            class="shuffle-button install-button"
+            id="install-app-button"
+            type="button"
+            aria-label="Instalar Trilha Flashcard no dispositivo"
+            aria-haspopup="dialog"
+            hidden
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M12 3v11M8 10l4 4 4-4M5 18v2h14v-2" />
+            </svg>
+            <span>Instalar</span>
+          </button>
           <button
             class="shuffle-button icon-only"
             id="theme-toggle-button"
@@ -430,9 +447,35 @@
       </div>
     </dialog>
 
+    <dialog class="dashboard-dialog install-dialog" id="install-dialog" aria-labelledby="install-dialog-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div>
+            <span class="dashboard-kicker">APLICATIVO</span>
+            <h2 id="install-dialog-title">Instalar Trilha Flashcard</h2>
+          </div>
+          <button class="dashboard-close" id="install-dialog-close" type="button" aria-label="Fechar">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
+          </button>
+        </header>
+        <p class="dashboard-intro" id="install-dialog-intro">
+          Instale o aplicativo para acessar seus flashcards diretamente pela tela inicial.
+        </p>
+        <ol class="install-steps" id="install-steps">
+          <li>Abra o menu do navegador.</li>
+          <li>Escolha “Instalar aplicativo” ou “Adicionar à tela inicial”.</li>
+          <li>Confirme a instalação.</li>
+        </ol>
+        <p class="install-note">Seu progresso continua salvo neste dispositivo. Use “Exportar progresso” para criar uma cópia de segurança.</p>
+        <button class="review-due-button install-confirm-button" id="install-confirm-button" type="button" hidden>
+          Instalar agora
+        </button>
+      </div>
+    </dialog>
+
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="decks.js?v=20260820-1"></script>
-    <script src="spaced-repetition.js?v=20260820-1"></script>
-    <script src="app.js?v=20260820-1"></script>
+    <script src="decks.js?v=20260820-2"></script>
+    <script src="spaced-repetition.js?v=20260820-2"></script>
+    <script src="app.js?v=20260820-2"></script>
   </body>
 </html>
