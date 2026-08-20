@@ -1,5 +1,6 @@
 const decks = trt4Decks;
 const STORAGE_KEY = "trilha-flashcard-state";
+const THEME_STORAGE_KEY = "trilha-flashcard-theme";
 const REVIEW_INTERVAL_DAYS = [1, 7, 30];
 
 const elements = {
@@ -29,6 +30,10 @@ const elements = {
   reveal: document.querySelector("#reveal-button"),
   forgot: document.querySelector("#forgot-button"),
   remembered: document.querySelector("#remembered-button"),
+  themeToggle: document.querySelector("#theme-toggle-button"),
+  searchInput: document.querySelector("#search-input"),
+  searchClear: document.querySelector("#search-clear"),
+  searchResults: document.querySelector("#search-results"),
   dashboardButton: document.querySelector("#dashboard-button"),
   dashboardDialog: document.querySelector("#dashboard-dialog"),
   dashboardClose: document.querySelector("#dashboard-close"),
@@ -40,7 +45,11 @@ const elements = {
   metricNextReview: document.querySelector("#metric-next-review"),
   metricStreak: document.querySelector("#metric-streak"),
   reviewDue: document.querySelector("#review-due-button"),
+  reviewWrong: document.querySelector("#review-wrong-button"),
   deckPerformance: document.querySelector("#deck-performance"),
+  exportButton: document.querySelector("#export-button"),
+  importButton: document.querySelector("#import-button"),
+  importInput: document.querySelector("#import-input"),
   toast: document.querySelector("#toast"),
 };
 
@@ -66,10 +75,30 @@ const state = {
   activity: Array.isArray(savedState.activity)
     ? [...new Set(savedState.activity.filter((date) => typeof date === "string"))]
     : [],
-  reviewMode: false,
+  queueMode: null,
 };
 
 let toastTimer;
+
+function applyTheme(theme) {
+  if (theme === "dark" || theme === "light") {
+    document.documentElement.setAttribute("data-theme", theme);
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+  }
+}
+
+function systemPrefersDark() {
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+function toggleTheme() {
+  const current = localStorage.getItem(THEME_STORAGE_KEY) || (systemPrefersDark() ? "dark" : "light");
+  const next = current === "dark" ? "light" : "dark";
+  localStorage.setItem(THEME_STORAGE_KEY, next);
+  applyTheme(next);
+  elements.themeToggle.setAttribute("aria-pressed", String(next === "dark"));
+}
 
 function currentDeck() {
   return decks.find((deck) => deck.id === state.deckId);
@@ -116,6 +145,15 @@ function getDueEntries(now = Date.now()) {
     .sort((first, second) => (
       new Date(state.ratings[first.key].nextReview).getTime()
       - new Date(state.ratings[second.key].nextReview).getTime()
+    ));
+}
+
+function getWrongEntries() {
+  return allCardEntries()
+    .filter(({ key }) => state.ratings[key]?.lastResult === "forgot")
+    .sort((first, second) => (
+      new Date(state.ratings[first.key].lastReviewed).getTime()
+      - new Date(state.ratings[second.key].lastReviewed).getTime()
     ));
 }
 
@@ -250,6 +288,7 @@ function renderDashboard() {
   const remembered = ratings.reduce((sum, rating) => sum + (rating.remembered || 0), 0);
   const accuracy = attempts ? Math.round((remembered / attempts) * 100) : 0;
   const dueEntries = getDueEntries();
+  const wrongEntries = getWrongEntries();
   const streak = getStudyStreak();
 
   elements.metricReviewed.textContent = String(reviewed);
@@ -266,6 +305,11 @@ function renderDashboard() {
   elements.reviewDue.textContent = dueEntries.length
     ? `Revisar ${dueEntries.length} ${dueEntries.length === 1 ? "cartão" : "cartões"} agora`
     : "Nenhuma revisão pendente";
+
+  elements.reviewWrong.disabled = wrongEntries.length === 0;
+  elements.reviewWrong.textContent = wrongEntries.length
+    ? `Revisar ${wrongEntries.length} ${wrongEntries.length === 1 ? "errado" : "errados"}`
+    : "Nenhum cartão errado";
 
   elements.deckPerformance.innerHTML = decks.map((deck) => {
     const stats = getDeckStats(deck);
@@ -345,20 +389,22 @@ function rateCard(didRemember) {
   showToast(didRemember ? "Boa — revisão agendada" : "Tudo bem — veremos novamente amanhã");
 
   window.setTimeout(() => {
-    if (!state.reviewMode) {
+    if (!state.queueMode) {
       move(1);
       return;
     }
 
-    const nextDue = getDueEntries()[0];
-    if (nextDue) {
-      goToEntry(nextDue);
+    const queue = state.queueMode === "wrong" ? getWrongEntries() : getDueEntries();
+    const nextEntry = queue[0];
+    if (nextEntry) {
+      goToEntry(nextEntry);
       return;
     }
 
-    state.reviewMode = false;
+    const finishedMessage = state.queueMode === "wrong" ? "Cartões errados revisados" : "Revisões do dia concluídas";
+    state.queueMode = null;
     move(1);
-    showToast("Revisões do dia concluídas");
+    showToast(finishedMessage);
   }, 320);
 }
 
@@ -370,7 +416,7 @@ function shuffleCards() {
   }
   state.index = 0;
   state.flipped = false;
-  state.reviewMode = false;
+  state.queueMode = null;
   render();
   showToast("Baralho embaralhado");
 }
@@ -390,17 +436,135 @@ function closeDashboard() {
 function startDueReview() {
   const firstDue = getDueEntries()[0];
   if (!firstDue) return;
-  state.reviewMode = true;
+  state.queueMode = "due";
   closeDashboard();
   goToEntry(firstDue);
   showToast("Revisão do dia iniciada");
+}
+
+function startWrongReview() {
+  const firstWrong = getWrongEntries()[0];
+  if (!firstWrong) return;
+  state.queueMode = "wrong";
+  closeDashboard();
+  goToEntry(firstWrong);
+  showToast("Revisão dos errados iniciada");
+}
+
+function escapeHtml(value) {
+  return (value || "")
+    .toString()
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function normalizeText(value) {
+  return (value || "").toString().toLowerCase();
+}
+
+function closeSearchResults() {
+  elements.searchResults.hidden = true;
+  elements.searchResults.innerHTML = "";
+}
+
+function renderSearchResults(rawQuery) {
+  const query = normalizeText(rawQuery).trim();
+  elements.searchClear.hidden = query.length === 0;
+  if (!query) {
+    closeSearchResults();
+    return;
+  }
+
+  const matches = allCardEntries()
+    .filter(({ deck, card }) => {
+      const haystack = [card.front, card.back, card.tag, card.topic, deck.title].map(normalizeText).join(" ");
+      return haystack.includes(query);
+    })
+    .slice(0, 30);
+
+  elements.searchResults.innerHTML = matches.length
+    ? matches
+        .map(
+          (entry, index) => `
+            <button type="button" class="search-result" data-result-index="${index}" role="option">
+              <span class="search-result-front">${escapeHtml(entry.card.front)}</span>
+              <span class="search-result-meta">${escapeHtml(entry.deck.title)}${entry.card.tag ? ` · ${escapeHtml(entry.card.tag)}` : ""}</span>
+            </button>
+          `
+        )
+        .join("")
+    : `<p class="search-empty">Nenhum cartão encontrado.</p>`;
+
+  elements.searchResults.hidden = false;
+  elements.searchResults.querySelectorAll(".search-result").forEach((button, index) => {
+    button.addEventListener("click", () => {
+      goToEntry(matches[index]);
+      elements.searchInput.value = "";
+      elements.searchClear.hidden = true;
+      closeSearchResults();
+    });
+  });
+}
+
+function exportProgress() {
+  const payload = {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    deckId: state.deckId,
+    index: state.index,
+    ratings: state.ratings,
+    activity: state.activity,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `trilha-flashcard-progresso-${dateKey()}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  showToast("Progresso exportado");
+}
+
+function importProgress(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data || typeof data !== "object") throw new Error("invalid");
+
+      state.ratings = data.ratings && typeof data.ratings === "object" && !Array.isArray(data.ratings)
+        ? data.ratings
+        : {};
+      state.activity = Array.isArray(data.activity)
+        ? [...new Set(data.activity.filter((entry) => typeof entry === "string"))]
+        : [];
+      if (typeof data.deckId === "string" && decks.some((deck) => deck.id === data.deckId)) {
+        state.deckId = data.deckId;
+      }
+      if (Number.isInteger(data.index)) {
+        state.index = data.index;
+      }
+      state.flipped = false;
+      state.queueMode = null;
+      render();
+      showToast("Progresso importado");
+    } catch {
+      showToast("Arquivo inválido para importação");
+    }
+  };
+  reader.onerror = () => showToast("Não foi possível ler o arquivo");
+  reader.readAsText(file);
 }
 
 elements.deckSelect.addEventListener("change", (event) => {
   state.deckId = event.target.value;
   state.index = 0;
   state.flipped = false;
-  state.reviewMode = false;
+  state.queueMode = null;
   render();
 });
 
@@ -414,13 +578,42 @@ elements.remembered.addEventListener("click", () => rateCard(true));
 elements.dashboardButton.addEventListener("click", openDashboard);
 elements.dashboardClose.addEventListener("click", closeDashboard);
 elements.reviewDue.addEventListener("click", startDueReview);
+elements.reviewWrong.addEventListener("click", startWrongReview);
 elements.dashboardDialog.addEventListener("click", (event) => {
   if (event.target === elements.dashboardDialog) closeDashboard();
+});
+elements.themeToggle.addEventListener("click", toggleTheme);
+elements.exportButton.addEventListener("click", exportProgress);
+elements.importButton.addEventListener("click", () => elements.importInput.click());
+elements.importInput.addEventListener("change", (event) => {
+  const file = event.target.files?.[0];
+  if (file) importProgress(file);
+  event.target.value = "";
+});
+
+elements.searchInput.addEventListener("input", (event) => renderSearchResults(event.target.value));
+elements.searchInput.addEventListener("focus", (event) => renderSearchResults(event.target.value));
+elements.searchClear.addEventListener("click", () => {
+  elements.searchInput.value = "";
+  elements.searchInput.focus();
+  renderSearchResults("");
+});
+document.addEventListener("click", (event) => {
+  if (!elements.searchInput.closest(".search-bar").contains(event.target)) {
+    closeSearchResults();
+  }
+});
+elements.searchInput.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeSearchResults();
 });
 
 document.addEventListener("keydown", (event) => {
   if (elements.dashboardDialog.open) return;
-  if (event.target instanceof HTMLSelectElement || event.target instanceof HTMLButtonElement) return;
+  if (
+    event.target instanceof HTMLSelectElement
+    || event.target instanceof HTMLButtonElement
+    || event.target instanceof HTMLInputElement
+  ) return;
   if (event.code === "Space") {
     event.preventDefault();
     toggleCard();
@@ -430,6 +623,16 @@ document.addEventListener("keydown", (event) => {
     move(1);
   }
 });
+
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+
+const explicitTheme = document.documentElement.getAttribute("data-theme");
+const effectiveDark = explicitTheme === "dark" || (!explicitTheme && systemPrefersDark());
+elements.themeToggle.setAttribute("aria-pressed", String(effectiveDark));
 
 renderDeckOptions();
 render();
