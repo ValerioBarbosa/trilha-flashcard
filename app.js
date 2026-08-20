@@ -117,11 +117,17 @@ const elements = {
   cardListSearch: document.querySelector("#card-list-search"),
   cardForm: document.querySelector("#card-form"),
   cardFormIndex: document.querySelector("#card-form-index"),
+  cardFormSourceDeck: document.querySelector("#card-form-source-deck"),
+  cardFormDiscipline: document.querySelector("#card-form-discipline"),
   cardFormFront: document.querySelector("#card-form-front"),
   cardFormBack: document.querySelector("#card-form-back"),
   cardFormTopic: document.querySelector("#card-form-topic"),
-  cardFormTopicList: document.querySelector("#card-form-topic-list"),
   cardFormTopicWarning: document.querySelector("#card-form-topic-warning"),
+  cardFormSubtopic: document.querySelector("#card-form-subtopic"),
+  cardFormLegalBasis: document.querySelector("#card-form-legal-basis"),
+  cardFormType: document.querySelector("#card-form-type"),
+  cardFormPriority: document.querySelector("#card-form-priority"),
+  cardFormDifficulty: document.querySelector("#card-form-difficulty"),
   cardFormTag: document.querySelector("#card-form-tag"),
   cardFormExample: document.querySelector("#card-form-example"),
   cardFormComplement: document.querySelector("#card-form-complement"),
@@ -757,19 +763,15 @@ function renderManageCards() {
     elements.manageCardsSummary.textContent += ` ${coverage.covered} de ${coverage.total} assuntos do edital com cartão.`;
   }
 
-  elements.cardFormTopicList.innerHTML = getUniqueTopics(deck)
-    .map((topic) => `<option value="${escapeHtml(topic)}"></option>`)
-    .join("");
-
   elements.cardList.innerHTML = deck.cards.length
     ? deck.cards
         .map((card, index) => {
-          const searchValue = [card.front, card.back, card.topic].filter(Boolean).join(" ").toLowerCase();
+          const searchValue = [card.front, card.back, card.topic, card.subtopic, card.legalBasis, card.type, card.priority, card.difficulty].filter(Boolean).join(" ").toLowerCase();
           return `
             <article class="card-list-row" data-search="${escapeHtml(searchValue)}">
               <div class="card-list-row-main">
                 <span class="card-list-front">${escapeHtml(card.front)}</span>
-                <span class="card-list-topic">${card.topic ? escapeHtml(card.topic) : "sem assunto"}</span>
+                <span class="card-list-topic">${[card.topic, card.subtopic, card.type, card.priority ? `Prioridade ${card.priority}` : "", card.difficulty].filter(Boolean).map(escapeHtml).join(" · ") || "sem classificação"}</span>
               </div>
               <div class="card-list-row-actions">
                 <button type="button" class="data-button" data-edit-card="${index}">Editar</button>
@@ -797,105 +799,185 @@ function filterCardList() {
   });
 }
 
+function editalDecks() {
+  return decks.filter((deck) => Array.isArray(deck.topics) && deck.topics.length > 0);
+}
+
+function renderDisciplineOptions(selectedDeckId = "") {
+  elements.cardFormDiscipline.innerHTML = [
+    '<option value="">Selecione a disciplina</option>',
+    ...editalDecks().map((deck) => `<option value="${escapeHtml(deck.id)}">${escapeHtml(deck.title)}</option>`),
+  ].join("");
+  elements.cardFormDiscipline.value = selectedDeckId;
+}
+
+function renderTopicOptions(selectedTopic = "") {
+  const deck = decks.find((entry) => entry.id === elements.cardFormDiscipline.value);
+  const topics = Array.isArray(deck?.topics) ? deck.topics : [];
+  const options = ['<option value="">Selecione o assunto</option>'];
+
+  topics.forEach((topic) => {
+    options.push(`<option value="${escapeHtml(topic)}">${escapeHtml(topic)}</option>`);
+  });
+  if (selectedTopic && !topics.includes(selectedTopic)) {
+    options.push(`<option value="${escapeHtml(selectedTopic)}">${escapeHtml(selectedTopic)} (importado)</option>`);
+  }
+
+  elements.cardFormTopic.innerHTML = options.join("");
+  elements.cardFormTopic.disabled = !deck;
+  elements.cardFormTopic.value = selectedTopic;
+  checkTopicWarning();
+}
+
 function checkTopicWarning() {
-  const deck = currentDeck();
-  const value = elements.cardFormTopic.value.trim();
-  const isUnknown = Boolean(value) && Array.isArray(deck.topics) && deck.topics.length > 0 && !deck.topics.includes(value);
+  const deck = decks.find((entry) => entry.id === elements.cardFormDiscipline.value);
+  const value = elements.cardFormTopic.value;
+  const isUnknown = Boolean(value) && Array.isArray(deck?.topics) && !deck.topics.includes(value);
   elements.cardFormTopicWarning.hidden = !isUnknown;
 }
 
 function openCardForm(index) {
-  const deck = currentDeck();
-  const card = index === null ? null : deck.cards[index];
+  const sourceDeck = currentDeck();
+  const card = index === null ? null : sourceDeck.cards[index];
+  const defaultDeck = sourceDeck.topics?.length ? sourceDeck : editalDecks()[0];
+  const selectedDeckId = card ? sourceDeck.id : defaultDeck?.id || "";
+
   elements.cardFormIndex.value = index === null ? "" : String(index);
+  elements.cardFormSourceDeck.value = sourceDeck.id;
+  renderDisciplineOptions(selectedDeckId);
+  renderTopicOptions(card?.topic || "");
   elements.cardFormFront.value = card?.front || "";
   elements.cardFormBack.value = card?.back || "";
-  elements.cardFormTopic.value = card?.topic || "";
+  elements.cardFormSubtopic.value = card?.subtopic || "";
+  elements.cardFormLegalBasis.value = card?.legalBasis || "";
+  elements.cardFormType.value = card?.type || "Conceito";
+  elements.cardFormPriority.value = card?.priority || "B";
+  elements.cardFormDifficulty.value = card?.difficulty || "Médio";
   elements.cardFormTag.value = card?.tag || "";
   elements.cardFormExample.value = card?.example || "";
   elements.cardFormComplement.value = card?.complement || "";
   elements.cardFormPitfall.value = card?.pitfall || "";
   elements.cardFormMnemonic.value = card?.mnemonic || "";
   elements.cardFormSaveAddAnother.hidden = index !== null;
-  checkTopicWarning();
   elements.cardForm.hidden = false;
   elements.cardForm.scrollIntoView({ block: "nearest" });
-  elements.cardFormFront.focus();
+  elements.cardFormDiscipline.focus();
 }
 
 function closeCardForm() {
   elements.cardForm.hidden = true;
   elements.cardForm.reset();
   elements.cardFormIndex.value = "";
+  elements.cardFormSourceDeck.value = "";
   elements.cardFormTopicWarning.hidden = true;
 }
 
 function buildCardFromForm() {
   const front = elements.cardFormFront.value.trim();
   const back = elements.cardFormBack.value.trim();
-  if (!front || !back) return null;
+  const disciplineId = elements.cardFormDiscipline.value;
+  const topic = elements.cardFormTopic.value;
+  if (!front || !back || !disciplineId || !topic) return null;
 
-  const card = { front, back };
-  const topic = elements.cardFormTopic.value.trim();
+  const card = {
+    front,
+    back,
+    topic,
+    type: elements.cardFormType.value,
+    priority: elements.cardFormPriority.value,
+    difficulty: elements.cardFormDifficulty.value,
+  };
+  const subtopic = elements.cardFormSubtopic.value.trim();
+  const legalBasis = elements.cardFormLegalBasis.value.trim();
   const tag = elements.cardFormTag.value.trim();
   const example = elements.cardFormExample.value.trim();
   const complement = elements.cardFormComplement.value.trim();
   const pitfall = elements.cardFormPitfall.value.trim();
   const mnemonic = elements.cardFormMnemonic.value.trim();
-  if (topic) card.topic = topic;
+  if (subtopic) card.subtopic = subtopic;
+  if (legalBasis) card.legalBasis = legalBasis;
   if (tag) card.tag = tag;
   if (example) card.example = example;
   if (complement) card.complement = complement;
   if (pitfall) card.pitfall = pitfall;
   if (mnemonic) card.mnemonic = mnemonic;
-  return card;
+  return { card, disciplineId };
 }
 
 function handleCardFormSubmit(event) {
   event.preventDefault();
-  const newCard = buildCardFromForm();
-  if (!newCard) {
-    showToast("Preencha o enunciado e o gabarito");
+  const built = buildCardFromForm();
+  if (!built) {
+    showToast("Preencha Disciplina, Assunto, Enunciado e Gabarito");
     return;
   }
 
-  const deck = currentDeck();
+  const { card: newCard, disciplineId } = built;
+  const targetDeck = decks.find((deck) => deck.id === disciplineId);
+  const sourceDeck = decks.find((deck) => deck.id === elements.cardFormSourceDeck.value) || currentDeck();
+  if (!targetDeck || !targetDeck.topics.includes(newCard.topic)) {
+    showToast("Selecione uma disciplina e um assunto válidos do edital");
+    return;
+  }
+
   const indexValue = elements.cardFormIndex.value;
   const isEdit = indexValue !== "";
   const editingIndex = isEdit ? Number(indexValue) : -1;
-
-  const duplicateIndex = deck.cards.findIndex(
-    (card, index) => index !== editingIndex && card.front.trim().toLowerCase() === newCard.front.trim().toLowerCase()
+  const duplicateIndex = targetDeck.cards.findIndex(
+    (card, index) => !(isEdit && targetDeck.id === sourceDeck.id && index === editingIndex)
+      && card.front.trim().toLowerCase() === newCard.front.trim().toLowerCase()
   );
-  if (duplicateIndex !== -1 && !window.confirm("Já existe um cartão com este enunciado neste baralho. Salvar mesmo assim?")) {
+  if (duplicateIndex !== -1 && !window.confirm("Já existe um cartão com este enunciado nesta disciplina. Salvar mesmo assim?")) {
     return;
   }
 
   if (isEdit) {
-    const previousCard = deck.cards[editingIndex];
-    const previousKey = buildCardKey(deck.id, previousCard.front);
-    const newKey = buildCardKey(deck.id, newCard.front);
-    if (previousKey !== newKey && state.ratings[previousKey]) {
-      state.ratings[newKey] = state.ratings[previousKey];
-      delete state.ratings[previousKey];
+    const previousCard = sourceDeck.cards[editingIndex];
+    if (!previousCard) {
+      showToast("Cartão original não encontrado");
+      return;
     }
-    deck.cards[editingIndex] = newCard;
+    const previousKey = buildCardKey(sourceDeck.id, previousCard.front);
+    const newKey = buildCardKey(targetDeck.id, newCard.front);
+    if (state.ratings[previousKey]) {
+      state.ratings[newKey] = state.ratings[previousKey];
+      if (previousKey !== newKey) delete state.ratings[previousKey];
+    }
+
+    if (sourceDeck.id === targetDeck.id) {
+      sourceDeck.cards[editingIndex] = newCard;
+      persistDeckCards(sourceDeck);
+    } else {
+      sourceDeck.cards.splice(editingIndex, 1);
+      targetDeck.cards.push(newCard);
+      persistDeckCards(sourceDeck);
+      persistDeckCards(targetDeck);
+    }
   } else {
-    deck.cards.push(newCard);
+    targetDeck.cards.push(newCard);
+    persistDeckCards(targetDeck);
   }
 
-  persistDeckCards(deck);
-  renderManageCards();
+  state.deckId = targetDeck.id;
+  state.index = Math.max(0, targetDeck.cards.indexOf(newCard));
+  state.topicFilter = "";
+  renderDeckOptions();
   lastTopicDeckId = null;
   render();
+  renderManageCards();
 
   const keepOpen = !isEdit && event.submitter?.id === "card-form-save-add-another";
   if (keepOpen) {
     const topic = elements.cardFormTopic.value;
+    const selectedDiscipline = elements.cardFormDiscipline.value;
     elements.cardForm.reset();
     elements.cardFormIndex.value = "";
-    elements.cardFormTopic.value = topic;
-    checkTopicWarning();
+    elements.cardFormSourceDeck.value = targetDeck.id;
+    renderDisciplineOptions(selectedDiscipline);
+    renderTopicOptions(topic);
+    elements.cardFormType.value = "Conceito";
+    elements.cardFormPriority.value = "B";
+    elements.cardFormDifficulty.value = "Médio";
     elements.cardFormFront.focus();
     showToast("Cartão adicionado — continue digitando");
   } else {
@@ -1134,7 +1216,8 @@ elements.cardImportInput.addEventListener("change", (event) => {
 });
 elements.cardExportDeckButton.addEventListener("click", exportDeckCards);
 elements.cardListSearch.addEventListener("input", filterCardList);
-elements.cardFormTopic.addEventListener("input", checkTopicWarning);
+elements.cardFormDiscipline.addEventListener("change", () => renderTopicOptions(""));
+elements.cardFormTopic.addEventListener("change", checkTopicWarning);
 
 elements.searchInput.addEventListener("input", (event) => renderSearchResults(event.target.value));
 elements.searchInput.addEventListener("focus", (event) => renderSearchResults(event.target.value));
