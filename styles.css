@@ -1338,6 +1338,28 @@ kbd {
   padding: 20px 0;
 }
 
+.card-form-warning {
+  margin: 0;
+  color: var(--coral);
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.card-list-search {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 9px 12px;
+  font: inherit;
+  margin-top: 14px;
+}
+
+.card-list-search:focus-visible {
+  outline: 3px solid rgba(18, 89, 241, 0.26);
+  outline-offset: 1px;
+}
+
 .deck-performance-heading strong {
   flex: 0 0 auto;
   font-size: 0.74rem;

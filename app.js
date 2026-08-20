@@ -104,6 +104,7 @@ const elements = {
   importDeckButton: document.querySelector("#import-deck-button"),
   importDeckInput: document.querySelector("#import-deck-input"),
   manageCardsCount: document.querySelector("#manage-cards-count"),
+  manageCardsCoverage: document.querySelector("#manage-cards-coverage"),
   openManageCardsButton: document.querySelector("#open-manage-cards-button"),
   manageCardsDialog: document.querySelector("#manage-cards-dialog"),
   manageCardsClose: document.querySelector("#manage-cards-close"),
@@ -113,18 +114,21 @@ const elements = {
   cardImportButton: document.querySelector("#card-import-button"),
   cardImportInput: document.querySelector("#card-import-input"),
   cardExportDeckButton: document.querySelector("#card-export-deck-button"),
+  cardListSearch: document.querySelector("#card-list-search"),
   cardForm: document.querySelector("#card-form"),
   cardFormIndex: document.querySelector("#card-form-index"),
   cardFormFront: document.querySelector("#card-form-front"),
   cardFormBack: document.querySelector("#card-form-back"),
   cardFormTopic: document.querySelector("#card-form-topic"),
   cardFormTopicList: document.querySelector("#card-form-topic-list"),
+  cardFormTopicWarning: document.querySelector("#card-form-topic-warning"),
   cardFormTag: document.querySelector("#card-form-tag"),
   cardFormExample: document.querySelector("#card-form-example"),
   cardFormComplement: document.querySelector("#card-form-complement"),
   cardFormPitfall: document.querySelector("#card-form-pitfall"),
   cardFormMnemonic: document.querySelector("#card-form-mnemonic"),
   cardFormCancel: document.querySelector("#card-form-cancel"),
+  cardFormSaveAddAnother: document.querySelector("#card-form-save-add-another"),
   cardList: document.querySelector("#card-list"),
   toast: document.querySelector("#toast"),
 };
@@ -215,6 +219,27 @@ function getDeckStats(deck, cards = deck.cards) {
   }, { reviewed: 0, attempts: 0, remembered: 0 });
 }
 
+function getDeckWeight(deck) {
+  const match = deck.title.match(/·\s*([\d,]+)\s*%/);
+  return match ? parseFloat(match[1].replace(",", ".")) : null;
+}
+
+function getDecksForDisplay() {
+  const overview = decks.find((deck) => deck.id === "trt4-overview");
+  const rest = decks.filter((deck) => deck !== overview);
+  const weighted = rest.filter((deck) => getDeckWeight(deck) !== null)
+    .sort((a, b) => getDeckWeight(b) - getDeckWeight(a));
+  const unweighted = rest.filter((deck) => getDeckWeight(deck) === null);
+  return overview ? [overview, ...weighted, ...unweighted] : [...weighted, ...unweighted];
+}
+
+function getTopicCoverage(deck) {
+  if (!Array.isArray(deck.topics) || !deck.topics.length) return null;
+  const covered = new Set(deck.cards.map((card) => card.topic).filter(Boolean));
+  const coveredCount = deck.topics.filter((topic) => covered.has(topic)).length;
+  return { covered: coveredCount, total: deck.topics.length };
+}
+
 function getUniqueTopics(deck) {
   if (Array.isArray(deck.topics) && deck.topics.length) {
     return deck.topics;
@@ -301,7 +326,7 @@ function saveProgress() {
 }
 
 function renderDeckOptions() {
-  elements.deckSelect.innerHTML = decks
+  elements.deckSelect.innerHTML = getDecksForDisplay()
     .map((deck) => `<option value="${deck.id}">${escapeHtml(deck.title)}</option>`)
     .join("");
   elements.deckSelect.value = state.deckId;
@@ -434,13 +459,21 @@ function renderDashboard() {
     ? `Revisar ${wrongEntries.length} ${wrongEntries.length === 1 ? "errado" : "errados"}`
     : "Nenhum cartão errado";
 
-  const currentCount = currentDeck().cards.length;
+  const currentDeckValue = currentDeck();
+  const currentCount = currentDeckValue.cards.length;
   elements.manageCardsCount.textContent = `${currentCount} ${currentCount === 1 ? "cartão" : "cartões"}`;
+  const currentCoverage = getTopicCoverage(currentDeckValue);
+  elements.manageCardsCoverage.hidden = !currentCoverage;
+  elements.manageCardsCoverage.textContent = currentCoverage
+    ? `${currentCoverage.covered} de ${currentCoverage.total} assuntos do edital com pelo menos 1 cartão.`
+    : "";
 
-  elements.deckPerformance.innerHTML = decks.map((deck) => {
+  elements.deckPerformance.innerHTML = getDecksForDisplay().map((deck) => {
     const stats = getDeckStats(deck);
     const progress = deck.cards.length ? Math.round((stats.reviewed / deck.cards.length) * 100) : 0;
     const deckAccuracy = stats.attempts ? Math.round((stats.remembered / stats.attempts) * 100) : 0;
+    const coverage = getTopicCoverage(deck);
+    const coverageText = coverage ? ` · ${coverage.covered} de ${coverage.total} assuntos` : "";
     return `
       <article class="deck-performance-row">
         <div class="deck-performance-heading">
@@ -451,7 +484,7 @@ function renderDashboard() {
         <div class="deck-performance-track" aria-hidden="true">
           <span style="width: ${progress}%"></span>
         </div>
-        <small>${deck.cards.length === 0 ? "sem cartões" : stats.attempts ? `${deckAccuracy}% de acerto` : "ainda não iniciado"}</small>
+        <small>${deck.cards.length === 0 ? "sem cartões" : stats.attempts ? `${deckAccuracy}% de acerto` : "ainda não iniciado"}${coverageText}</small>
       </article>
     `;
   }).join("");
@@ -779,6 +812,7 @@ function removeCustomDeck(deckId) {
 
 function openManageCards() {
   closeDashboard();
+  elements.cardListSearch.value = "";
   renderManageCards();
   elements.manageCardsDialog.showModal();
   elements.manageCardsDialog.scrollTop = 0;
@@ -797,6 +831,10 @@ function renderManageCards() {
   elements.manageCardsSummary.textContent = deck.cards.length
     ? `${deck.cards.length} ${deck.cards.length === 1 ? "cartão" : "cartões"} neste baralho.`
     : "Nenhum cartão neste baralho ainda.";
+  const coverage = getTopicCoverage(deck);
+  if (coverage) {
+    elements.manageCardsSummary.textContent += ` ${coverage.covered} de ${coverage.total} assuntos do edital com cartão.`;
+  }
 
   elements.cardFormTopicList.innerHTML = getUniqueTopics(deck)
     .map((topic) => `<option value="${escapeHtml(topic)}"></option>`)
@@ -804,9 +842,10 @@ function renderManageCards() {
 
   elements.cardList.innerHTML = deck.cards.length
     ? deck.cards
-        .map(
-          (card, index) => `
-            <article class="card-list-row">
+        .map((card, index) => {
+          const searchValue = [card.front, card.back, card.topic].filter(Boolean).join(" ").toLowerCase();
+          return `
+            <article class="card-list-row" data-search="${escapeHtml(searchValue)}">
               <div class="card-list-row-main">
                 <span class="card-list-front">${escapeHtml(card.front)}</span>
                 <span class="card-list-topic">${card.topic ? escapeHtml(card.topic) : "sem assunto"}</span>
@@ -816,8 +855,8 @@ function renderManageCards() {
                 <button type="button" class="deck-remove-button" data-delete-card="${index}" aria-label="Excluir cartão">✕</button>
               </div>
             </article>
-          `
-        )
+          `;
+        })
         .join("")
     : `<p class="card-list-empty">Nenhum cartão ainda. Use "Adicionar cartão" ou "Importar cartões" para começar.</p>`;
 
@@ -827,6 +866,21 @@ function renderManageCards() {
   elements.cardList.querySelectorAll("[data-delete-card]").forEach((button) => {
     button.addEventListener("click", () => deleteCard(Number(button.dataset.deleteCard)));
   });
+  filterCardList();
+}
+
+function filterCardList() {
+  const query = elements.cardListSearch.value.trim().toLowerCase();
+  elements.cardList.querySelectorAll(".card-list-row").forEach((row) => {
+    row.hidden = Boolean(query) && !row.dataset.search.includes(query);
+  });
+}
+
+function checkTopicWarning() {
+  const deck = currentDeck();
+  const value = elements.cardFormTopic.value.trim();
+  const isUnknown = Boolean(value) && Array.isArray(deck.topics) && deck.topics.length > 0 && !deck.topics.includes(value);
+  elements.cardFormTopicWarning.hidden = !isUnknown;
 }
 
 function openCardForm(index) {
@@ -841,6 +895,8 @@ function openCardForm(index) {
   elements.cardFormComplement.value = card?.complement || "";
   elements.cardFormPitfall.value = card?.pitfall || "";
   elements.cardFormMnemonic.value = card?.mnemonic || "";
+  elements.cardFormSaveAddAnother.hidden = index !== null;
+  checkTopicWarning();
   elements.cardForm.hidden = false;
   elements.cardForm.scrollIntoView({ block: "nearest" });
   elements.cardFormFront.focus();
@@ -850,6 +906,7 @@ function closeCardForm() {
   elements.cardForm.hidden = true;
   elements.cardForm.reset();
   elements.cardFormIndex.value = "";
+  elements.cardFormTopicWarning.hidden = true;
 }
 
 function buildCardFromForm() {
@@ -884,27 +941,46 @@ function handleCardFormSubmit(event) {
   const deck = currentDeck();
   const indexValue = elements.cardFormIndex.value;
   const isEdit = indexValue !== "";
+  const editingIndex = isEdit ? Number(indexValue) : -1;
+
+  const duplicateIndex = deck.cards.findIndex(
+    (card, index) => index !== editingIndex && card.front.trim().toLowerCase() === newCard.front.trim().toLowerCase()
+  );
+  if (duplicateIndex !== -1 && !window.confirm("Já existe um cartão com este enunciado neste baralho. Salvar mesmo assim?")) {
+    return;
+  }
 
   if (isEdit) {
-    const index = Number(indexValue);
-    const previousCard = deck.cards[index];
+    const previousCard = deck.cards[editingIndex];
     const previousKey = buildCardKey(deck.id, previousCard.front);
     const newKey = buildCardKey(deck.id, newCard.front);
     if (previousKey !== newKey && state.ratings[previousKey]) {
       state.ratings[newKey] = state.ratings[previousKey];
       delete state.ratings[previousKey];
     }
-    deck.cards[index] = newCard;
+    deck.cards[editingIndex] = newCard;
   } else {
     deck.cards.push(newCard);
   }
 
   persistDeckCards(deck);
-  closeCardForm();
   renderManageCards();
   lastTopicDeckId = null;
   render();
-  showToast(isEdit ? "Cartão atualizado" : "Cartão adicionado");
+
+  const keepOpen = !isEdit && event.submitter?.id === "card-form-save-add-another";
+  if (keepOpen) {
+    const topic = elements.cardFormTopic.value;
+    elements.cardForm.reset();
+    elements.cardFormIndex.value = "";
+    elements.cardFormTopic.value = topic;
+    checkTopicWarning();
+    elements.cardFormFront.focus();
+    showToast("Cartão adicionado — continue digitando");
+  } else {
+    closeCardForm();
+    showToast(isEdit ? "Cartão atualizado" : "Cartão adicionado");
+  }
 }
 
 function deleteCard(index) {
@@ -1032,6 +1108,8 @@ elements.cardImportInput.addEventListener("change", (event) => {
   event.target.value = "";
 });
 elements.cardExportDeckButton.addEventListener("click", exportDeckCards);
+elements.cardListSearch.addEventListener("input", filterCardList);
+elements.cardFormTopic.addEventListener("input", checkTopicWarning);
 
 elements.searchInput.addEventListener("input", (event) => renderSearchResults(event.target.value));
 elements.searchInput.addEventListener("focus", (event) => renderSearchResults(event.target.value));

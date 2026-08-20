@@ -287,6 +287,7 @@
           <p class="data-section-hint" id="manage-cards-hint">
             Adicione, edite, importe ou remova cartões do baralho selecionado no topo.
           </p>
+          <p class="data-section-hint" id="manage-cards-coverage" hidden></p>
           <div class="data-section-buttons">
             <button class="data-button" id="open-manage-cards-button" type="button">Gerenciar cartões</button>
           </div>
@@ -346,6 +347,8 @@
           <button class="data-button" id="card-export-deck-button" type="button">Exportar cartões</button>
         </div>
 
+        <input type="search" class="card-list-search" id="card-list-search" placeholder="Buscar cartão neste baralho..." aria-label="Buscar cartão neste baralho" />
+
         <form class="card-form" id="card-form" hidden>
           <input type="hidden" id="card-form-index" value="" />
           <label class="card-form-field">
@@ -360,6 +363,7 @@
             <span>Assunto</span>
             <input type="text" id="card-form-topic" list="card-form-topic-list" autocomplete="off" placeholder="Escolha ou digite um assunto" />
             <datalist id="card-form-topic-list"></datalist>
+            <p class="card-form-warning" id="card-form-topic-warning" hidden>Esse assunto não está na lista do edital para este baralho. Confira a grafia ou deixe em branco.</p>
           </label>
           <label class="card-form-field">
             <span>Tag (rótulo curto, opcional)</span>
@@ -383,6 +387,7 @@
           </label>
           <div class="card-form-actions">
             <button type="button" class="data-button" id="card-form-cancel">Cancelar</button>
+            <button type="submit" class="data-button" id="card-form-save-add-another">Salvar e adicionar outro</button>
             <button type="submit" class="review-due-button" id="card-form-save">Salvar cartão</button>
           </div>
         </form>
