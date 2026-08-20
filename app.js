@@ -105,10 +105,6 @@ const elements = {
   exportButton: document.querySelector("#export-button"),
   importButton: document.querySelector("#import-button"),
   importInput: document.querySelector("#import-input"),
-  importDeckButton: document.querySelector("#import-deck-button"),
-  importDeckInput: document.querySelector("#import-deck-input"),
-  manageCardsCount: document.querySelector("#manage-cards-count"),
-  manageCardsCoverage: document.querySelector("#manage-cards-coverage"),
   openManageCardsButton: document.querySelector("#open-manage-cards-button"),
   manageCardsDialog: document.querySelector("#manage-cards-dialog"),
   manageCardsClose: document.querySelector("#manage-cards-close"),
@@ -463,15 +459,6 @@ function renderDashboard() {
     ? `Revisar ${wrongEntries.length} ${wrongEntries.length === 1 ? "errado" : "errados"}`
     : "Nenhum cartão errado";
 
-  const currentDeckValue = currentDeck();
-  const currentCount = currentDeckValue.cards.length;
-  elements.manageCardsCount.textContent = `${currentCount} ${currentCount === 1 ? "cartão" : "cartões"}`;
-  const currentCoverage = getTopicCoverage(currentDeckValue);
-  elements.manageCardsCoverage.hidden = !currentCoverage;
-  elements.manageCardsCoverage.textContent = currentCoverage
-    ? `${currentCoverage.covered} de ${currentCoverage.total} assuntos do edital com pelo menos 1 cartão.`
-    : "";
-
   elements.deckPerformance.innerHTML = getDecksForDisplay().map((deck) => {
     const stats = getDeckStats(deck);
     const progress = deck.cards.length ? Math.round((stats.reviewed / deck.cards.length) * 100) : 0;
@@ -724,76 +711,6 @@ function importProgress(file) {
   reader.readAsText(file);
 }
 
-function slugify(text) {
-  return (
-    text
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "") || "baralho"
-  );
-}
-
-function normalizeImportedDeck(raw) {
-  if (!raw || typeof raw !== "object") return null;
-  const title = typeof raw.title === "string" ? raw.title.trim() : "";
-  const cardsInput = Array.isArray(raw.cards) ? raw.cards : null;
-  if (!title || !cardsInput) return null;
-
-  const cards = cardsInput
-    .filter((card) => card && typeof card.front === "string" && card.front.trim() && typeof card.back === "string" && card.back.trim())
-    .map((card) => ({
-      front: card.front.trim(),
-      back: card.back.trim(),
-      ...(typeof card.example === "string" ? { example: card.example } : {}),
-      ...(typeof card.tag === "string" ? { tag: card.tag } : {}),
-      ...(typeof card.topic === "string" ? { topic: card.topic } : {}),
-      ...(typeof card.complement === "string" ? { complement: card.complement } : {}),
-      ...(typeof card.pitfall === "string" ? { pitfall: card.pitfall } : {}),
-      ...(typeof card.mnemonic === "string" ? { mnemonic: card.mnemonic } : {}),
-    }));
-
-  if (!cards.length) return null;
-
-  return {
-    id: `custom-${slugify(title)}-${Date.now().toString(36)}`,
-    title,
-    custom: true,
-    cards,
-  };
-}
-
-function importDeck(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      const rawDecks = Array.isArray(data) ? data : Array.isArray(data?.decks) ? data.decks : [data];
-      const imported = rawDecks.map(normalizeImportedDeck).filter(Boolean);
-      if (!imported.length) throw new Error("invalid");
-
-      imported.forEach((deck) => decks.push(deck));
-      saveCustomDecks();
-      renderDeckOptions();
-      state.deckId = imported[0].id;
-      state.index = 0;
-      state.flipped = false;
-      state.queueMode = null;
-      render();
-      showToast(
-        imported.length === 1
-          ? `Baralho "${imported[0].title}" importado com ${imported[0].cards.length} cartões`
-          : `${imported.length} baralhos importados`
-      );
-    } catch {
-      showToast("Arquivo inválido para importar baralho");
-    }
-  };
-  reader.onerror = () => showToast("Não foi possível ler o arquivo");
-  reader.readAsText(file);
-}
-
 function removeCustomDeck(deckId) {
   const deck = decks.find((entry) => entry.id === deckId && entry.custom);
   if (!deck) return;
@@ -1003,42 +920,153 @@ function deleteCard(index) {
   showToast("Cartão excluído");
 }
 
-function importCardsIntoCurrentDeck(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      const rawCards = Array.isArray(data) ? data : Array.isArray(data?.cards) ? data.cards : null;
-      if (!rawCards) throw new Error("invalid");
+const PDFJS_MODULE_URL = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
+const PDFJS_WORKER_URL = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
 
-      const cards = rawCards
-        .filter((card) => card && typeof card.front === "string" && card.front.trim() && typeof card.back === "string" && card.back.trim())
-        .map((card) => ({
-          front: card.front.trim(),
-          back: card.back.trim(),
-          ...(typeof card.example === "string" && card.example ? { example: card.example } : {}),
-          ...(typeof card.tag === "string" && card.tag ? { tag: card.tag } : {}),
-          ...(typeof card.topic === "string" && card.topic ? { topic: card.topic } : {}),
-          ...(typeof card.complement === "string" && card.complement ? { complement: card.complement } : {}),
-          ...(typeof card.pitfall === "string" && card.pitfall ? { pitfall: card.pitfall } : {}),
-          ...(typeof card.mnemonic === "string" && card.mnemonic ? { mnemonic: card.mnemonic } : {}),
-        }));
+function normalizeImportedCards(rawCards) {
+  if (!Array.isArray(rawCards)) return [];
 
-      if (!cards.length) throw new Error("invalid");
+  return rawCards
+    .filter((card) => card && typeof card.front === "string" && card.front.trim() && typeof card.back === "string" && card.back.trim())
+    .map((card) => ({
+      front: card.front.trim(),
+      back: card.back.trim(),
+      ...(typeof card.example === "string" && card.example.trim() ? { example: card.example.trim() } : {}),
+      ...(typeof card.tag === "string" && card.tag.trim() ? { tag: card.tag.trim() } : {}),
+      ...(typeof card.topic === "string" && card.topic.trim() ? { topic: card.topic.trim() } : {}),
+      ...(typeof card.complement === "string" && card.complement.trim() ? { complement: card.complement.trim() } : {}),
+      ...(typeof card.pitfall === "string" && card.pitfall.trim() ? { pitfall: card.pitfall.trim() } : {}),
+      ...(typeof card.mnemonic === "string" && card.mnemonic.trim() ? { mnemonic: card.mnemonic.trim() } : {}),
+    }));
+}
 
-      const deck = currentDeck();
-      cards.forEach((card) => deck.cards.push(card));
-      persistDeckCards(deck);
-      renderManageCards();
-      lastTopicDeckId = null;
-      render();
-      showToast(`${cards.length} ${cards.length === 1 ? "cartão importado" : "cartões importados"}`);
-    } catch {
-      showToast("Arquivo inválido para importar cartões");
+function parseLabeledPdfCards(text) {
+  const cards = [];
+  const lines = text.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+  const frontPattern = /^(?:pergunta|quest[aã]o|frente|q)\s*[:\-–—]\s*(.*)$/i;
+  const backPattern = /^(?:resposta|gabarito|verso|a)\s*[:\-–—]\s*(.*)$/i;
+  let current = null;
+  let side = null;
+
+  const finish = () => {
+    if (current?.front?.trim() && current?.back?.trim()) {
+      cards.push({ front: current.front.trim(), back: current.back.trim(), tag: "PDF" });
     }
   };
-  reader.onerror = () => showToast("Não foi possível ler o arquivo");
-  reader.readAsText(file);
+
+  lines.forEach((line) => {
+    const frontMatch = line.match(frontPattern);
+    const backMatch = line.match(backPattern);
+
+    if (frontMatch) {
+      finish();
+      current = { front: frontMatch[1], back: "" };
+      side = "front";
+    } else if (backMatch && current) {
+      current.back = backMatch[1];
+      side = "back";
+    } else if (current && side) {
+      current[side] = `${current[side]}\n${line}`.trim();
+    }
+  });
+  finish();
+  return cards;
+}
+
+function parsePdfPageFallback(text, pageNumber) {
+  const blocks = text.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean);
+  if (blocks.length >= 2) {
+    return {
+      front: blocks[0],
+      back: blocks.slice(1).join("\n\n"),
+      tag: "PDF",
+      complement: `Importado da página ${pageNumber}.`,
+    };
+  }
+
+  const lines = text.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+  if (lines.length >= 2) {
+    return {
+      front: lines[0],
+      back: lines.slice(1).join("\n"),
+      tag: "PDF",
+      complement: `Importado da página ${pageNumber}.`,
+    };
+  }
+  return null;
+}
+
+async function extractCardsFromPdf(file) {
+  const pdfjs = await import(PDFJS_MODULE_URL);
+  pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
+  const pdf = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
+  const cards = [];
+
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+    const page = await pdf.getPage(pageNumber);
+    const content = await page.getTextContent();
+    let pageText = "";
+    content.items.forEach((item) => {
+      pageText += item.str;
+      pageText += item.hasEOL ? "\n" : " ";
+    });
+    pageText = pageText.replace(/[ \t]+\n/g, "\n").replace(/[ \t]{2,}/g, " ").trim();
+    if (!pageText) continue;
+
+    const labeled = parseLabeledPdfCards(pageText);
+    if (labeled.length) {
+      cards.push(...labeled.map((card) => ({ ...card, complement: `Importado da página ${pageNumber}.` })));
+    } else {
+      const fallback = parsePdfPageFallback(pageText, pageNumber);
+      if (fallback) cards.push(fallback);
+    }
+  }
+
+  return cards;
+}
+
+function addImportedCards(cards, sourceLabel) {
+  if (!cards.length) throw new Error("empty");
+
+  const deck = currentDeck();
+  cards.forEach((card) => deck.cards.push(card));
+  persistDeckCards(deck);
+  renderManageCards();
+  lastTopicDeckId = null;
+  render();
+  showToast(`${cards.length} ${cards.length === 1 ? "cartão importado" : "cartões importados"} do ${sourceLabel}`);
+}
+
+async function importCardsIntoCurrentDeck(file) {
+  try {
+    const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+    if (isPdf) {
+      showToast("Lendo e convertendo o PDF...");
+      const cards = await extractCardsFromPdf(file);
+      if (!cards.length) throw new Error("empty-pdf");
+      const confirmed = window.confirm(
+        `O PDF gerou ${cards.length} ${cards.length === 1 ? "cartão" : "cartões""}. Deseja adicionar ao baralho atual? Você poderá revisar e editar cada cartão em seguida.`
+      );
+      if (!confirmed) {
+        showToast("Importação cancelada");
+        return;
+      }
+      addImportedCards(cards, "PDF");
+      return;
+    }
+
+    const data = JSON.parse(await file.text());
+    const rawCards = Array.isArray(data) ? data : Array.isArray(data?.cards) ? data.cards : null;
+    const cards = normalizeImportedCards(rawCards);
+    addImportedCards(cards, "JSON");
+  } catch (error) {
+    console.error("Falha ao importar cartões:", error);
+    showToast(
+      file.name.toLowerCase().endsWith(".pdf")
+        ? "Não foi possível extrair cartões deste PDF"
+        : "Arquivo JSON inválido para importar cartões"
+    );
+  }
 }
 
 function exportDeckCards() {
@@ -1090,13 +1118,6 @@ elements.importInput.addEventListener("change", (event) => {
   if (file) importProgress(file);
   event.target.value = "";
 });
-elements.importDeckButton.addEventListener("click", () => elements.importDeckInput.click());
-elements.importDeckInput.addEventListener("change", (event) => {
-  const file = event.target.files?.[0];
-  if (file) importDeck(file);
-  event.target.value = "";
-});
-
 elements.openManageCardsButton.addEventListener("click", openManageCards);
 elements.manageCardsClose.addEventListener("click", closeManageCards);
 elements.manageCardsDialog.addEventListener("click", (event) => {
@@ -1108,7 +1129,7 @@ elements.cardForm.addEventListener("submit", handleCardFormSubmit);
 elements.cardImportButton.addEventListener("click", () => elements.cardImportInput.click());
 elements.cardImportInput.addEventListener("change", (event) => {
   const file = event.target.files?.[0];
-  if (file) importCardsIntoCurrentDeck(file);
+  if (file) void importCardsIntoCurrentDeck(file);
   event.target.value = "";
 });
 elements.cardExportDeckButton.addEventListener("click", exportDeckCards);
