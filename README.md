@@ -16,6 +16,7 @@ Um leitor de flashcards local, responsivo e sem instalação, personalizado para
 - tema claro/escuro, com detecção automática da preferência do sistema;
 - exportação e importação do progresso em arquivo `.json`, para levar o histórico a outro dispositivo;
 - importação de baralhos próprios em `.json`, sem precisar editar código;
+- gerenciamento de cartões pelo próprio navegador: adicionar, editar, excluir e importar/exportar cartões de qualquer baralho (incluindo os baralhos por disciplina), sem editar `decks.js`;
 - instalação como app (PWA) e uso offline após o primeiro carregamento.
 
 ## Como abrir
@@ -42,6 +43,12 @@ Os cartões ficam definidos em `decks.js` e podem ser editados sem alterar a int
 Campos opcionais adicionais usados pelo leitor: `tag` (rótulo curto no topo do cartão), `complement`, `pitfall` e `mnemonic` (blocos extras exibidos no verso).
 
 Cada baralho já tem um array `topics` com os assuntos do edital verticalizado (usado pelo filtro de Assunto na barra de busca). Para o filtro funcionar, use exatamente uma dessas strings no campo `topic` de cada cartão que você adicionar.
+
+## Gerenciar cartões pelo navegador
+
+No painel de Desempenho, em "Cartões do baralho atual", clique em "Gerenciar cartões" para adicionar, editar ou excluir cartões do baralho selecionado no topo — inclusive os baralhos por disciplina, sem precisar editar `decks.js`. Também é possível importar cartões (`.json`, mesmo formato usado na seção abaixo) ou exportar os cartões do baralho atual.
+
+Edições em baralhos por disciplina ficam salvas no navegador (via `localStorage`) por cima do conteúdo original de `decks.js`; ao editar `decks.js` diretamente, essas edições salvas continuam valendo até serem removidas ou sobrescritas.
 
 ## Importar seu próprio baralho
 

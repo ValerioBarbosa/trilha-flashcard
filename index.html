@@ -279,6 +279,19 @@
           <div class="deck-performance" id="deck-performance"></div>
         </section>
 
+        <section class="data-section" aria-labelledby="manage-cards-section-title">
+          <div class="deck-performance-title-row">
+            <h3 id="manage-cards-section-title">Cartões do baralho atual</h3>
+            <span id="manage-cards-count">0 cartões</span>
+          </div>
+          <p class="data-section-hint" id="manage-cards-hint">
+            Adicione, edite, importe ou remova cartões do baralho selecionado no topo.
+          </p>
+          <div class="data-section-buttons">
+            <button class="data-button" id="open-manage-cards-button" type="button">Gerenciar cartões</button>
+          </div>
+        </section>
+
         <section class="data-section" aria-labelledby="data-section-title">
           <div class="deck-performance-title-row">
             <h3 id="data-section-title">Seus dados</h3>
@@ -309,6 +322,72 @@
             <input type="file" id="import-deck-input" accept="application/json" hidden />
           </div>
         </section>
+      </div>
+    </dialog>
+
+    <dialog class="dashboard-dialog manage-cards-dialog" id="manage-cards-dialog" aria-labelledby="manage-cards-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div>
+            <span class="dashboard-kicker" id="manage-cards-kicker">BARALHO</span>
+            <h2 id="manage-cards-title">Gerenciar cartões</h2>
+          </div>
+          <button class="dashboard-close" id="manage-cards-close" type="button" aria-label="Fechar">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
+          </button>
+        </header>
+
+        <p class="dashboard-intro" id="manage-cards-summary">Nenhum cartão neste baralho ainda.</p>
+
+        <div class="data-section-buttons">
+          <button class="data-button" id="card-add-button" type="button">+ Adicionar cartão</button>
+          <button class="data-button" id="card-import-button" type="button">Importar cartões (.json)</button>
+          <input type="file" id="card-import-input" accept="application/json" hidden />
+          <button class="data-button" id="card-export-deck-button" type="button">Exportar cartões</button>
+        </div>
+
+        <form class="card-form" id="card-form" hidden>
+          <input type="hidden" id="card-form-index" value="" />
+          <label class="card-form-field">
+            <span>Enunciado (frente) *</span>
+            <textarea id="card-form-front" required rows="2"></textarea>
+          </label>
+          <label class="card-form-field">
+            <span>Gabarito (verso) *</span>
+            <textarea id="card-form-back" required rows="3"></textarea>
+          </label>
+          <label class="card-form-field">
+            <span>Assunto</span>
+            <input type="text" id="card-form-topic" list="card-form-topic-list" autocomplete="off" placeholder="Escolha ou digite um assunto" />
+            <datalist id="card-form-topic-list"></datalist>
+          </label>
+          <label class="card-form-field">
+            <span>Tag (rótulo curto, opcional)</span>
+            <input type="text" id="card-form-tag" />
+          </label>
+          <label class="card-form-field">
+            <span>Exemplo / observação (opcional)</span>
+            <textarea id="card-form-example" rows="2"></textarea>
+          </label>
+          <label class="card-form-field">
+            <span>Complemento (opcional)</span>
+            <textarea id="card-form-complement" rows="2"></textarea>
+          </label>
+          <label class="card-form-field">
+            <span>Pegadinha (opcional)</span>
+            <textarea id="card-form-pitfall" rows="2"></textarea>
+          </label>
+          <label class="card-form-field">
+            <span>Macete (opcional)</span>
+            <textarea id="card-form-mnemonic" rows="2"></textarea>
+          </label>
+          <div class="card-form-actions">
+            <button type="button" class="data-button" id="card-form-cancel">Cancelar</button>
+            <button type="submit" class="review-due-button" id="card-form-save">Salvar cartão</button>
+          </div>
+        </form>
+
+        <div class="card-list" id="card-list"></div>
       </div>
     </dialog>
 
