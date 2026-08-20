@@ -337,6 +337,60 @@
 
         <form class="card-form" id="card-form" hidden>
           <input type="hidden" id="card-form-index" value="" />
+          <input type="hidden" id="card-form-source-deck" value="" />
+
+          <div class="card-form-classification-grid">
+            <label class="card-form-field">
+              <span>Disciplina *</span>
+              <select id="card-form-discipline" required>
+                <option value="">Selecione a disciplina</option>
+              </select>
+            </label>
+            <label class="card-form-field">
+              <span>Assunto *</span>
+              <select id="card-form-topic" required disabled>
+                <option value="">Selecione primeiro a disciplina</option>
+              </select>
+              <p class="card-form-warning" id="card-form-topic-warning" hidden>Selecione um assunto previsto no edital desta disciplina.</p>
+            </label>
+            <label class="card-form-field">
+              <span>Subassunto (opcional)</span>
+              <input type="text" id="card-form-subtopic" placeholder="Detalhamento do assunto" />
+            </label>
+            <label class="card-form-field">
+              <span>Fundamento legal (opcional)</span>
+              <input type="text" id="card-form-legal-basis" placeholder="Ex.: CF, art. 5º, LXVIII" />
+            </label>
+            <label class="card-form-field">
+              <span>Tipo do cartão *</span>
+              <select id="card-form-type" required>
+                <option value="Conceito">Conceito</option>
+                <option value="Lei seca">Lei seca</option>
+                <option value="Jurisprudência">Jurisprudência</option>
+                <option value="Prazo">Prazo</option>
+                <option value="Pegadinha FCC">Pegadinha FCC</option>
+                <option value="Questão">Questão</option>
+                <option value="Mnemônico">Mnemônico</option>
+              </select>
+            </label>
+            <label class="card-form-field">
+              <span>Prioridade *</span>
+              <select id="card-form-priority" required>
+                <option value="A">A — alta incidência</option>
+                <option value="B" selected>B — incidência média</option>
+                <option value="C">C — complementar</option>
+              </select>
+            </label>
+            <label class="card-form-field">
+              <span>Dificuldade *</span>
+              <select id="card-form-difficulty" required>
+                <option value="Fácil">Fácil</option>
+                <option value="Médio" selected>Médio</option>
+                <option value="Difícil">Difícil</option>
+              </select>
+            </label>
+          </div>
+
           <label class="card-form-field">
             <span>Enunciado (frente) *</span>
             <textarea id="card-form-front" required rows="2"></textarea>
@@ -344,12 +398,6 @@
           <label class="card-form-field">
             <span>Gabarito (verso) *</span>
             <textarea id="card-form-back" required rows="3"></textarea>
-          </label>
-          <label class="card-form-field">
-            <span>Assunto</span>
-            <input type="text" id="card-form-topic" list="card-form-topic-list" autocomplete="off" placeholder="Escolha ou digite um assunto" />
-            <datalist id="card-form-topic-list"></datalist>
-            <p class="card-form-warning" id="card-form-topic-warning" hidden>Esse assunto não está na lista do edital para este baralho. Confira a grafia ou deixe em branco.</p>
           </label>
           <label class="card-form-field">
             <span>Tag (rótulo curto, opcional)</span>
