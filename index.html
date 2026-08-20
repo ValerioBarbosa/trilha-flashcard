@@ -78,6 +78,20 @@
             <span>Desempenho</span>
           </button>
 
+          <button
+            class="shuffle-button"
+            id="open-manage-cards-button"
+            type="button"
+            aria-label="Gerenciar cartões do baralho atual"
+            aria-haspopup="dialog"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <rect x="4" y="5" width="16" height="14" rx="2" />
+              <path d="M8 9h8M8 13h8M8 17h5" />
+            </svg>
+            <span>Gerenciar cartões</span>
+          </button>
+
           <button class="shuffle-button" id="shuffle-button" type="button" aria-label="Embaralhar cartões">
             <svg aria-hidden="true" viewBox="0 0 24 24">
               <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
@@ -279,20 +293,6 @@
           <div class="deck-performance" id="deck-performance"></div>
         </section>
 
-        <section class="data-section" aria-labelledby="manage-cards-section-title">
-          <div class="deck-performance-title-row">
-            <h3 id="manage-cards-section-title">Cartões do baralho atual</h3>
-            <span id="manage-cards-count">0 cartões</span>
-          </div>
-          <p class="data-section-hint" id="manage-cards-hint">
-            Adicione, edite, importe ou remova cartões do baralho selecionado no topo.
-          </p>
-          <p class="data-section-hint" id="manage-cards-coverage" hidden></p>
-          <div class="data-section-buttons">
-            <button class="data-button" id="open-manage-cards-button" type="button">Gerenciar cartões</button>
-          </div>
-        </section>
-
         <section class="data-section" aria-labelledby="data-section-title">
           <div class="deck-performance-title-row">
             <h3 id="data-section-title">Seus dados</h3>
@@ -308,21 +308,7 @@
           </div>
         </section>
 
-        <section class="data-section" aria-labelledby="custom-deck-section-title">
-          <div class="deck-performance-title-row">
-            <h3 id="custom-deck-section-title">Meus baralhos</h3>
-            <span>conteúdo próprio</span>
-          </div>
-          <p class="data-section-hint">
-            Importe um arquivo <code>.json</code> com seus próprios cartões (formato:
-            <code>{"title": "...", "cards": [{"front": "...", "back": "..."}]}</code>). O baralho aparece no
-            seletor no topo e pode ser removido depois em "Progresso por disciplina".
-          </p>
-          <div class="data-section-buttons">
-            <button class="data-button" id="import-deck-button" type="button">Importar baralho</button>
-            <input type="file" id="import-deck-input" accept="application/json" hidden />
-          </div>
-        </section>
+
       </div>
     </dialog>
 
@@ -342,8 +328,8 @@
 
         <div class="data-section-buttons">
           <button class="data-button" id="card-add-button" type="button">+ Adicionar cartão</button>
-          <button class="data-button" id="card-import-button" type="button">Importar cartões (.json)</button>
-          <input type="file" id="card-import-input" accept="application/json" hidden />
+          <button class="data-button" id="card-import-button" type="button">Importar cartões (JSON ou PDF)</button>
+          <input type="file" id="card-import-input" accept="application/json,.json,application/pdf,.pdf" hidden />
           <button class="data-button" id="card-export-deck-button" type="button">Exportar cartões</button>
         </div>
 
