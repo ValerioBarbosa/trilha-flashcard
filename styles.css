@@ -1263,8 +1263,33 @@ kbd {
   color: var(--ink);
 }
 
+.card-form-classification-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--blue) 4%, var(--surface));
+  padding: 14px;
+}
+
+.card-form-classification-grid .card-form-field:first-child,
+.card-form-classification-grid .card-form-field:nth-child(2) {
+  grid-column: span 1;
+}
+
+.card-form-field select {
+  min-height: 42px;
+  appearance: auto;
+}
+
+.card-form-field select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .card-form-field textarea,
-.card-form-field input[type="text"] {
+.card-form-field input[type="text"],
+.card-form-field select {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--surface);
@@ -1276,7 +1301,8 @@ kbd {
 }
 
 .card-form-field textarea:focus-visible,
-.card-form-field input[type="text"]:focus-visible {
+.card-form-field input[type="text"]:focus-visible,
+.card-form-field select:focus-visible {
   outline: 3px solid rgba(18, 89, 241, 0.26);
   outline-offset: 1px;
 }
@@ -1593,6 +1619,11 @@ kbd {
 
   .metric-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .card-form-classification-grid {
+    grid-template-columns: 1fr;
+    padding: 12px;
   }
 
   .metric-card {
