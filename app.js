@@ -49,6 +49,7 @@ const elements = {
   searchInput: document.querySelector("#search-input"),
   searchClear: document.querySelector("#search-clear"),
   searchResults: document.querySelector("#search-results"),
+  topicSelect: document.querySelector("#topic-select"),
   dashboardButton: document.querySelector("#dashboard-button"),
   dashboardDialog: document.querySelector("#dashboard-dialog"),
   dashboardClose: document.querySelector("#dashboard-close"),
@@ -93,9 +94,11 @@ const state = {
     ? [...new Set(savedState.activity.filter((date) => typeof date === "string"))]
     : [],
   queueMode: null,
+  topicFilter: "",
 };
 
 let toastTimer;
+let lastTopicDeckId = null;
 
 function applyTheme(theme) {
   if (theme === "dark" || theme === "light") {
@@ -142,8 +145,8 @@ function allCardEntries() {
   })));
 }
 
-function getDeckStats(deck) {
-  return deck.cards.reduce((stats, card) => {
+function getDeckStats(deck, cards = deck.cards) {
+  return cards.reduce((stats, card) => {
     const rating = state.ratings[cardKey(deck, card)];
     if (!rating?.attempts) return stats;
     stats.reviewed += 1;
@@ -151,6 +154,42 @@ function getDeckStats(deck) {
     stats.remembered += rating.remembered || 0;
     return stats;
   }, { reviewed: 0, attempts: 0, remembered: 0 });
+}
+
+function getUniqueTopics(deck) {
+  const seen = new Set();
+  const topics = [];
+  deck.cards.forEach((card) => {
+    if (card.topic && !seen.has(card.topic)) {
+      seen.add(card.topic);
+      topics.push(card.topic);
+    }
+  });
+  return topics;
+}
+
+function syncTopicOptions() {
+  const deck = currentDeck();
+  if (deck.id !== lastTopicDeckId) {
+    lastTopicDeckId = deck.id;
+    state.topicFilter = "";
+    const topics = getUniqueTopics(deck);
+    elements.topicSelect.innerHTML = ['<option value="">Todos os assuntos</option>']
+      .concat(topics.map((topic) => `<option value="${escapeHtml(topic)}">${escapeHtml(topic)}</option>`))
+      .join("");
+    elements.topicSelect.disabled = topics.length === 0;
+  }
+  elements.topicSelect.value = state.topicFilter;
+}
+
+function getFilteredIndices() {
+  const deck = currentDeck();
+  if (!state.topicFilter) return deck.cards.map((_, index) => index);
+  const indices = [];
+  deck.cards.forEach((card, index) => {
+    if (card.topic === state.topicFilter) indices.push(index);
+  });
+  return indices.length ? indices : deck.cards.map((_, index) => index);
 }
 
 function getDueEntries(now = Date.now()) {
@@ -208,9 +247,11 @@ function renderDeckOptions() {
 
 function renderProgress() {
   const deck = currentDeck();
-  const total = deck.cards.length;
-  const stats = getDeckStats(deck);
-  elements.progressLabel.textContent = `${state.index + 1} de ${total}`;
+  const indices = getFilteredIndices();
+  const total = indices.length;
+  const stats = getDeckStats(deck, indices.map((index) => deck.cards[index]));
+  const position = indices.indexOf(state.index);
+  elements.progressLabel.textContent = `${(position === -1 ? 0 : position) + 1} de ${total}`;
   elements.sessionScore.textContent = stats.attempts === 0
     ? "0 estudados"
     : `${stats.remembered} de ${stats.attempts} lembrados`;
@@ -218,18 +259,20 @@ function renderProgress() {
   elements.progressTrack.setAttribute("aria-valuemax", String(total));
   elements.progressTrack.setAttribute("aria-valuenow", String(stats.reviewed));
   elements.progressTrack.setAttribute("aria-valuetext", `${stats.reviewed} de ${total} cartões revisados`);
-  elements.progressTrack.innerHTML = deck.cards
-    .map((card, index) => {
+  elements.progressTrack.innerHTML = indices
+    .map((cardIndex) => {
+      const card = deck.cards[cardIndex];
       const wasReviewed = Boolean(state.ratings[cardKey(deck, card)]?.attempts);
-      const status = index === state.index ? "current" : wasReviewed ? "complete" : "";
+      const status = cardIndex === state.index ? "current" : wasReviewed ? "complete" : "";
       return `<span class="progress-segment ${status}" aria-hidden="true"></span>`;
     })
     .join("");
   elements.sessionCount.textContent = `${stats.reviewed} de ${total}`;
-  elements.sessionDots.innerHTML = deck.cards
-    .map((card, index) => {
+  elements.sessionDots.innerHTML = indices
+    .map((cardIndex) => {
+      const card = deck.cards[cardIndex];
       const wasReviewed = Boolean(state.ratings[cardKey(deck, card)]?.attempts);
-      const status = index === state.index ? "current" : wasReviewed ? "complete" : "";
+      const status = cardIndex === state.index ? "current" : wasReviewed ? "complete" : "";
       return `<span class="session-dot ${status}"></span>`;
     })
     .join("");
@@ -331,6 +374,7 @@ function render() {
   state.index = Math.min(Math.max(state.index, 0), currentDeck().cards.length - 1);
   elements.deckSelect.value = state.deckId;
   elements.deckSourceNote.textContent = currentDeck().sourceNote || "";
+  syncTopicOptions();
   renderProgress();
   renderCard();
   renderDashboard();
@@ -350,8 +394,11 @@ function toggleCard() {
 }
 
 function move(direction) {
-  const total = currentDeck().cards.length;
-  state.index = (state.index + direction + total) % total;
+  const indices = getFilteredIndices();
+  const position = indices.indexOf(state.index);
+  const fromPosition = position === -1 ? 0 : position;
+  const nextPosition = (fromPosition + direction + indices.length) % indices.length;
+  state.index = indices[nextPosition];
   state.flipped = false;
   render();
 }
@@ -360,6 +407,7 @@ function goToEntry(entry) {
   state.deckId = entry.deck.id;
   state.index = entry.index;
   state.flipped = false;
+  state.topicFilter = "";
   render();
 }
 
@@ -402,6 +450,7 @@ function shuffleCards() {
   state.index = 0;
   state.flipped = false;
   state.queueMode = null;
+  state.topicFilter = "";
   render();
   showToast("Baralho embaralhado");
 }
@@ -686,6 +735,14 @@ document.addEventListener("click", (event) => {
 });
 elements.searchInput.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeSearchResults();
+});
+
+elements.topicSelect.addEventListener("change", (event) => {
+  state.topicFilter = event.target.value;
+  const indices = getFilteredIndices();
+  state.index = indices.includes(state.index) ? state.index : indices[0];
+  state.flipped = false;
+  render();
 });
 
 document.addEventListener("keydown", (event) => {
