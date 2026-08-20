@@ -88,23 +88,35 @@
       </header>
 
       <section class="study-area" aria-live="polite">
-        <div class="search-bar" role="search">
-          <svg aria-hidden="true" viewBox="0 0 24 24" class="search-icon">
-            <circle cx="10.5" cy="10.5" r="6.5" />
-            <path d="m20 20-4.6-4.6" />
-          </svg>
-          <input
-            type="search"
-            id="search-input"
-            class="search-input"
-            placeholder="Buscar cartão por palavra-chave ou tag"
-            aria-label="Buscar cartão por palavra-chave ou tag"
-            autocomplete="off"
-          />
-          <button type="button" id="search-clear" class="search-clear" aria-label="Limpar busca" hidden>
-            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
-          </button>
-          <div class="search-results" id="search-results" role="listbox" aria-label="Resultados da busca" hidden></div>
+        <div class="filter-row">
+          <div class="search-bar" role="search">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="search-icon">
+              <circle cx="10.5" cy="10.5" r="6.5" />
+              <path d="m20 20-4.6-4.6" />
+            </svg>
+            <input
+              type="search"
+              id="search-input"
+              class="search-input"
+              placeholder="Buscar cartão por palavra-chave ou tag"
+              aria-label="Buscar cartão por palavra-chave ou tag"
+              autocomplete="off"
+            />
+            <button type="button" id="search-clear" class="search-clear" aria-label="Limpar busca" hidden>
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
+            </button>
+            <div class="search-results" id="search-results" role="listbox" aria-label="Resultados da busca" hidden></div>
+          </div>
+
+          <label class="topic-picker">
+            <span class="sr-only">Filtrar por assunto</span>
+            <select id="topic-select" aria-label="Filtrar por assunto">
+              <option value="">Todos os assuntos</option>
+            </select>
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="m7 9.5 5 5 5-5" />
+            </svg>
+          </label>
         </div>
 
         <div class="progress-heading">
@@ -281,11 +293,28 @@
             <input type="file" id="import-input" accept="application/json" hidden />
           </div>
         </section>
+
+        <section class="data-section" aria-labelledby="custom-deck-section-title">
+          <div class="deck-performance-title-row">
+            <h3 id="custom-deck-section-title">Meus baralhos</h3>
+            <span>conteúdo próprio</span>
+          </div>
+          <p class="data-section-hint">
+            Importe um arquivo <code>.json</code> com seus próprios cartões (formato:
+            <code>{"title": "...", "cards": [{"front": "...", "back": "..."}]}</code>). O baralho aparece no
+            seletor no topo e pode ser removido depois em "Progresso por disciplina".
+          </p>
+          <div class="data-section-buttons">
+            <button class="data-button" id="import-deck-button" type="button">Importar baralho</button>
+            <input type="file" id="import-deck-input" accept="application/json" hidden />
+          </div>
+        </section>
       </div>
     </dialog>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="decks.js"></script>
+    <script src="spaced-repetition.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

@@ -1,7 +1,22 @@
-const decks = trt4Decks;
 const STORAGE_KEY = "trilha-flashcard-state";
 const THEME_STORAGE_KEY = "trilha-flashcard-theme";
-const REVIEW_INTERVAL_DAYS = [1, 7, 30];
+const CUSTOM_DECKS_KEY = "trilha-flashcard-custom-decks";
+const { dateKey, cardKey: buildCardKey, computeNextRating, isDue, isWrong, getStudyStreak: computeStudyStreak } = SpacedRepetition;
+
+function loadCustomDecks() {
+  try {
+    const value = JSON.parse(localStorage.getItem(CUSTOM_DECKS_KEY) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomDecks() {
+  localStorage.setItem(CUSTOM_DECKS_KEY, JSON.stringify(decks.filter((deck) => deck.custom)));
+}
+
+const decks = [...trt4Decks, ...loadCustomDecks()];
 
 const elements = {
   deckSelect: document.querySelector("#deck-select"),
@@ -34,6 +49,7 @@ const elements = {
   searchInput: document.querySelector("#search-input"),
   searchClear: document.querySelector("#search-clear"),
   searchResults: document.querySelector("#search-results"),
+  topicSelect: document.querySelector("#topic-select"),
   dashboardButton: document.querySelector("#dashboard-button"),
   dashboardDialog: document.querySelector("#dashboard-dialog"),
   dashboardClose: document.querySelector("#dashboard-close"),
@@ -50,6 +66,8 @@ const elements = {
   exportButton: document.querySelector("#export-button"),
   importButton: document.querySelector("#import-button"),
   importInput: document.querySelector("#import-input"),
+  importDeckButton: document.querySelector("#import-deck-button"),
+  importDeckInput: document.querySelector("#import-deck-input"),
   toast: document.querySelector("#toast"),
 };
 
@@ -76,9 +94,11 @@ const state = {
     ? [...new Set(savedState.activity.filter((date) => typeof date === "string"))]
     : [],
   queueMode: null,
+  topicFilter: "",
 };
 
 let toastTimer;
+let lastTopicDeckId = null;
 
 function applyTheme(theme) {
   if (theme === "dark" || theme === "light") {
@@ -109,7 +129,7 @@ function currentCard() {
 }
 
 function cardKey(deck, card) {
-  return `${deck.id}::${card.front}`;
+  return buildCardKey(deck.id, card.front);
 }
 
 function currentCardKey() {
@@ -125,8 +145,8 @@ function allCardEntries() {
   })));
 }
 
-function getDeckStats(deck) {
-  return deck.cards.reduce((stats, card) => {
+function getDeckStats(deck, cards = deck.cards) {
+  return cards.reduce((stats, card) => {
     const rating = state.ratings[cardKey(deck, card)];
     if (!rating?.attempts) return stats;
     stats.reviewed += 1;
@@ -136,12 +156,45 @@ function getDeckStats(deck) {
   }, { reviewed: 0, attempts: 0, remembered: 0 });
 }
 
+function getUniqueTopics(deck) {
+  const seen = new Set();
+  const topics = [];
+  deck.cards.forEach((card) => {
+    if (card.topic && !seen.has(card.topic)) {
+      seen.add(card.topic);
+      topics.push(card.topic);
+    }
+  });
+  return topics;
+}
+
+function syncTopicOptions() {
+  const deck = currentDeck();
+  if (deck.id !== lastTopicDeckId) {
+    lastTopicDeckId = deck.id;
+    state.topicFilter = "";
+    const topics = getUniqueTopics(deck);
+    elements.topicSelect.innerHTML = ['<option value="">Todos os assuntos</option>']
+      .concat(topics.map((topic) => `<option value="${escapeHtml(topic)}">${escapeHtml(topic)}</option>`))
+      .join("");
+    elements.topicSelect.disabled = topics.length === 0;
+  }
+  elements.topicSelect.value = state.topicFilter;
+}
+
+function getFilteredIndices() {
+  const deck = currentDeck();
+  if (!state.topicFilter) return deck.cards.map((_, index) => index);
+  const indices = [];
+  deck.cards.forEach((card, index) => {
+    if (card.topic === state.topicFilter) indices.push(index);
+  });
+  return indices.length ? indices : deck.cards.map((_, index) => index);
+}
+
 function getDueEntries(now = Date.now()) {
   return allCardEntries()
-    .filter(({ key }) => {
-      const rating = state.ratings[key];
-      return rating?.nextReview && new Date(rating.nextReview).getTime() <= now;
-    })
+    .filter(({ key }) => isDue(state.ratings[key], now))
     .sort((first, second) => (
       new Date(state.ratings[first.key].nextReview).getTime()
       - new Date(state.ratings[second.key].nextReview).getTime()
@@ -150,7 +203,7 @@ function getDueEntries(now = Date.now()) {
 
 function getWrongEntries() {
   return allCardEntries()
-    .filter(({ key }) => state.ratings[key]?.lastResult === "forgot")
+    .filter(({ key }) => isWrong(state.ratings[key]))
     .sort((first, second) => (
       new Date(state.ratings[first.key].lastReviewed).getTime()
       - new Date(state.ratings[second.key].lastReviewed).getTime()
@@ -165,13 +218,6 @@ function getNextReview() {
     .sort((first, second) => first - second)[0] || null;
 }
 
-function dateKey(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
 function registerActivity() {
   const today = dateKey();
   if (!state.activity.includes(today)) state.activity.push(today);
@@ -179,21 +225,7 @@ function registerActivity() {
 }
 
 function getStudyStreak() {
-  const studiedDates = new Set(state.activity);
-  const cursor = new Date();
-  cursor.setHours(12, 0, 0, 0);
-
-  if (!studiedDates.has(dateKey(cursor))) {
-    cursor.setDate(cursor.getDate() - 1);
-    if (!studiedDates.has(dateKey(cursor))) return 0;
-  }
-
-  let streak = 0;
-  while (studiedDates.has(dateKey(cursor))) {
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return streak;
+  return computeStudyStreak(state.activity);
 }
 
 function saveProgress() {
@@ -208,16 +240,18 @@ function saveProgress() {
 
 function renderDeckOptions() {
   elements.deckSelect.innerHTML = decks
-    .map((deck) => `<option value="${deck.id}">${deck.title}</option>`)
+    .map((deck) => `<option value="${deck.id}">${escapeHtml(deck.title)}</option>`)
     .join("");
   elements.deckSelect.value = state.deckId;
 }
 
 function renderProgress() {
   const deck = currentDeck();
-  const total = deck.cards.length;
-  const stats = getDeckStats(deck);
-  elements.progressLabel.textContent = `${state.index + 1} de ${total}`;
+  const indices = getFilteredIndices();
+  const total = indices.length;
+  const stats = getDeckStats(deck, indices.map((index) => deck.cards[index]));
+  const position = indices.indexOf(state.index);
+  elements.progressLabel.textContent = `${(position === -1 ? 0 : position) + 1} de ${total}`;
   elements.sessionScore.textContent = stats.attempts === 0
     ? "0 estudados"
     : `${stats.remembered} de ${stats.attempts} lembrados`;
@@ -225,18 +259,20 @@ function renderProgress() {
   elements.progressTrack.setAttribute("aria-valuemax", String(total));
   elements.progressTrack.setAttribute("aria-valuenow", String(stats.reviewed));
   elements.progressTrack.setAttribute("aria-valuetext", `${stats.reviewed} de ${total} cartões revisados`);
-  elements.progressTrack.innerHTML = deck.cards
-    .map((card, index) => {
+  elements.progressTrack.innerHTML = indices
+    .map((cardIndex) => {
+      const card = deck.cards[cardIndex];
       const wasReviewed = Boolean(state.ratings[cardKey(deck, card)]?.attempts);
-      const status = index === state.index ? "current" : wasReviewed ? "complete" : "";
+      const status = cardIndex === state.index ? "current" : wasReviewed ? "complete" : "";
       return `<span class="progress-segment ${status}" aria-hidden="true"></span>`;
     })
     .join("");
   elements.sessionCount.textContent = `${stats.reviewed} de ${total}`;
-  elements.sessionDots.innerHTML = deck.cards
-    .map((card, index) => {
+  elements.sessionDots.innerHTML = indices
+    .map((cardIndex) => {
+      const card = deck.cards[cardIndex];
       const wasReviewed = Boolean(state.ratings[cardKey(deck, card)]?.attempts);
-      const status = index === state.index ? "current" : wasReviewed ? "complete" : "";
+      const status = cardIndex === state.index ? "current" : wasReviewed ? "complete" : "";
       return `<span class="session-dot ${status}"></span>`;
     })
     .join("");
@@ -318,7 +354,8 @@ function renderDashboard() {
     return `
       <article class="deck-performance-row">
         <div class="deck-performance-heading">
-          <span>${deck.title}</span>
+          <span>${escapeHtml(deck.title)}</span>
+          ${deck.custom ? `<button type="button" class="deck-remove-button" data-remove-deck="${escapeHtml(deck.id)}" aria-label="Remover baralho ${escapeHtml(deck.title)}">✕</button>` : ""}
           <strong>${stats.reviewed}/${deck.cards.length}</strong>
         </div>
         <div class="deck-performance-track" aria-hidden="true">
@@ -328,12 +365,16 @@ function renderDashboard() {
       </article>
     `;
   }).join("");
+  elements.deckPerformance.querySelectorAll("[data-remove-deck]").forEach((button) => {
+    button.addEventListener("click", () => removeCustomDeck(button.dataset.removeDeck));
+  });
 }
 
 function render() {
   state.index = Math.min(Math.max(state.index, 0), currentDeck().cards.length - 1);
   elements.deckSelect.value = state.deckId;
   elements.deckSourceNote.textContent = currentDeck().sourceNote || "";
+  syncTopicOptions();
   renderProgress();
   renderCard();
   renderDashboard();
@@ -353,8 +394,11 @@ function toggleCard() {
 }
 
 function move(direction) {
-  const total = currentDeck().cards.length;
-  state.index = (state.index + direction + total) % total;
+  const indices = getFilteredIndices();
+  const position = indices.indexOf(state.index);
+  const fromPosition = position === -1 ? 0 : position;
+  const nextPosition = (fromPosition + direction + indices.length) % indices.length;
+  state.index = indices[nextPosition];
   state.flipped = false;
   render();
 }
@@ -363,25 +407,14 @@ function goToEntry(entry) {
   state.deckId = entry.deck.id;
   state.index = entry.index;
   state.flipped = false;
+  state.topicFilter = "";
   render();
 }
 
 function rateCard(didRemember) {
   const now = new Date();
   const key = currentCardKey();
-  const previous = state.ratings[key] || { attempts: 0, remembered: 0, stage: 0 };
-  const intervalIndex = Math.min(previous.stage || 0, REVIEW_INTERVAL_DAYS.length - 1);
-  const intervalDays = didRemember ? REVIEW_INTERVAL_DAYS[intervalIndex] : 1;
-  const nextReview = new Date(now.getTime() + intervalDays * 86400000);
-
-  state.ratings[key] = {
-    attempts: previous.attempts + 1,
-    remembered: (previous.remembered || 0) + (didRemember ? 1 : 0),
-    stage: didRemember ? Math.min((previous.stage || 0) + 1, REVIEW_INTERVAL_DAYS.length) : 0,
-    lastResult: didRemember ? "remembered" : "forgot",
-    lastReviewed: now.toISOString(),
-    nextReview: nextReview.toISOString(),
-  };
+  state.ratings[key] = computeNextRating(state.ratings[key], didRemember, now);
   registerActivity();
   renderProgress();
   renderDashboard();
@@ -417,6 +450,7 @@ function shuffleCards() {
   state.index = 0;
   state.flipped = false;
   state.queueMode = null;
+  state.topicFilter = "";
   render();
   showToast("Baralho embaralhado");
 }
@@ -560,6 +594,96 @@ function importProgress(file) {
   reader.readAsText(file);
 }
 
+function slugify(text) {
+  return (
+    text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "baralho"
+  );
+}
+
+function normalizeImportedDeck(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const title = typeof raw.title === "string" ? raw.title.trim() : "";
+  const cardsInput = Array.isArray(raw.cards) ? raw.cards : null;
+  if (!title || !cardsInput) return null;
+
+  const cards = cardsInput
+    .filter((card) => card && typeof card.front === "string" && card.front.trim() && typeof card.back === "string" && card.back.trim())
+    .map((card) => ({
+      front: card.front.trim(),
+      back: card.back.trim(),
+      ...(typeof card.example === "string" ? { example: card.example } : {}),
+      ...(typeof card.tag === "string" ? { tag: card.tag } : {}),
+      ...(typeof card.topic === "string" ? { topic: card.topic } : {}),
+      ...(typeof card.complement === "string" ? { complement: card.complement } : {}),
+      ...(typeof card.pitfall === "string" ? { pitfall: card.pitfall } : {}),
+      ...(typeof card.mnemonic === "string" ? { mnemonic: card.mnemonic } : {}),
+    }));
+
+  if (!cards.length) return null;
+
+  return {
+    id: `custom-${slugify(title)}-${Date.now().toString(36)}`,
+    title,
+    custom: true,
+    cards,
+  };
+}
+
+function importDeck(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      const rawDecks = Array.isArray(data) ? data : Array.isArray(data?.decks) ? data.decks : [data];
+      const imported = rawDecks.map(normalizeImportedDeck).filter(Boolean);
+      if (!imported.length) throw new Error("invalid");
+
+      imported.forEach((deck) => decks.push(deck));
+      saveCustomDecks();
+      renderDeckOptions();
+      state.deckId = imported[0].id;
+      state.index = 0;
+      state.flipped = false;
+      state.queueMode = null;
+      render();
+      showToast(
+        imported.length === 1
+          ? `Baralho "${imported[0].title}" importado com ${imported[0].cards.length} cartões`
+          : `${imported.length} baralhos importados`
+      );
+    } catch {
+      showToast("Arquivo inválido para importar baralho");
+    }
+  };
+  reader.onerror = () => showToast("Não foi possível ler o arquivo");
+  reader.readAsText(file);
+}
+
+function removeCustomDeck(deckId) {
+  const deck = decks.find((entry) => entry.id === deckId && entry.custom);
+  if (!deck) return;
+  if (!window.confirm(`Remover o baralho "${deck.title}"? O progresso salvo dele também será apagado.`)) return;
+
+  decks.splice(decks.indexOf(deck), 1);
+  deck.cards.forEach((card) => {
+    delete state.ratings[buildCardKey(deck.id, card.front)];
+  });
+  saveCustomDecks();
+
+  if (state.deckId === deckId) {
+    state.deckId = decks[0].id;
+    state.index = 0;
+  }
+  renderDeckOptions();
+  render();
+  showToast("Baralho removido");
+}
+
 elements.deckSelect.addEventListener("change", (event) => {
   state.deckId = event.target.value;
   state.index = 0;
@@ -590,6 +714,12 @@ elements.importInput.addEventListener("change", (event) => {
   if (file) importProgress(file);
   event.target.value = "";
 });
+elements.importDeckButton.addEventListener("click", () => elements.importDeckInput.click());
+elements.importDeckInput.addEventListener("change", (event) => {
+  const file = event.target.files?.[0];
+  if (file) importDeck(file);
+  event.target.value = "";
+});
 
 elements.searchInput.addEventListener("input", (event) => renderSearchResults(event.target.value));
 elements.searchInput.addEventListener("focus", (event) => renderSearchResults(event.target.value));
@@ -605,6 +735,14 @@ document.addEventListener("click", (event) => {
 });
 elements.searchInput.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeSearchResults();
+});
+
+elements.topicSelect.addEventListener("change", (event) => {
+  state.topicFilter = event.target.value;
+  const indices = getFilteredIndices();
+  state.index = indices.includes(state.index) ? state.index : indices[0];
+  state.flipped = false;
+  render();
 });
 
 document.addEventListener("keydown", (event) => {
