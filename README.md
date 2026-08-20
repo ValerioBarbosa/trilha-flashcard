@@ -41,6 +41,8 @@ Os cartões ficam definidos em `decks.js` e podem ser editados sem alterar a int
 
 Campos opcionais adicionais usados pelo leitor: `tag` (rótulo curto no topo do cartão), `complement`, `pitfall` e `mnemonic` (blocos extras exibidos no verso).
 
+Cada baralho já tem um array `topics` com os assuntos do edital verticalizado (usado pelo filtro de Assunto na barra de busca). Para o filtro funcionar, use exatamente uma dessas strings no campo `topic` de cada cartão que você adicionar.
+
 ## Importar seu próprio baralho
 
 No painel de Desempenho, em "Meus baralhos", importe um arquivo `.json` no formato:
