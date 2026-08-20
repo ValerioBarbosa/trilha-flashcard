@@ -1411,6 +1411,39 @@ kbd {
   font-size: 0.68rem;
 }
 
+.install-dialog {
+  width: min(560px, calc(100vw - 32px));
+}
+
+.install-steps {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0;
+  padding-left: 24px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.install-steps li::marker {
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.install-note {
+  margin: 0 0 20px;
+  border-left: 3px solid var(--blue);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--blue) 6%, var(--surface-2));
+  padding: 12px 14px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.install-confirm-button {
+  width: 100%;
+}
+
 @media (max-width: 1420px) {
   .session-progress {
     display: none;
