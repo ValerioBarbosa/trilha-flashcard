@@ -1045,7 +1045,7 @@ async function importCardsIntoCurrentDeck(file) {
       const cards = await extractCardsFromPdf(file);
       if (!cards.length) throw new Error("empty-pdf");
       const confirmed = window.confirm(
-        `O PDF gerou ${cards.length} ${cards.length === 1 ? "cartão" : "cartões""}. Deseja adicionar ao baralho atual? Você poderá revisar e editar cada cartão em seguida.`
+        `O PDF gerou ${cards.length} ${cards.length === 1 ? "cartão" : "cartões"}. Deseja adicionar ao baralho atual? Você poderá revisar e editar cada cartão em seguida.`
       );
       if (!confirmed) {
         showToast("Importação cancelada");
