@@ -158,6 +158,9 @@ function getDeckStats(deck, cards = deck.cards) {
 }
 
 function getUniqueTopics(deck) {
+  if (Array.isArray(deck.topics) && deck.topics.length) {
+    return deck.topics;
+  }
   const seen = new Set();
   const topics = [];
   deck.cards.forEach((card) => {
