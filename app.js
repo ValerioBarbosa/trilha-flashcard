@@ -174,7 +174,9 @@ function openInstallDialog() {
 
   elements.installSteps.innerHTML = isIOS
     ? "<li>Abra esta página no Safari.</li><li>Toque no botão Compartilhar.</li><li>Escolha “Adicionar à Tela de Início”.</li><li>Toque em “Adicionar”.</li>"
-    : "<li>Toque em “Instalar agora” abaixo.</li><li>Confirme a instalação apresentada pelo navegador.</li><li>Abra o Trilha Flashcard pela tela inicial.</li>";
+    : deferredInstallPrompt
+      ? "<li>Toque em “Instalar agora” abaixo.</li><li>Confirme a instalação apresentada pelo navegador.</li><li>Abra o Trilha Flashcard pela tela inicial.</li>"
+      : "<li>Abra o menu do navegador.</li><li>Escolha “Instalar aplicativo” ou “Adicionar à tela inicial”.</li><li>Confirme a instalação.</li>";
 
   elements.installConfirmButton.hidden = !deferredInstallPrompt || isIOS;
   elements.installDialog.showModal();
