@@ -47,7 +47,11 @@ const decks = [...trt4Decks, ...loadCustomDecks()];
 (function applyBuiltinOverrides() {
   const overrides = loadBuiltinOverrides();
   decks.forEach((deck) => {
-    if (!deck.custom && Array.isArray(overrides[deck.id])) {
+    if (
+      !deck.custom
+      && Array.isArray(overrides[deck.id])
+      && (overrides[deck.id].length > 0 || deck.cards.length === 0)
+    ) {
       deck.cards = overrides[deck.id];
     }
   });

@@ -8,7 +8,48 @@ const trt4Decks = [
       "Prioridades A/B/C e núcleo duro",
       "Edital 2022 × atualização 2026",
     ],
-    cards: [],
+    cards: [
+          {
+                "front": "Como usar um flashcard?",
+                "back": "Leia o enunciado, tente responder sem consultar material e só depois revele o gabarito.",
+                "topic": "Dashboard de preparação por disciplina",
+                "tag": "COMECE AQUI",
+                "example": "Recuperar a informação da memória é mais eficaz do que apenas reler."
+          },
+          {
+                "front": "O que fazer quando eu não lembrar a resposta?",
+                "back": "Marque “Não lembrei”. O cartão entrará novamente no ciclo de revisão.",
+                "topic": "Dashboard de preparação por disciplina",
+                "tag": "MÉTODO",
+                "pitfall": "Não marque “Lembrei” apenas porque a resposta pareceu familiar depois de revelada."
+          },
+          {
+                "front": "Quando devo marcar “Lembrei”?",
+                "back": "Quando você conseguir recuperar a ideia central antes de revelar o gabarito.",
+                "topic": "Dashboard de preparação por disciplina",
+                "tag": "MÉTODO"
+          },
+          {
+                "front": "Como funciona a revisão espaçada?",
+                "back": "O aplicativo registra seu desempenho e agenda revisões futuras para combater o esquecimento.",
+                "topic": "Prioridades A/B/C e núcleo duro",
+                "tag": "REVISÃO",
+                "mnemonic": "Revisar antes de esquecer custa menos do que reaprender."
+          },
+          {
+                "front": "Qual deve ser a prioridade inicial no TRT-4 AJAJ?",
+                "back": "Comece pelas disciplinas de maior peso e maior recorrência, sem abandonar o núcleo básico.",
+                "topic": "Prioridades A/B/C e núcleo duro",
+                "tag": "ESTRATÉGIA",
+                "complement": "Processo do Trabalho, Português, Direito Administrativo e Direito do Trabalho concentram a maior parte da preparação indicada no aplicativo."
+          },
+          {
+                "front": "Para que serve o painel Desempenho?",
+                "back": "Para acompanhar cartões revisados, taxa de acerto, revisões pendentes, sequência e cobertura por disciplina.",
+                "topic": "Dashboard de preparação por disciplina",
+                "tag": "DESEMPENHO"
+          }
+    ],
   },
   {
     id: "labor-procedure",
@@ -49,7 +90,113 @@ const trt4Decks = [
       "Jurisprudência trabalhista",
       "Pagamento a dependentes e assistência judiciária",
     ],
-    cards: [],
+    cards: [
+          {
+                "front": "Qual é a competência material central da Justiça do Trabalho?",
+                "back": "Processar e julgar as ações oriundas da relação de trabalho, além das demais hipóteses do art. 114 da Constituição.",
+                "topic": "Organização e competência da Justiça do Trabalho",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 114."
+          },
+          {
+                "front": "O CPC pode ser aplicado ao processo do trabalho?",
+                "back": "Sim, de forma subsidiária e supletiva, quando houver compatibilidade com o processo trabalhista.",
+                "topic": "Princípios; aplicação subsidiária/supletiva do CPC",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 769, e CPC, art. 15."
+          },
+          {
+                "front": "Qual é o prazo prescricional trabalhista básico?",
+                "back": "Cinco anos durante o contrato, limitado a dois anos após a extinção do vínculo para ajuizar a ação.",
+                "topic": "Prescrição, decadência e prescrição intercorrente",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 7º, XXIX."
+          },
+          {
+                "front": "Qual é o prazo da prescrição intercorrente no processo do trabalho?",
+                "back": "Dois anos.",
+                "topic": "Prescrição, decadência e prescrição intercorrente",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 11-A."
+          },
+          {
+                "front": "Como são contados os prazos processuais trabalhistas?",
+                "back": "Em dias úteis, excluindo-se o dia do começo e incluindo-se o dia do vencimento.",
+                "topic": "Atos, termos e prazos processuais",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, arts. 775 e 775-A."
+          },
+          {
+                "front": "O jus postulandi alcança o TST?",
+                "back": "Não. Limita-se às Varas do Trabalho e aos Tribunais Regionais do Trabalho.",
+                "topic": "Partes, procuradores e jus postulandi",
+                "tag": "TST",
+                "complement": "Entendimento consolidado na Súmula 425 do TST."
+          },
+          {
+                "front": "Quando são devidos honorários sucumbenciais na Justiça do Trabalho?",
+                "back": "Ao advogado da parte vencedora, inclusive em sucumbência recíproca, nos termos da CLT.",
+                "topic": "Honorários advocatícios",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 791-A."
+          },
+          {
+                "front": "Qual é a consequência do não comparecimento do reclamante à audiência?",
+                "back": "Em regra, o arquivamento da reclamação e a condenação em custas, salvo justificativa legalmente aceita.",
+                "topic": "Audiência, conciliação, notificação, arquivamento, revelia e confissão",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 844."
+          },
+          {
+                "front": "Qual é a consequência do não comparecimento do reclamado à audiência?",
+                "back": "Em regra, revelia e confissão quanto à matéria de fato.",
+                "topic": "Audiência, conciliação, notificação, arquivamento, revelia e confissão",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 844."
+          },
+          {
+                "front": "Quem possui o ônus de provar o fato constitutivo do direito?",
+                "back": "O reclamante.",
+                "topic": "Provas e ônus",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 818."
+          },
+          {
+                "front": "Quem possui o ônus de provar fato impeditivo, modificativo ou extintivo?",
+                "back": "O reclamado.",
+                "topic": "Provas e ônus",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 818."
+          },
+          {
+                "front": "Qual é o limite de valor do procedimento sumaríssimo?",
+                "back": "Dissídios individuais cujo valor não exceda quarenta salários mínimos na data do ajuizamento.",
+                "topic": "Procedimento sumaríssimo",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 852-A."
+          },
+          {
+                "front": "Qual é o prazo geral para interpor recurso ordinário trabalhista?",
+                "back": "Oito dias.",
+                "topic": "Recursos trabalhistas",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 895."
+          },
+          {
+                "front": "Qual é o prazo dos embargos de declaração no processo do trabalho?",
+                "back": "Cinco dias.",
+                "topic": "Recursos trabalhistas",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 897-A."
+          },
+          {
+                "front": "A execução trabalhista pode ser promovida de ofício?",
+                "back": "Sim, quando as partes não estiverem representadas por advogado; nos demais casos, depende de requerimento.",
+                "topic": "Execução trabalhista - princípios e espécies",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 878."
+          }
+    ],
   },
   {
     id: "portuguese",
@@ -135,7 +282,114 @@ const trt4Decks = [
       "Acidente do trabalho e responsabilidade civil",
       "Jurisprudência do STF e TST",
     ],
-    cards: [],
+    cards: [
+          {
+                "front": "Quais são os elementos clássicos da relação de emprego?",
+                "back": "Pessoa física, pessoalidade, não eventualidade, onerosidade e subordinação.",
+                "topic": "Relação de trabalho e relação de emprego",
+                "tag": "CLT",
+                "complement": "Base legal principal: CLT, arts. 2º e 3º.",
+                "mnemonic": "Pe-Pe-N-O-S: pessoa física, pessoalidade, não eventualidade, onerosidade e subordinação."
+          },
+          {
+                "front": "Quem é considerado empregador pela CLT?",
+                "back": "A empresa, individual ou coletiva, que assume os riscos da atividade econômica, admite, assalaria e dirige a prestação pessoal de serviços.",
+                "topic": "Empregado, empregador e poderes empregatícios",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 2º."
+          },
+          {
+                "front": "Quem é considerado empregado pela CLT?",
+                "back": "A pessoa física que presta serviços não eventuais a empregador, sob dependência e mediante salário.",
+                "topic": "Empregado, empregador e poderes empregatícios",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 3º."
+          },
+          {
+                "front": "A alteração contratual prejudicial ao empregado é válida?",
+                "back": "Em regra, não. Exige mútuo consentimento e ausência de prejuízo direto ou indireto ao empregado.",
+                "topic": "Alteração contratual e jus variandi",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 468."
+          },
+          {
+                "front": "Qual é a duração normal diária do trabalho prevista na Constituição?",
+                "back": "Até oito horas diárias e quarenta e quatro semanais, salvo compensação ou redução admitida.",
+                "topic": "Duração e jornada",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 7º, XIII."
+          },
+          {
+                "front": "Qual é o adicional mínimo constitucional do serviço extraordinário?",
+                "back": "Cinquenta por cento sobre a hora normal.",
+                "topic": "Duração e jornada",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 7º, XVI."
+          },
+          {
+                "front": "Qual é o adicional constitucional mínimo de férias?",
+                "back": "Um terço a mais do que o salário normal.",
+                "topic": "Férias",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 7º, XVII."
+          },
+          {
+                "front": "Qual é o prazo mínimo do aviso prévio constitucional?",
+                "back": "Trinta dias, sendo proporcional ao tempo de serviço nos termos da lei.",
+                "topic": "Aviso prévio",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 7º, XXI."
+          },
+          {
+                "front": "O empregador assume os riscos da atividade econômica?",
+                "back": "Sim. A alteridade é característica da relação de emprego.",
+                "topic": "Empregado, empregador e poderes empregatícios",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 2º."
+          },
+          {
+                "front": "O tempo à disposição do empregador integra a jornada?",
+                "back": "Em regra, sim, quando o empregado aguarda ou executa ordens, salvo hipóteses legais de exclusão.",
+                "topic": "Duração e jornada",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 4º."
+          },
+          {
+                "front": "Qual é a finalidade principal do FGTS?",
+                "back": "Formar proteção financeira vinculada ao contrato de trabalho, com depósitos do empregador e saques nas hipóteses legais.",
+                "topic": "FGTS",
+                "tag": "LEI SECA",
+                "complement": "Base constitucional: CF, art. 7º, III."
+          },
+          {
+                "front": "A gestante possui estabilidade provisória?",
+                "back": "Sim, desde a confirmação da gravidez até cinco meses após o parto.",
+                "topic": "Proteção à mulher, gestante e menor",
+                "tag": "ADCT",
+                "complement": "Base legal: ADCT, art. 10, II, b."
+          },
+          {
+                "front": "Convenção coletiva e acordo coletivo são a mesma coisa?",
+                "back": "Não. A convenção é celebrada entre sindicatos; o acordo, entre sindicato profissional e uma ou mais empresas.",
+                "topic": "Convenções e acordos coletivos",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 611."
+          },
+          {
+                "front": "O teletrabalho necessariamente ocorre apenas na residência?",
+                "back": "Não. Caracteriza-se pela prestação fora das dependências do empregador, de maneira preponderante ou não, com uso de tecnologias, sem configurar trabalho externo.",
+                "topic": "Teletrabalho",
+                "tag": "CLT",
+                "complement": "Base legal: CLT, art. 75-B."
+          },
+          {
+                "front": "Qual é a regra constitucional sobre redução salarial?",
+                "back": "É vedada, salvo o disposto em convenção ou acordo coletivo.",
+                "topic": "Salário, remuneração e parcelas",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 7º, VI."
+          }
+    ],
   },
   {
     id: "constitutional",
@@ -160,7 +414,65 @@ const trt4Decks = [
       "Justiça do Trabalho e CSJT",
       "Funções essenciais à Justiça",
     ],
-    cards: [],
+    cards: [
+          {
+                "front": "Quais são os fundamentos da República Federativa do Brasil?",
+                "back": "Soberania, cidadania, dignidade da pessoa humana, valores sociais do trabalho e da livre iniciativa e pluralismo político.",
+                "topic": "Princípios fundamentais",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 1º.",
+                "mnemonic": "SO-CI-DI-VA-PLU."
+          },
+          {
+                "front": "Quais Poderes são independentes e harmônicos entre si?",
+                "back": "Legislativo, Executivo e Judiciário.",
+                "topic": "Princípios fundamentais",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 2º."
+          },
+          {
+                "front": "As normas definidoras de direitos e garantias fundamentais têm aplicação imediata?",
+                "back": "Sim.",
+                "topic": "Aplicabilidade, vigência e eficácia das normas",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 5º, §1º."
+          },
+          {
+                "front": "Qual remédio constitucional protege direito líquido e certo não amparado por habeas corpus ou habeas data?",
+                "back": "Mandado de segurança.",
+                "topic": "Remédios constitucionais",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 5º, LXIX."
+          },
+          {
+                "front": "Qual remédio constitucional protege a liberdade de locomoção?",
+                "back": "Habeas corpus.",
+                "topic": "Remédios constitucionais",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 5º, LXVIII."
+          },
+          {
+                "front": "Qual remédio permite conhecer ou retificar dados pessoais em registros públicos?",
+                "back": "Habeas data.",
+                "topic": "Remédios constitucionais",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 5º, LXXII."
+          },
+          {
+                "front": "Quais órgãos integram a Justiça do Trabalho?",
+                "back": "Tribunal Superior do Trabalho, Tribunais Regionais do Trabalho e Juízes do Trabalho.",
+                "topic": "Justiça do Trabalho e CSJT",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 111."
+          },
+          {
+                "front": "Compete à Justiça do Trabalho julgar ações sobre exercício do direito de greve?",
+                "back": "Sim.",
+                "topic": "Justiça do Trabalho e CSJT",
+                "tag": "CF/88",
+                "complement": "Base legal: CF, art. 114, II."
+          }
+    ],
   },
   {
     id: "civil-procedure",
