@@ -800,7 +800,7 @@ function filterCardList() {
 }
 
 function editalDecks() {
-  return decks.filter((deck) => Array.isArray(deck.topics) && deck.topics.length > 0);
+  return decks.filter((deck) => deck.id !== "trt4-overview" && Array.isArray(deck.topics) && deck.topics.length > 0);
 }
 
 function renderDisciplineOptions(selectedDeckId = "") {
