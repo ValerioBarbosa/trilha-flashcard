@@ -743,7 +743,7 @@ function openManageCards() {
 function closeManageCards() {
   if (elements.manageCardsDialog.open) elements.manageCardsDialog.close();
   closeCardForm();
-  openDashboard();
+  elements.openManageCardsButton.focus();
 }
 
 function renderManageCards() {
