@@ -125,7 +125,7 @@ function currentDeck() {
 }
 
 function currentCard() {
-  return currentDeck().cards[state.index];
+  return currentDeck().cards[state.index] ?? null;
 }
 
 function cardKey(deck, card) {
@@ -133,7 +133,8 @@ function cardKey(deck, card) {
 }
 
 function currentCardKey() {
-  return cardKey(currentDeck(), currentCard());
+  const card = currentCard();
+  return card ? cardKey(currentDeck(), card) : null;
 }
 
 function allCardEntries() {
@@ -251,7 +252,7 @@ function renderProgress() {
   const total = indices.length;
   const stats = getDeckStats(deck, indices.map((index) => deck.cards[index]));
   const position = indices.indexOf(state.index);
-  elements.progressLabel.textContent = `${(position === -1 ? 0 : position) + 1} de ${total}`;
+  elements.progressLabel.textContent = total === 0 ? "Sem cartões" : `${(position === -1 ? 0 : position) + 1} de ${total}`;
   elements.sessionScore.textContent = stats.attempts === 0
     ? "0 estudados"
     : `${stats.remembered} de ${stats.attempts} lembrados`;
@@ -286,6 +287,31 @@ function fillCallout(wrapper, textEl, value) {
 
 function renderCard() {
   const card = currentCard();
+  const isEmpty = !card;
+  elements.flashcard.disabled = isEmpty;
+  elements.reveal.disabled = isEmpty;
+  elements.forgot.disabled = isEmpty;
+  elements.remembered.disabled = isEmpty;
+  elements.previous.disabled = isEmpty;
+  elements.next.disabled = isEmpty;
+
+  if (isEmpty) {
+    elements.front.textContent = "Este baralho ainda não tem cartões.";
+    elements.front.classList.remove("is-medium", "is-long");
+    elements.back.textContent = "";
+    elements.back.classList.remove("is-long");
+    elements.example.textContent = "";
+    elements.tagFront.textContent = "";
+    elements.tagBack.textContent = "";
+    elements.topic.textContent = "";
+    fillCallout(elements.complement, elements.complementText, "");
+    fillCallout(elements.pitfall, elements.pitfallText, "");
+    fillCallout(elements.mnemonic, elements.mnemonicText, "");
+    elements.flashcard.classList.remove("is-flipped");
+    elements.flashcard.setAttribute("aria-label", "Baralho vazio");
+    return;
+  }
+
   elements.front.textContent = card.front;
   elements.back.textContent = card.back;
   elements.example.textContent = card.example || "";
@@ -349,7 +375,7 @@ function renderDashboard() {
 
   elements.deckPerformance.innerHTML = decks.map((deck) => {
     const stats = getDeckStats(deck);
-    const progress = Math.round((stats.reviewed / deck.cards.length) * 100);
+    const progress = deck.cards.length ? Math.round((stats.reviewed / deck.cards.length) * 100) : 0;
     const deckAccuracy = stats.attempts ? Math.round((stats.remembered / stats.attempts) * 100) : 0;
     return `
       <article class="deck-performance-row">
@@ -361,7 +387,7 @@ function renderDashboard() {
         <div class="deck-performance-track" aria-hidden="true">
           <span style="width: ${progress}%"></span>
         </div>
-        <small>${stats.attempts ? `${deckAccuracy}% de acerto` : "ainda não iniciado"}</small>
+        <small>${deck.cards.length === 0 ? "sem cartões" : stats.attempts ? `${deckAccuracy}% de acerto` : "ainda não iniciado"}</small>
       </article>
     `;
   }).join("");
@@ -371,7 +397,7 @@ function renderDashboard() {
 }
 
 function render() {
-  state.index = Math.min(Math.max(state.index, 0), currentDeck().cards.length - 1);
+  state.index = Math.min(Math.max(state.index, 0), Math.max(currentDeck().cards.length - 1, 0));
   elements.deckSelect.value = state.deckId;
   elements.deckSourceNote.textContent = currentDeck().sourceNote || "";
   syncTopicOptions();
@@ -389,12 +415,14 @@ function showToast(message) {
 }
 
 function toggleCard() {
+  if (!currentCard()) return;
   state.flipped = !state.flipped;
   renderCard();
 }
 
 function move(direction) {
   const indices = getFilteredIndices();
+  if (!indices.length) return;
   const position = indices.indexOf(state.index);
   const fromPosition = position === -1 ? 0 : position;
   const nextPosition = (fromPosition + direction + indices.length) % indices.length;
@@ -412,8 +440,9 @@ function goToEntry(entry) {
 }
 
 function rateCard(didRemember) {
-  const now = new Date();
   const key = currentCardKey();
+  if (!key) return;
+  const now = new Date();
   state.ratings[key] = computeNextRating(state.ratings[key], didRemember, now);
   registerActivity();
   renderProgress();

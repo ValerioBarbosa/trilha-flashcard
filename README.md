@@ -3,7 +3,7 @@
 Um leitor de flashcards local, responsivo e sem instalação, personalizado para o primeiro concurso TRT4 - Analista Judiciário, Área Judiciária. O app inclui:
 
 - um baralho inicial com formato histórico, prioridades e alerta pré-edital;
-- dez baralhos por disciplina, seguindo o edital verticalizado fornecido, mais um baralho extra "Justiça do Trabalho · CF/88 e CLT" com 64 cartões (complemento, pegadinha e macete por cartão);
+- doze baralhos por disciplina, seguindo o edital verticalizado, prontos para receber os cartões (os cartões ficam a cargo de quem estuda, conforme o edital atualizado);
 - virada animada do cartão;
 - navegação por botões ou teclado;
 - marcação “Lembrei” e “Não lembrei”;
@@ -33,7 +33,13 @@ Depois acesse `http://localhost:4173`.
 - `Espaço`: virar o cartão
 - `←` / `→`: navegar
 
-Os cartões ficam definidos em `decks.js` e podem ser editados sem alterar a interface.
+Os cartões ficam definidos em `decks.js` e podem ser editados sem alterar a interface. Cada baralho começa vazio (`cards: []`); adicione cartões no formato:
+
+```js
+{ front: "Pergunta", back: "Resposta", topic: "Assunto (opcional, usado no filtro)", example: "Observação opcional" }
+```
+
+Campos opcionais adicionais usados pelo leitor: `tag` (rótulo curto no topo do cartão), `complement`, `pitfall` e `mnemonic` (blocos extras exibidos no verso).
 
 ## Importar seu próprio baralho
 
