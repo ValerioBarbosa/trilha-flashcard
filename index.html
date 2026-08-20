@@ -281,11 +281,28 @@
             <input type="file" id="import-input" accept="application/json" hidden />
           </div>
         </section>
+
+        <section class="data-section" aria-labelledby="custom-deck-section-title">
+          <div class="deck-performance-title-row">
+            <h3 id="custom-deck-section-title">Meus baralhos</h3>
+            <span>conteúdo próprio</span>
+          </div>
+          <p class="data-section-hint">
+            Importe um arquivo <code>.json</code> com seus próprios cartões (formato:
+            <code>{"title": "...", "cards": [{"front": "...", "back": "..."}]}</code>). O baralho aparece no
+            seletor no topo e pode ser removido depois em "Progresso por disciplina".
+          </p>
+          <div class="data-section-buttons">
+            <button class="data-button" id="import-deck-button" type="button">Importar baralho</button>
+            <input type="file" id="import-deck-input" accept="application/json" hidden />
+          </div>
+        </section>
       </div>
     </dialog>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="decks.js"></script>
+    <script src="spaced-repetition.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

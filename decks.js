@@ -102,6 +102,11 @@ const trt4Decks = [
       { front: "Como resolver problemas de divisão proporcional?", back: "Somar as partes da razão, encontrar o valor de uma parte e multiplicar pela quantidade atribuída a cada parcela.", example: "Prioridade A · razões, proporções e modelagem." },
       { front: "O que fazer em problemas de relações arbitrárias e dedução?", back: "Montar tabela ou diagrama, registrar restrições e testar apenas conclusões obrigatórias.", example: "Prioridade A · não extrapolar o enunciado." },
       { front: "Qual foi a incidência histórica de Matemática e RLM?", back: "Cinco questões gerais, equivalentes a 5,6% da pontuação objetiva ponderada.", example: "Na classificação do material: três de Matemática e duas de RLM." },
+      { front: "Quando usar regra de três simples e quando usar composta?", back: "Simples envolve duas grandezas direta ou inversamente proporcionais; composta envolve três ou mais grandezas relacionadas simultaneamente.", example: "Prioridade A · identifique cada grandeza como direta ou inversa antes de montar a proporção." },
+      { front: "Qual é a fórmula do termo geral de uma progressão aritmética (PA)?", back: "aₙ = a₁ + (n − 1) × r, em que a₁ é o primeiro termo, r é a razão e n é a posição do termo.", example: "Ex.: PA (2, 5, 8, ...), r = 3; o 10º termo é 2 + 9×3 = 29." },
+      { front: "Como negar uma proposição composta com “e” (conjunção)?", back: "Pela lei de De Morgan: nega-se cada proposição e troca-se “e” por “ou”.", example: "Negação de “chove e faz frio” é “não chove ou não faz frio”." },
+      { front: "Quando um condicional (“se p, então q”) é falso?", back: "Apenas quando o antecedente (p) é verdadeiro e o consequente (q) é falso; em todos os outros casos o condicional é verdadeiro.", example: "Prioridade A · é o caso mais cobrado e mais gerador de pegadinha em RLM." },
+      { front: "Qual é a diferença entre juros simples e compostos no cálculo do montante?", back: "Simples: M = C × (1 + i × t), juros incidem só sobre o capital inicial. Compostos: M = C × (1 + i)ᵗ, juros incidem sobre o montante acumulado.", example: "Para prazos maiores, a diferença entre os dois cresce de forma acentuada." },
     ],
   },
   {
@@ -126,6 +131,10 @@ const trt4Decks = [
       { front: "O consentimento é a única base legal para tratamento de dados?", back: "Não. A LGPD prevê diversas bases legais; a aplicável depende da finalidade, do contexto e do tipo de dado.", example: "Lei 13.709/2018, arts. 7º e 11." },
       { front: "Quais blocos tratam de Poder Público e segurança na LGPD?", back: "Arts. 23 a 32, 37 a 41 e 46 a 54.", example: "Tratamento público, registros, agentes, segurança e incidentes." },
       { front: "Qual foi a incidência histórica de LGPD e Direito Digital?", back: "Duas questões gerais, equivalentes a 2,2% da pontuação objetiva ponderada.", example: "Prioridade B · manter revisões programadas sem abandonar o tema." },
+      { front: "Quais são os principais direitos do titular de dados previstos na LGPD?", back: "Confirmação da existência de tratamento, acesso, correção, anonimização/bloqueio/eliminação de dados desnecessários, portabilidade, informação sobre compartilhamento e revogação do consentimento.", example: "Lei 13.709/2018, art. 18." },
+      { front: "Qual é a diferença entre controlador e operador na LGPD?", back: "Controlador toma as decisões sobre o tratamento de dados; operador realiza o tratamento em nome do controlador, seguindo suas instruções.", example: "Lei 13.709/2018, art. 5º, VI e VII." },
+      { front: "O que é o encarregado (DPO) previsto na LGPD?", back: "Pessoa indicada pelo controlador para atuar como canal de comunicação entre controlador, titulares e a Autoridade Nacional de Proteção de Dados (ANPD).", example: "Lei 13.709/2018, art. 5º, VIII, e art. 41." },
+      { front: "Qual órgão fiscaliza o cumprimento da LGPD?", back: "A Autoridade Nacional de Proteção de Dados (ANPD), responsável por zelar pela proteção de dados e fiscalizar o cumprimento da lei.", example: "Lei 13.709/2018, art. 55-A, incluído pela Lei 13.853/2019." },
     ],
   },
   {

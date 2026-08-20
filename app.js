@@ -1,7 +1,22 @@
-const decks = trt4Decks;
 const STORAGE_KEY = "trilha-flashcard-state";
 const THEME_STORAGE_KEY = "trilha-flashcard-theme";
-const REVIEW_INTERVAL_DAYS = [1, 7, 30];
+const CUSTOM_DECKS_KEY = "trilha-flashcard-custom-decks";
+const { dateKey, cardKey: buildCardKey, computeNextRating, isDue, isWrong, getStudyStreak: computeStudyStreak } = SpacedRepetition;
+
+function loadCustomDecks() {
+  try {
+    const value = JSON.parse(localStorage.getItem(CUSTOM_DECKS_KEY) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomDecks() {
+  localStorage.setItem(CUSTOM_DECKS_KEY, JSON.stringify(decks.filter((deck) => deck.custom)));
+}
+
+const decks = [...trt4Decks, ...loadCustomDecks()];
 
 const elements = {
   deckSelect: document.querySelector("#deck-select"),
@@ -50,6 +65,8 @@ const elements = {
   exportButton: document.querySelector("#export-button"),
   importButton: document.querySelector("#import-button"),
   importInput: document.querySelector("#import-input"),
+  importDeckButton: document.querySelector("#import-deck-button"),
+  importDeckInput: document.querySelector("#import-deck-input"),
   toast: document.querySelector("#toast"),
 };
 
@@ -109,7 +126,7 @@ function currentCard() {
 }
 
 function cardKey(deck, card) {
-  return `${deck.id}::${card.front}`;
+  return buildCardKey(deck.id, card.front);
 }
 
 function currentCardKey() {
@@ -138,10 +155,7 @@ function getDeckStats(deck) {
 
 function getDueEntries(now = Date.now()) {
   return allCardEntries()
-    .filter(({ key }) => {
-      const rating = state.ratings[key];
-      return rating?.nextReview && new Date(rating.nextReview).getTime() <= now;
-    })
+    .filter(({ key }) => isDue(state.ratings[key], now))
     .sort((first, second) => (
       new Date(state.ratings[first.key].nextReview).getTime()
       - new Date(state.ratings[second.key].nextReview).getTime()
@@ -150,7 +164,7 @@ function getDueEntries(now = Date.now()) {
 
 function getWrongEntries() {
   return allCardEntries()
-    .filter(({ key }) => state.ratings[key]?.lastResult === "forgot")
+    .filter(({ key }) => isWrong(state.ratings[key]))
     .sort((first, second) => (
       new Date(state.ratings[first.key].lastReviewed).getTime()
       - new Date(state.ratings[second.key].lastReviewed).getTime()
@@ -165,13 +179,6 @@ function getNextReview() {
     .sort((first, second) => first - second)[0] || null;
 }
 
-function dateKey(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
 function registerActivity() {
   const today = dateKey();
   if (!state.activity.includes(today)) state.activity.push(today);
@@ -179,21 +186,7 @@ function registerActivity() {
 }
 
 function getStudyStreak() {
-  const studiedDates = new Set(state.activity);
-  const cursor = new Date();
-  cursor.setHours(12, 0, 0, 0);
-
-  if (!studiedDates.has(dateKey(cursor))) {
-    cursor.setDate(cursor.getDate() - 1);
-    if (!studiedDates.has(dateKey(cursor))) return 0;
-  }
-
-  let streak = 0;
-  while (studiedDates.has(dateKey(cursor))) {
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return streak;
+  return computeStudyStreak(state.activity);
 }
 
 function saveProgress() {
@@ -208,7 +201,7 @@ function saveProgress() {
 
 function renderDeckOptions() {
   elements.deckSelect.innerHTML = decks
-    .map((deck) => `<option value="${deck.id}">${deck.title}</option>`)
+    .map((deck) => `<option value="${deck.id}">${escapeHtml(deck.title)}</option>`)
     .join("");
   elements.deckSelect.value = state.deckId;
 }
@@ -318,7 +311,8 @@ function renderDashboard() {
     return `
       <article class="deck-performance-row">
         <div class="deck-performance-heading">
-          <span>${deck.title}</span>
+          <span>${escapeHtml(deck.title)}</span>
+          ${deck.custom ? `<button type="button" class="deck-remove-button" data-remove-deck="${escapeHtml(deck.id)}" aria-label="Remover baralho ${escapeHtml(deck.title)}">✕</button>` : ""}
           <strong>${stats.reviewed}/${deck.cards.length}</strong>
         </div>
         <div class="deck-performance-track" aria-hidden="true">
@@ -328,6 +322,9 @@ function renderDashboard() {
       </article>
     `;
   }).join("");
+  elements.deckPerformance.querySelectorAll("[data-remove-deck]").forEach((button) => {
+    button.addEventListener("click", () => removeCustomDeck(button.dataset.removeDeck));
+  });
 }
 
 function render() {
@@ -369,19 +366,7 @@ function goToEntry(entry) {
 function rateCard(didRemember) {
   const now = new Date();
   const key = currentCardKey();
-  const previous = state.ratings[key] || { attempts: 0, remembered: 0, stage: 0 };
-  const intervalIndex = Math.min(previous.stage || 0, REVIEW_INTERVAL_DAYS.length - 1);
-  const intervalDays = didRemember ? REVIEW_INTERVAL_DAYS[intervalIndex] : 1;
-  const nextReview = new Date(now.getTime() + intervalDays * 86400000);
-
-  state.ratings[key] = {
-    attempts: previous.attempts + 1,
-    remembered: (previous.remembered || 0) + (didRemember ? 1 : 0),
-    stage: didRemember ? Math.min((previous.stage || 0) + 1, REVIEW_INTERVAL_DAYS.length) : 0,
-    lastResult: didRemember ? "remembered" : "forgot",
-    lastReviewed: now.toISOString(),
-    nextReview: nextReview.toISOString(),
-  };
+  state.ratings[key] = computeNextRating(state.ratings[key], didRemember, now);
   registerActivity();
   renderProgress();
   renderDashboard();
@@ -560,6 +545,96 @@ function importProgress(file) {
   reader.readAsText(file);
 }
 
+function slugify(text) {
+  return (
+    text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "baralho"
+  );
+}
+
+function normalizeImportedDeck(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const title = typeof raw.title === "string" ? raw.title.trim() : "";
+  const cardsInput = Array.isArray(raw.cards) ? raw.cards : null;
+  if (!title || !cardsInput) return null;
+
+  const cards = cardsInput
+    .filter((card) => card && typeof card.front === "string" && card.front.trim() && typeof card.back === "string" && card.back.trim())
+    .map((card) => ({
+      front: card.front.trim(),
+      back: card.back.trim(),
+      ...(typeof card.example === "string" ? { example: card.example } : {}),
+      ...(typeof card.tag === "string" ? { tag: card.tag } : {}),
+      ...(typeof card.topic === "string" ? { topic: card.topic } : {}),
+      ...(typeof card.complement === "string" ? { complement: card.complement } : {}),
+      ...(typeof card.pitfall === "string" ? { pitfall: card.pitfall } : {}),
+      ...(typeof card.mnemonic === "string" ? { mnemonic: card.mnemonic } : {}),
+    }));
+
+  if (!cards.length) return null;
+
+  return {
+    id: `custom-${slugify(title)}-${Date.now().toString(36)}`,
+    title,
+    custom: true,
+    cards,
+  };
+}
+
+function importDeck(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      const rawDecks = Array.isArray(data) ? data : Array.isArray(data?.decks) ? data.decks : [data];
+      const imported = rawDecks.map(normalizeImportedDeck).filter(Boolean);
+      if (!imported.length) throw new Error("invalid");
+
+      imported.forEach((deck) => decks.push(deck));
+      saveCustomDecks();
+      renderDeckOptions();
+      state.deckId = imported[0].id;
+      state.index = 0;
+      state.flipped = false;
+      state.queueMode = null;
+      render();
+      showToast(
+        imported.length === 1
+          ? `Baralho "${imported[0].title}" importado com ${imported[0].cards.length} cartões`
+          : `${imported.length} baralhos importados`
+      );
+    } catch {
+      showToast("Arquivo inválido para importar baralho");
+    }
+  };
+  reader.onerror = () => showToast("Não foi possível ler o arquivo");
+  reader.readAsText(file);
+}
+
+function removeCustomDeck(deckId) {
+  const deck = decks.find((entry) => entry.id === deckId && entry.custom);
+  if (!deck) return;
+  if (!window.confirm(`Remover o baralho "${deck.title}"? O progresso salvo dele também será apagado.`)) return;
+
+  decks.splice(decks.indexOf(deck), 1);
+  deck.cards.forEach((card) => {
+    delete state.ratings[buildCardKey(deck.id, card.front)];
+  });
+  saveCustomDecks();
+
+  if (state.deckId === deckId) {
+    state.deckId = decks[0].id;
+    state.index = 0;
+  }
+  renderDeckOptions();
+  render();
+  showToast("Baralho removido");
+}
+
 elements.deckSelect.addEventListener("change", (event) => {
   state.deckId = event.target.value;
   state.index = 0;
@@ -588,6 +663,12 @@ elements.importButton.addEventListener("click", () => elements.importInput.click
 elements.importInput.addEventListener("change", (event) => {
   const file = event.target.files?.[0];
   if (file) importProgress(file);
+  event.target.value = "";
+});
+elements.importDeckButton.addEventListener("click", () => elements.importDeckInput.click());
+elements.importDeckInput.addEventListener("change", (event) => {
+  const file = event.target.files?.[0];
+  if (file) importDeck(file);
   event.target.value = "";
 });
 

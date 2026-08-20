@@ -15,6 +15,7 @@ Um leitor de flashcards local, responsivo e sem instalação, personalizado para
 - busca de cartões por palavra-chave ou tag, em todos os baralhos;
 - tema claro/escuro, com detecção automática da preferência do sistema;
 - exportação e importação do progresso em arquivo `.json`, para levar o histórico a outro dispositivo;
+- importação de baralhos próprios em `.json`, sem precisar editar código;
 - instalação como app (PWA) e uso offline após o primeiro carregamento.
 
 ## Como abrir
@@ -33,6 +34,33 @@ Depois acesse `http://localhost:4173`.
 - `←` / `→`: navegar
 
 Os cartões ficam definidos em `decks.js` e podem ser editados sem alterar a interface.
+
+## Importar seu próprio baralho
+
+No painel de Desempenho, em "Meus baralhos", importe um arquivo `.json` no formato:
+
+```json
+{
+  "title": "Meu baralho",
+  "cards": [
+    { "front": "Pergunta", "back": "Resposta", "example": "Observação opcional" }
+  ]
+}
+```
+
+Também aceita um array de baralhos (`[{...}, {...}]`) ou `{"decks": [...]}` para importar vários de uma vez.
+Baralhos importados ficam salvos no navegador e podem ser removidos a qualquer momento na lista de progresso.
+
+## Testes
+
+O projeto usa [Vitest](https://vitest.dev) para testar a lógica de repetição espaçada (`spaced-repetition.js`):
+
+```bash
+npm install
+npm test
+```
+
+Um workflow do GitHub Actions (`.github/workflows/ci.yml`) roda os testes a cada push e pull request.
 
 ## Atenção ao status do concurso
 

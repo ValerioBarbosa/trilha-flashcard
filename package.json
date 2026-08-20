@@ -1,0 +1,12 @@
+{
+  "name": "trilha-flashcard",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Leitor de flashcards para estudos de concursos públicos.",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.11"
+  }
+}
