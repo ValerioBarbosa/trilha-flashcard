@@ -10,8 +10,12 @@ Um leitor de flashcards local, responsivo e sem instalação, personalizado para
 - progresso por disciplina e embaralhamento;
 - retomada automática do último cartão usando `localStorage`;
 - histórico persistente de tentativas e taxa de acerto;
-- revisão espaçada em 1, 7 e 30 dias;
-- painel de desempenho com sequência de estudos e revisões pendentes.
+- revisão espaçada em 1, 7 e 30 dias, incluindo um modo "revisar errados";
+- painel de desempenho com sequência de estudos e revisões pendentes;
+- busca de cartões por palavra-chave ou tag, em todos os baralhos;
+- tema claro/escuro, com detecção automática da preferência do sistema;
+- exportação e importação do progresso em arquivo `.json`, para levar o histórico a outro dispositivo;
+- instalação como app (PWA) e uso offline após o primeiro carregamento.
 
 ## Como abrir
 
