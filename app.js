@@ -136,8 +136,73 @@ const elements = {
   cardFormCancel: document.querySelector("#card-form-cancel"),
   cardFormSaveAddAnother: document.querySelector("#card-form-save-add-another"),
   cardList: document.querySelector("#card-list"),
+  installButton: document.querySelector("#install-app-button"),
+  installDialog: document.querySelector("#install-dialog"),
+  installDialogClose: document.querySelector("#install-dialog-close"),
+  installDialogIntro: document.querySelector("#install-dialog-intro"),
+  installSteps: document.querySelector("#install-steps"),
+  installConfirmButton: document.querySelector("#install-confirm-button"),
   toast: document.querySelector("#toast"),
 };
+
+let deferredInstallPrompt = null;
+
+function isAppInstalled() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+function isIOSDevice() {
+  return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+}
+
+function setInstallButtonVisibility() {
+  elements.installButton.hidden = isAppInstalled();
+}
+
+function openInstallDialog() {
+  if (isAppInstalled()) {
+    showToast("O aplicativo já está instalado");
+    return;
+  }
+
+  const isIOS = isIOSDevice();
+  elements.installDialogIntro.textContent = isIOS
+    ? "No iPhone ou iPad, a instalação é feita pelo menu Compartilhar do Safari."
+    : deferredInstallPrompt
+      ? "Instale o aplicativo para acessar seus flashcards diretamente pela tela inicial."
+      : "Use o menu do navegador para adicionar o aplicativo à tela inicial.";
+
+  elements.installSteps.innerHTML = isIOS
+    ? "<li>Abra esta página no Safari.</li><li>Toque no botão Compartilhar.</li><li>Escolha “Adicionar à Tela de Início”.</li><li>Toque em “Adicionar”.</li>"
+    : "<li>Toque em “Instalar agora” abaixo.</li><li>Confirme a instalação apresentada pelo navegador.</li><li>Abra o Trilha Flashcard pela tela inicial.</li>";
+
+  elements.installConfirmButton.hidden = !deferredInstallPrompt || isIOS;
+  elements.installDialog.showModal();
+  elements.installDialogClose.focus();
+}
+
+function closeInstallDialog() {
+  if (elements.installDialog.open) elements.installDialog.close();
+  elements.installButton.focus();
+}
+
+async function promptInstall() {
+  if (!deferredInstallPrompt) {
+    openInstallDialog();
+    return;
+  }
+
+  deferredInstallPrompt.prompt();
+  const choice = await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  closeInstallDialog();
+  if (choice.outcome === "accepted") {
+    elements.installButton.hidden = true;
+    showToast("Instalação iniciada");
+  } else {
+    showToast("Instalação cancelada");
+  }
+}
 
 function loadSavedState() {
   try {
@@ -1170,6 +1235,26 @@ function exportDeckCards() {
   showToast("Cartões exportados");
 }
 
+elements.installButton.addEventListener("click", openInstallDialog);
+elements.installDialogClose.addEventListener("click", closeInstallDialog);
+elements.installDialog.addEventListener("click", (event) => {
+  if (event.target === elements.installDialog) closeInstallDialog();
+});
+elements.installConfirmButton.addEventListener("click", () => void promptInstall());
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  setInstallButtonVisibility();
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  elements.installButton.hidden = true;
+  if (elements.installDialog.open) elements.installDialog.close();
+  showToast("Trilha Flashcard instalado");
+});
+
 elements.deckSelect.addEventListener("change", (event) => {
   state.deckId = event.target.value;
   state.index = 0;
@@ -1244,7 +1329,7 @@ elements.topicSelect.addEventListener("change", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (elements.dashboardDialog.open || elements.manageCardsDialog.open) return;
+  if (elements.dashboardDialog.open || elements.manageCardsDialog.open || elements.installDialog.open) return;
   if (
     event.target instanceof HTMLSelectElement
     || event.target instanceof HTMLButtonElement
@@ -1269,6 +1354,7 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
 const explicitTheme = document.documentElement.getAttribute("data-theme");
 const effectiveDark = explicitTheme === "dark" || (!explicitTheme && systemPrefersDark());
 elements.themeToggle.setAttribute("aria-pressed", String(effectiveDark));
+setInstallButtonVisibility();
 
 renderDeckOptions();
 render();
