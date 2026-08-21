@@ -71,3 +71,10 @@
     root.SpacedRepetition = api;
   }
 })(typeof window !== "undefined" ? window : globalThis);
+
+if (typeof document !== "undefined") {
+  const motionScript = document.createElement("script");
+  motionScript.type = "module";
+  motionScript.src = "./motion-animations.js?v=20260820-1";
+  document.head.append(motionScript);
+}
