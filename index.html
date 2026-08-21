@@ -90,6 +90,17 @@
           </button>
 
           <button
+            class="shuffle-button study-button"
+            id="open-study-session-button"
+            type="button"
+            aria-label="Montar sessão de estudo"
+            aria-haspopup="dialog"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" /></svg>
+            <span>Estudar</span>
+          </button>
+
+          <button
             class="shuffle-button"
             id="dashboard-button"
             type="button"
@@ -326,8 +337,8 @@
             Exporte um arquivo para levar seu progresso a outro dispositivo, ou importe um backup salvo antes.
           </p>
           <div class="data-section-buttons">
-            <button class="data-button" id="export-button" type="button">Exportar progresso</button>
-            <button class="data-button" id="import-button" type="button">Importar progresso</button>
+            <button class="data-button" id="export-button" type="button">Baixar backup completo</button>
+            <button class="data-button" id="import-button" type="button">Restaurar backup</button>
             <input type="file" id="import-input" accept="application/json" hidden />
           </div>
         </section>
@@ -355,6 +366,8 @@
           <button class="data-button" id="card-import-button" type="button">Importar cartões (JSON ou PDF)</button>
           <input type="file" id="card-import-input" accept="application/json,.json,application/pdf,.pdf" hidden />
           <button class="data-button" id="card-export-deck-button" type="button">Exportar cartões</button>
+          <button class="data-button" id="trash-button" type="button">Lixeira (0)</button>
+          <button class="data-button" id="undo-delete-button" type="button" hidden>Desfazer exclusão</button>
         </div>
 
         <input type="search" class="card-list-search" id="card-list-search" placeholder="Buscar cartão neste baralho..." aria-label="Buscar cartão neste baralho" />
@@ -454,6 +467,46 @@
       </div>
     </dialog>
 
+    <dialog class="dashboard-dialog compact-dialog" id="import-preview-dialog" aria-labelledby="import-preview-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div><span class="dashboard-kicker">CONFERÊNCIA</span><h2 id="import-preview-title">Revisar importação</h2></div>
+          <button class="dashboard-close" id="import-preview-close" type="button" aria-label="Fechar">✕</button>
+        </header>
+        <p class="dashboard-intro" id="import-preview-summary"></p>
+        <div class="import-preview-list" id="import-preview-list"></div>
+        <div class="card-form-actions">
+          <button class="data-button" id="import-preview-cancel" type="button">Cancelar</button>
+          <button class="review-due-button" id="import-preview-confirm" type="button">Confirmar importação</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="dashboard-dialog compact-dialog" id="trash-dialog" aria-labelledby="trash-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div><span class="dashboard-kicker">RECUPERAÇÃO</span><h2 id="trash-title">Lixeira</h2></div>
+          <button class="dashboard-close" id="trash-close" type="button" aria-label="Fechar">✕</button>
+        </header>
+        <div class="card-list" id="trash-list"></div>
+      </div>
+    </dialog>
+
+    <dialog class="dashboard-dialog compact-dialog" id="study-session-dialog" aria-labelledby="study-session-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div><span class="dashboard-kicker">SESSÃO PERSONALIZADA</span><h2 id="study-session-title">O que estudar agora?</h2></div>
+          <button class="dashboard-close" id="study-session-close" type="button" aria-label="Fechar">✕</button>
+        </header>
+        <form id="study-session-form" class="study-session-form">
+          <label class="card-form-field"><span>Quantidade</span><select id="study-session-count"><option>10</option><option selected>20</option><option>30</option></select></label>
+          <label class="card-form-field"><span>Conteúdo</span><select id="study-session-scope"><option value="current">Disciplina atual</option><option value="all">Todas as disciplinas</option><option value="new">Nunca estudados</option><option value="wrong">Somente errados</option><option value="due">Revisões pendentes</option></select></label>
+          <label class="card-form-field"><span>Prioridade</span><select id="study-session-priority"><option value="">Todas</option><option value="A">Prioridade A</option><option value="B">Prioridade B</option><option value="C">Prioridade C</option></select></label>
+          <button class="review-due-button" type="submit">Iniciar sessão</button>
+        </form>
+      </div>
+    </dialog>
+
     <dialog class="dashboard-dialog install-dialog" id="install-dialog" aria-labelledby="install-dialog-title">
       <div class="dashboard-content">
         <header class="dashboard-header">
@@ -485,6 +538,10 @@
     <script src="spaced-repetition.js?v=20260820-2"></script>
     <script src="card-import.js?v=20260821-1"></script>
     <script src="card-storage.js?v=20260821-1"></script>
-    <script src="app.js?v=20260821-8"></script>
+    <script src="card-database.js?v=20260821-1"></script>
+    <script type="module">
+      try { await CardDatabase.hydrateLocalStorage(localStorage); } catch (error) { console.warn("IndexedDB indisponível", error); }
+      await import("./app.js?v=20260821-9");
+    </script>
   </body>
 </html>
