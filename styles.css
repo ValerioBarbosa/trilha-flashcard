@@ -1465,7 +1465,7 @@ kbd {
   }
 }
 
-@media (max-width: 1320px) {
+@media (max-width: 1500px) {
   .topbar {
     grid-template-columns: 1fr minmax(320px, 420px) 1fr;
     gap: 20px;
