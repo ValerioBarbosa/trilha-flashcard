@@ -18,6 +18,11 @@ Um leitor de flashcards local, responsivo e sem instalação, personalizado para
 - importação de baralhos próprios em `.json`, sem precisar editar código;
 - gerenciamento de cartões pelo próprio navegador: adicionar, editar, excluir e importar/exportar cartões de qualquer baralho (incluindo os baralhos por disciplina), sem editar `decks.js`;
 - instalação como app (PWA) e uso offline após o primeiro carregamento.
+- armazenamento durável em IndexedDB, com migração automática do conteúdo local;
+- conferência dos cartões antes de confirmar uma importação;
+- lixeira com restauração e desfazer exclusão;
+- backup completo de cartões, desempenho e lixeira;
+- sessões personalizadas por quantidade, escopo e prioridade.
 
 ## Como abrir
 
