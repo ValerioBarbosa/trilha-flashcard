@@ -14,8 +14,8 @@ if (!reduceMotion) {
 
   const animateCardIn = (direction = 1) => safeAnimate(
     document.querySelector("#flashcard"),
-    { opacity: [0.72, 1], x: [14 * direction, 0], scale: [0.985, 1] },
-    { duration: 0.24, easing: [0.22, 1, 0.36, 1] },
+    { opacity: [0.6, 1], x: [20 * direction, 0], scale: [0.98, 1] },
+    { duration: 0.3, easing: [0.22, 1, 0.36, 1] },
   );
 
   const animateFlip = () => safeAnimate(
@@ -24,21 +24,37 @@ if (!reduceMotion) {
     { duration: 0.22, easing: "ease-in-out" },
   );
 
-  const animateFeedback = (remembered) => safeAnimate(
-    document.querySelector("#flashcard"),
-    remembered
-      ? { y: [0, -5, 0], scale: [1, 1.012, 1] }
-      : { x: [0, -5, 5, -3, 3, 0] },
-    { duration: remembered ? 0.32 : 0.36, easing: "ease-out" },
-  );
+  const animateFeedback = (remembered) => {
+    safeAnimate(
+      document.querySelector("#flashcard"),
+      remembered
+        ? { y: [0, -5, 0], scale: [1, 1.012, 1] }
+        : { x: [0, -5, 5, -3, 3, 0] },
+      { duration: remembered ? 0.32 : 0.36, easing: "ease-out" },
+    );
+
+    if (remembered) {
+      safeAnimate(
+        document.querySelector("#remembered-button"),
+        { scale: [1, 1.08, 1] },
+        { duration: 0.25, easing: "ease-out" },
+      );
+    } else {
+      safeAnimate(
+        document.querySelector("#forgot-button"),
+        { x: [0, -4, 4, -2, 2, 0] },
+        { duration: 0.28, easing: "ease-out" },
+      );
+    }
+  };
 
   const animateDialog = (dialog) => {
     if (!dialog?.open) return;
     safeAnimate(dialog, { opacity: [0, 1] }, { duration: 0.16, easing: "ease-out" });
     safeAnimate(
       dialog.querySelector(".dashboard-content"),
-      { opacity: [0, 1], y: [16, 0], scale: [0.985, 1] },
-      { duration: 0.24, easing: [0.22, 1, 0.36, 1] },
+      { opacity: [0, 1], y: [20, 0], scale: [0.985, 1] },
+      { duration: 0.25, easing: [0.22, 1, 0.36, 1] },
     );
   };
 
