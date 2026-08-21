@@ -1,5 +1,7 @@
-const { describe, expect, it } = require("vitest");
-const { applySnapshot, createSnapshot, hasStudyData, isSyncableKey } = require("../cloud-sync.js");
+import { describe, expect, it } from "vitest";
+import CloudSync from "../cloud-sync.js";
+
+const { applySnapshot, createSnapshot, hasStudyData, isSyncableKey } = CloudSync;
 
 function memoryStorage(initial = {}) {
   const data = new Map(Object.entries(initial));
