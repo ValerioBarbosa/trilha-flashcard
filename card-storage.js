@@ -67,6 +67,7 @@
         });
         throw error;
       }
+      return entries;
     }
 
     return { loadCustomDecks, loadBuiltinOverride, persistDecks };

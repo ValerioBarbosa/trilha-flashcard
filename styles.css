@@ -1247,6 +1247,17 @@ kbd {
   width: min(640px, calc(100vw - 32px));
 }
 
+.compact-dialog { width: min(680px, calc(100vw - 32px)); }
+.study-button { border-color: color-mix(in srgb, var(--blue) 40%, var(--line)); color: var(--blue); }
+.study-session-form { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: end; }
+.study-session-form .review-due-button { grid-column: 1 / -1; }
+.import-preview-list { display: flex; flex-direction: column; gap: 8px; max-height: min(52vh, 460px); margin: 16px 0; overflow: auto; }
+.import-preview-row { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--line-soft); border-radius: 12px; padding: 12px; cursor: pointer; }
+.import-preview-row input { width: 18px; height: 18px; margin-top: 2px; }
+.import-preview-row span { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
+.import-preview-row strong { color: var(--ink); font-size: 0.86rem; }
+.import-preview-row small { color: var(--muted); }
+
 .card-form {
   display: flex;
   flex-direction: column;
@@ -1534,6 +1545,8 @@ kbd {
 }
 
 @media (max-width: 660px) {
+  .study-session-form { grid-template-columns: 1fr; }
+  .study-session-form .review-due-button { grid-column: auto; }
   .app-shell {
     padding: 16px 14px 24px;
   }

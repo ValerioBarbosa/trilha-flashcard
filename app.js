@@ -1,11 +1,13 @@
 const STORAGE_KEY = "trilha-flashcard-state";
 const THEME_STORAGE_KEY = "trilha-flashcard-theme";
+const TRASH_STORAGE_KEY = "trilha-flashcard-trash";
 const { dateKey, cardKey: buildCardKey, computeNextRating, isDue, isWrong, getStudyStreak: computeStudyStreak } = SpacedRepetition;
 const deckStorage = CardStorage.createDeckStorage(localStorage);
 const decks = [...trt4Decks, ...deckStorage.loadCustomDecks()];
 
 function persistDeckCards(deck) {
-  deckStorage.persistDecks([deck], decks);
+  const entries = deckStorage.persistDecks([deck], decks);
+  void CardDatabase.persistEntries([...entries]).catch((error) => console.warn("Falha no espelho IndexedDB", error));
 }
 
 (function applyBuiltinOverrides() {
@@ -54,6 +56,7 @@ const elements = {
   searchResults: document.querySelector("#search-results"),
   topicSelect: document.querySelector("#topic-select"),
   dashboardButton: document.querySelector("#dashboard-button"),
+  openStudySessionButton: document.querySelector("#open-study-session-button"),
   dashboardDialog: document.querySelector("#dashboard-dialog"),
   dashboardClose: document.querySelector("#dashboard-close"),
   dashboardSummary: document.querySelector("#dashboard-summary"),
@@ -78,6 +81,8 @@ const elements = {
   cardImportButton: document.querySelector("#card-import-button"),
   cardImportInput: document.querySelector("#card-import-input"),
   cardExportDeckButton: document.querySelector("#card-export-deck-button"),
+  trashButton: document.querySelector("#trash-button"),
+  undoDeleteButton: document.querySelector("#undo-delete-button"),
   cardListSearch: document.querySelector("#card-list-search"),
   cardForm: document.querySelector("#card-form"),
   cardFormIndex: document.querySelector("#card-form-index"),
@@ -100,6 +105,21 @@ const elements = {
   cardFormCancel: document.querySelector("#card-form-cancel"),
   cardFormSaveAddAnother: document.querySelector("#card-form-save-add-another"),
   cardList: document.querySelector("#card-list"),
+  importPreviewDialog: document.querySelector("#import-preview-dialog"),
+  importPreviewClose: document.querySelector("#import-preview-close"),
+  importPreviewCancel: document.querySelector("#import-preview-cancel"),
+  importPreviewConfirm: document.querySelector("#import-preview-confirm"),
+  importPreviewSummary: document.querySelector("#import-preview-summary"),
+  importPreviewList: document.querySelector("#import-preview-list"),
+  trashDialog: document.querySelector("#trash-dialog"),
+  trashClose: document.querySelector("#trash-close"),
+  trashList: document.querySelector("#trash-list"),
+  studySessionDialog: document.querySelector("#study-session-dialog"),
+  studySessionClose: document.querySelector("#study-session-close"),
+  studySessionForm: document.querySelector("#study-session-form"),
+  studySessionCount: document.querySelector("#study-session-count"),
+  studySessionScope: document.querySelector("#study-session-scope"),
+  studySessionPriority: document.querySelector("#study-session-priority"),
   installButton: document.querySelector("#install-app-button"),
   installDialog: document.querySelector("#install-dialog"),
   installDialogClose: document.querySelector("#install-dialog-close"),
@@ -193,8 +213,23 @@ const state = {
     ? [...new Set(savedState.activity.filter((date) => typeof date === "string"))]
     : [],
   queueMode: null,
+  customQueue: [],
   topicFilter: "",
 };
+
+let trash = (() => {
+  try {
+    const value = JSON.parse(localStorage.getItem(TRASH_STORAGE_KEY) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch { return []; }
+})();
+let pendingImport = null;
+
+function persistTrash() {
+  const value = JSON.stringify(trash.slice(-100));
+  localStorage.setItem(TRASH_STORAGE_KEY, value);
+  void CardDatabase.persistEntries([[TRASH_STORAGE_KEY, value]]).catch((error) => console.warn("Falha ao salvar lixeira", error));
+}
 
 let toastTimer;
 let ratingAdvanceTimer = null;
@@ -361,13 +396,15 @@ function getStudyStreak() {
 }
 
 function saveProgress() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+  const value = JSON.stringify({
     version: 2,
     deckId: state.deckId,
     index: state.index,
     ratings: state.ratings,
     activity: state.activity,
-  }));
+  });
+  localStorage.setItem(STORAGE_KEY, value);
+  void CardDatabase.persistEntries([[STORAGE_KEY, value]]).catch((error) => console.warn("Falha ao salvar progresso no IndexedDB", error));
 }
 
 function renderDeckOptions() {
@@ -598,14 +635,19 @@ function rateCard(didRemember) {
       return;
     }
 
-    const queue = state.queueMode === "wrong" ? getWrongEntries() : getDueEntries();
+    const queue = state.queueMode === "custom"
+      ? state.customQueue.filter((entry) => entry.key !== key)
+      : state.queueMode === "wrong" ? getWrongEntries() : getDueEntries();
+    if (state.queueMode === "custom") state.customQueue = queue;
     const nextEntry = queue[0];
     if (nextEntry) {
       goToEntry(nextEntry);
       return;
     }
 
-    const finishedMessage = state.queueMode === "wrong" ? "Cartões errados revisados" : "Revisões do dia concluídas";
+    const finishedMessage = state.queueMode === "custom"
+      ? "Sessão personalizada concluída"
+      : state.queueMode === "wrong" ? "Cartões errados revisados" : "Revisões do dia concluídas";
     state.queueMode = null;
     move(1);
     showToast(finishedMessage);
@@ -654,6 +696,34 @@ function startWrongReview() {
   closeDashboard();
   goToEntry(firstWrong);
   showToast("Revisão dos errados iniciada");
+}
+
+function openStudySession() {
+  elements.studySessionDialog.showModal();
+  elements.studySessionClose.focus();
+}
+
+function buildCustomSession(event) {
+  event.preventDefault();
+  const scope = elements.studySessionScope.value;
+  const priority = elements.studySessionPriority.value;
+  const count = Number(elements.studySessionCount.value);
+  let entries = allCardEntries();
+  if (scope === "current") entries = entries.filter(({ deck }) => deck.id === state.deckId);
+  if (scope === "new") entries = entries.filter(({ key }) => !state.ratings[key]?.attempts);
+  if (scope === "wrong") entries = entries.filter(({ key }) => isWrong(state.ratings[key]));
+  if (scope === "due") entries = entries.filter(({ key }) => isDue(state.ratings[key]));
+  if (priority) entries = entries.filter(({ card }) => card.priority === priority);
+  entries.sort(() => Math.random() - 0.5);
+  state.customQueue = entries.slice(0, count);
+  if (!state.customQueue.length) {
+    showToast("Nenhum cartão corresponde aos filtros");
+    return;
+  }
+  state.queueMode = "custom";
+  elements.studySessionDialog.close();
+  goToEntry(state.customQueue[0]);
+  showToast(`Sessão iniciada com ${state.customQueue.length} cartões`);
 }
 
 function escapeHtml(value) {
@@ -715,30 +785,37 @@ function renderSearchResults(rawQuery) {
 
 function exportProgress() {
   const payload = {
-    version: 2,
+    version: 3,
+    kind: "trilha-flashcard-full-backup",
     exportedAt: new Date().toISOString(),
     deckId: state.deckId,
     index: state.index,
     ratings: state.ratings,
     activity: state.activity,
+    decks: decks.map((deck) => ({
+      id: deck.id,
+      title: deck.title,
+      custom: Boolean(deck.custom),
+      topics: deck.topics || [],
+      cards: deck.cards,
+    })),
+    trash,
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `trilha-flashcard-progresso-${dateKey()}.json`;
+  link.download = `trilha-flashcard-backup-completo-${dateKey()}.json`;
   document.body.appendChild(link);
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
-  showToast("Progresso exportado");
+  showToast("Backup completo baixado");
 }
 
-function importProgress(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
+async function importProgress(file) {
     try {
-      const data = JSON.parse(reader.result);
+      const data = JSON.parse(await file.text());
       if (!data || typeof data !== "object") throw new Error("invalid");
 
       state.ratings = data.ratings && typeof data.ratings === "object" && !Array.isArray(data.ratings)
@@ -753,16 +830,28 @@ function importProgress(file) {
       if (Number.isInteger(data.index)) {
         state.index = data.index;
       }
+      if (Array.isArray(data.decks)) {
+        data.decks.forEach((savedDeck) => {
+          let deck = decks.find((entry) => entry.id === savedDeck.id);
+          if (!deck && savedDeck.custom && Array.isArray(savedDeck.cards)) {
+            deck = { id: savedDeck.id, title: savedDeck.title || "Baralho restaurado", custom: true, topics: savedDeck.topics || [], cards: [] };
+            decks.push(deck);
+          }
+          if (deck && Array.isArray(savedDeck.cards)) deck.cards = savedDeck.cards;
+        });
+        const entries = deckStorage.persistDecks(decks, decks);
+        await CardDatabase.persistEntries([...entries]);
+      }
+      trash = Array.isArray(data.trash) ? data.trash.slice(-100) : trash;
+      persistTrash();
       state.flipped = false;
       state.queueMode = null;
+      renderDeckOptions();
       render();
-      showToast("Progresso importado");
+      showToast("Backup completo restaurado");
     } catch {
-      showToast("Arquivo inválido para importação");
+      showToast("Backup inválido ou incompatível");
     }
-  };
-  reader.onerror = () => showToast("Não foi possível ler o arquivo");
-  reader.readAsText(file);
 }
 
 function removeCustomDeck(deckId) {
@@ -774,7 +863,7 @@ function removeCustomDeck(deckId) {
   deck.cards.forEach((card) => {
     delete state.ratings[buildCardKey(deck.id, card.front)];
   });
-  saveCustomDecks();
+  persistDeckCards(deck);
 
   if (state.deckId === deckId) {
     state.deckId = decks[0].id;
@@ -802,6 +891,8 @@ function closeManageCards() {
 
 function renderManageCards() {
   const deck = currentDeck();
+  elements.trashButton.textContent = `Lixeira (${trash.length})`;
+  elements.undoDeleteButton.hidden = trash.length === 0;
   elements.manageCardsKicker.textContent = deck.title.toUpperCase();
   elements.manageCardsSummary.textContent = deck.cards.length
     ? `${deck.cards.length} ${deck.cards.length === 1 ? "cartão" : "cartões"} neste baralho.`
@@ -1068,12 +1159,44 @@ function deleteCard(index) {
   if (!window.confirm(`Excluir o cartão "${preview}"?`)) return;
 
   delete state.ratings[buildCardKey(deck.id, card.front)];
+  trash.push({ id: `${Date.now()}-${Math.random()}`, deckId: deck.id, index, card, deletedAt: new Date().toISOString() });
+  persistTrash();
   deck.cards.splice(index, 1);
   persistDeckCards(deck);
   renderManageCards();
   lastTopicDeckId = null;
   render();
-  showToast("Cartão excluído");
+  showToast("Cartão movido para a lixeira");
+}
+
+function restoreTrashItem(itemId = null) {
+  const trashIndex = itemId ? trash.findIndex((item) => item.id === itemId) : trash.length - 1;
+  const item = trash[trashIndex];
+  if (!item) return;
+  const deck = decks.find((entry) => entry.id === item.deckId);
+  if (!deck) return;
+  deck.cards.splice(Math.min(item.index, deck.cards.length), 0, item.card);
+  trash.splice(trashIndex, 1);
+  persistTrash();
+  persistDeckCards(deck);
+  lastTopicDeckId = null;
+  render();
+  renderManageCards();
+  renderTrash();
+  showToast("Cartão restaurado");
+}
+
+function renderTrash() {
+  elements.trashList.innerHTML = trash.length
+    ? [...trash].reverse().map((item) => `
+      <article class="card-list-row">
+        <div class="card-list-row-main"><span class="card-list-front">${escapeHtml(item.card.front)}</span><span class="card-list-topic">${escapeHtml(decks.find((deck) => deck.id === item.deckId)?.title || item.deckId)}</span></div>
+        <button class="data-button" type="button" data-restore-trash="${escapeHtml(item.id)}">Restaurar</button>
+      </article>`).join("")
+    : '<p class="card-list-empty">A lixeira está vazia.</p>';
+  elements.trashList.querySelectorAll("[data-restore-trash]").forEach((button) => {
+    button.addEventListener("click", () => restoreTrashItem(button.dataset.restoreTrash));
+  });
 }
 
 const PDFJS_MODULE_URL = "./vendor/pdf.mjs?v=4.10.38";
@@ -1124,7 +1247,21 @@ function findImportTarget(card, fallbackDeck) {
   return decks.find((deck) => deck.id === card.discipline || normalizeDeckName(deck.title) === requested) || fallbackDeck;
 }
 
-function addImportedCards(cards, sourceLabel) {
+function openImportPreview(cards, sourceLabel) {
+  pendingImport = { cards, sourceLabel };
+  const duplicates = cards.filter((card) => {
+    const deck = findImportTarget(card, currentDeck());
+    return deck.cards.some((existing) => existing.front.trim().toLowerCase() === card.front.trim().toLowerCase());
+  }).length;
+  elements.importPreviewSummary.textContent = `${cards.length} cartões encontrados${duplicates ? ` · ${duplicates} repetidos serão ignorados` : ""}. Desmarque o que não deseja importar.`;
+  elements.importPreviewList.innerHTML = cards.map((card, index) => {
+    const deck = findImportTarget(card, currentDeck());
+    return `<label class="import-preview-row"><input type="checkbox" data-import-index="${index}" checked><span><strong>${escapeHtml(card.front)}</strong><small>${escapeHtml(deck.title)}${card.topic ? ` · ${escapeHtml(card.topic)}` : ""}</small></span></label>`;
+  }).join("");
+  elements.importPreviewDialog.showModal();
+}
+
+async function addImportedCards(cards, sourceLabel) {
   if (!cards.length) throw new Error("empty");
 
   const fallbackDeck = currentDeck();
@@ -1146,11 +1283,13 @@ function addImportedCards(cards, sourceLabel) {
     added += 1;
   });
   try {
-    deckStorage.persistDecks(changedDecks, decks);
+    const entries = deckStorage.persistDecks(changedDecks, decks);
+    await CardDatabase.persistEntries([...entries]);
   } catch (error) {
     snapshots.forEach((snapshot, deck) => {
       deck.cards = snapshot;
     });
+    try { deckStorage.persistDecks(changedDecks, decks); } catch {}
     throw new Error("storage-failed", { cause: error });
   }
   renderManageCards();
@@ -1171,14 +1310,7 @@ async function importCardsIntoCurrentDeck(file) {
       showToast("Lendo e convertendo o PDF...");
       const cards = await extractCardsFromPdf(file);
       if (!cards.length) throw new Error("empty-pdf");
-      const confirmed = window.confirm(
-        `O PDF gerou ${cards.length} ${cards.length === 1 ? "cartão" : "cartões"}. Deseja adicionar ao baralho atual? Você poderá revisar e editar cada cartão em seguida.`
-      );
-      if (!confirmed) {
-        showToast("Importação cancelada");
-        return;
-      }
-      addImportedCards(cards, "PDF");
+      openImportPreview(cards, "PDF");
       return;
     }
 
@@ -1193,7 +1325,7 @@ async function importCardsIntoCurrentDeck(file) {
             : [])
           : null;
     const cards = normalizeImportedCards(rawCards);
-    addImportedCards(cards, "JSON");
+    openImportPreview(cards, "JSON");
   } catch (error) {
     console.error("Falha ao importar cartões:", error);
     showToast(
@@ -1266,6 +1398,9 @@ elements.shuffle.addEventListener("click", shuffleCards);
 elements.forgot.addEventListener("click", () => rateCard(false));
 elements.remembered.addEventListener("click", () => rateCard(true));
 elements.dashboardButton.addEventListener("click", openDashboard);
+elements.openStudySessionButton.addEventListener("click", openStudySession);
+elements.studySessionClose.addEventListener("click", () => elements.studySessionDialog.close());
+elements.studySessionForm.addEventListener("submit", buildCustomSession);
 elements.dashboardClose.addEventListener("click", closeDashboard);
 elements.reviewDue.addEventListener("click", startDueReview);
 elements.reviewWrong.addEventListener("click", startWrongReview);
@@ -1295,6 +1430,27 @@ elements.cardImportInput.addEventListener("change", (event) => {
   event.target.value = "";
 });
 elements.cardExportDeckButton.addEventListener("click", exportDeckCards);
+elements.trashButton.addEventListener("click", () => { renderTrash(); elements.trashDialog.showModal(); });
+elements.trashClose.addEventListener("click", () => elements.trashDialog.close());
+elements.undoDeleteButton.addEventListener("click", () => restoreTrashItem());
+elements.importPreviewClose.addEventListener("click", () => elements.importPreviewDialog.close());
+elements.importPreviewCancel.addEventListener("click", () => { pendingImport = null; elements.importPreviewDialog.close(); showToast("Importação cancelada"); });
+elements.importPreviewConfirm.addEventListener("click", async () => {
+  if (!pendingImport) return;
+  const cards = [...elements.importPreviewList.querySelectorAll("[data-import-index]:checked")]
+    .map((input) => pendingImport.cards[Number(input.dataset.importIndex)]);
+  if (!cards.length) { showToast("Selecione pelo menos um cartão"); return; }
+  const { sourceLabel } = pendingImport;
+  elements.importPreviewConfirm.disabled = true;
+  try {
+    await addImportedCards(cards, sourceLabel);
+    pendingImport = null;
+    elements.importPreviewDialog.close();
+  } catch (error) {
+    console.error(error);
+    showToast("Não foi possível salvar os cartões");
+  } finally { elements.importPreviewConfirm.disabled = false; }
+});
 elements.cardListSearch.addEventListener("input", filterCardList);
 elements.cardFormDiscipline.addEventListener("change", () => renderTopicOptions(""));
 elements.cardFormTopic.addEventListener("change", checkTopicWarning);
@@ -1324,7 +1480,7 @@ elements.topicSelect.addEventListener("change", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (elements.dashboardDialog.open || elements.manageCardsDialog.open || elements.installDialog.open) return;
+  if (elements.dashboardDialog.open || elements.manageCardsDialog.open || elements.installDialog.open || elements.importPreviewDialog.open || elements.trashDialog.open || elements.studySessionDialog.open) return;
   const isTypingTarget = event.target instanceof HTMLSelectElement
     || event.target instanceof HTMLInputElement
     || event.target instanceof HTMLTextAreaElement
@@ -1346,7 +1502,7 @@ document.addEventListener("keydown", (event) => {
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("sw.js?v=20260821-6", { updateViaCache: "none" })
+      .register("sw.js?v=20260821-7", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {});
   });
