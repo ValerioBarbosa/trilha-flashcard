@@ -887,6 +887,17 @@ function editalDecks() {
   return decks.filter((deck) => deck.id !== "trt4-overview" && Array.isArray(deck.topics) && deck.topics.length > 0);
 }
 
+function replaceSelectOptions(select, options) {
+  const fragment = document.createDocumentFragment();
+  options.forEach(({ value, label }) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    fragment.append(option);
+  });
+  select.replaceChildren(fragment);
+}
+
 function renderDisciplineOptions(selectedDeckId = "", extraDeck = null) {
   const availableDecks = editalDecks();
   if (
@@ -898,26 +909,26 @@ function renderDisciplineOptions(selectedDeckId = "", extraDeck = null) {
     availableDecks.unshift(extraDeck);
   }
 
-  elements.cardFormDiscipline.innerHTML = [
-    '<option value="">Selecione a disciplina</option>',
-    ...availableDecks.map((deck) => `<option value="${escapeHtml(deck.id)}">${escapeHtml(deck.title)}</option>`),
-  ].join("");
+  replaceSelectOptions(elements.cardFormDiscipline, [
+    { value: "", label: "Selecione a disciplina" },
+    ...availableDecks.map((deck) => ({ value: deck.id, label: deck.title })),
+  ]);
   elements.cardFormDiscipline.value = selectedDeckId;
 }
 
 function renderTopicOptions(selectedTopic = "") {
   const deck = decks.find((entry) => entry.id === elements.cardFormDiscipline.value);
   const topics = Array.isArray(deck?.topics) ? deck.topics : [];
-  const options = ['<option value="">Selecione o assunto</option>'];
+  const options = [{ value: "", label: "Selecione o assunto" }];
 
   topics.forEach((topic) => {
-    options.push(`<option value="${escapeHtml(topic)}">${escapeHtml(topic)}</option>`);
+    options.push({ value: topic, label: topic });
   });
   if (selectedTopic && !topics.includes(selectedTopic)) {
-    options.push(`<option value="${escapeHtml(selectedTopic)}">${escapeHtml(selectedTopic)} (importado)</option>`);
+    options.push({ value: selectedTopic, label: `${selectedTopic} (importado)` });
   }
 
-  elements.cardFormTopic.innerHTML = options.join("");
+  replaceSelectOptions(elements.cardFormTopic, options);
   elements.cardFormTopic.disabled = !deck;
   elements.cardFormTopic.value = selectedTopic;
   checkTopicWarning();
@@ -958,7 +969,9 @@ function openCardForm(index) {
   elements.cardFormSaveAddAnother.hidden = index !== null;
   elements.cardForm.hidden = false;
   elements.cardForm.scrollIntoView({ block: "nearest" });
-  elements.cardFormDiscipline.focus();
+  if (!window.matchMedia("(pointer: coarse)").matches) {
+    elements.cardFormDiscipline.focus();
+  }
 }
 
 function closeCardForm() {
