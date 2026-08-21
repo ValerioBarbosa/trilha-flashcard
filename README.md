@@ -22,6 +22,7 @@ Um leitor de flashcards local, responsivo e sem instalação, personalizado para
 - conferência dos cartões antes de confirmar uma importação;
 - lixeira com restauração e desfazer exclusão;
 - backup completo de cartões, desempenho e lixeira;
+- sincronização opcional com Google e Firebase, com modo offline e escolha segura em caso de conflito;
 - sessões personalizadas por quantidade, escopo e prioridade.
 
 ## Como abrir
@@ -56,6 +57,16 @@ No botão "Gerenciar cartões", adicione, edite ou exclua cartões do baralho se
 O JSON aceita tanto `front`/`back` quanto `pergunta`/`resposta`. Os campos `disciplina`, `assunto`, `subassunto`, `fundamentoLegal`, `tipo`, `prioridade` e `dificuldade` também são reconhecidos. Quando `disciplina` corresponde a um baralho do edital, o cartão é enviado automaticamente para ele; sem esse campo, vai para o baralho atualmente selecionado. Cartões repetidos são ignorados.
 
 Edições em baralhos por disciplina ficam salvas no navegador (via `localStorage`) por cima do conteúdo original de `decks.js`; ao editar `decks.js` diretamente, essas edições salvas continuam valendo até serem removidas ou sobrescritas.
+
+## Ativar sincronização na nuvem
+
+1. Crie um projeto no Firebase e um aplicativo Web.
+2. Ative **Authentication > Google**.
+3. Crie o banco **Cloud Firestore** e publique as regras de `firestore.rules.example`.
+4. Adicione `valeriobarbosa.github.io` aos domínios autorizados do Authentication.
+5. Copie a configuração Web para `firebase-config.js`, substituindo `null` pelo objeto `firebaseConfig`.
+
+Os documentos ficam em `flashcardUsers/{uid}`. As regras permitem que cada usuário leia e altere somente o próprio documento. Na primeira conexão, os dados locais são enviados automaticamente se a nuvem estiver vazia. Se existirem duas versões, o aplicativo exige uma escolha antes de substituir qualquer dado.
 
 ## Importar seu próprio baralho
 

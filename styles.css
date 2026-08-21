@@ -958,6 +958,50 @@ button:focus-visible {
   gap: 10px;
 }
 
+.cloud-section {
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-control);
+  background: var(--surface-3);
+}
+
+#cloud-sync-status[data-state="saved"] { color: var(--green-dark); }
+#cloud-sync-status[data-state="syncing"] { color: var(--blue); }
+#cloud-sync-status[data-state="error"] { color: var(--coral-dark); }
+
+.cloud-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.cloud-choice {
+  display: grid;
+  gap: 8px;
+  min-height: 126px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  text-align: left;
+  cursor: pointer;
+}
+
+.cloud-choice:hover,
+.cloud-choice:focus-visible {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 18%, transparent);
+}
+
+.cloud-choice strong { color: var(--ink); font-size: 1rem; }
+.cloud-choice span { color: var(--muted-2); line-height: 1.5; }
+
+@media (max-width: 620px) {
+  .cloud-choice-grid { grid-template-columns: 1fr; }
+}
+
 .data-button {
   min-height: 42px;
   border: 1.5px solid var(--line);

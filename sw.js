@@ -1,12 +1,14 @@
-const CACHE_NAME = "trilha-flashcard-v15";
+const CACHE_NAME = "trilha-flashcard-v16";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=20260821-5",
-  "./app.js?v=20260821-9",
+  "./styles.css?v=20260821-6",
+  "./app.js?v=20260821-10",
   "./card-import.js?v=20260821-1",
   "./card-storage.js?v=20260821-1",
   "./card-database.js?v=20260821-1",
+  "./firebase-config.js?v=20260821-1",
+  "./cloud-sync.js?v=20260821-1",
   "./vendor/pdf.mjs?v=4.10.38",
   "./vendor/pdf.worker.mjs?v=4.10.38",
   "./decks.js?v=20260820-2",

@@ -8,6 +8,7 @@ const decks = [...trt4Decks, ...deckStorage.loadCustomDecks()];
 function persistDeckCards(deck) {
   const entries = deckStorage.persistDecks([deck], decks);
   void CardDatabase.persistEntries([...entries]).catch((error) => console.warn("Falha no espelho IndexedDB", error));
+  markCloudDirty();
 }
 
 (function applyBuiltinOverrides() {
@@ -127,6 +128,15 @@ const elements = {
   installSteps: document.querySelector("#install-steps"),
   installConfirmButton: document.querySelector("#install-confirm-button"),
   toast: document.querySelector("#toast"),
+  cloudSyncStatus: document.querySelector("#cloud-sync-status"),
+  cloudSyncDetail: document.querySelector("#cloud-sync-detail"),
+  cloudSignInButton: document.querySelector("#cloud-sign-in-button"),
+  cloudSyncNowButton: document.querySelector("#cloud-sync-now-button"),
+  cloudSignOutButton: document.querySelector("#cloud-sign-out-button"),
+  cloudConflictDialog: document.querySelector("#cloud-conflict-dialog"),
+  cloudUseLocalButton: document.querySelector("#cloud-use-local-button"),
+  cloudUseRemoteButton: document.querySelector("#cloud-use-remote-button"),
+  cloudConflictCancel: document.querySelector("#cloud-conflict-cancel"),
 };
 
 let deferredInstallPrompt = null;
@@ -229,11 +239,146 @@ function persistTrash() {
   const value = JSON.stringify(trash.slice(-100));
   localStorage.setItem(TRASH_STORAGE_KEY, value);
   void CardDatabase.persistEntries([[TRASH_STORAGE_KEY, value]]).catch((error) => console.warn("Falha ao salvar lixeira", error));
+  markCloudDirty();
 }
 
 let toastTimer;
 let ratingAdvanceTimer = null;
 let lastTopicDeckId = null;
+let cloudAdapter = null;
+let cloudUser = null;
+let cloudReady = false;
+let cloudSyncTimer = null;
+
+const CLOUD_META_KEY = "trilha-flashcard-cloud-meta";
+
+function setCloudStatus(label, stateName = "local", detail = null) {
+  if (!elements.cloudSyncStatus) return;
+  elements.cloudSyncStatus.textContent = label;
+  elements.cloudSyncStatus.dataset.state = stateName;
+  if (detail) elements.cloudSyncDetail.textContent = detail;
+}
+
+function readCloudMeta() {
+  try { return JSON.parse(localStorage.getItem(CLOUD_META_KEY) || "null") || {}; }
+  catch { return {}; }
+}
+
+function writeCloudMeta(meta) {
+  localStorage.setItem(CLOUD_META_KEY, JSON.stringify(meta));
+}
+
+function markCloudDirty() {
+  if (!cloudReady || !cloudUser || !cloudAdapter) return;
+  clearTimeout(cloudSyncTimer);
+  setCloudStatus(navigator.onLine ? "Sincronizando…" : "Aguardando internet", "syncing");
+  cloudSyncTimer = setTimeout(() => void uploadCloudSnapshot(), 1400);
+}
+
+async function uploadCloudSnapshot({ notify = false } = {}) {
+  if (!cloudUser || !cloudAdapter) return;
+  if (!navigator.onLine) {
+    setCloudStatus("Aguardando internet", "syncing", "As alterações serão enviadas automaticamente quando a conexão voltar.");
+    return;
+  }
+  try {
+    setCloudStatus("Sincronizando…", "syncing");
+    const updatedAtISO = await cloudAdapter.write(cloudUser.uid, CloudSync.createSnapshot(localStorage));
+    writeCloudMeta({ uid: cloudUser.uid, remoteUpdatedAtISO: updatedAtISO });
+    cloudReady = true;
+    setCloudStatus("Salvo", "saved", `Sincronizado com ${cloudUser.email || "sua conta Google"}.`);
+    if (notify) showToast("Dados sincronizados na nuvem");
+  } catch (error) {
+    console.error("Falha na sincronização:", error);
+    setCloudStatus("Falha ao sincronizar", "error", "Seus dados continuam seguros neste aparelho. Tente novamente quando estiver online.");
+    if (notify) showToast("Não foi possível sincronizar agora");
+  }
+}
+
+async function applyRemoteSnapshot(remote) {
+  const rollback = CloudSync.createSnapshot(localStorage);
+  try {
+    sessionStorage.setItem("trilha-flashcard-cloud-rollback", JSON.stringify(rollback));
+    CloudSync.applySnapshot(localStorage, remote.snapshot);
+    await CardDatabase.persistEntries(Object.entries(remote.snapshot.entries));
+    writeCloudMeta({ uid: cloudUser.uid, remoteUpdatedAtISO: remote.updatedAtISO || "" });
+    location.reload();
+  } catch (error) {
+    CloudSync.applySnapshot(localStorage, rollback);
+    await CardDatabase.persistEntries(Object.entries(rollback.entries)).catch(() => {});
+    console.error("Falha ao baixar dados da nuvem:", error);
+    setCloudStatus("Falha ao restaurar", "error");
+    showToast("Os dados deste aparelho não foram alterados");
+  }
+}
+
+async function reconcileCloudData(user) {
+  setCloudStatus("Verificando…", "syncing");
+  const remote = await cloudAdapter.read(user.uid);
+  const local = CloudSync.createSnapshot(localStorage);
+  const meta = readCloudMeta();
+
+  if (!remote?.snapshot) {
+    cloudReady = true;
+    await uploadCloudSnapshot();
+    showToast("Dados deste aparelho enviados para a nuvem");
+    return;
+  }
+  if (!CloudSync.hasStudyData(local)) {
+    await applyRemoteSnapshot(remote);
+    return;
+  }
+  if (meta.uid === user.uid && meta.remoteUpdatedAtISO === remote.updatedAtISO) {
+    cloudReady = true;
+    setCloudStatus("Salvo", "saved", `Sincronizado com ${user.email || "sua conta Google"}.`);
+    return;
+  }
+
+  cloudReady = false;
+  setCloudStatus("Escolha necessária", "syncing", "Há uma versão neste aparelho e outra na nuvem.");
+  elements.cloudConflictDialog.showModal();
+  elements.cloudUseLocalButton.focus();
+  elements.cloudUseRemoteButton.onclick = () => {
+    elements.cloudConflictDialog.close();
+    void applyRemoteSnapshot(remote);
+  };
+}
+
+function updateCloudButtons(user) {
+  elements.cloudSignInButton.hidden = Boolean(user);
+  elements.cloudSyncNowButton.hidden = !user;
+  elements.cloudSignOutButton.hidden = !user;
+}
+
+async function initializeCloudSync() {
+  try {
+    cloudAdapter = await CloudSync.createFirebaseAdapter(globalThis.TrilhaFirebaseConfig);
+    cloudAdapter.observeUser(async (user) => {
+      cloudUser = user;
+      updateCloudButtons(user);
+      if (!user) {
+        cloudReady = false;
+        setCloudStatus("Somente neste aparelho", "local", "Entre com o Google para sincronizar entre dispositivos.");
+        return;
+      }
+      try { await reconcileCloudData(user); }
+      catch (error) {
+        console.error("Falha ao verificar a nuvem:", error);
+        setCloudStatus("Nuvem indisponível", "error", "Seus dados continuam seguros neste aparelho.");
+      }
+    });
+  } catch (error) {
+    const pendingConfiguration = error?.message === "firebase-not-configured";
+    elements.cloudSignInButton.disabled = true;
+    setCloudStatus(
+      pendingConfiguration ? "Configuração pendente" : "Nuvem indisponível",
+      pendingConfiguration ? "local" : "error",
+      pendingConfiguration
+        ? "A sincronização está pronta no aplicativo e aguarda a ativação do projeto Firebase."
+        : "Seus dados continuam seguros neste aparelho."
+    );
+  }
+}
 
 function applyTheme(theme) {
   if (theme === "dark" || theme === "light") {
@@ -405,6 +550,7 @@ function saveProgress() {
   });
   localStorage.setItem(STORAGE_KEY, value);
   void CardDatabase.persistEntries([[STORAGE_KEY, value]]).catch((error) => console.warn("Falha ao salvar progresso no IndexedDB", error));
+  markCloudDirty();
 }
 
 function renderDeckOptions() {
@@ -1368,6 +1514,35 @@ elements.installDialog.addEventListener("click", (event) => {
   if (event.target === elements.installDialog) closeInstallDialog();
 });
 elements.installConfirmButton.addEventListener("click", () => void promptInstall());
+elements.cloudSignInButton.addEventListener("click", async () => {
+  try { await cloudAdapter?.signIn(); }
+  catch (error) {
+    if (error?.code !== "auth/popup-closed-by-user") {
+      console.error("Falha no login Google:", error);
+      showToast("Não foi possível entrar com o Google");
+    }
+  }
+});
+elements.cloudSyncNowButton.addEventListener("click", () => void uploadCloudSnapshot({ notify: true }));
+elements.cloudSignOutButton.addEventListener("click", async () => {
+  clearTimeout(cloudSyncTimer);
+  await cloudAdapter?.signOut();
+  showToast("Sincronização desconectada");
+});
+elements.cloudUseLocalButton.addEventListener("click", async () => {
+  elements.cloudConflictDialog.close();
+  cloudReady = true;
+  await uploadCloudSnapshot({ notify: true });
+});
+elements.cloudConflictCancel.addEventListener("click", () => elements.cloudConflictDialog.close());
+window.addEventListener("online", () => {
+  if (!cloudUser) return;
+  if (cloudReady) void uploadCloudSnapshot();
+  else void reconcileCloudData(cloudUser).catch(() => setCloudStatus("Nuvem indisponível", "error"));
+});
+window.addEventListener("offline", () => {
+  if (cloudUser) setCloudStatus("Aguardando internet", "syncing", "As alterações serão sincronizadas quando a conexão voltar.");
+});
 
 window.addEventListener("beforeinstallprompt", (event) => {
   event.preventDefault();
@@ -1502,11 +1677,13 @@ document.addEventListener("keydown", (event) => {
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("sw.js?v=20260821-7", { updateViaCache: "none" })
+      .register("sw.js?v=20260821-8", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {});
   });
 }
+
+void initializeCloudSync();
 
 const explicitTheme = document.documentElement.getAttribute("data-theme");
 const effectiveDark = explicitTheme === "dark" || (!explicitTheme && systemPrefersDark());

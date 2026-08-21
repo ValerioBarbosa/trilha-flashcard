@@ -22,7 +22,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260821-5" />
+    <link rel="stylesheet" href="styles.css?v=20260821-6" />
     <script>
       try {
         const savedTheme = localStorage.getItem("trilha-flashcard-theme");
@@ -343,7 +343,47 @@
           </div>
         </section>
 
+        <section class="cloud-section" aria-labelledby="cloud-section-title">
+          <div class="deck-performance-title-row">
+            <h3 id="cloud-section-title">Sincronização na nuvem</h3>
+            <span id="cloud-sync-status" data-state="local">Somente neste aparelho</span>
+          </div>
+          <p class="data-section-hint" id="cloud-sync-detail">
+            Entre com o Google para manter cartões e progresso iguais no celular e no computador.
+          </p>
+          <div class="data-section-buttons">
+            <button class="data-button cloud-sign-in" id="cloud-sign-in-button" type="button">Entrar com Google</button>
+            <button class="data-button" id="cloud-sync-now-button" type="button" hidden>Sincronizar agora</button>
+            <button class="data-button" id="cloud-sign-out-button" type="button" hidden>Sair da nuvem</button>
+          </div>
+        </section>
 
+
+      </div>
+    </dialog>
+
+    <dialog class="dashboard-dialog cloud-conflict-dialog" id="cloud-conflict-dialog" aria-labelledby="cloud-conflict-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div>
+            <span class="dashboard-kicker">SINCRONIZAÇÃO SEGURA</span>
+            <h2 id="cloud-conflict-title">Qual versão deseja manter?</h2>
+          </div>
+        </header>
+        <p class="dashboard-intro">
+          Encontramos dados neste aparelho e também na nuvem. Nada será substituído sem sua escolha.
+        </p>
+        <div class="cloud-choice-grid">
+          <button class="cloud-choice" id="cloud-use-local-button" type="button">
+            <strong>Usar este aparelho</strong>
+            <span>Envia os cartões e o progresso atuais para a nuvem.</span>
+          </button>
+          <button class="cloud-choice" id="cloud-use-remote-button" type="button">
+            <strong>Usar dados da nuvem</strong>
+            <span>Baixa a versão salva em outro dispositivo.</span>
+          </button>
+        </div>
+        <button class="data-button" id="cloud-conflict-cancel" type="button">Decidir depois</button>
       </div>
     </dialog>
 
@@ -539,9 +579,11 @@
     <script src="card-import.js?v=20260821-1"></script>
     <script src="card-storage.js?v=20260821-1"></script>
     <script src="card-database.js?v=20260821-1"></script>
+    <script src="firebase-config.js?v=20260821-1"></script>
+    <script src="cloud-sync.js?v=20260821-1"></script>
     <script type="module">
       try { await CardDatabase.hydrateLocalStorage(localStorage); } catch (error) { console.warn("IndexedDB indisponível", error); }
-      await import("./app.js?v=20260821-9");
+      await import("./app.js?v=20260821-10");
     </script>
   </body>
 </html>
