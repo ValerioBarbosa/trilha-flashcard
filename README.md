@@ -46,7 +46,9 @@ Cada baralho já tem um array `topics` com os assuntos do edital verticalizado (
 
 ## Gerenciar cartões pelo navegador
 
-No painel de Desempenho, em "Cartões do baralho atual", clique em "Gerenciar cartões" para adicionar, editar ou excluir cartões do baralho selecionado no topo — inclusive os baralhos por disciplina, sem precisar editar `decks.js`. Também é possível importar cartões (`.json`, mesmo formato usado na seção abaixo) ou exportar os cartões do baralho atual.
+No botão "Gerenciar cartões", adicione, edite ou exclua cartões do baralho selecionado no topo — inclusive os baralhos por disciplina, sem precisar editar `decks.js`. Também é possível importar cartões em JSON ou PDF e exportar os cartões do baralho atual.
+
+O JSON aceita tanto `front`/`back` quanto `pergunta`/`resposta`. Os campos `disciplina`, `assunto`, `subassunto`, `fundamentoLegal`, `tipo`, `prioridade` e `dificuldade` também são reconhecidos. Quando `disciplina` corresponde a um baralho do edital, o cartão é enviado automaticamente para ele; sem esse campo, vai para o baralho atualmente selecionado. Cartões repetidos são ignorados.
 
 Edições em baralhos por disciplina ficam salvas no navegador (via `localStorage`) por cima do conteúdo original de `decks.js`; ao editar `decks.js` diretamente, essas edições salvas continuam valendo até serem removidas ou sobrescritas.
 

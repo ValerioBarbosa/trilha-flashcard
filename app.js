@@ -1112,81 +1112,9 @@ function deleteCard(index) {
   showToast("Cartão excluído");
 }
 
-const PDFJS_MODULE_URL = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
-const PDFJS_WORKER_URL = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
-
-function normalizeImportedCards(rawCards) {
-  if (!Array.isArray(rawCards)) return [];
-
-  return rawCards
-    .filter((card) => card && typeof card.front === "string" && card.front.trim() && typeof card.back === "string" && card.back.trim())
-    .map((card) => ({
-      front: card.front.trim(),
-      back: card.back.trim(),
-      ...(typeof card.example === "string" && card.example.trim() ? { example: card.example.trim() } : {}),
-      ...(typeof card.tag === "string" && card.tag.trim() ? { tag: card.tag.trim() } : {}),
-      ...(typeof card.topic === "string" && card.topic.trim() ? { topic: card.topic.trim() } : {}),
-      ...(typeof card.complement === "string" && card.complement.trim() ? { complement: card.complement.trim() } : {}),
-      ...(typeof card.pitfall === "string" && card.pitfall.trim() ? { pitfall: card.pitfall.trim() } : {}),
-      ...(typeof card.mnemonic === "string" && card.mnemonic.trim() ? { mnemonic: card.mnemonic.trim() } : {}),
-    }));
-}
-
-function parseLabeledPdfCards(text) {
-  const cards = [];
-  const lines = text.split(/\n+/).map((line) => line.trim()).filter(Boolean);
-  const frontPattern = /^(?:pergunta|quest[aã]o|frente|q)\s*[:\-–—]\s*(.*)$/i;
-  const backPattern = /^(?:resposta|gabarito|verso|a)\s*[:\-–—]\s*(.*)$/i;
-  let current = null;
-  let side = null;
-
-  const finish = () => {
-    if (current?.front?.trim() && current?.back?.trim()) {
-      cards.push({ front: current.front.trim(), back: current.back.trim(), tag: "PDF" });
-    }
-  };
-
-  lines.forEach((line) => {
-    const frontMatch = line.match(frontPattern);
-    const backMatch = line.match(backPattern);
-
-    if (frontMatch) {
-      finish();
-      current = { front: frontMatch[1], back: "" };
-      side = "front";
-    } else if (backMatch && current) {
-      current.back = backMatch[1];
-      side = "back";
-    } else if (current && side) {
-      current[side] = `${current[side]}\n${line}`.trim();
-    }
-  });
-  finish();
-  return cards;
-}
-
-function parsePdfPageFallback(text, pageNumber) {
-  const blocks = text.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean);
-  if (blocks.length >= 2) {
-    return {
-      front: blocks[0],
-      back: blocks.slice(1).join("\n\n"),
-      tag: "PDF",
-      complement: `Importado da página ${pageNumber}.`,
-    };
-  }
-
-  const lines = text.split(/\n+/).map((line) => line.trim()).filter(Boolean);
-  if (lines.length >= 2) {
-    return {
-      front: lines[0],
-      back: lines.slice(1).join("\n"),
-      tag: "PDF",
-      complement: `Importado da página ${pageNumber}.`,
-    };
-  }
-  return null;
-}
+const PDFJS_MODULE_URL = "./vendor/pdf.mjs?v=4.10.38";
+const PDFJS_WORKER_URL = "./vendor/pdf.worker.mjs?v=4.10.38";
+const { normalizeImportedCards, parseLabeledPdfCards, parsePdfPageFallback } = CardImport;
 
 async function extractCardsFromPdf(file) {
   const pdfjs = await import(PDFJS_MODULE_URL);
@@ -1217,20 +1145,54 @@ async function extractCardsFromPdf(file) {
   return cards;
 }
 
+function normalizeDeckName(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s*·\s*[\d,]+\s*%.*$/, "")
+    .trim()
+    .toLowerCase();
+}
+
+function findImportTarget(card, fallbackDeck) {
+  if (!card.discipline) return fallbackDeck;
+  const requested = normalizeDeckName(card.discipline);
+  return decks.find((deck) => deck.id === card.discipline || normalizeDeckName(deck.title) === requested) || fallbackDeck;
+}
+
 function addImportedCards(cards, sourceLabel) {
   if (!cards.length) throw new Error("empty");
 
-  const deck = currentDeck();
-  cards.forEach((card) => deck.cards.push(card));
-  persistDeckCards(deck);
+  const fallbackDeck = currentDeck();
+  const changedDecks = new Set();
+  let added = 0;
+  let duplicates = 0;
+  cards.forEach((importedCard) => {
+    const deck = findImportTarget(importedCard, fallbackDeck);
+    const { discipline, ...card } = importedCard;
+    const duplicate = deck.cards.some((existing) => existing.front.trim().toLowerCase() === card.front.trim().toLowerCase());
+    if (duplicate) {
+      duplicates += 1;
+      return;
+    }
+    deck.cards.push(card);
+    changedDecks.add(deck);
+    added += 1;
+  });
+  changedDecks.forEach(persistDeckCards);
   renderManageCards();
   lastTopicDeckId = null;
   render();
-  showToast(`${cards.length} ${cards.length === 1 ? "cartão importado" : "cartões importados"} do ${sourceLabel}`);
+  const duplicateMessage = duplicates ? `; ${duplicates} repetido${duplicates === 1 ? " ignorado" : "s ignorados"}` : "";
+  showToast(`${added} ${added === 1 ? "cartão importado" : "cartões importados"} do ${sourceLabel}${duplicateMessage}`);
 }
 
 async function importCardsIntoCurrentDeck(file) {
+  const originalLabel = elements.cardImportButton.textContent;
+  elements.cardImportButton.disabled = true;
+  elements.cardImportButton.textContent = "Importando...";
   try {
+    if (file.size > 25 * 1024 * 1024) throw new Error("file-too-large");
     const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
     if (isPdf) {
       showToast("Lendo e convertendo o PDF...");
@@ -1248,16 +1210,29 @@ async function importCardsIntoCurrentDeck(file) {
     }
 
     const data = JSON.parse(await file.text());
-    const rawCards = Array.isArray(data) ? data : Array.isArray(data?.cards) ? data.cards : null;
+    const rawCards = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.cards)
+        ? data.cards
+        : Array.isArray(data?.decks)
+          ? data.decks.flatMap((deck) => Array.isArray(deck?.cards)
+            ? deck.cards.map((card) => ({ ...card, discipline: card.discipline || deck.id || deck.title }))
+            : [])
+          : null;
     const cards = normalizeImportedCards(rawCards);
     addImportedCards(cards, "JSON");
   } catch (error) {
     console.error("Falha ao importar cartões:", error);
     showToast(
-      file.name.toLowerCase().endsWith(".pdf")
-        ? "Não foi possível extrair cartões deste PDF"
-        : "Arquivo JSON inválido para importar cartões"
+      error.message === "file-too-large"
+        ? "Arquivo muito grande — limite de 25 MB"
+        : file.name.toLowerCase().endsWith(".pdf")
+          ? "PDF sem texto reconhecível ou formato incompatível"
+          : "JSON inválido: use os campos pergunta/resposta ou front/back"
     );
+  } finally {
+    elements.cardImportButton.disabled = false;
+    elements.cardImportButton.textContent = originalLabel;
   }
 }
 
