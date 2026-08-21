@@ -2,7 +2,7 @@ const CACHE_NAME = "trilha-flashcard-v15";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=20260821-4",
+  "./styles.css?v=20260821-5",
   "./app.js?v=20260821-9",
   "./card-import.js?v=20260821-1",
   "./card-storage.js?v=20260821-1",
