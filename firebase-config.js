@@ -1,7 +1,7 @@
 // Configuração pública do aplicativo Web. A segurança dos dados é aplicada
 // pelas regras do Firestore e pela autenticação, não por estes identificadores.
 globalThis.TrilhaFirebaseConfig = {
-  apiKey: "AIzaSyD79PFaTXTUJBYJYEj1YfYJnfi6lh6DerY",
+  apiKey: "AIzaSyD79PFaTXTUJBYJYEjlYfYJnfi6lh6DerY",
   authDomain: "trilha-flashcard.firebaseapp.com",
   projectId: "trilha-flashcard",
   storageBucket: "trilha-flashcard.firebasestorage.app",
