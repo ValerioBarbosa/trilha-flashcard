@@ -1,9 +1,9 @@
-const CACHE_NAME = "trilha-flashcard-v4";
+const CACHE_NAME = "trilha-flashcard-v9";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=20260820-2",
-  "./app.js?v=20260820-2",
+  "./styles.css?v=20260821-3",
+  "./app.js?v=20260821-3",
   "./decks.js?v=20260820-2",
   "./spaced-repetition.js?v=20260820-2",
   "./motion-animations.js?v=20260820-1",

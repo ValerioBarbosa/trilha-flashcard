@@ -7,8 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Trilha Flashcard" />
-    <meta name="theme-color" content="#fbfcff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" id="theme-color" content="#fbfcff" />
     <meta
       name="description"
       content="Trilha Flashcard — estudos e revisão para concursos públicos."
@@ -23,13 +22,21 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260820-2" />
+    <link rel="stylesheet" href="styles.css?v=20260821-3" />
     <script>
       try {
         const savedTheme = localStorage.getItem("trilha-flashcard-theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const effectiveTheme = savedTheme === "dark" || savedTheme === "light"
+          ? savedTheme
+          : prefersDark ? "dark" : "light";
         if (savedTheme === "dark" || savedTheme === "light") {
           document.documentElement.setAttribute("data-theme", savedTheme);
         }
+        document.querySelector("#theme-color").setAttribute(
+          "content",
+          effectiveTheme === "dark" ? "#0b1220" : "#fbfcff"
+        );
       } catch {}
     </script>
   </head>
@@ -476,6 +483,6 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="decks.js?v=20260820-2"></script>
     <script src="spaced-repetition.js?v=20260820-2"></script>
-    <script src="app.js?v=20260820-2"></script>
+    <script src="app.js?v=20260821-3"></script>
   </body>
 </html>

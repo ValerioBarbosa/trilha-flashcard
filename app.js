@@ -233,6 +233,7 @@ const state = {
 };
 
 let toastTimer;
+let ratingAdvanceTimer = null;
 let lastTopicDeckId = null;
 
 function applyTheme(theme) {
@@ -241,6 +242,13 @@ function applyTheme(theme) {
   } else {
     document.documentElement.removeAttribute("data-theme");
   }
+  const effectiveTheme = theme === "dark" || theme === "light"
+    ? theme
+    : systemPrefersDark() ? "dark" : "light";
+  document.querySelector("#theme-color")?.setAttribute(
+    "content",
+    effectiveTheme === "dark" ? "#0b1220" : "#fbfcff"
+  );
 }
 
 function systemPrefersDark() {
@@ -427,7 +435,7 @@ function renderProgress() {
       return `<span class="progress-segment ${status}" aria-hidden="true"></span>`;
     })
     .join("");
-  elements.sessionCount.textContent = `${stats.reviewed} de ${total}`;
+  elements.sessionCount.textContent = total === 0 ? "0 de 0" : `${(position === -1 ? 0 : position) + 1} de ${total}`;
   elements.sessionDots.innerHTML = indices
     .map((cardIndex) => {
       const card = deck.cards[cardIndex];
@@ -449,8 +457,8 @@ function renderCard() {
   const isEmpty = !card;
   elements.flashcard.disabled = isEmpty;
   elements.reveal.disabled = isEmpty;
-  elements.forgot.disabled = isEmpty;
-  elements.remembered.disabled = isEmpty;
+  elements.forgot.disabled = isEmpty || ratingAdvanceTimer !== null;
+  elements.remembered.disabled = isEmpty || ratingAdvanceTimer !== null;
   elements.previous.disabled = isEmpty;
   elements.next.disabled = isEmpty;
 
@@ -602,16 +610,25 @@ function goToEntry(entry) {
 
 function rateCard(didRemember) {
   const key = currentCardKey();
-  if (!key) return;
+  if (!key || ratingAdvanceTimer !== null) return;
   const now = new Date();
   state.ratings[key] = computeNextRating(state.ratings[key], didRemember, now);
+  elements.forgot.disabled = true;
+  elements.remembered.disabled = true;
   registerActivity();
   renderProgress();
   renderDashboard();
   saveProgress();
   showToast(didRemember ? "Boa — revisão agendada" : "Tudo bem — veremos novamente amanhã");
 
-  window.setTimeout(() => {
+  ratingAdvanceTimer = window.setTimeout(() => {
+    ratingAdvanceTimer = null;
+
+    if (currentCardKey() !== key) {
+      renderCard();
+      return;
+    }
+
     if (!state.queueMode) {
       move(1);
       return;
@@ -870,10 +887,20 @@ function editalDecks() {
   return decks.filter((deck) => deck.id !== "trt4-overview" && Array.isArray(deck.topics) && deck.topics.length > 0);
 }
 
-function renderDisciplineOptions(selectedDeckId = "") {
+function renderDisciplineOptions(selectedDeckId = "", extraDeck = null) {
+  const availableDecks = editalDecks();
+  if (
+    extraDeck
+    && Array.isArray(extraDeck.topics)
+    && extraDeck.topics.length > 0
+    && !availableDecks.some((deck) => deck.id === extraDeck.id)
+  ) {
+    availableDecks.unshift(extraDeck);
+  }
+
   elements.cardFormDiscipline.innerHTML = [
     '<option value="">Selecione a disciplina</option>',
-    ...editalDecks().map((deck) => `<option value="${escapeHtml(deck.id)}">${escapeHtml(deck.title)}</option>`),
+    ...availableDecks.map((deck) => `<option value="${escapeHtml(deck.id)}">${escapeHtml(deck.title)}</option>`),
   ].join("");
   elements.cardFormDiscipline.value = selectedDeckId;
 }
@@ -906,12 +933,15 @@ function checkTopicWarning() {
 function openCardForm(index) {
   const sourceDeck = currentDeck();
   const card = index === null ? null : sourceDeck.cards[index];
-  const defaultDeck = sourceDeck.topics?.length ? sourceDeck : editalDecks()[0];
+  const disciplineDecks = editalDecks();
+  const defaultDeck = disciplineDecks.some((deck) => deck.id === sourceDeck.id)
+    ? sourceDeck
+    : disciplineDecks[0];
   const selectedDeckId = card ? sourceDeck.id : defaultDeck?.id || "";
 
   elements.cardFormIndex.value = index === null ? "" : String(index);
   elements.cardFormSourceDeck.value = sourceDeck.id;
-  renderDisciplineOptions(selectedDeckId);
+  renderDisciplineOptions(selectedDeckId, card ? sourceDeck : null);
   renderTopicOptions(card?.topic || "");
   elements.cardFormFront.value = card?.front || "";
   elements.cardFormBack.value = card?.back || "";
@@ -1325,24 +1355,27 @@ elements.searchInput.addEventListener("keydown", (event) => {
 elements.topicSelect.addEventListener("change", (event) => {
   state.topicFilter = event.target.value;
   const indices = getFilteredIndices();
-  state.index = indices.includes(state.index) ? state.index : indices[0];
+  state.index = indices.includes(state.index) ? state.index : indices[0] ?? 0;
   state.flipped = false;
   render();
 });
 
 document.addEventListener("keydown", (event) => {
   if (elements.dashboardDialog.open || elements.manageCardsDialog.open || elements.installDialog.open) return;
-  if (
-    event.target instanceof HTMLSelectElement
-    || event.target instanceof HTMLButtonElement
+  const isTypingTarget = event.target instanceof HTMLSelectElement
     || event.target instanceof HTMLInputElement
-  ) return;
+    || event.target instanceof HTMLTextAreaElement
+    || event.target.isContentEditable;
+  if (isTypingTarget) return;
   if (event.code === "Space") {
+    if (event.target instanceof HTMLButtonElement) return;
     event.preventDefault();
     toggleCard();
   } else if (event.key === "ArrowLeft") {
+    event.preventDefault();
     move(-1);
   } else if (event.key === "ArrowRight") {
+    event.preventDefault();
     move(1);
   }
 });
