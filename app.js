@@ -1677,7 +1677,7 @@ document.addEventListener("keydown", (event) => {
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("sw.js?v=20260821-8", { updateViaCache: "none" })
+      .register("sw.js?v=20260821-9", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {});
   });
