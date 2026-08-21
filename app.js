@@ -1,58 +1,22 @@
 const STORAGE_KEY = "trilha-flashcard-state";
 const THEME_STORAGE_KEY = "trilha-flashcard-theme";
-const CUSTOM_DECKS_KEY = "trilha-flashcard-custom-decks";
-const BUILTIN_OVERRIDES_KEY = "trilha-flashcard-builtin-overrides";
 const { dateKey, cardKey: buildCardKey, computeNextRating, isDue, isWrong, getStudyStreak: computeStudyStreak } = SpacedRepetition;
-
-function loadCustomDecks() {
-  try {
-    const value = JSON.parse(localStorage.getItem(CUSTOM_DECKS_KEY) || "[]");
-    return Array.isArray(value) ? value : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveCustomDecks() {
-  localStorage.setItem(CUSTOM_DECKS_KEY, JSON.stringify(decks.filter((deck) => deck.custom)));
-}
-
-function loadBuiltinOverrides() {
-  try {
-    const value = JSON.parse(localStorage.getItem(BUILTIN_OVERRIDES_KEY) || "{}");
-    return value && typeof value === "object" && !Array.isArray(value) ? value : {};
-  } catch {
-    return {};
-  }
-}
-
-function saveBuiltinOverrides() {
-  const overrides = {};
-  decks.forEach((deck) => {
-    if (!deck.custom) overrides[deck.id] = deck.cards;
-  });
-  localStorage.setItem(BUILTIN_OVERRIDES_KEY, JSON.stringify(overrides));
-}
+const deckStorage = CardStorage.createDeckStorage(localStorage);
+const decks = [...trt4Decks, ...deckStorage.loadCustomDecks()];
 
 function persistDeckCards(deck) {
-  if (deck.custom) {
-    saveCustomDecks();
-  } else {
-    saveBuiltinOverrides();
-  }
+  deckStorage.persistDecks([deck], decks);
 }
 
-const decks = [...trt4Decks, ...loadCustomDecks()];
-
 (function applyBuiltinOverrides() {
-  const overrides = loadBuiltinOverrides();
   decks.forEach((deck) => {
+    const override = deck.custom ? null : deckStorage.loadBuiltinOverride(deck.id);
     if (
       !deck.custom
-      && Array.isArray(overrides[deck.id])
-      && (overrides[deck.id].length > 0 || deck.cards.length === 0)
+      && Array.isArray(override)
+      && (override.length > 0 || deck.cards.length === 0)
     ) {
-      deck.cards = overrides[deck.id];
+      deck.cards = override;
     }
   });
 })();
@@ -1165,6 +1129,7 @@ function addImportedCards(cards, sourceLabel) {
 
   const fallbackDeck = currentDeck();
   const changedDecks = new Set();
+  const snapshots = new Map();
   let added = 0;
   let duplicates = 0;
   cards.forEach((importedCard) => {
@@ -1175,11 +1140,19 @@ function addImportedCards(cards, sourceLabel) {
       duplicates += 1;
       return;
     }
+    if (!snapshots.has(deck)) snapshots.set(deck, deck.cards.slice());
     deck.cards.push(card);
     changedDecks.add(deck);
     added += 1;
   });
-  changedDecks.forEach(persistDeckCards);
+  try {
+    deckStorage.persistDecks(changedDecks, decks);
+  } catch (error) {
+    snapshots.forEach((snapshot, deck) => {
+      deck.cards = snapshot;
+    });
+    throw new Error("storage-failed", { cause: error });
+  }
   renderManageCards();
   lastTopicDeckId = null;
   render();
@@ -1226,6 +1199,8 @@ async function importCardsIntoCurrentDeck(file) {
     showToast(
       error.message === "file-too-large"
         ? "Arquivo muito grande — limite de 25 MB"
+        : error.message === "storage-failed"
+          ? "Não foi possível salvar os cartões. Libere espaço no navegador e tente novamente"
         : file.name.toLowerCase().endsWith(".pdf")
           ? "PDF sem texto reconhecível ou formato incompatível"
           : "JSON inválido: use os campos pergunta/resposta ou front/back"
