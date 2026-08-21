@@ -47,7 +47,11 @@ const decks = [...trt4Decks, ...loadCustomDecks()];
 (function applyBuiltinOverrides() {
   const overrides = loadBuiltinOverrides();
   decks.forEach((deck) => {
-    if (!deck.custom && Array.isArray(overrides[deck.id])) {
+    if (
+      !deck.custom
+      && Array.isArray(overrides[deck.id])
+      && (overrides[deck.id].length > 0 || deck.cards.length === 0)
+    ) {
       deck.cards = overrides[deck.id];
     }
   });
@@ -101,10 +105,6 @@ const elements = {
   exportButton: document.querySelector("#export-button"),
   importButton: document.querySelector("#import-button"),
   importInput: document.querySelector("#import-input"),
-  importDeckButton: document.querySelector("#import-deck-button"),
-  importDeckInput: document.querySelector("#import-deck-input"),
-  manageCardsCount: document.querySelector("#manage-cards-count"),
-  manageCardsCoverage: document.querySelector("#manage-cards-coverage"),
   openManageCardsButton: document.querySelector("#open-manage-cards-button"),
   manageCardsDialog: document.querySelector("#manage-cards-dialog"),
   manageCardsClose: document.querySelector("#manage-cards-close"),
@@ -117,11 +117,17 @@ const elements = {
   cardListSearch: document.querySelector("#card-list-search"),
   cardForm: document.querySelector("#card-form"),
   cardFormIndex: document.querySelector("#card-form-index"),
+  cardFormSourceDeck: document.querySelector("#card-form-source-deck"),
+  cardFormDiscipline: document.querySelector("#card-form-discipline"),
   cardFormFront: document.querySelector("#card-form-front"),
   cardFormBack: document.querySelector("#card-form-back"),
   cardFormTopic: document.querySelector("#card-form-topic"),
-  cardFormTopicList: document.querySelector("#card-form-topic-list"),
   cardFormTopicWarning: document.querySelector("#card-form-topic-warning"),
+  cardFormSubtopic: document.querySelector("#card-form-subtopic"),
+  cardFormLegalBasis: document.querySelector("#card-form-legal-basis"),
+  cardFormType: document.querySelector("#card-form-type"),
+  cardFormPriority: document.querySelector("#card-form-priority"),
+  cardFormDifficulty: document.querySelector("#card-form-difficulty"),
   cardFormTag: document.querySelector("#card-form-tag"),
   cardFormExample: document.querySelector("#card-form-example"),
   cardFormComplement: document.querySelector("#card-form-complement"),
@@ -130,8 +136,75 @@ const elements = {
   cardFormCancel: document.querySelector("#card-form-cancel"),
   cardFormSaveAddAnother: document.querySelector("#card-form-save-add-another"),
   cardList: document.querySelector("#card-list"),
+  installButton: document.querySelector("#install-app-button"),
+  installDialog: document.querySelector("#install-dialog"),
+  installDialogClose: document.querySelector("#install-dialog-close"),
+  installDialogIntro: document.querySelector("#install-dialog-intro"),
+  installSteps: document.querySelector("#install-steps"),
+  installConfirmButton: document.querySelector("#install-confirm-button"),
   toast: document.querySelector("#toast"),
 };
+
+let deferredInstallPrompt = null;
+
+function isAppInstalled() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+function isIOSDevice() {
+  return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+}
+
+function setInstallButtonVisibility() {
+  elements.installButton.hidden = isAppInstalled();
+}
+
+function openInstallDialog() {
+  if (isAppInstalled()) {
+    showToast("O aplicativo já está instalado");
+    return;
+  }
+
+  const isIOS = isIOSDevice();
+  elements.installDialogIntro.textContent = isIOS
+    ? "No iPhone ou iPad, a instalação é feita pelo menu Compartilhar do Safari."
+    : deferredInstallPrompt
+      ? "Instale o aplicativo para acessar seus flashcards diretamente pela tela inicial."
+      : "Use o menu do navegador para adicionar o aplicativo à tela inicial.";
+
+  elements.installSteps.innerHTML = isIOS
+    ? "<li>Abra esta página no Safari.</li><li>Toque no botão Compartilhar.</li><li>Escolha “Adicionar à Tela de Início”.</li><li>Toque em “Adicionar”.</li>"
+    : deferredInstallPrompt
+      ? "<li>Toque em “Instalar agora” abaixo.</li><li>Confirme a instalação apresentada pelo navegador.</li><li>Abra o Trilha Flashcard pela tela inicial.</li>"
+      : "<li>Abra o menu do navegador.</li><li>Escolha “Instalar aplicativo” ou “Adicionar à tela inicial”.</li><li>Confirme a instalação.</li>";
+
+  elements.installConfirmButton.hidden = !deferredInstallPrompt || isIOS;
+  elements.installDialog.showModal();
+  elements.installDialogClose.focus();
+}
+
+function closeInstallDialog() {
+  if (elements.installDialog.open) elements.installDialog.close();
+  elements.installButton.focus();
+}
+
+async function promptInstall() {
+  if (!deferredInstallPrompt) {
+    openInstallDialog();
+    return;
+  }
+
+  deferredInstallPrompt.prompt();
+  const choice = await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  closeInstallDialog();
+  if (choice.outcome === "accepted") {
+    elements.installButton.hidden = true;
+    showToast("Instalação iniciada");
+  } else {
+    showToast("Instalação cancelada");
+  }
+}
 
 function loadSavedState() {
   try {
@@ -160,6 +233,7 @@ const state = {
 };
 
 let toastTimer;
+let ratingAdvanceTimer = null;
 let lastTopicDeckId = null;
 
 function applyTheme(theme) {
@@ -168,6 +242,13 @@ function applyTheme(theme) {
   } else {
     document.documentElement.removeAttribute("data-theme");
   }
+  const effectiveTheme = theme === "dark" || theme === "light"
+    ? theme
+    : systemPrefersDark() ? "dark" : "light";
+  document.querySelector("#theme-color")?.setAttribute(
+    "content",
+    effectiveTheme === "dark" ? "#0b1220" : "#fbfcff"
+  );
 }
 
 function systemPrefersDark() {
@@ -354,7 +435,7 @@ function renderProgress() {
       return `<span class="progress-segment ${status}" aria-hidden="true"></span>`;
     })
     .join("");
-  elements.sessionCount.textContent = `${stats.reviewed} de ${total}`;
+  elements.sessionCount.textContent = total === 0 ? "0 de 0" : `${(position === -1 ? 0 : position) + 1} de ${total}`;
   elements.sessionDots.innerHTML = indices
     .map((cardIndex) => {
       const card = deck.cards[cardIndex];
@@ -376,8 +457,8 @@ function renderCard() {
   const isEmpty = !card;
   elements.flashcard.disabled = isEmpty;
   elements.reveal.disabled = isEmpty;
-  elements.forgot.disabled = isEmpty;
-  elements.remembered.disabled = isEmpty;
+  elements.forgot.disabled = isEmpty || ratingAdvanceTimer !== null;
+  elements.remembered.disabled = isEmpty || ratingAdvanceTimer !== null;
   elements.previous.disabled = isEmpty;
   elements.next.disabled = isEmpty;
 
@@ -459,15 +540,6 @@ function renderDashboard() {
     ? `Revisar ${wrongEntries.length} ${wrongEntries.length === 1 ? "errado" : "errados"}`
     : "Nenhum cartão errado";
 
-  const currentDeckValue = currentDeck();
-  const currentCount = currentDeckValue.cards.length;
-  elements.manageCardsCount.textContent = `${currentCount} ${currentCount === 1 ? "cartão" : "cartões"}`;
-  const currentCoverage = getTopicCoverage(currentDeckValue);
-  elements.manageCardsCoverage.hidden = !currentCoverage;
-  elements.manageCardsCoverage.textContent = currentCoverage
-    ? `${currentCoverage.covered} de ${currentCoverage.total} assuntos do edital com pelo menos 1 cartão.`
-    : "";
-
   elements.deckPerformance.innerHTML = getDecksForDisplay().map((deck) => {
     const stats = getDeckStats(deck);
     const progress = deck.cards.length ? Math.round((stats.reviewed / deck.cards.length) * 100) : 0;
@@ -538,16 +610,25 @@ function goToEntry(entry) {
 
 function rateCard(didRemember) {
   const key = currentCardKey();
-  if (!key) return;
+  if (!key || ratingAdvanceTimer !== null) return;
   const now = new Date();
   state.ratings[key] = computeNextRating(state.ratings[key], didRemember, now);
+  elements.forgot.disabled = true;
+  elements.remembered.disabled = true;
   registerActivity();
   renderProgress();
   renderDashboard();
   saveProgress();
   showToast(didRemember ? "Boa — revisão agendada" : "Tudo bem — veremos novamente amanhã");
 
-  window.setTimeout(() => {
+  ratingAdvanceTimer = window.setTimeout(() => {
+    ratingAdvanceTimer = null;
+
+    if (currentCardKey() !== key) {
+      renderCard();
+      return;
+    }
+
     if (!state.queueMode) {
       move(1);
       return;
@@ -720,76 +801,6 @@ function importProgress(file) {
   reader.readAsText(file);
 }
 
-function slugify(text) {
-  return (
-    text
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "") || "baralho"
-  );
-}
-
-function normalizeImportedDeck(raw) {
-  if (!raw || typeof raw !== "object") return null;
-  const title = typeof raw.title === "string" ? raw.title.trim() : "";
-  const cardsInput = Array.isArray(raw.cards) ? raw.cards : null;
-  if (!title || !cardsInput) return null;
-
-  const cards = cardsInput
-    .filter((card) => card && typeof card.front === "string" && card.front.trim() && typeof card.back === "string" && card.back.trim())
-    .map((card) => ({
-      front: card.front.trim(),
-      back: card.back.trim(),
-      ...(typeof card.example === "string" ? { example: card.example } : {}),
-      ...(typeof card.tag === "string" ? { tag: card.tag } : {}),
-      ...(typeof card.topic === "string" ? { topic: card.topic } : {}),
-      ...(typeof card.complement === "string" ? { complement: card.complement } : {}),
-      ...(typeof card.pitfall === "string" ? { pitfall: card.pitfall } : {}),
-      ...(typeof card.mnemonic === "string" ? { mnemonic: card.mnemonic } : {}),
-    }));
-
-  if (!cards.length) return null;
-
-  return {
-    id: `custom-${slugify(title)}-${Date.now().toString(36)}`,
-    title,
-    custom: true,
-    cards,
-  };
-}
-
-function importDeck(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      const rawDecks = Array.isArray(data) ? data : Array.isArray(data?.decks) ? data.decks : [data];
-      const imported = rawDecks.map(normalizeImportedDeck).filter(Boolean);
-      if (!imported.length) throw new Error("invalid");
-
-      imported.forEach((deck) => decks.push(deck));
-      saveCustomDecks();
-      renderDeckOptions();
-      state.deckId = imported[0].id;
-      state.index = 0;
-      state.flipped = false;
-      state.queueMode = null;
-      render();
-      showToast(
-        imported.length === 1
-          ? `Baralho "${imported[0].title}" importado com ${imported[0].cards.length} cartões`
-          : `${imported.length} baralhos importados`
-      );
-    } catch {
-      showToast("Arquivo inválido para importar baralho");
-    }
-  };
-  reader.onerror = () => showToast("Não foi possível ler o arquivo");
-  reader.readAsText(file);
-}
-
 function removeCustomDeck(deckId) {
   const deck = decks.find((entry) => entry.id === deckId && entry.custom);
   if (!deck) return;
@@ -822,7 +833,7 @@ function openManageCards() {
 function closeManageCards() {
   if (elements.manageCardsDialog.open) elements.manageCardsDialog.close();
   closeCardForm();
-  openDashboard();
+  elements.openManageCardsButton.focus();
 }
 
 function renderManageCards() {
@@ -836,19 +847,15 @@ function renderManageCards() {
     elements.manageCardsSummary.textContent += ` ${coverage.covered} de ${coverage.total} assuntos do edital com cartão.`;
   }
 
-  elements.cardFormTopicList.innerHTML = getUniqueTopics(deck)
-    .map((topic) => `<option value="${escapeHtml(topic)}"></option>`)
-    .join("");
-
   elements.cardList.innerHTML = deck.cards.length
     ? deck.cards
         .map((card, index) => {
-          const searchValue = [card.front, card.back, card.topic].filter(Boolean).join(" ").toLowerCase();
+          const searchValue = [card.front, card.back, card.topic, card.subtopic, card.legalBasis, card.type, card.priority, card.difficulty].filter(Boolean).join(" ").toLowerCase();
           return `
             <article class="card-list-row" data-search="${escapeHtml(searchValue)}">
               <div class="card-list-row-main">
                 <span class="card-list-front">${escapeHtml(card.front)}</span>
-                <span class="card-list-topic">${card.topic ? escapeHtml(card.topic) : "sem assunto"}</span>
+                <span class="card-list-topic">${[card.topic, card.subtopic, card.type, card.priority ? `Prioridade ${card.priority}` : "", card.difficulty].filter(Boolean).map(escapeHtml).join(" · ") || "sem classificação"}</span>
               </div>
               <div class="card-list-row-actions">
                 <button type="button" class="data-button" data-edit-card="${index}">Editar</button>
@@ -876,105 +883,198 @@ function filterCardList() {
   });
 }
 
+function editalDecks() {
+  return decks.filter((deck) => deck.id !== "trt4-overview" && Array.isArray(deck.topics) && deck.topics.length > 0);
+}
+
+function renderDisciplineOptions(selectedDeckId = "", extraDeck = null) {
+  const availableDecks = editalDecks();
+  if (
+    extraDeck
+    && Array.isArray(extraDeck.topics)
+    && extraDeck.topics.length > 0
+    && !availableDecks.some((deck) => deck.id === extraDeck.id)
+  ) {
+    availableDecks.unshift(extraDeck);
+  }
+
+  elements.cardFormDiscipline.innerHTML = [
+    '<option value="">Selecione a disciplina</option>',
+    ...availableDecks.map((deck) => `<option value="${escapeHtml(deck.id)}">${escapeHtml(deck.title)}</option>`),
+  ].join("");
+  elements.cardFormDiscipline.value = selectedDeckId;
+}
+
+function renderTopicOptions(selectedTopic = "") {
+  const deck = decks.find((entry) => entry.id === elements.cardFormDiscipline.value);
+  const topics = Array.isArray(deck?.topics) ? deck.topics : [];
+  const options = ['<option value="">Selecione o assunto</option>'];
+
+  topics.forEach((topic) => {
+    options.push(`<option value="${escapeHtml(topic)}">${escapeHtml(topic)}</option>`);
+  });
+  if (selectedTopic && !topics.includes(selectedTopic)) {
+    options.push(`<option value="${escapeHtml(selectedTopic)}">${escapeHtml(selectedTopic)} (importado)</option>`);
+  }
+
+  elements.cardFormTopic.innerHTML = options.join("");
+  elements.cardFormTopic.disabled = !deck;
+  elements.cardFormTopic.value = selectedTopic;
+  checkTopicWarning();
+}
+
 function checkTopicWarning() {
-  const deck = currentDeck();
-  const value = elements.cardFormTopic.value.trim();
-  const isUnknown = Boolean(value) && Array.isArray(deck.topics) && deck.topics.length > 0 && !deck.topics.includes(value);
+  const deck = decks.find((entry) => entry.id === elements.cardFormDiscipline.value);
+  const value = elements.cardFormTopic.value;
+  const isUnknown = Boolean(value) && Array.isArray(deck?.topics) && !deck.topics.includes(value);
   elements.cardFormTopicWarning.hidden = !isUnknown;
 }
 
 function openCardForm(index) {
-  const deck = currentDeck();
-  const card = index === null ? null : deck.cards[index];
+  const sourceDeck = currentDeck();
+  const card = index === null ? null : sourceDeck.cards[index];
+  const disciplineDecks = editalDecks();
+  const defaultDeck = disciplineDecks.some((deck) => deck.id === sourceDeck.id)
+    ? sourceDeck
+    : disciplineDecks[0];
+  const selectedDeckId = card ? sourceDeck.id : defaultDeck?.id || "";
+
   elements.cardFormIndex.value = index === null ? "" : String(index);
+  elements.cardFormSourceDeck.value = sourceDeck.id;
+  renderDisciplineOptions(selectedDeckId, card ? sourceDeck : null);
+  renderTopicOptions(card?.topic || "");
   elements.cardFormFront.value = card?.front || "";
   elements.cardFormBack.value = card?.back || "";
-  elements.cardFormTopic.value = card?.topic || "";
+  elements.cardFormSubtopic.value = card?.subtopic || "";
+  elements.cardFormLegalBasis.value = card?.legalBasis || "";
+  elements.cardFormType.value = card?.type || "Conceito";
+  elements.cardFormPriority.value = card?.priority || "B";
+  elements.cardFormDifficulty.value = card?.difficulty || "Médio";
   elements.cardFormTag.value = card?.tag || "";
   elements.cardFormExample.value = card?.example || "";
   elements.cardFormComplement.value = card?.complement || "";
   elements.cardFormPitfall.value = card?.pitfall || "";
   elements.cardFormMnemonic.value = card?.mnemonic || "";
   elements.cardFormSaveAddAnother.hidden = index !== null;
-  checkTopicWarning();
   elements.cardForm.hidden = false;
   elements.cardForm.scrollIntoView({ block: "nearest" });
-  elements.cardFormFront.focus();
+  elements.cardFormDiscipline.focus();
 }
 
 function closeCardForm() {
   elements.cardForm.hidden = true;
   elements.cardForm.reset();
   elements.cardFormIndex.value = "";
+  elements.cardFormSourceDeck.value = "";
   elements.cardFormTopicWarning.hidden = true;
 }
 
 function buildCardFromForm() {
   const front = elements.cardFormFront.value.trim();
   const back = elements.cardFormBack.value.trim();
-  if (!front || !back) return null;
+  const disciplineId = elements.cardFormDiscipline.value;
+  const topic = elements.cardFormTopic.value;
+  if (!front || !back || !disciplineId || !topic) return null;
 
-  const card = { front, back };
-  const topic = elements.cardFormTopic.value.trim();
+  const card = {
+    front,
+    back,
+    topic,
+    type: elements.cardFormType.value,
+    priority: elements.cardFormPriority.value,
+    difficulty: elements.cardFormDifficulty.value,
+  };
+  const subtopic = elements.cardFormSubtopic.value.trim();
+  const legalBasis = elements.cardFormLegalBasis.value.trim();
   const tag = elements.cardFormTag.value.trim();
   const example = elements.cardFormExample.value.trim();
   const complement = elements.cardFormComplement.value.trim();
   const pitfall = elements.cardFormPitfall.value.trim();
   const mnemonic = elements.cardFormMnemonic.value.trim();
-  if (topic) card.topic = topic;
+  if (subtopic) card.subtopic = subtopic;
+  if (legalBasis) card.legalBasis = legalBasis;
   if (tag) card.tag = tag;
   if (example) card.example = example;
   if (complement) card.complement = complement;
   if (pitfall) card.pitfall = pitfall;
   if (mnemonic) card.mnemonic = mnemonic;
-  return card;
+  return { card, disciplineId };
 }
 
 function handleCardFormSubmit(event) {
   event.preventDefault();
-  const newCard = buildCardFromForm();
-  if (!newCard) {
-    showToast("Preencha o enunciado e o gabarito");
+  const built = buildCardFromForm();
+  if (!built) {
+    showToast("Preencha Disciplina, Assunto, Enunciado e Gabarito");
     return;
   }
 
-  const deck = currentDeck();
+  const { card: newCard, disciplineId } = built;
+  const targetDeck = decks.find((deck) => deck.id === disciplineId);
+  const sourceDeck = decks.find((deck) => deck.id === elements.cardFormSourceDeck.value) || currentDeck();
+  if (!targetDeck || !targetDeck.topics.includes(newCard.topic)) {
+    showToast("Selecione uma disciplina e um assunto válidos do edital");
+    return;
+  }
+
   const indexValue = elements.cardFormIndex.value;
   const isEdit = indexValue !== "";
   const editingIndex = isEdit ? Number(indexValue) : -1;
-
-  const duplicateIndex = deck.cards.findIndex(
-    (card, index) => index !== editingIndex && card.front.trim().toLowerCase() === newCard.front.trim().toLowerCase()
+  const duplicateIndex = targetDeck.cards.findIndex(
+    (card, index) => !(isEdit && targetDeck.id === sourceDeck.id && index === editingIndex)
+      && card.front.trim().toLowerCase() === newCard.front.trim().toLowerCase()
   );
-  if (duplicateIndex !== -1 && !window.confirm("Já existe um cartão com este enunciado neste baralho. Salvar mesmo assim?")) {
+  if (duplicateIndex !== -1 && !window.confirm("Já existe um cartão com este enunciado nesta disciplina. Salvar mesmo assim?")) {
     return;
   }
 
   if (isEdit) {
-    const previousCard = deck.cards[editingIndex];
-    const previousKey = buildCardKey(deck.id, previousCard.front);
-    const newKey = buildCardKey(deck.id, newCard.front);
-    if (previousKey !== newKey && state.ratings[previousKey]) {
-      state.ratings[newKey] = state.ratings[previousKey];
-      delete state.ratings[previousKey];
+    const previousCard = sourceDeck.cards[editingIndex];
+    if (!previousCard) {
+      showToast("Cartão original não encontrado");
+      return;
     }
-    deck.cards[editingIndex] = newCard;
+    const previousKey = buildCardKey(sourceDeck.id, previousCard.front);
+    const newKey = buildCardKey(targetDeck.id, newCard.front);
+    if (state.ratings[previousKey]) {
+      state.ratings[newKey] = state.ratings[previousKey];
+      if (previousKey !== newKey) delete state.ratings[previousKey];
+    }
+
+    if (sourceDeck.id === targetDeck.id) {
+      sourceDeck.cards[editingIndex] = newCard;
+      persistDeckCards(sourceDeck);
+    } else {
+      sourceDeck.cards.splice(editingIndex, 1);
+      targetDeck.cards.push(newCard);
+      persistDeckCards(sourceDeck);
+      persistDeckCards(targetDeck);
+    }
   } else {
-    deck.cards.push(newCard);
+    targetDeck.cards.push(newCard);
+    persistDeckCards(targetDeck);
   }
 
-  persistDeckCards(deck);
-  renderManageCards();
+  state.deckId = targetDeck.id;
+  state.index = Math.max(0, targetDeck.cards.indexOf(newCard));
+  state.topicFilter = "";
+  renderDeckOptions();
   lastTopicDeckId = null;
   render();
+  renderManageCards();
 
   const keepOpen = !isEdit && event.submitter?.id === "card-form-save-add-another";
   if (keepOpen) {
     const topic = elements.cardFormTopic.value;
+    const selectedDiscipline = elements.cardFormDiscipline.value;
     elements.cardForm.reset();
     elements.cardFormIndex.value = "";
-    elements.cardFormTopic.value = topic;
-    checkTopicWarning();
+    elements.cardFormSourceDeck.value = targetDeck.id;
+    renderDisciplineOptions(selectedDiscipline);
+    renderTopicOptions(topic);
+    elements.cardFormType.value = "Conceito";
+    elements.cardFormPriority.value = "B";
+    elements.cardFormDifficulty.value = "Médio";
     elements.cardFormFront.focus();
     showToast("Cartão adicionado — continue digitando");
   } else {
@@ -999,42 +1099,153 @@ function deleteCard(index) {
   showToast("Cartão excluído");
 }
 
-function importCardsIntoCurrentDeck(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      const rawCards = Array.isArray(data) ? data : Array.isArray(data?.cards) ? data.cards : null;
-      if (!rawCards) throw new Error("invalid");
+const PDFJS_MODULE_URL = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
+const PDFJS_WORKER_URL = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
 
-      const cards = rawCards
-        .filter((card) => card && typeof card.front === "string" && card.front.trim() && typeof card.back === "string" && card.back.trim())
-        .map((card) => ({
-          front: card.front.trim(),
-          back: card.back.trim(),
-          ...(typeof card.example === "string" && card.example ? { example: card.example } : {}),
-          ...(typeof card.tag === "string" && card.tag ? { tag: card.tag } : {}),
-          ...(typeof card.topic === "string" && card.topic ? { topic: card.topic } : {}),
-          ...(typeof card.complement === "string" && card.complement ? { complement: card.complement } : {}),
-          ...(typeof card.pitfall === "string" && card.pitfall ? { pitfall: card.pitfall } : {}),
-          ...(typeof card.mnemonic === "string" && card.mnemonic ? { mnemonic: card.mnemonic } : {}),
-        }));
+function normalizeImportedCards(rawCards) {
+  if (!Array.isArray(rawCards)) return [];
 
-      if (!cards.length) throw new Error("invalid");
+  return rawCards
+    .filter((card) => card && typeof card.front === "string" && card.front.trim() && typeof card.back === "string" && card.back.trim())
+    .map((card) => ({
+      front: card.front.trim(),
+      back: card.back.trim(),
+      ...(typeof card.example === "string" && card.example.trim() ? { example: card.example.trim() } : {}),
+      ...(typeof card.tag === "string" && card.tag.trim() ? { tag: card.tag.trim() } : {}),
+      ...(typeof card.topic === "string" && card.topic.trim() ? { topic: card.topic.trim() } : {}),
+      ...(typeof card.complement === "string" && card.complement.trim() ? { complement: card.complement.trim() } : {}),
+      ...(typeof card.pitfall === "string" && card.pitfall.trim() ? { pitfall: card.pitfall.trim() } : {}),
+      ...(typeof card.mnemonic === "string" && card.mnemonic.trim() ? { mnemonic: card.mnemonic.trim() } : {}),
+    }));
+}
 
-      const deck = currentDeck();
-      cards.forEach((card) => deck.cards.push(card));
-      persistDeckCards(deck);
-      renderManageCards();
-      lastTopicDeckId = null;
-      render();
-      showToast(`${cards.length} ${cards.length === 1 ? "cartão importado" : "cartões importados"}`);
-    } catch {
-      showToast("Arquivo inválido para importar cartões");
+function parseLabeledPdfCards(text) {
+  const cards = [];
+  const lines = text.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+  const frontPattern = /^(?:pergunta|quest[aã]o|frente|q)\s*[:\-–—]\s*(.*)$/i;
+  const backPattern = /^(?:resposta|gabarito|verso|a)\s*[:\-–—]\s*(.*)$/i;
+  let current = null;
+  let side = null;
+
+  const finish = () => {
+    if (current?.front?.trim() && current?.back?.trim()) {
+      cards.push({ front: current.front.trim(), back: current.back.trim(), tag: "PDF" });
     }
   };
-  reader.onerror = () => showToast("Não foi possível ler o arquivo");
-  reader.readAsText(file);
+
+  lines.forEach((line) => {
+    const frontMatch = line.match(frontPattern);
+    const backMatch = line.match(backPattern);
+
+    if (frontMatch) {
+      finish();
+      current = { front: frontMatch[1], back: "" };
+      side = "front";
+    } else if (backMatch && current) {
+      current.back = backMatch[1];
+      side = "back";
+    } else if (current && side) {
+      current[side] = `${current[side]}\n${line}`.trim();
+    }
+  });
+  finish();
+  return cards;
+}
+
+function parsePdfPageFallback(text, pageNumber) {
+  const blocks = text.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean);
+  if (blocks.length >= 2) {
+    return {
+      front: blocks[0],
+      back: blocks.slice(1).join("\n\n"),
+      tag: "PDF",
+      complement: `Importado da página ${pageNumber}.`,
+    };
+  }
+
+  const lines = text.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+  if (lines.length >= 2) {
+    return {
+      front: lines[0],
+      back: lines.slice(1).join("\n"),
+      tag: "PDF",
+      complement: `Importado da página ${pageNumber}.`,
+    };
+  }
+  return null;
+}
+
+async function extractCardsFromPdf(file) {
+  const pdfjs = await import(PDFJS_MODULE_URL);
+  pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
+  const pdf = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
+  const cards = [];
+
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+    const page = await pdf.getPage(pageNumber);
+    const content = await page.getTextContent();
+    let pageText = "";
+    content.items.forEach((item) => {
+      pageText += item.str;
+      pageText += item.hasEOL ? "\n" : " ";
+    });
+    pageText = pageText.replace(/[ \t]+\n/g, "\n").replace(/[ \t]{2,}/g, " ").trim();
+    if (!pageText) continue;
+
+    const labeled = parseLabeledPdfCards(pageText);
+    if (labeled.length) {
+      cards.push(...labeled.map((card) => ({ ...card, complement: `Importado da página ${pageNumber}.` })));
+    } else {
+      const fallback = parsePdfPageFallback(pageText, pageNumber);
+      if (fallback) cards.push(fallback);
+    }
+  }
+
+  return cards;
+}
+
+function addImportedCards(cards, sourceLabel) {
+  if (!cards.length) throw new Error("empty");
+
+  const deck = currentDeck();
+  cards.forEach((card) => deck.cards.push(card));
+  persistDeckCards(deck);
+  renderManageCards();
+  lastTopicDeckId = null;
+  render();
+  showToast(`${cards.length} ${cards.length === 1 ? "cartão importado" : "cartões importados"} do ${sourceLabel}`);
+}
+
+async function importCardsIntoCurrentDeck(file) {
+  try {
+    const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+    if (isPdf) {
+      showToast("Lendo e convertendo o PDF...");
+      const cards = await extractCardsFromPdf(file);
+      if (!cards.length) throw new Error("empty-pdf");
+      const confirmed = window.confirm(
+        `O PDF gerou ${cards.length} ${cards.length === 1 ? "cartão" : "cartões"}. Deseja adicionar ao baralho atual? Você poderá revisar e editar cada cartão em seguida.`
+      );
+      if (!confirmed) {
+        showToast("Importação cancelada");
+        return;
+      }
+      addImportedCards(cards, "PDF");
+      return;
+    }
+
+    const data = JSON.parse(await file.text());
+    const rawCards = Array.isArray(data) ? data : Array.isArray(data?.cards) ? data.cards : null;
+    const cards = normalizeImportedCards(rawCards);
+    addImportedCards(cards, "JSON");
+  } catch (error) {
+    console.error("Falha ao importar cartões:", error);
+    showToast(
+      file.name.toLowerCase().endsWith(".pdf")
+        ? "Não foi possível extrair cartões deste PDF"
+        : "Arquivo JSON inválido para importar cartões"
+    );
+  }
 }
 
 function exportDeckCards() {
@@ -1055,6 +1266,26 @@ function exportDeckCards() {
   URL.revokeObjectURL(url);
   showToast("Cartões exportados");
 }
+
+elements.installButton.addEventListener("click", openInstallDialog);
+elements.installDialogClose.addEventListener("click", closeInstallDialog);
+elements.installDialog.addEventListener("click", (event) => {
+  if (event.target === elements.installDialog) closeInstallDialog();
+});
+elements.installConfirmButton.addEventListener("click", () => void promptInstall());
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  setInstallButtonVisibility();
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  elements.installButton.hidden = true;
+  if (elements.installDialog.open) elements.installDialog.close();
+  showToast("Trilha Flashcard instalado");
+});
 
 elements.deckSelect.addEventListener("change", (event) => {
   state.deckId = event.target.value;
@@ -1086,13 +1317,6 @@ elements.importInput.addEventListener("change", (event) => {
   if (file) importProgress(file);
   event.target.value = "";
 });
-elements.importDeckButton.addEventListener("click", () => elements.importDeckInput.click());
-elements.importDeckInput.addEventListener("change", (event) => {
-  const file = event.target.files?.[0];
-  if (file) importDeck(file);
-  event.target.value = "";
-});
-
 elements.openManageCardsButton.addEventListener("click", openManageCards);
 elements.manageCardsClose.addEventListener("click", closeManageCards);
 elements.manageCardsDialog.addEventListener("click", (event) => {
@@ -1104,12 +1328,13 @@ elements.cardForm.addEventListener("submit", handleCardFormSubmit);
 elements.cardImportButton.addEventListener("click", () => elements.cardImportInput.click());
 elements.cardImportInput.addEventListener("change", (event) => {
   const file = event.target.files?.[0];
-  if (file) importCardsIntoCurrentDeck(file);
+  if (file) void importCardsIntoCurrentDeck(file);
   event.target.value = "";
 });
 elements.cardExportDeckButton.addEventListener("click", exportDeckCards);
 elements.cardListSearch.addEventListener("input", filterCardList);
-elements.cardFormTopic.addEventListener("input", checkTopicWarning);
+elements.cardFormDiscipline.addEventListener("change", () => renderTopicOptions(""));
+elements.cardFormTopic.addEventListener("change", checkTopicWarning);
 
 elements.searchInput.addEventListener("input", (event) => renderSearchResults(event.target.value));
 elements.searchInput.addEventListener("focus", (event) => renderSearchResults(event.target.value));
@@ -1130,24 +1355,27 @@ elements.searchInput.addEventListener("keydown", (event) => {
 elements.topicSelect.addEventListener("change", (event) => {
   state.topicFilter = event.target.value;
   const indices = getFilteredIndices();
-  state.index = indices.includes(state.index) ? state.index : indices[0];
+  state.index = indices.includes(state.index) ? state.index : indices[0] ?? 0;
   state.flipped = false;
   render();
 });
 
 document.addEventListener("keydown", (event) => {
-  if (elements.dashboardDialog.open || elements.manageCardsDialog.open) return;
-  if (
-    event.target instanceof HTMLSelectElement
-    || event.target instanceof HTMLButtonElement
+  if (elements.dashboardDialog.open || elements.manageCardsDialog.open || elements.installDialog.open) return;
+  const isTypingTarget = event.target instanceof HTMLSelectElement
     || event.target instanceof HTMLInputElement
-  ) return;
+    || event.target instanceof HTMLTextAreaElement
+    || event.target.isContentEditable;
+  if (isTypingTarget) return;
   if (event.code === "Space") {
+    if (event.target instanceof HTMLButtonElement) return;
     event.preventDefault();
     toggleCard();
   } else if (event.key === "ArrowLeft") {
+    event.preventDefault();
     move(-1);
   } else if (event.key === "ArrowRight") {
+    event.preventDefault();
     move(1);
   }
 });
@@ -1161,6 +1389,7 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
 const explicitTheme = document.documentElement.getAttribute("data-theme");
 const effectiveDark = explicitTheme === "dark" || (!explicitTheme && systemPrefersDark());
 elements.themeToggle.setAttribute("aria-pressed", String(effectiveDark));
+setInstallButtonVisibility();
 
 renderDeckOptions();
 render();

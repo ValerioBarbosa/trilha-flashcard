@@ -3,8 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#fbfcff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Trilha Flashcard" />
+    <meta name="theme-color" id="theme-color" content="#fbfcff" />
     <meta
       name="description"
       content="Trilha Flashcard — estudos e revisão para concursos públicos."
@@ -19,13 +22,21 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260821-3" />
     <script>
       try {
         const savedTheme = localStorage.getItem("trilha-flashcard-theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const effectiveTheme = savedTheme === "dark" || savedTheme === "light"
+          ? savedTheme
+          : prefersDark ? "dark" : "light";
         if (savedTheme === "dark" || savedTheme === "light") {
           document.documentElement.setAttribute("data-theme", savedTheme);
         }
+        document.querySelector("#theme-color").setAttribute(
+          "content",
+          effectiveTheme === "dark" ? "#0b1220" : "#fbfcff"
+        );
       } catch {}
     </script>
   </head>
@@ -49,6 +60,19 @@
         </label>
 
         <div class="topbar-actions">
+          <button
+            class="shuffle-button install-button"
+            id="install-app-button"
+            type="button"
+            aria-label="Instalar Trilha Flashcard no dispositivo"
+            aria-haspopup="dialog"
+            hidden
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M12 3v11M8 10l4 4 4-4M5 18v2h14v-2" />
+            </svg>
+            <span>Instalar</span>
+          </button>
           <button
             class="shuffle-button icon-only"
             id="theme-toggle-button"
@@ -76,6 +100,20 @@
               <path d="M4 19V9M10 19V5M16 19v-7M22 19V3" />
             </svg>
             <span>Desempenho</span>
+          </button>
+
+          <button
+            class="shuffle-button"
+            id="open-manage-cards-button"
+            type="button"
+            aria-label="Gerenciar cartões do baralho atual"
+            aria-haspopup="dialog"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <rect x="4" y="5" width="16" height="14" rx="2" />
+              <path d="M8 9h8M8 13h8M8 17h5" />
+            </svg>
+            <span>Gerenciar cartões</span>
           </button>
 
           <button class="shuffle-button" id="shuffle-button" type="button" aria-label="Embaralhar cartões">
@@ -279,20 +317,6 @@
           <div class="deck-performance" id="deck-performance"></div>
         </section>
 
-        <section class="data-section" aria-labelledby="manage-cards-section-title">
-          <div class="deck-performance-title-row">
-            <h3 id="manage-cards-section-title">Cartões do baralho atual</h3>
-            <span id="manage-cards-count">0 cartões</span>
-          </div>
-          <p class="data-section-hint" id="manage-cards-hint">
-            Adicione, edite, importe ou remova cartões do baralho selecionado no topo.
-          </p>
-          <p class="data-section-hint" id="manage-cards-coverage" hidden></p>
-          <div class="data-section-buttons">
-            <button class="data-button" id="open-manage-cards-button" type="button">Gerenciar cartões</button>
-          </div>
-        </section>
-
         <section class="data-section" aria-labelledby="data-section-title">
           <div class="deck-performance-title-row">
             <h3 id="data-section-title">Seus dados</h3>
@@ -308,21 +332,7 @@
           </div>
         </section>
 
-        <section class="data-section" aria-labelledby="custom-deck-section-title">
-          <div class="deck-performance-title-row">
-            <h3 id="custom-deck-section-title">Meus baralhos</h3>
-            <span>conteúdo próprio</span>
-          </div>
-          <p class="data-section-hint">
-            Importe um arquivo <code>.json</code> com seus próprios cartões (formato:
-            <code>{"title": "...", "cards": [{"front": "...", "back": "..."}]}</code>). O baralho aparece no
-            seletor no topo e pode ser removido depois em "Progresso por disciplina".
-          </p>
-          <div class="data-section-buttons">
-            <button class="data-button" id="import-deck-button" type="button">Importar baralho</button>
-            <input type="file" id="import-deck-input" accept="application/json" hidden />
-          </div>
-        </section>
+
       </div>
     </dialog>
 
@@ -342,8 +352,8 @@
 
         <div class="data-section-buttons">
           <button class="data-button" id="card-add-button" type="button">+ Adicionar cartão</button>
-          <button class="data-button" id="card-import-button" type="button">Importar cartões (.json)</button>
-          <input type="file" id="card-import-input" accept="application/json" hidden />
+          <button class="data-button" id="card-import-button" type="button">Importar cartões (JSON ou PDF)</button>
+          <input type="file" id="card-import-input" accept="application/json,.json,application/pdf,.pdf" hidden />
           <button class="data-button" id="card-export-deck-button" type="button">Exportar cartões</button>
         </div>
 
@@ -351,6 +361,60 @@
 
         <form class="card-form" id="card-form" hidden>
           <input type="hidden" id="card-form-index" value="" />
+          <input type="hidden" id="card-form-source-deck" value="" />
+
+          <div class="card-form-classification-grid">
+            <label class="card-form-field">
+              <span>Disciplina *</span>
+              <select id="card-form-discipline" required>
+                <option value="">Selecione a disciplina</option>
+              </select>
+            </label>
+            <label class="card-form-field">
+              <span>Assunto *</span>
+              <select id="card-form-topic" required disabled>
+                <option value="">Selecione primeiro a disciplina</option>
+              </select>
+              <p class="card-form-warning" id="card-form-topic-warning" hidden>Selecione um assunto previsto no edital desta disciplina.</p>
+            </label>
+            <label class="card-form-field">
+              <span>Subassunto (opcional)</span>
+              <input type="text" id="card-form-subtopic" placeholder="Detalhamento do assunto" />
+            </label>
+            <label class="card-form-field">
+              <span>Fundamento legal (opcional)</span>
+              <input type="text" id="card-form-legal-basis" placeholder="Ex.: CF, art. 5º, LXVIII" />
+            </label>
+            <label class="card-form-field">
+              <span>Tipo do cartão *</span>
+              <select id="card-form-type" required>
+                <option value="Conceito">Conceito</option>
+                <option value="Lei seca">Lei seca</option>
+                <option value="Jurisprudência">Jurisprudência</option>
+                <option value="Prazo">Prazo</option>
+                <option value="Pegadinha FCC">Pegadinha FCC</option>
+                <option value="Questão">Questão</option>
+                <option value="Mnemônico">Mnemônico</option>
+              </select>
+            </label>
+            <label class="card-form-field">
+              <span>Prioridade *</span>
+              <select id="card-form-priority" required>
+                <option value="A">A — alta incidência</option>
+                <option value="B" selected>B — incidência média</option>
+                <option value="C">C — complementar</option>
+              </select>
+            </label>
+            <label class="card-form-field">
+              <span>Dificuldade *</span>
+              <select id="card-form-difficulty" required>
+                <option value="Fácil">Fácil</option>
+                <option value="Médio" selected>Médio</option>
+                <option value="Difícil">Difícil</option>
+              </select>
+            </label>
+          </div>
+
           <label class="card-form-field">
             <span>Enunciado (frente) *</span>
             <textarea id="card-form-front" required rows="2"></textarea>
@@ -358,12 +422,6 @@
           <label class="card-form-field">
             <span>Gabarito (verso) *</span>
             <textarea id="card-form-back" required rows="3"></textarea>
-          </label>
-          <label class="card-form-field">
-            <span>Assunto</span>
-            <input type="text" id="card-form-topic" list="card-form-topic-list" autocomplete="off" placeholder="Escolha ou digite um assunto" />
-            <datalist id="card-form-topic-list"></datalist>
-            <p class="card-form-warning" id="card-form-topic-warning" hidden>Esse assunto não está na lista do edital para este baralho. Confira a grafia ou deixe em branco.</p>
           </label>
           <label class="card-form-field">
             <span>Tag (rótulo curto, opcional)</span>
@@ -396,9 +454,35 @@
       </div>
     </dialog>
 
+    <dialog class="dashboard-dialog install-dialog" id="install-dialog" aria-labelledby="install-dialog-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div>
+            <span class="dashboard-kicker">APLICATIVO</span>
+            <h2 id="install-dialog-title">Instalar Trilha Flashcard</h2>
+          </div>
+          <button class="dashboard-close" id="install-dialog-close" type="button" aria-label="Fechar">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
+          </button>
+        </header>
+        <p class="dashboard-intro" id="install-dialog-intro">
+          Instale o aplicativo para acessar seus flashcards diretamente pela tela inicial.
+        </p>
+        <ol class="install-steps" id="install-steps">
+          <li>Abra o menu do navegador.</li>
+          <li>Escolha “Instalar aplicativo” ou “Adicionar à tela inicial”.</li>
+          <li>Confirme a instalação.</li>
+        </ol>
+        <p class="install-note">Seu progresso continua salvo neste dispositivo. Use “Exportar progresso” para criar uma cópia de segurança.</p>
+        <button class="review-due-button install-confirm-button" id="install-confirm-button" type="button" hidden>
+          Instalar agora
+        </button>
+      </div>
+    </dialog>
+
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="decks.js"></script>
-    <script src="spaced-repetition.js"></script>
-    <script src="app.js"></script>
+    <script src="decks.js?v=20260820-2"></script>
+    <script src="spaced-repetition.js?v=20260820-2"></script>
+    <script src="app.js?v=20260821-3"></script>
   </body>
 </html>
