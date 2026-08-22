@@ -28,6 +28,19 @@
     await transaction("readwrite", (store) => entries.forEach(([key, value]) => store.put(value, key)));
   }
 
+  async function replaceEntries(entries) {
+    const nextKeys = new Set(entries.map(([key]) => key));
+    await transaction("readwrite", (store) => {
+      const request = store.getAllKeys();
+      request.onsuccess = () => {
+        request.result.forEach((key) => {
+          if (!nextKeys.has(key)) store.delete(key);
+        });
+        entries.forEach(([key, value]) => store.put(value, key));
+      };
+    });
+  }
+
   async function hydrateLocalStorage(storage) {
     const database = await openDatabase();
     const entries = await new Promise((resolve, reject) => {
@@ -50,5 +63,5 @@
     });
   }
 
-  root.CardDatabase = { persistEntries, hydrateLocalStorage };
+  root.CardDatabase = { persistEntries, replaceEntries, hydrateLocalStorage };
 })(typeof globalThis !== "undefined" ? globalThis : this);
