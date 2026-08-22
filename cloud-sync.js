@@ -12,10 +12,12 @@
 
   function createSnapshot(storage) {
     const entries = {};
+    const keys = [];
     for (let index = 0; index < storage.length; index += 1) {
       const key = storage.key(index);
-      if (key && isSyncableKey(key)) entries[key] = storage.getItem(key);
+      if (key && isSyncableKey(key)) keys.push(key);
     }
+    keys.sort().forEach((key) => { entries[key] = storage.getItem(key); });
     return { version: 1, entries };
   }
 
@@ -23,9 +25,36 @@
     if (!snapshot || snapshot.version !== 1 || !snapshot.entries || typeof snapshot.entries !== "object") {
       throw new Error("invalid-cloud-snapshot");
     }
+    const remoteKeys = new Set(Object.keys(snapshot.entries).filter(isSyncableKey));
+    const localKeys = [];
+    for (let index = 0; index < storage.length; index += 1) {
+      const key = storage.key(index);
+      if (key && isSyncableKey(key)) localKeys.push(key);
+    }
+    localKeys.forEach((key) => {
+      if (!remoteKeys.has(key)) storage.removeItem(key);
+    });
     Object.entries(snapshot.entries).forEach(([key, value]) => {
       if (isSyncableKey(key) && typeof value === "string") storage.setItem(key, value);
     });
+  }
+
+  function snapshotFingerprint(snapshot) {
+    const serialized = JSON.stringify(snapshot);
+    let hash = 2166136261;
+    for (let index = 0; index < serialized.length; index += 1) {
+      hash ^= serialized.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(16).padStart(8, "0");
+  }
+
+  function reconciliationAction({ local, remote, meta, uid }) {
+    if (!remote?.snapshot) return "upload";
+    if (!hasStudyData(local)) return "download";
+    const sameRemote = meta?.uid === uid && meta?.remoteUpdatedAtISO === remote.updatedAtISO;
+    if (!sameRemote) return "conflict";
+    return meta.dirty || meta.syncedFingerprint !== snapshotFingerprint(local) ? "upload" : "saved";
   }
 
   function hasStudyData(snapshot) {
@@ -63,18 +92,32 @@
         const result = await firestoreApi.getDoc(firestoreApi.doc(db, "flashcardUsers", uid));
         return result.exists() ? result.data() : null;
       },
-      async write(uid, snapshot) {
-        const updatedAtISO = new Date().toISOString();
-        await firestoreApi.setDoc(firestoreApi.doc(db, "flashcardUsers", uid), {
-          ownerUid: uid,
-          snapshot,
-          updatedAt: firestoreApi.serverTimestamp(),
-          updatedAtISO,
+      async write(uid, snapshot, { expectedUpdatedAtISO = null, force = false } = {}) {
+        const reference = firestoreApi.doc(db, "flashcardUsers", uid);
+        const updatedAtISO = `${new Date().toISOString()}:${crypto.randomUUID()}`;
+        await firestoreApi.runTransaction(db, async (transaction) => {
+          const current = await transaction.get(reference);
+          const currentToken = current.exists() ? current.data().updatedAtISO || null : null;
+          if (!force && currentToken !== expectedUpdatedAtISO) throw new Error("cloud-conflict");
+          transaction.set(reference, {
+            ownerUid: uid,
+            snapshot,
+            updatedAt: firestoreApi.serverTimestamp(),
+            updatedAtISO,
+          });
         });
         return updatedAtISO;
       },
     };
   }
 
-  return { applySnapshot, createFirebaseAdapter, createSnapshot, hasStudyData, isSyncableKey };
+  return {
+    applySnapshot,
+    createFirebaseAdapter,
+    createSnapshot,
+    hasStudyData,
+    isSyncableKey,
+    reconciliationAction,
+    snapshotFingerprint,
+  };
 });

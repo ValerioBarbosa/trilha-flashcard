@@ -9,7 +9,7 @@ describe("fluxo de estudo v2", () => {
   it("carrega o banco durável antes do aplicativo", () => {
     expect(html.indexOf("card-database.js")).toBeGreaterThan(-1);
     expect(html.indexOf("hydrateLocalStorage")).toBeLessThan(html.indexOf('import("./app.js'));
-    expect(serviceWorker).toContain("card-database.js?v=20260821-1");
+    expect(serviceWorker).toContain("card-database.js?v=20260822-1");
   });
 
   it("expõe prévia, lixeira, backup e sessão personalizada", () => {

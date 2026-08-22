@@ -269,13 +269,15 @@ function writeCloudMeta(meta) {
 }
 
 function markCloudDirty() {
+  const meta = readCloudMeta();
+  writeCloudMeta({ ...meta, dirty: true, localRevision: (Number(meta.localRevision) || 0) + 1 });
   if (!cloudReady || !cloudUser || !cloudAdapter) return;
   clearTimeout(cloudSyncTimer);
   setCloudStatus(navigator.onLine ? "Sincronizando…" : "Aguardando internet", "syncing");
   cloudSyncTimer = setTimeout(() => void uploadCloudSnapshot(), 1400);
 }
 
-async function uploadCloudSnapshot({ notify = false } = {}) {
+async function uploadCloudSnapshot({ notify = false, force = false } = {}) {
   if (!cloudUser || !cloudAdapter) return;
   if (!navigator.onLine) {
     setCloudStatus("Aguardando internet", "syncing", "As alterações serão enviadas automaticamente quando a conexão voltar.");
@@ -283,12 +285,30 @@ async function uploadCloudSnapshot({ notify = false } = {}) {
   }
   try {
     setCloudStatus("Sincronizando…", "syncing");
-    const updatedAtISO = await cloudAdapter.write(cloudUser.uid, CloudSync.createSnapshot(localStorage));
-    writeCloudMeta({ uid: cloudUser.uid, remoteUpdatedAtISO: updatedAtISO });
+    const snapshot = CloudSync.createSnapshot(localStorage);
+    const meta = readCloudMeta();
+    const updatedAtISO = await cloudAdapter.write(cloudUser.uid, snapshot, {
+      expectedUpdatedAtISO: meta.uid === cloudUser.uid ? meta.remoteUpdatedAtISO || null : null,
+      force,
+    });
+    writeCloudMeta({
+      ...meta,
+      uid: cloudUser.uid,
+      remoteUpdatedAtISO: updatedAtISO,
+      syncedFingerprint: CloudSync.snapshotFingerprint(snapshot),
+      dirty: false,
+    });
     cloudReady = true;
     setCloudStatus("Salvo", "saved", `Sincronizado com ${cloudUser.email || "sua conta Google"}.`);
     if (notify) showToast("Dados sincronizados na nuvem");
   } catch (error) {
+    if (error?.message === "cloud-conflict") {
+      cloudReady = false;
+      setCloudStatus("Escolha necessária", "syncing", "A nuvem mudou em outro dispositivo.");
+      await reconcileCloudData(cloudUser).catch(() => {});
+      if (notify) showToast("Revise o conflito antes de sincronizar");
+      return;
+    }
     console.error("Falha na sincronização:", error);
     setCloudStatus("Falha ao sincronizar", "error", "Seus dados continuam seguros neste aparelho. Tente novamente quando estiver online.");
     if (notify) showToast("Não foi possível sincronizar agora");
@@ -300,12 +320,18 @@ async function applyRemoteSnapshot(remote) {
   try {
     sessionStorage.setItem("trilha-flashcard-cloud-rollback", JSON.stringify(rollback));
     CloudSync.applySnapshot(localStorage, remote.snapshot);
-    await CardDatabase.persistEntries(Object.entries(remote.snapshot.entries));
-    writeCloudMeta({ uid: cloudUser.uid, remoteUpdatedAtISO: remote.updatedAtISO || "" });
+    await CardDatabase.replaceEntries(Object.entries(remote.snapshot.entries));
+    writeCloudMeta({
+      ...readCloudMeta(),
+      uid: cloudUser.uid,
+      remoteUpdatedAtISO: remote.updatedAtISO || "",
+      syncedFingerprint: CloudSync.snapshotFingerprint(remote.snapshot),
+      dirty: false,
+    });
     location.reload();
   } catch (error) {
     CloudSync.applySnapshot(localStorage, rollback);
-    await CardDatabase.persistEntries(Object.entries(rollback.entries)).catch(() => {});
+    await CardDatabase.replaceEntries(Object.entries(rollback.entries)).catch(() => {});
     console.error("Falha ao baixar dados da nuvem:", error);
     setCloudStatus("Falha ao restaurar", "error");
     showToast("Os dados deste aparelho não foram alterados");
@@ -318,17 +344,19 @@ async function reconcileCloudData(user) {
   const local = CloudSync.createSnapshot(localStorage);
   const meta = readCloudMeta();
 
-  if (!remote?.snapshot) {
+  const action = CloudSync.reconciliationAction({ local, remote, meta, uid: user.uid });
+
+  if (action === "upload") {
     cloudReady = true;
     await uploadCloudSnapshot();
-    showToast("Dados deste aparelho enviados para a nuvem");
+    if (!remote?.snapshot) showToast("Dados deste aparelho enviados para a nuvem");
     return;
   }
-  if (!CloudSync.hasStudyData(local)) {
+  if (action === "download") {
     await applyRemoteSnapshot(remote);
     return;
   }
-  if (meta.uid === user.uid && meta.remoteUpdatedAtISO === remote.updatedAtISO) {
+  if (action === "saved") {
     cloudReady = true;
     setCloudStatus("Salvo", "saved", `Sincronizado com ${user.email || "sua conta Google"}.`);
     return;
@@ -548,6 +576,7 @@ function saveProgress() {
     ratings: state.ratings,
     activity: state.activity,
   });
+  if (localStorage.getItem(STORAGE_KEY) === value) return;
   localStorage.setItem(STORAGE_KEY, value);
   void CardDatabase.persistEntries([[STORAGE_KEY, value]]).catch((error) => console.warn("Falha ao salvar progresso no IndexedDB", error));
   markCloudDirty();
@@ -1532,7 +1561,7 @@ elements.cloudSignOutButton.addEventListener("click", async () => {
 elements.cloudUseLocalButton.addEventListener("click", async () => {
   elements.cloudConflictDialog.close();
   cloudReady = true;
-  await uploadCloudSnapshot({ notify: true });
+  await uploadCloudSnapshot({ notify: true, force: true });
 });
 elements.cloudConflictCancel.addEventListener("click", () => elements.cloudConflictDialog.close());
 window.addEventListener("online", () => {
