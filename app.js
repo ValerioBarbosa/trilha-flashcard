@@ -351,6 +351,9 @@ let trash = (() => {
 })();
 let pendingImport = null;
 
+ensureCardIds(decks);
+migrateLegacyRatingKeys();
+
 function persistTrash() {
   const value = JSON.stringify(trash.slice(-100));
   localStorage.setItem(TRASH_STORAGE_KEY, value);
@@ -560,12 +563,47 @@ function currentCard() {
 }
 
 function cardKey(deck, card) {
-  return buildCardKey(deck.id, card.front);
+  return buildCardKey(deck.id, card.id);
 }
 
 function currentCardKey() {
   const card = currentCard();
   return card ? cardKey(currentDeck(), card) : null;
+}
+
+function generateCardId() {
+  return typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function ensureCardIds(deckList) {
+  deckList.forEach((deck) => {
+    let changed = false;
+    deck.cards.forEach((card) => {
+      if (!card.id) {
+        card.id = generateCardId();
+        changed = true;
+      }
+    });
+    if (changed) {
+      const entries = deckStorage.persistDecks([deck], decks);
+      void CardDatabase.persistEntries([...entries]).catch((error) => console.warn("Falha ao salvar IDs dos cartões", error));
+    }
+  });
+}
+
+function migrateLegacyRatingKeys() {
+  decks.forEach((deck) => {
+    deck.cards.forEach((card) => {
+      const legacyKey = `${deck.id}::${card.front}`;
+      const newKey = cardKey(deck, card);
+      if (legacyKey !== newKey && state.ratings[legacyKey] && !state.ratings[newKey]) {
+        state.ratings[newKey] = state.ratings[legacyKey];
+        delete state.ratings[legacyKey];
+      }
+    });
+  });
 }
 
 function allCardEntries() {
@@ -1458,6 +1496,8 @@ async function importProgress(file) {
           }
           if (deck && Array.isArray(savedDeck.cards)) deck.cards = savedDeck.cards;
         });
+        ensureCardIds(decks);
+        migrateLegacyRatingKeys();
         const entries = deckStorage.persistDecks(decks, decks);
         await CardDatabase.persistEntries([...entries]);
       }
@@ -1480,7 +1520,7 @@ function removeCustomDeck(deckId) {
 
   decks.splice(decks.indexOf(deck), 1);
   deck.cards.forEach((card) => {
-    delete state.ratings[buildCardKey(deck.id, card.front)];
+    delete state.ratings[cardKey(deck, card)];
   });
   persistDeckCards(deck);
 
@@ -1722,8 +1762,9 @@ function handleCardFormSubmit(event) {
       showToast("Cartão original não encontrado");
       return;
     }
-    const previousKey = buildCardKey(sourceDeck.id, previousCard.front);
-    const newKey = buildCardKey(targetDeck.id, newCard.front);
+    newCard.id = previousCard.id || generateCardId();
+    const previousKey = buildCardKey(sourceDeck.id, previousCard.id);
+    const newKey = cardKey(targetDeck, newCard);
     if (state.ratings[previousKey]) {
       state.ratings[newKey] = state.ratings[previousKey];
       if (previousKey !== newKey) delete state.ratings[previousKey];
@@ -1739,6 +1780,7 @@ function handleCardFormSubmit(event) {
       persistDeckCards(targetDeck);
     }
   } else {
+    newCard.id = generateCardId();
     targetDeck.cards.push(newCard);
     persistDeckCards(targetDeck);
   }
@@ -1778,8 +1820,10 @@ function deleteCard(index) {
   const preview = card.front.length > 60 ? `${card.front.slice(0, 60)}…` : card.front;
   if (!window.confirm(`Excluir o cartão "${preview}"?`)) return;
 
-  delete state.ratings[buildCardKey(deck.id, card.front)];
-  trash.push({ id: `${Date.now()}-${Math.random()}`, deckId: deck.id, index, card, deletedAt: new Date().toISOString() });
+  const key = cardKey(deck, card);
+  const rating = state.ratings[key];
+  delete state.ratings[key];
+  trash.push({ id: `${Date.now()}-${Math.random()}`, deckId: deck.id, index, card, rating, deletedAt: new Date().toISOString() });
   persistTrash();
   deck.cards.splice(index, 1);
   persistDeckCards(deck);
@@ -1796,6 +1840,7 @@ function restoreTrashItem(itemId = null) {
   const deck = decks.find((entry) => entry.id === item.deckId);
   if (!deck) return;
   deck.cards.splice(Math.min(item.index, deck.cards.length), 0, item.card);
+  if (item.rating) state.ratings[cardKey(deck, item.card)] = item.rating;
   trash.splice(trashIndex, 1);
   persistTrash();
   persistDeckCards(deck);
@@ -1898,6 +1943,7 @@ async function addImportedCards(cards, sourceLabel) {
       return;
     }
     if (!snapshots.has(deck)) snapshots.set(deck, deck.cards.slice());
+    card.id = generateCardId();
     deck.cards.push(card);
     changedDecks.add(deck);
     added += 1;
