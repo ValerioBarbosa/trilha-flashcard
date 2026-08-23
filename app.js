@@ -177,6 +177,14 @@ const elements = {
   trashButton: document.querySelector("#trash-button"),
   undoDeleteButton: document.querySelector("#undo-delete-button"),
   cardListSearch: document.querySelector("#card-list-search"),
+  cardListDiscipline: document.querySelector("#card-list-discipline"),
+  cardListTopic: document.querySelector("#card-list-topic-filter"),
+  cardListPriority: document.querySelector("#card-list-priority"),
+  cardListDifficulty: document.querySelector("#card-list-difficulty"),
+  cardListSort: document.querySelector("#card-list-sort"),
+  cardListResultCount: document.querySelector("#card-list-result-count"),
+  cardListExpandAll: document.querySelector("#card-list-expand-all"),
+  cardListCollapseAll: document.querySelector("#card-list-collapse-all"),
   cardForm: document.querySelector("#card-form"),
   cardFormIndex: document.querySelector("#card-form-index"),
   cardFormSourceDeck: document.querySelector("#card-form-source-deck"),
@@ -350,6 +358,7 @@ let trash = (() => {
   } catch { return []; }
 })();
 let pendingImport = null;
+const managerOpenTopics = new Set();
 
 function persistTrash() {
   const value = JSON.stringify(trash.slice(-100));
@@ -1497,6 +1506,11 @@ function removeCustomDeck(deckId) {
 function openManageCards() {
   closeDashboard();
   elements.cardListSearch.value = "";
+  elements.cardListTopic.value = "";
+  elements.cardListPriority.value = "";
+  elements.cardListDifficulty.value = "";
+  elements.cardListSort.value = "original";
+  managerOpenTopics.clear();
   renderManageCards();
   elements.manageCardsDialog.showModal();
   elements.manageCardsDialog.scrollTop = 0;
@@ -1509,11 +1523,41 @@ function closeManageCards() {
   elements.openManageCardsButton.focus();
 }
 
+function renderManagerFilters(deck) {
+  replaceSelectOptions(elements.cardListDiscipline, decks.map((entry) => ({
+    value: entry.id,
+    label: `${entry.title} (${entry.cards.length})`,
+  })));
+  elements.cardListDiscipline.value = deck.id;
+
+  const previousTopic = elements.cardListTopic.value;
+  const topics = [...new Set(deck.cards.map((card) => card.topic || "Sem assunto"))]
+    .sort((left, right) => left.localeCompare(right, "pt-BR"));
+  replaceSelectOptions(elements.cardListTopic, [
+    { value: "", label: "Todos os assuntos" },
+    ...topics.map((topic) => ({ value: topic, label: topic })),
+  ]);
+  elements.cardListTopic.value = topics.includes(previousTopic) ? previousTopic : "";
+}
+
+function managerFilters() {
+  return {
+    query: elements.cardListSearch.value,
+    topic: elements.cardListTopic.value,
+    priority: elements.cardListPriority.value,
+    difficulty: elements.cardListDifficulty.value,
+    sort: elements.cardListSort.value,
+  };
+}
+
 function renderManageCards() {
   const deck = currentDeck();
+  renderManagerFilters(deck);
   elements.trashButton.textContent = `Lixeira (${trash.length})`;
   elements.undoDeleteButton.hidden = trash.length === 0;
   elements.manageCardsKicker.textContent = deck.title.toUpperCase();
+
+  const result = CardManager.organizeCards(deck.cards, managerFilters());
   elements.manageCardsSummary.textContent = deck.cards.length
     ? `${deck.cards.length} ${deck.cards.length === 1 ? "cartão" : "cartões"} neste baralho.`
     : "Nenhum cartão neste baralho ainda.";
@@ -1521,40 +1565,79 @@ function renderManageCards() {
   if (coverage) {
     elements.manageCardsSummary.textContent += ` ${coverage.covered} de ${coverage.total} assuntos do edital com cartão.`;
   }
+  elements.cardListResultCount.textContent = result.filtered === result.total
+    ? `${result.total} ${result.total === 1 ? "cartão" : "cartões"}`
+    : `${result.filtered} de ${result.total} cartões`;
 
-  elements.cardList.innerHTML = deck.cards.length
-    ? deck.cards
-        .map((card, index) => {
-          const searchValue = [card.front, card.back, card.topic, card.subtopic, card.legalBasis, card.type, card.priority, card.difficulty].filter(Boolean).join(" ").toLowerCase();
-          return `
-            <article class="card-list-row" data-search="${escapeHtml(searchValue)}">
-              <div class="card-list-row-main">
-                <span class="card-list-front">${escapeHtml(card.front)}</span>
-                <span class="card-list-topic">${[card.topic, card.subtopic, card.type, card.priority ? `Prioridade ${card.priority}` : "", card.difficulty].filter(Boolean).map(escapeHtml).join(" · ") || "sem classificação"}</span>
-              </div>
-              <div class="card-list-row-actions">
-                <button type="button" class="data-button" data-edit-card="${index}">Editar</button>
-                <button type="button" class="deck-remove-button" data-delete-card="${index}" aria-label="Excluir cartão">✕</button>
-              </div>
-            </article>
-          `;
-        })
-        .join("")
-    : `<p class="card-list-empty">Nenhum cartão ainda. Use "Adicionar cartão" ou "Importar cartões" para começar.</p>`;
+  const filters = managerFilters();
+  const forceOpen = Boolean(filters.query.trim() || filters.topic || filters.priority || filters.difficulty);
+  elements.cardList.innerHTML = result.groups.length
+    ? result.groups.map((group) => {
+        const isOpen = forceOpen || managerOpenTopics.has(group.name);
+        const rows = group.entries.map(({ card, index }) => `
+          <article class="card-list-row">
+            <div class="card-list-row-main">
+              <span class="card-list-front">${escapeHtml(card.front)}</span>
+              <span class="card-list-topic">${[card.subtopic, card.type, card.priority ? `Prioridade ${card.priority}` : "", card.difficulty, card.legalBasis].filter(Boolean).map(escapeHtml).join(" · ") || "sem classificação"}</span>
+            </div>
+            <div class="card-list-row-actions">
+              <button type="button" class="data-button card-edit-button" data-edit-card="${index}">Editar</button>
+              <details class="card-row-menu">
+                <summary aria-label="Mais ações para este cartão">•••</summary>
+                <button type="button" data-delete-card="${index}">Excluir cartão</button>
+              </details>
+            </div>
+          </article>`).join("");
+        return `
+          <details class="card-topic-group" data-topic="${escapeHtml(group.name)}" ${isOpen ? "open" : ""}>
+            <summary>
+              <span>${escapeHtml(group.name)}</span>
+              <strong>${group.entries.length} ${group.entries.length === 1 ? "cartão" : "cartões"}</strong>
+            </summary>
+            <div class="card-topic-cards">${rows}</div>
+          </details>`;
+      }).join("")
+    : `<p class="card-list-empty">${deck.cards.length ? "Nenhum cartão corresponde aos filtros." : 'Nenhum cartão ainda. Use "Adicionar cartão" ou "Importar cartões" para começar.'}</p>`;
 
+  elements.cardList.querySelectorAll(".card-topic-group").forEach((group) => {
+    group.addEventListener("toggle", () => {
+      const topic = group.dataset.topic;
+      if (group.open) managerOpenTopics.add(topic);
+      else managerOpenTopics.delete(topic);
+    });
+  });
   elements.cardList.querySelectorAll("[data-edit-card]").forEach((button) => {
     button.addEventListener("click", () => openCardForm(Number(button.dataset.editCard)));
   });
   elements.cardList.querySelectorAll("[data-delete-card]").forEach((button) => {
     button.addEventListener("click", () => deleteCard(Number(button.dataset.deleteCard)));
   });
-  filterCardList();
 }
 
 function filterCardList() {
-  const query = elements.cardListSearch.value.trim().toLowerCase();
-  elements.cardList.querySelectorAll(".card-list-row").forEach((row) => {
-    row.hidden = Boolean(query) && !row.dataset.search.includes(query);
+  renderManageCards();
+}
+
+function changeManagerDiscipline() {
+  const deck = decks.find((entry) => entry.id === elements.cardListDiscipline.value);
+  if (!deck || deck.id === state.deckId) return;
+  state.deckId = deck.id;
+  state.index = 0;
+  state.flipped = false;
+  state.topicFilter = "";
+  elements.cardListTopic.value = "";
+  managerOpenTopics.clear();
+  renderDeckOptions();
+  lastTopicDeckId = null;
+  render();
+  renderManageCards();
+}
+
+function setAllManagerGroups(open) {
+  elements.cardList.querySelectorAll(".card-topic-group").forEach((group) => {
+    group.open = open;
+    if (open) managerOpenTopics.add(group.dataset.topic);
+    else managerOpenTopics.delete(group.dataset.topic);
   });
 }
 
@@ -2119,6 +2202,11 @@ elements.importPreviewConfirm.addEventListener("click", async () => {
   } finally { elements.importPreviewConfirm.disabled = false; }
 });
 elements.cardListSearch.addEventListener("input", filterCardList);
+elements.cardListDiscipline.addEventListener("change", changeManagerDiscipline);
+[elements.cardListTopic, elements.cardListPriority, elements.cardListDifficulty, elements.cardListSort]
+  .forEach((control) => control.addEventListener("change", filterCardList));
+elements.cardListExpandAll.addEventListener("click", () => setAllManagerGroups(true));
+elements.cardListCollapseAll.addEventListener("click", () => setAllManagerGroups(false));
 elements.cardFormDiscipline.addEventListener("change", () => renderTopicOptions(""));
 elements.cardFormTopic.addEventListener("change", checkTopicWarning);
 

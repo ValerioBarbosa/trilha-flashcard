@@ -22,7 +22,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260823-1" />
+    <link rel="stylesheet" href="styles.css?v=20260823-2" />
     <script>
       try {
         const savedTheme = localStorage.getItem("trilha-flashcard-theme");
@@ -440,7 +440,26 @@
           <button class="data-button" id="undo-delete-button" type="button" hidden>Desfazer exclusão</button>
         </div>
 
-        <input type="search" class="card-list-search" id="card-list-search" placeholder="Buscar cartão neste baralho..." aria-label="Buscar cartão neste baralho" />
+        <div class="card-manager-tools">
+          <input type="search" class="card-list-search" id="card-list-search" placeholder="Buscar pergunta, resposta, base legal ou tag..." aria-label="Buscar cartão" />
+          <details class="card-filter-panel" open>
+            <summary>Filtros e organização</summary>
+            <div class="card-manager-filter-grid">
+              <label><span>Disciplina</span><select id="card-list-discipline"></select></label>
+              <label><span>Assunto</span><select id="card-list-topic-filter"><option value="">Todos os assuntos</option></select></label>
+              <label><span>Prioridade</span><select id="card-list-priority"><option value="">Todas</option><option value="A">Prioridade A</option><option value="B">Prioridade B</option><option value="C">Prioridade C</option></select></label>
+              <label><span>Dificuldade</span><select id="card-list-difficulty"><option value="">Todas</option><option value="Fácil">Fácil</option><option value="Médio">Médio</option><option value="Difícil">Difícil</option></select></label>
+              <label><span>Ordenar</span><select id="card-list-sort"><option value="original">Ordem original</option><option value="topic">Assunto</option><option value="alphabetical">Pergunta A–Z</option><option value="priority">Prioridade</option></select></label>
+            </div>
+          </details>
+          <div class="card-manager-results">
+            <span id="card-list-result-count">0 cartões</span>
+            <div>
+              <button type="button" class="card-tree-action" id="card-list-expand-all">Expandir todos</button>
+              <button type="button" class="card-tree-action" id="card-list-collapse-all">Recolher todos</button>
+            </div>
+          </div>
+        </div>
 
         <form class="card-form" id="card-form" hidden>
           <input type="hidden" id="card-form-index" value="" />
@@ -664,12 +683,13 @@
     <script src="spaced-repetition.js?v=20260823-1"></script>
     <script src="card-import.js?v=20260821-1"></script>
     <script src="card-storage.js?v=20260823-1"></script>
+    <script src="card-manager.js?v=20260823-1"></script>
     <script src="card-database.js?v=20260822-1"></script>
     <script src="firebase-config.js?v=20260821-2"></script>
     <script src="cloud-sync.js?v=20260823-2"></script>
     <script type="module">
       try { await CardDatabase.hydrateLocalStorage(localStorage); } catch (error) { console.warn("IndexedDB indisponível", error); }
-      await import("./app.js?v=20260823-1");
+      await import("./app.js?v=20260823-2");
     </script>
   </body>
 </html>
