@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import CloudSync from "../cloud-sync.js";
 
-const { applySnapshot, createSnapshot, hasStudyData, isSyncableKey, reconciliationAction, snapshotFingerprint } = CloudSync;
+const { applySnapshot, createFirebaseAdapter, createSnapshot, hasStudyData, isSyncableKey, reconciliationAction, snapshotFingerprint } = CloudSync;
 
 function memoryStorage(initial = {}) {
   const data = new Map(Object.entries(initial));
@@ -16,6 +16,12 @@ function memoryStorage(initial = {}) {
 }
 
 describe("cloud sync", () => {
+  it("usa popup no login Google para funcionar em hosts externos ao Firebase", () => {
+    const adapterSource = createFirebaseAdapter.toString();
+    expect(adapterSource).toContain("signInWithPopup");
+    expect(adapterSource).not.toContain("signInWithRedirect");
+  });
+
   it("exporta apenas dados de estudo e exclui preferências locais", () => {
     const storage = memoryStorage({
       "trilha-flashcard-state": "{\"ratings\":{}}",
