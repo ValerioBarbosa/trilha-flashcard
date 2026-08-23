@@ -20,6 +20,10 @@
   --coral-dark: #e65343;
   --green: #a8dfb2;
   --green-dark: #0f7b42;
+  --amber: #ffd08a;
+  --amber-dark: #a2610a;
+  --teal: #9fe3d9;
+  --teal-dark: #0b6f63;
   --shadow: 0 20px 48px rgba(16, 30, 60, 0.11), 0 4px 10px rgba(16, 30, 60, 0.08);
   --radius-card: 15px;
   --radius-control: 13px;
@@ -50,6 +54,10 @@
     --coral-dark: #ff6a57;
     --green: #8fe0ab;
     --green-dark: #0c3f24;
+    --amber: #f4b94e;
+    --amber-dark: #3a2604;
+    --teal: #6cd0c3;
+    --teal-dark: #06231f;
     --shadow: 0 18px 48px rgba(0, 0, 0, 0.55), 0 3px 8px rgba(0, 0, 0, 0.35);
   }
 }
@@ -188,10 +196,18 @@ button {
 
 .brand-context {
   margin: 5px 0 0 2px;
+  border: 0;
+  background: none;
   color: var(--muted-2);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.15em;
+  cursor: pointer;
+  padding: 0;
+}
+
+.brand-context:hover {
+  color: var(--blue);
 }
 
 .deck-picker {
@@ -701,11 +717,38 @@ button:focus-visible {
   right: -108px;
 }
 
+.reveal-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 46px;
+}
+
+.reveal-row .action-button.reveal {
+  min-width: 260px;
+}
+
 .actions {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
   margin-top: 46px;
+}
+
+.rating-actions {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.simulated-actions {
+  grid-template-columns: 1fr;
+  margin-top: 18px;
+}
+
+.simulated-actions .action-button {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
 }
 
 .action-button {
@@ -741,7 +784,7 @@ button:focus-visible {
   pointer-events: none;
 }
 
-.action-button.forgot {
+.action-button.again {
   background: var(--coral);
   color: white;
 }
@@ -752,9 +795,19 @@ button:focus-visible {
   color: var(--blue);
 }
 
-.action-button.remembered {
+.action-button.hard {
+  background: var(--amber);
+  color: var(--amber-dark);
+}
+
+.action-button.good {
   background: var(--green);
   color: var(--green-dark);
+}
+
+.action-button.easy {
+  background: var(--teal);
+  color: var(--teal-dark);
 }
 
 .keyboard-hint {
@@ -776,6 +829,209 @@ button:focus-visible {
 
 .deck-source-note:empty {
   display: none;
+}
+
+.empty-profile-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 40px 28px;
+  border: 1px dashed var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  text-align: center;
+}
+
+.empty-profile-state h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.empty-profile-state p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.profile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.profile-row.is-active {
+  border-color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 8%, transparent);
+}
+
+.profile-row-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.profile-row-badge {
+  border-radius: 999px;
+  background: var(--blue);
+  color: white;
+  padding: 2px 9px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.profile-row-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.profile-new-title {
+  margin: 8px 0 8px;
+  font-size: 0.95rem;
+}
+
+.profile-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.profile-new-row {
+  display: flex;
+  gap: 10px;
+}
+
+.profile-new-row input {
+  flex: 1;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 0 12px;
+  font-size: 0.9rem;
+}
+
+.topic-dashboard-section {
+  margin-top: 28px;
+}
+
+.weekly-evolution {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 64px;
+  margin: 14px 0 18px;
+  padding: 0 2px;
+}
+
+.weekly-evolution-day {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  height: 100%;
+}
+
+.weekly-evolution-bar {
+  width: 100%;
+  min-height: 3px;
+  border-radius: 4px 4px 0 0;
+  background: var(--blue);
+}
+
+.weekly-evolution-day.is-today .weekly-evolution-bar {
+  background: var(--green-dark);
+}
+
+.weekly-evolution-label {
+  color: var(--muted);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.topic-table {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.topic-table-head,
+.topic-table-row {
+  display: grid;
+  grid-template-columns: 2.2fr 0.9fr 0.9fr 1.2fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+}
+
+.topic-table-head {
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.topic-table-row {
+  border-top: 1px solid var(--line-soft);
+  font-size: 0.85rem;
+}
+
+.topic-table-row.is-weak {
+  background: color-mix(in srgb, var(--coral) 8%, transparent);
+}
+
+.topic-table-topic {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.topic-table-topic strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topic-table-topic small {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.study-session-simulated {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted-2);
+  font-size: 0.85rem;
+}
+
+.study-session-simulated input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--blue);
 }
 
 .filter-row {
@@ -1728,10 +1984,19 @@ kbd {
     display: none;
   }
 
-  .actions {
+  .reveal-row {
+    margin-top: 16px;
+  }
+
+  .reveal-row .action-button.reveal {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .rating-actions {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin-top: 16px;
+    margin-top: 12px;
   }
 
   .action-button {
@@ -1739,11 +2004,6 @@ kbd {
     gap: 8px;
     padding: 0 12px;
     font-size: 0.9rem;
-  }
-
-  .action-button.reveal {
-    grid-column: 1 / -1;
-    grid-row: 1;
   }
 
   .keyboard-hint {

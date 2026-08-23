@@ -47,3 +47,41 @@ describe("persistência dos baralhos", () => {
     expect(api.loadBuiltinOverride(second.id)).toBeNull();
   });
 });
+
+describe("perfis de concurso", () => {
+  it("usa as mesmas chaves de sempre para o perfil padrão", () => {
+    const storage = createFakeStorage();
+    const api = CardStorage.createDeckStorage(storage, CardStorage.DEFAULT_PROFILE_ID);
+    const custom = { id: "meu-baralho", custom: true, cards: [{ front: "P", back: "R" }] };
+
+    api.persistDecks(new Set([custom]), [custom]);
+
+    expect(storage.values.has(CardStorage.CUSTOM_DECKS_KEY)).toBe(true);
+  });
+
+  it("isola os baralhos customizados entre perfis diferentes", () => {
+    const storage = createFakeStorage();
+    const sefaz = CardStorage.createDeckStorage(storage, "sefaz-rs");
+    const abin = CardStorage.createDeckStorage(storage, "abin");
+    const sefazDeck = { id: "tributario", custom: true, cards: [{ front: "P1", back: "R1" }] };
+    const abinDeck = { id: "inteligencia", custom: true, cards: [{ front: "P2", back: "R2" }] };
+
+    sefaz.persistDecks(new Set([sefazDeck]), [sefazDeck]);
+    abin.persistDecks(new Set([abinDeck]), [abinDeck]);
+
+    expect(sefaz.loadCustomDecks()).toEqual([sefazDeck]);
+    expect(abin.loadCustomDecks()).toEqual([abinDeck]);
+  });
+
+  it("isola os overrides de baralho nativo por perfil", () => {
+    const storage = createFakeStorage();
+    const trt4 = CardStorage.createDeckStorage(storage, CardStorage.DEFAULT_PROFILE_ID);
+    const outro = CardStorage.createDeckStorage(storage, "outro-concurso");
+    const deck = { id: "direito-constitucional", custom: false, cards: [{ front: "P", back: "R" }] };
+
+    trt4.persistDecks(new Set([deck]), [deck]);
+
+    expect(trt4.loadBuiltinOverride(deck.id)).toEqual(deck.cards);
+    expect(outro.loadBuiltinOverride(deck.id)).toBeNull();
+  });
+});

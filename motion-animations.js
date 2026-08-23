@@ -24,7 +24,8 @@ if (!reduceMotion) {
     { duration: 0.22, easing: "ease-in-out" },
   );
 
-  const animateFeedback = (remembered) => {
+  const animateFeedback = (rating) => {
+    const remembered = rating !== "again";
     safeAnimate(
       document.querySelector("#flashcard"),
       remembered
@@ -35,13 +36,13 @@ if (!reduceMotion) {
 
     if (remembered) {
       safeAnimate(
-        document.querySelector("#remembered-button"),
+        document.querySelector(`#${rating}-button`),
         { scale: [1, 1.08, 1] },
         { duration: 0.25, easing: "ease-out" },
       );
     } else {
       safeAnimate(
-        document.querySelector("#forgot-button"),
+        document.querySelector("#again-button"),
         { x: [0, -4, 4, -2, 2, 0] },
         { duration: 0.28, easing: "ease-out" },
       );
@@ -62,8 +63,10 @@ if (!reduceMotion) {
   document.querySelector("#next-button")?.addEventListener("click", () => queueMicrotask(() => animateCardIn(1)));
   document.querySelector("#flashcard")?.addEventListener("click", () => queueMicrotask(animateFlip));
   document.querySelector("#reveal-button")?.addEventListener("click", () => queueMicrotask(animateFlip));
-  document.querySelector("#remembered-button")?.addEventListener("click", () => animateFeedback(true));
-  document.querySelector("#forgot-button")?.addEventListener("click", () => animateFeedback(false));
+  document.querySelector("#again-button")?.addEventListener("click", () => animateFeedback("again"));
+  document.querySelector("#hard-button")?.addEventListener("click", () => animateFeedback("hard"));
+  document.querySelector("#good-button")?.addEventListener("click", () => animateFeedback("good"));
+  document.querySelector("#easy-button")?.addEventListener("click", () => animateFeedback("easy"));
 
   document.querySelectorAll("dialog.dashboard-dialog").forEach((dialog) => {
     new MutationObserver(() => animateDialog(dialog)).observe(dialog, {
@@ -120,7 +123,7 @@ if (!reduceMotion) {
   }
 
   safeAnimate(
-    document.querySelectorAll(".topbar, .filter-row, .progress-heading, .card-stage, .actions"),
+    document.querySelectorAll(".topbar, .filter-row, .progress-heading, .card-stage, .reveal-row, .actions"),
     { opacity: [0, 1], y: [8, 0] },
     { duration: 0.28, delay: stagger(0.04), easing: [0.22, 1, 0.36, 1] },
   );

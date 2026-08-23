@@ -1,9 +1,92 @@
-const STORAGE_KEY = "trilha-flashcard-state";
 const THEME_STORAGE_KEY = "trilha-flashcard-theme";
-const TRASH_STORAGE_KEY = "trilha-flashcard-trash";
 const { dateKey, cardKey: buildCardKey, computeNextRating, isDue, isWrong, getStudyStreak: computeStudyStreak } = SpacedRepetition;
-const deckStorage = CardStorage.createDeckStorage(localStorage);
-const decks = [...trt4Decks, ...deckStorage.loadCustomDecks()];
+
+const PROFILES_KEY = "trilha-flashcard-profiles";
+const ACTIVE_PROFILE_KEY = "trilha-flashcard-active-profile";
+const DEFAULT_PROFILE_ID = CardStorage.DEFAULT_PROFILE_ID;
+const DEFAULT_PROFILE_NAME = "TRT-4 · AJAJ";
+const PROFILE_PRESETS = ["SEFAZ-RS", "Receita Federal", "ABIN"];
+
+function loadProfileList() {
+  try {
+    const value = JSON.parse(localStorage.getItem(PROFILES_KEY) || "[]");
+    return Array.isArray(value)
+      ? value.filter((profile) => profile && typeof profile.id === "string" && typeof profile.name === "string")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveProfileList(profiles) {
+  localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
+}
+
+function getAllProfiles() {
+  return [{ id: DEFAULT_PROFILE_ID, name: DEFAULT_PROFILE_NAME, builtin: true }, ...loadProfileList()];
+}
+
+function getActiveProfileId() {
+  const stored = localStorage.getItem(ACTIVE_PROFILE_KEY);
+  return stored && getAllProfiles().some((profile) => profile.id === stored) ? stored : DEFAULT_PROFILE_ID;
+}
+
+function scopedKey(baseKey, profileId) {
+  return profileId === DEFAULT_PROFILE_ID ? baseKey : `${baseKey}::${profileId}`;
+}
+
+const activeProfileId = getActiveProfileId();
+const STORAGE_KEY = scopedKey("trilha-flashcard-state", activeProfileId);
+const TRASH_STORAGE_KEY = scopedKey("trilha-flashcard-trash", activeProfileId);
+
+const deckStorage = CardStorage.createDeckStorage(localStorage, activeProfileId);
+const decks = activeProfileId === DEFAULT_PROFILE_ID
+  ? [...trt4Decks, ...deckStorage.loadCustomDecks()]
+  : [...deckStorage.loadCustomDecks()];
+
+function switchToProfile(profileId) {
+  localStorage.setItem(ACTIVE_PROFILE_KEY, profileId);
+  location.reload();
+}
+
+function slugify(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function createProfile(name) {
+  const trimmed = name.trim();
+  if (!trimmed) return null;
+  const profiles = loadProfileList();
+  const baseId = slugify(trimmed) || `perfil-${Date.now()}`;
+  let id = baseId;
+  let suffix = 2;
+  const existingIds = new Set(getAllProfiles().map((profile) => profile.id));
+  while (existingIds.has(id)) {
+    id = `${baseId}-${suffix}`;
+    suffix += 1;
+  }
+  const profile = { id, name: trimmed, builtin: false };
+  saveProfileList([...profiles, profile]);
+  return profile;
+}
+
+function deleteProfile(profileId) {
+  if (profileId === DEFAULT_PROFILE_ID) return;
+  [
+    scopedKey("trilha-flashcard-state", profileId),
+    scopedKey("trilha-flashcard-trash", profileId),
+    `${CardStorage.CUSTOM_DECKS_KEY}::${profileId}`,
+  ].forEach((key) => localStorage.removeItem(key));
+  saveProfileList(loadProfileList().filter((profile) => profile.id !== profileId));
+  if (getActiveProfileId() === profileId) {
+    localStorage.setItem(ACTIVE_PROFILE_KEY, DEFAULT_PROFILE_ID);
+  }
+}
 
 function persistDeckCards(deck) {
   const entries = deckStorage.persistDecks([deck], decks);
@@ -49,8 +132,13 @@ const elements = {
   next: document.querySelector("#next-button"),
   shuffle: document.querySelector("#shuffle-button"),
   reveal: document.querySelector("#reveal-button"),
-  forgot: document.querySelector("#forgot-button"),
-  remembered: document.querySelector("#remembered-button"),
+  ratingActions: document.querySelector("#rating-actions"),
+  again: document.querySelector("#again-button"),
+  hard: document.querySelector("#hard-button"),
+  good: document.querySelector("#good-button"),
+  easy: document.querySelector("#easy-button"),
+  simulatedActions: document.querySelector("#simulated-actions"),
+  simulatedNextButton: document.querySelector("#simulated-next-button"),
   themeToggle: document.querySelector("#theme-toggle-button"),
   searchInput: document.querySelector("#search-input"),
   searchClear: document.querySelector("#search-clear"),
@@ -70,6 +158,10 @@ const elements = {
   reviewDue: document.querySelector("#review-due-button"),
   reviewWrong: document.querySelector("#review-wrong-button"),
   deckPerformance: document.querySelector("#deck-performance"),
+  topicDashboardToday: document.querySelector("#topic-dashboard-today"),
+  weeklyEvolution: document.querySelector("#weekly-evolution"),
+  topicTableBody: document.querySelector("#topic-table-body"),
+  topicTableEmpty: document.querySelector("#topic-table-empty"),
   exportButton: document.querySelector("#export-button"),
   importButton: document.querySelector("#import-button"),
   importInput: document.querySelector("#import-input"),
@@ -121,6 +213,9 @@ const elements = {
   studySessionCount: document.querySelector("#study-session-count"),
   studySessionScope: document.querySelector("#study-session-scope"),
   studySessionPriority: document.querySelector("#study-session-priority"),
+  studySessionDiscipline: document.querySelector("#study-session-discipline"),
+  studySessionTopic: document.querySelector("#study-session-topic"),
+  studySessionSimulated: document.querySelector("#study-session-simulated"),
   installButton: document.querySelector("#install-app-button"),
   installDialog: document.querySelector("#install-dialog"),
   installDialogClose: document.querySelector("#install-dialog-close"),
@@ -137,6 +232,23 @@ const elements = {
   cloudUseLocalButton: document.querySelector("#cloud-use-local-button"),
   cloudUseRemoteButton: document.querySelector("#cloud-use-remote-button"),
   cloudConflictCancel: document.querySelector("#cloud-conflict-cancel"),
+  studyArea: document.querySelector("#study-area"),
+  emptyProfileState: document.querySelector("#empty-profile-state"),
+  emptyProfileCreateButton: document.querySelector("#empty-profile-create-button"),
+  newDisciplineButton: document.querySelector("#new-discipline-button"),
+  newDisciplineDialog: document.querySelector("#new-discipline-dialog"),
+  newDisciplineClose: document.querySelector("#new-discipline-close"),
+  newDisciplineName: document.querySelector("#new-discipline-name"),
+  newDisciplineTopics: document.querySelector("#new-discipline-topics"),
+  newDisciplineCancel: document.querySelector("#new-discipline-cancel"),
+  newDisciplineSave: document.querySelector("#new-discipline-save"),
+  profileSwitchButton: document.querySelector("#profile-switch-button"),
+  profilesDialog: document.querySelector("#profiles-dialog"),
+  profilesClose: document.querySelector("#profiles-close"),
+  profileList: document.querySelector("#profile-list"),
+  profilePresets: document.querySelector("#profile-presets"),
+  profileNewName: document.querySelector("#profile-new-name"),
+  profileNewCreate: document.querySelector("#profile-new-create"),
 };
 
 let deferredInstallPrompt = null;
@@ -213,7 +325,7 @@ const savedState = loadSavedState();
 const state = {
   deckId: savedState.deckId && decks.some((deck) => deck.id === savedState.deckId)
     ? savedState.deckId
-    : decks[0].id,
+    : decks[0]?.id ?? null,
   index: Number.isInteger(savedState.index) ? savedState.index : 0,
   flipped: false,
   ratings: savedState.ratings && typeof savedState.ratings === "object" && !Array.isArray(savedState.ratings)
@@ -224,6 +336,10 @@ const state = {
     : [],
   queueMode: null,
   customQueue: [],
+  customSimulated: false,
+  dailyReviewCounts: savedState.dailyReviewCounts && typeof savedState.dailyReviewCounts === "object" && !Array.isArray(savedState.dailyReviewCounts)
+    ? savedState.dailyReviewCounts
+    : {},
   topicFilter: "",
 };
 
@@ -436,11 +552,11 @@ function toggleTheme() {
 }
 
 function currentDeck() {
-  return decks.find((deck) => deck.id === state.deckId);
+  return decks.find((deck) => deck.id === state.deckId) ?? null;
 }
 
 function currentCard() {
-  return currentDeck().cards[state.index] ?? null;
+  return currentDeck()?.cards[state.index] ?? null;
 }
 
 function cardKey(deck, card) {
@@ -524,6 +640,7 @@ function syncTopicOptions() {
 
 function getFilteredIndices() {
   const deck = currentDeck();
+  if (!deck) return [];
   if (!state.topicFilter) return deck.cards.map((_, index) => index);
   const indices = [];
   deck.cards.forEach((card, index) => {
@@ -562,6 +679,22 @@ function registerActivity() {
   const today = dateKey();
   if (!state.activity.includes(today)) state.activity.push(today);
   state.activity = state.activity.slice(-366);
+
+  state.dailyReviewCounts[today] = (state.dailyReviewCounts[today] || 0) + 1;
+  const cutoff = dateKey(new Date(Date.now() - 60 * 86400000));
+  Object.keys(state.dailyReviewCounts).forEach((key) => {
+    if (key < cutoff) delete state.dailyReviewCounts[key];
+  });
+}
+
+function getLastNDaysCounts(days) {
+  const result = [];
+  for (let offset = days - 1; offset >= 0; offset -= 1) {
+    const date = new Date(Date.now() - offset * 86400000);
+    const key = dateKey(date);
+    result.push({ date: key, weekday: date.toLocaleDateString("pt-BR", { weekday: "short" }), count: state.dailyReviewCounts[key] || 0, isToday: offset === 0 });
+  }
+  return result;
 }
 
 function getStudyStreak() {
@@ -575,6 +708,7 @@ function saveProgress() {
     index: state.index,
     ratings: state.ratings,
     activity: state.activity,
+    dailyReviewCounts: state.dailyReviewCounts,
   });
   if (localStorage.getItem(STORAGE_KEY) === value) return;
   localStorage.setItem(STORAGE_KEY, value);
@@ -633,10 +767,18 @@ function renderCard() {
   const isEmpty = !card;
   elements.flashcard.disabled = isEmpty;
   elements.reveal.disabled = isEmpty;
-  elements.forgot.disabled = isEmpty || ratingAdvanceTimer !== null;
-  elements.remembered.disabled = isEmpty || ratingAdvanceTimer !== null;
+  const ratingDisabled = isEmpty || ratingAdvanceTimer !== null;
+  elements.again.disabled = ratingDisabled;
+  elements.hard.disabled = ratingDisabled;
+  elements.good.disabled = ratingDisabled;
+  elements.easy.disabled = ratingDisabled;
+  elements.simulatedNextButton.disabled = ratingDisabled;
   elements.previous.disabled = isEmpty;
   elements.next.disabled = isEmpty;
+
+  const inSimulatedSession = state.queueMode === "custom" && state.customSimulated;
+  elements.ratingActions.hidden = inSimulatedSession;
+  elements.simulatedActions.hidden = !inSimulatedSession;
 
   if (isEmpty) {
     elements.front.textContent = "Este baralho ainda não tem cartões.";
@@ -739,9 +881,102 @@ function renderDashboard() {
   elements.deckPerformance.querySelectorAll("[data-remove-deck]").forEach((button) => {
     button.addEventListener("click", () => removeCustomDeck(button.dataset.removeDeck));
   });
+
+  renderTopicDashboard();
+}
+
+function getTopicStats() {
+  const map = new Map();
+  const now = Date.now();
+
+  editalDecks().forEach((deck) => {
+    deck.topics.forEach((topic) => {
+      map.set(`${deck.id}::${topic}`, {
+        deckTitle: deck.title,
+        topic,
+        total: 0,
+        reviewed: 0,
+        attempts: 0,
+        remembered: 0,
+        due: 0,
+        priorityAPending: 0,
+      });
+    });
+  });
+
+  decks.forEach((deck) => {
+    if (!Array.isArray(deck.topics) || !deck.topics.length) return;
+    deck.cards.forEach((card) => {
+      if (!card.topic) return;
+      const key = `${deck.id}::${card.topic}`;
+      let entry = map.get(key);
+      if (!entry) {
+        entry = { deckTitle: deck.title, topic: card.topic, total: 0, reviewed: 0, attempts: 0, remembered: 0, due: 0, priorityAPending: 0 };
+        map.set(key, entry);
+      }
+      const rating = state.ratings[cardKey(deck, card)];
+      entry.total += 1;
+      if (rating?.attempts) {
+        entry.reviewed += 1;
+        entry.attempts += rating.attempts;
+        entry.remembered += rating.remembered || 0;
+      } else if (card.priority === "A") {
+        entry.priorityAPending += 1;
+      }
+      if (isDue(rating, now)) entry.due += 1;
+    });
+  });
+
+  return [...map.values()];
+}
+
+function renderTopicDashboard() {
+  const today = dateKey();
+  elements.topicDashboardToday.textContent = `${state.dailyReviewCounts[today] || 0} estudados hoje`;
+
+  const days = getLastNDaysCounts(7);
+  const maxCount = Math.max(1, ...days.map((day) => day.count));
+  elements.weeklyEvolution.innerHTML = days.map((day) => `
+    <div class="weekly-evolution-day ${day.isToday ? "is-today" : ""}">
+      <div class="weekly-evolution-bar" style="height: ${Math.max(6, Math.round((day.count / maxCount) * 100))}%" title="${day.count} cartões"></div>
+      <span class="weekly-evolution-label">${escapeHtml(day.weekday.replace(".", ""))}</span>
+    </div>
+  `).join("");
+
+  const stats = getTopicStats().filter((entry) => entry.total > 0);
+  const ranked = [...stats].sort((a, b) => {
+    const accuracyA = a.attempts ? a.remembered / a.attempts : -1;
+    const accuracyB = b.attempts ? b.remembered / b.attempts : -1;
+    return accuracyA - accuracyB;
+  });
+
+  elements.topicTableEmpty.hidden = ranked.length > 0;
+  elements.topicTableBody.innerHTML = ranked.map((entry) => {
+    const accuracy = entry.attempts ? Math.round((entry.remembered / entry.attempts) * 100) : null;
+    const isWeak = accuracy !== null && accuracy < 60;
+    return `
+      <div class="topic-table-row ${isWeak ? "is-weak" : ""}" role="row">
+        <span class="topic-table-topic" role="cell">
+          <strong>${escapeHtml(entry.topic)}</strong>
+          <small>${escapeHtml(entry.deckTitle)} · ${entry.reviewed}/${entry.total} cartões</small>
+        </span>
+        <span role="cell">${accuracy === null ? "—" : `${accuracy}%`}</span>
+        <span role="cell">${entry.due || "—"}</span>
+        <span role="cell">${entry.priorityAPending || "—"}</span>
+      </div>
+    `;
+  }).join("");
 }
 
 function render() {
+  if (decks.length === 0) {
+    elements.studyArea.hidden = true;
+    elements.emptyProfileState.hidden = false;
+    return;
+  }
+  elements.studyArea.hidden = false;
+  elements.emptyProfileState.hidden = true;
+
   state.index = Math.min(Math.max(state.index, 0), Math.max(currentDeck().cards.length - 1, 0));
   elements.deckSelect.value = state.deckId;
   elements.deckSourceNote.textContent = currentDeck().sourceNote || "";
@@ -752,7 +987,161 @@ function render() {
   saveProgress();
 }
 
+function updateTopbarAvailability() {
+  const hasDecks = decks.length > 0;
+  elements.dashboardButton.disabled = !hasDecks;
+  elements.openManageCardsButton.disabled = !hasDecks;
+  elements.shuffle.disabled = !hasDecks;
+  elements.openStudySessionButton.disabled = !hasDecks;
+}
+
+function getActiveProfile() {
+  return getAllProfiles().find((profile) => profile.id === activeProfileId) || getAllProfiles()[0];
+}
+
+function renderProfileSwitchButton() {
+  elements.profileSwitchButton.textContent = getActiveProfile().name;
+}
+
+function renderProfilesDialog() {
+  const profiles = getAllProfiles();
+  elements.profileList.innerHTML = profiles.map((profile) => `
+    <article class="profile-row ${profile.id === activeProfileId ? "is-active" : ""}">
+      <span class="profile-row-name">
+        ${escapeHtml(profile.name)}
+        ${profile.id === activeProfileId ? '<span class="profile-row-badge">ATIVO</span>' : ""}
+      </span>
+      <span class="profile-row-actions">
+        ${profile.id === activeProfileId ? "" : `<button type="button" class="data-button" data-activate-profile="${escapeHtml(profile.id)}">Ativar</button>`}
+        ${profile.builtin ? "" : `<button type="button" class="deck-remove-button" data-delete-profile="${escapeHtml(profile.id)}" aria-label="Excluir perfil ${escapeHtml(profile.name)}">✕</button>`}
+      </span>
+    </article>
+  `).join("");
+
+  elements.profileList.querySelectorAll("[data-activate-profile]").forEach((button) => {
+    button.addEventListener("click", () => switchToProfile(button.dataset.activateProfile));
+  });
+  elements.profileList.querySelectorAll("[data-delete-profile]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const profile = profiles.find((entry) => entry.id === button.dataset.deleteProfile);
+      if (!profile) return;
+      if (!window.confirm(`Excluir o perfil "${profile.name}"? Todas as disciplinas, cartões e o desempenho dele serão apagados.`)) return;
+      const wasActive = profile.id === activeProfileId;
+      deleteProfile(profile.id);
+      if (wasActive) {
+        location.reload();
+        return;
+      }
+      renderProfilesDialog();
+    });
+  });
+
+  elements.profilePresets.innerHTML = PROFILE_PRESETS
+    .filter((preset) => !profiles.some((profile) => profile.name === preset))
+    .map((preset) => `<button type="button" class="data-button" data-preset="${escapeHtml(preset)}">${escapeHtml(preset)}</button>`)
+    .join("");
+  elements.profilePresets.querySelectorAll("[data-preset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      elements.profileNewName.value = button.dataset.preset;
+      elements.profileNewName.focus();
+    });
+  });
+}
+
+function openProfilesDialog() {
+  elements.profileNewName.value = "";
+  renderProfilesDialog();
+  elements.profilesDialog.showModal();
+  elements.profilesDialog.scrollTop = 0;
+  elements.profilesClose.focus();
+}
+
+function closeProfilesDialog() {
+  if (elements.profilesDialog.open) elements.profilesDialog.close();
+  elements.profileSwitchButton.focus();
+}
+
+function createProfileAndActivate() {
+  const profile = createProfile(elements.profileNewName.value);
+  if (!profile) {
+    showToast("Informe o nome do novo perfil");
+    return;
+  }
+  switchToProfile(profile.id);
+}
+
+function openNewDisciplineDialog() {
+  elements.newDisciplineName.value = "";
+  elements.newDisciplineTopics.value = "";
+  elements.newDisciplineDialog.showModal();
+  elements.newDisciplineDialog.scrollTop = 0;
+  elements.newDisciplineName.focus();
+}
+
+function closeNewDisciplineDialog() {
+  if (elements.newDisciplineDialog.open) elements.newDisciplineDialog.close();
+}
+
+function createNewDiscipline() {
+  const name = elements.newDisciplineName.value.trim();
+  if (!name) {
+    showToast("Informe o nome da disciplina");
+    return;
+  }
+  const topics = elements.newDisciplineTopics.value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (!topics.length) {
+    showToast("Informe ao menos um assunto para esta disciplina");
+    return;
+  }
+  const baseId = slugify(name) || `disciplina-${Date.now()}`;
+  let id = baseId;
+  let suffix = 2;
+  while (decks.some((deck) => deck.id === id)) {
+    id = `${baseId}-${suffix}`;
+    suffix += 1;
+  }
+
+  const deck = { id, title: name, custom: true, topics, cards: [] };
+  decks.push(deck);
+  persistDeckCards(deck);
+  state.deckId = deck.id;
+  state.index = 0;
+  lastTopicDeckId = null;
+  closeNewDisciplineDialog();
+  updateTopbarAvailability();
+  renderDeckOptions();
+  render();
+  showToast(`Disciplina "${name}" criada`);
+}
+
+const dialogStack = [];
+document.querySelectorAll("dialog").forEach((dialog) => {
+  dialog.addEventListener("close", () => {
+    const index = dialogStack.indexOf(dialog);
+    if (index !== -1) dialogStack.splice(index, 1);
+  });
+});
+const nativeShowModal = HTMLDialogElement.prototype.showModal;
+HTMLDialogElement.prototype.showModal = function trackedShowModal(...args) {
+  const index = dialogStack.indexOf(this);
+  if (index !== -1) dialogStack.splice(index, 1);
+  dialogStack.push(this);
+  return nativeShowModal.apply(this, args);
+};
+
+function toastHost() {
+  for (let index = dialogStack.length - 1; index >= 0; index -= 1) {
+    if (dialogStack[index].open) return dialogStack[index];
+  }
+  return document.body;
+}
+
 function showToast(message) {
+  const host = toastHost();
+  if (elements.toast.parentElement !== host) host.appendChild(elements.toast);
   clearTimeout(toastTimer);
   elements.toast.textContent = message;
   elements.toast.classList.add("show");
@@ -784,18 +1173,27 @@ function goToEntry(entry) {
   render();
 }
 
-function rateCard(didRemember) {
+const RATING_TOASTS = {
+  again: "Tudo bem — veremos novamente amanhã",
+  hard: "Anotado — revisão mais próxima",
+  good: "Boa — revisão agendada",
+  easy: "Ótimo — revisão mais espaçada",
+};
+
+function rateCard(rating) {
   const key = currentCardKey();
   if (!key || ratingAdvanceTimer !== null) return;
   const now = new Date();
-  state.ratings[key] = computeNextRating(state.ratings[key], didRemember, now);
-  elements.forgot.disabled = true;
-  elements.remembered.disabled = true;
+  state.ratings[key] = computeNextRating(state.ratings[key], rating, now);
+  elements.again.disabled = true;
+  elements.hard.disabled = true;
+  elements.good.disabled = true;
+  elements.easy.disabled = true;
   registerActivity();
   renderProgress();
   renderDashboard();
   saveProgress();
-  showToast(didRemember ? "Boa — revisão agendada" : "Tudo bem — veremos novamente amanhã");
+  showToast(RATING_TOASTS[rating] || RATING_TOASTS.good);
 
   ratingAdvanceTimer = window.setTimeout(() => {
     ratingAdvanceTimer = null;
@@ -824,9 +1222,29 @@ function rateCard(didRemember) {
       ? "Sessão personalizada concluída"
       : state.queueMode === "wrong" ? "Cartões errados revisados" : "Revisões do dia concluídas";
     state.queueMode = null;
+    state.customSimulated = false;
     move(1);
     showToast(finishedMessage);
   }, 320);
+}
+
+function advanceSimulatedSession() {
+  if (state.queueMode !== "custom" || !state.customSimulated || ratingAdvanceTimer !== null) return;
+  const key = currentCardKey();
+  ratingAdvanceTimer = window.setTimeout(() => {
+    ratingAdvanceTimer = null;
+    state.customQueue = state.customQueue.filter((entry) => entry.key !== key);
+    const nextEntry = state.customQueue[0];
+    if (nextEntry) {
+      goToEntry(nextEntry);
+      return;
+    }
+    state.queueMode = null;
+    state.customSimulated = false;
+    move(1);
+    showToast("Simulado concluído");
+  }, 200);
+  renderCard();
 }
 
 function shuffleCards() {
@@ -873,7 +1291,28 @@ function startWrongReview() {
   showToast("Revisão dos errados iniciada");
 }
 
+function renderStudySessionDisciplineOptions() {
+  const options = [{ value: "", label: "Todas as disciplinas" }].concat(
+    decks.filter((deck) => deck.cards.length > 0).map((deck) => ({ value: deck.id, label: deck.title }))
+  );
+  replaceSelectOptions(elements.studySessionDiscipline, options);
+}
+
+function renderStudySessionTopicOptions() {
+  const deck = decks.find((entry) => entry.id === elements.studySessionDiscipline.value);
+  const topics = deck ? getUniqueTopics(deck) : [];
+  replaceSelectOptions(elements.studySessionTopic, [
+    { value: "", label: "Todos os assuntos" },
+    ...topics.map((topic) => ({ value: topic, label: topic })),
+  ]);
+  elements.studySessionTopic.disabled = !deck || topics.length === 0;
+}
+
 function openStudySession() {
+  renderStudySessionDisciplineOptions();
+  elements.studySessionDiscipline.value = "";
+  renderStudySessionTopicOptions();
+  elements.studySessionSimulated.checked = false;
   elements.studySessionDialog.showModal();
   elements.studySessionClose.focus();
 }
@@ -882,9 +1321,13 @@ function buildCustomSession(event) {
   event.preventDefault();
   const scope = elements.studySessionScope.value;
   const priority = elements.studySessionPriority.value;
+  const disciplineId = elements.studySessionDiscipline.value;
+  const topic = elements.studySessionTopic.value;
+  const simulated = elements.studySessionSimulated.checked;
   const count = Number(elements.studySessionCount.value);
   let entries = allCardEntries();
-  if (scope === "current") entries = entries.filter(({ deck }) => deck.id === state.deckId);
+  if (disciplineId) entries = entries.filter(({ deck }) => deck.id === disciplineId);
+  if (topic) entries = entries.filter(({ card }) => card.topic === topic);
   if (scope === "new") entries = entries.filter(({ key }) => !state.ratings[key]?.attempts);
   if (scope === "wrong") entries = entries.filter(({ key }) => isWrong(state.ratings[key]));
   if (scope === "due") entries = entries.filter(({ key }) => isDue(state.ratings[key]));
@@ -896,9 +1339,10 @@ function buildCustomSession(event) {
     return;
   }
   state.queueMode = "custom";
+  state.customSimulated = simulated;
   elements.studySessionDialog.close();
   goToEntry(state.customQueue[0]);
-  showToast(`Sessão iniciada com ${state.customQueue.length} cartões`);
+  showToast(`Sessão iniciada com ${state.customQueue.length} cartões${simulated ? " (modo simulado)" : ""}`);
 }
 
 function escapeHtml(value) {
@@ -1041,9 +1485,10 @@ function removeCustomDeck(deckId) {
   persistDeckCards(deck);
 
   if (state.deckId === deckId) {
-    state.deckId = decks[0].id;
+    state.deckId = decks[0]?.id ?? null;
     state.index = 0;
   }
+  updateTopbarAvailability();
   renderDeckOptions();
   render();
   showToast("Baralho removido");
@@ -1599,12 +2044,16 @@ elements.reveal.addEventListener("click", toggleCard);
 elements.previous.addEventListener("click", () => move(-1));
 elements.next.addEventListener("click", () => move(1));
 elements.shuffle.addEventListener("click", shuffleCards);
-elements.forgot.addEventListener("click", () => rateCard(false));
-elements.remembered.addEventListener("click", () => rateCard(true));
+elements.again.addEventListener("click", () => rateCard("again"));
+elements.hard.addEventListener("click", () => rateCard("hard"));
+elements.good.addEventListener("click", () => rateCard("good"));
+elements.easy.addEventListener("click", () => rateCard("easy"));
+elements.simulatedNextButton.addEventListener("click", advanceSimulatedSession);
 elements.dashboardButton.addEventListener("click", openDashboard);
 elements.openStudySessionButton.addEventListener("click", openStudySession);
 elements.studySessionClose.addEventListener("click", () => elements.studySessionDialog.close());
 elements.studySessionForm.addEventListener("submit", buildCustomSession);
+elements.studySessionDiscipline.addEventListener("change", () => renderStudySessionTopicOptions());
 elements.dashboardClose.addEventListener("click", closeDashboard);
 elements.reviewDue.addEventListener("click", startDueReview);
 elements.reviewWrong.addEventListener("click", startWrongReview);
@@ -1637,6 +2086,20 @@ elements.cardExportDeckButton.addEventListener("click", exportDeckCards);
 elements.trashButton.addEventListener("click", () => { renderTrash(); elements.trashDialog.showModal(); });
 elements.trashClose.addEventListener("click", () => elements.trashDialog.close());
 elements.undoDeleteButton.addEventListener("click", () => restoreTrashItem());
+elements.profileSwitchButton.addEventListener("click", openProfilesDialog);
+elements.profilesClose.addEventListener("click", closeProfilesDialog);
+elements.profileNewCreate.addEventListener("click", createProfileAndActivate);
+elements.profilesDialog.addEventListener("click", (event) => {
+  if (event.target === elements.profilesDialog) closeProfilesDialog();
+});
+elements.newDisciplineButton.addEventListener("click", openNewDisciplineDialog);
+elements.emptyProfileCreateButton.addEventListener("click", openNewDisciplineDialog);
+elements.newDisciplineClose.addEventListener("click", closeNewDisciplineDialog);
+elements.newDisciplineCancel.addEventListener("click", closeNewDisciplineDialog);
+elements.newDisciplineSave.addEventListener("click", createNewDiscipline);
+elements.newDisciplineDialog.addEventListener("click", (event) => {
+  if (event.target === elements.newDisciplineDialog) closeNewDisciplineDialog();
+});
 elements.importPreviewClose.addEventListener("click", () => elements.importPreviewDialog.close());
 elements.importPreviewCancel.addEventListener("click", () => { pendingImport = null; elements.importPreviewDialog.close(); showToast("Importação cancelada"); });
 elements.importPreviewConfirm.addEventListener("click", async () => {
@@ -1684,7 +2147,16 @@ elements.topicSelect.addEventListener("change", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (elements.dashboardDialog.open || elements.manageCardsDialog.open || elements.installDialog.open || elements.importPreviewDialog.open || elements.trashDialog.open || elements.studySessionDialog.open) return;
+  if (
+    elements.dashboardDialog.open
+    || elements.manageCardsDialog.open
+    || elements.installDialog.open
+    || elements.importPreviewDialog.open
+    || elements.trashDialog.open
+    || elements.studySessionDialog.open
+    || elements.profilesDialog.open
+    || elements.newDisciplineDialog.open
+  ) return;
   const isTypingTarget = event.target instanceof HTMLSelectElement
     || event.target instanceof HTMLInputElement
     || event.target instanceof HTMLTextAreaElement
@@ -1706,7 +2178,7 @@ document.addEventListener("keydown", (event) => {
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("sw.js?v=20260821-9", { updateViaCache: "none" })
+      .register("sw.js?v=20260823-1", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {});
   });
@@ -1719,5 +2191,7 @@ const effectiveDark = explicitTheme === "dark" || (!explicitTheme && systemPrefe
 elements.themeToggle.setAttribute("aria-pressed", String(effectiveDark));
 setInstallButtonVisibility();
 
+renderProfileSwitchButton();
+updateTopbarAvailability();
 renderDeckOptions();
 render();

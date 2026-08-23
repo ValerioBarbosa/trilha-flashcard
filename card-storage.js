@@ -6,6 +6,7 @@
   const CUSTOM_DECKS_KEY = "trilha-flashcard-custom-decks";
   const LEGACY_BUILTIN_OVERRIDES_KEY = "trilha-flashcard-builtin-overrides";
   const BUILTIN_DECK_KEY_PREFIX = "trilha-flashcard-deck:";
+  const DEFAULT_PROFILE_ID = "trt4";
 
   function parseJson(value, fallback) {
     try {
@@ -15,15 +16,20 @@
     }
   }
 
-  function createDeckStorage(storage) {
+  function createDeckStorage(storage, profileId = DEFAULT_PROFILE_ID) {
+    const isDefaultProfile = !profileId || profileId === DEFAULT_PROFILE_ID;
+    const customDecksKey = isDefaultProfile ? CUSTOM_DECKS_KEY : `${CUSTOM_DECKS_KEY}::${profileId}`;
+    const builtinKeyPrefix = isDefaultProfile ? BUILTIN_DECK_KEY_PREFIX : `${BUILTIN_DECK_KEY_PREFIX}${profileId}::`;
+
     function loadCustomDecks() {
-      const value = parseJson(storage.getItem(CUSTOM_DECKS_KEY), []);
+      const value = parseJson(storage.getItem(customDecksKey), []);
       return Array.isArray(value) ? value : [];
     }
 
     function loadBuiltinOverride(deckId) {
-      const current = parseJson(storage.getItem(`${BUILTIN_DECK_KEY_PREFIX}${deckId}`), null);
+      const current = parseJson(storage.getItem(`${builtinKeyPrefix}${deckId}`), null);
       if (Array.isArray(current)) return current;
+      if (!isDefaultProfile) return null;
 
       const legacy = parseJson(storage.getItem(LEGACY_BUILTIN_OVERRIDES_KEY), {});
       return Array.isArray(legacy?.[deckId]) ? legacy[deckId] : null;
@@ -32,11 +38,11 @@
     function buildEntry(deck, allDecks) {
       return deck.custom
         ? {
-            key: CUSTOM_DECKS_KEY,
+            key: customDecksKey,
             value: JSON.stringify(allDecks.filter((item) => item.custom)),
           }
         : {
-            key: `${BUILTIN_DECK_KEY_PREFIX}${deck.id}`,
+            key: `${builtinKeyPrefix}${deck.id}`,
             value: JSON.stringify(deck.cards),
           };
     }
@@ -73,5 +79,5 @@
     return { loadCustomDecks, loadBuiltinOverride, persistDecks };
   }
 
-  return { createDeckStorage, CUSTOM_DECKS_KEY, LEGACY_BUILTIN_OVERRIDES_KEY, BUILTIN_DECK_KEY_PREFIX };
+  return { createDeckStorage, CUSTOM_DECKS_KEY, LEGACY_BUILTIN_OVERRIDES_KEY, BUILTIN_DECK_KEY_PREFIX, DEFAULT_PROFILE_ID };
 });
