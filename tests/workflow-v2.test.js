@@ -12,6 +12,15 @@ describe("fluxo de estudo v2", () => {
     expect(serviceWorker).toContain("card-database.js?v=20260822-1");
   });
 
+  it("expõe filtros e árvore no gerenciador de cartões", () => {
+    ["card-list-discipline", "card-list-topic-filter", "card-list-priority", "card-list-difficulty", "card-list-expand-all"].forEach((id) => {
+      expect(html).toContain(`id="${id}"`);
+    });
+    expect(html).toContain("card-manager.js");
+    expect(app).toContain("CardManager.organizeCards");
+    expect(app).toContain("card-topic-group");
+  });
+
   it("expõe prévia, lixeira, backup e sessão personalizada", () => {
     ["import-preview-dialog", "trash-dialog", "study-session-dialog", "export-button"].forEach((id) => {
       expect(html).toContain(`id="${id}"`);
