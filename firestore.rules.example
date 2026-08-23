@@ -1,27 +1,40 @@
 rules_version = '2';
 
+// Schema v2: one document per deck/card/rating/grave instead of a single
+// blob-of-everything document. Every write still requires the caller to be
+// the owner (request.auth.uid == userId); field-level validation is kept
+// light on purpose — cards carry many optional fields, and this app has no
+// server-side logic that trusts this data beyond echoing it back to its owner.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /flashcardUsers/{userId} {
-      allow read: if request.auth != null
-        && request.auth.uid == userId;
+      match /decks/{deckId} {
+        allow read, write: if request.auth != null
+          && request.auth.uid == userId
+          && request.resource.data.title is string
+          && request.resource.data.topics is list;
 
-      allow create, update: if request.auth != null
-        && request.auth.uid == userId
-        && request.resource.data.ownerUid == userId
-        && request.resource.data.keys().hasOnly([
-          'ownerUid',
-          'snapshot',
-          'updatedAt',
-          'updatedAtISO'
-        ])
-        && request.resource.data.snapshot is map
-        && request.resource.data.snapshot.version == 1
-        && request.resource.data.snapshot.entries is map
-        && request.resource.data.updatedAt is timestamp
-        && request.resource.data.updatedAtISO is string;
+        match /cards/{cardId} {
+          allow read, write: if request.auth != null
+            && request.auth.uid == userId
+            && request.resource.data.front is string
+            && request.resource.data.back is string;
+        }
+      }
 
-      allow delete: if false;
+      match /ratings/{cardId} {
+        allow read, write: if request.auth != null
+          && request.auth.uid == userId
+          && request.resource.data.deckId is string;
+      }
+
+      match /graves/{objectId} {
+        allow read, write: if request.auth != null
+          && request.auth.uid == userId
+          && request.resource.data.type in ['card', 'deck']
+          && request.resource.data.deletedAt is string;
+        allow delete: if false;
+      }
     }
 
     match /{document=**} {

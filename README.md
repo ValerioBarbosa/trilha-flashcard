@@ -66,7 +66,9 @@ Edições em baralhos por disciplina ficam salvas no navegador (via `localStorag
 4. Adicione `valeriobarbosa.github.io` aos domínios autorizados do Authentication.
 5. Copie a configuração Web para `firebase-config.js`, substituindo `null` pelo objeto `firebaseConfig`.
 
-Os documentos ficam em `flashcardUsers/{uid}`. As regras permitem que cada usuário leia e altere somente o próprio documento. Na primeira conexão, os dados locais são enviados automaticamente se a nuvem estiver vazia. Se existirem duas versões, o aplicativo exige uma escolha antes de substituir qualquer dado.
+Os documentos ficam em `flashcardUsers/{uid}/decks/{deckId}` (e sua subcoleção `cards`), `flashcardUsers/{uid}/ratings/{cardId}` e `flashcardUsers/{uid}/graves/{id}` — um documento por baralho/cartão/avaliação, não mais um blob único. As regras permitem que cada usuário leia e altere somente os próprios documentos. A cada sincronização, cada cartão/baralho/avaliação é comparado individualmente pelo mais recente (`updatedAt`) e mesclado automaticamente — não há mais uma tela pedindo para escolher entre "este aparelho" ou "a nuvem".
+
+**Atualizando de uma versão anterior:** se o projeto Firebase já estava em uso com o esquema antigo (um documento único em `flashcardUsers/{uid}`), publique as regras atualizadas de `firestore.rules.example` no console do Firebase antes de sincronizar novamente — as regras antigas bloqueiam as novas subcoleções. Os dados antigos nesse documento único não são lidos pelo novo código (ele não apaga nada, apenas não os usa mais); qualquer aparelho que ainda tenha os baralhos localmente vai reenviá-los no novo formato na primeira sincronização.
 
 ## Importar seu próprio baralho
 

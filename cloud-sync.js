@@ -3,66 +3,169 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   if (root) root.CloudSync = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function createCloudSyncApi() {
-  const SYNC_PREFIXES = ["trilha-flashcard-"];
-  const EXCLUDED_KEYS = new Set(["trilha-flashcard-theme", "trilha-flashcard-cloud-meta"]);
+  const CARD_FIELDS = [
+    "front", "back", "topic", "subtopic", "legalBasis", "tag",
+    "example", "complement", "pitfall", "mnemonic", "type", "priority", "difficulty",
+  ];
 
-  function isSyncableKey(key) {
-    return SYNC_PREFIXES.some((prefix) => key.startsWith(prefix)) && !EXCLUDED_KEYS.has(key);
+  function compareTimestamps(a, b) {
+    const timeA = a ? new Date(a).getTime() : -Infinity;
+    const timeB = b ? new Date(b).getTime() : -Infinity;
+    return timeA - timeB;
   }
 
-  function createSnapshot(storage) {
-    const entries = {};
-    const keys = [];
-    for (let index = 0; index < storage.length; index += 1) {
-      const key = storage.key(index);
-      if (key && isSyncableKey(key)) keys.push(key);
-    }
-    keys.sort().forEach((key) => { entries[key] = storage.getItem(key); });
-    return { version: 1, entries };
+  // ---- local state (decks/state.ratings/graves) -> flat records shaped like Firestore documents ----
+
+  function flattenDecks(decks) {
+    return decks.map((deck) => ({
+      id: deck.id,
+      title: deck.title,
+      topics: deck.topics || [],
+      custom: Boolean(deck.custom),
+      sourceNote: deck.sourceNote || null,
+      updatedAt: deck.updatedAt || null,
+    }));
   }
 
-  function applySnapshot(storage, snapshot) {
-    if (!snapshot || snapshot.version !== 1 || !snapshot.entries || typeof snapshot.entries !== "object") {
-      throw new Error("invalid-cloud-snapshot");
-    }
-    const remoteKeys = new Set(Object.keys(snapshot.entries).filter(isSyncableKey));
-    const localKeys = [];
-    for (let index = 0; index < storage.length; index += 1) {
-      const key = storage.key(index);
-      if (key && isSyncableKey(key)) localKeys.push(key);
-    }
-    localKeys.forEach((key) => {
-      if (!remoteKeys.has(key)) storage.removeItem(key);
+  function flattenCards(decks) {
+    const cards = [];
+    decks.forEach((deck) => {
+      deck.cards.forEach((card) => {
+        if (!card.id) return;
+        const record = { id: card.id, deckId: deck.id, updatedAt: card.updatedAt || null };
+        CARD_FIELDS.forEach((field) => {
+          if (card[field] !== undefined) record[field] = card[field];
+        });
+        cards.push(record);
+      });
     });
-    Object.entries(snapshot.entries).forEach(([key, value]) => {
-      if (isSyncableKey(key) && typeof value === "string") storage.setItem(key, value);
+    return cards;
+  }
+
+  function ratingUpdatedAt(rating) {
+    return rating?.lastReviewed || null;
+  }
+
+  function flattenRatings(ratings) {
+    return Object.entries(ratings || {}).map(([key, rating]) => {
+      const separatorIndex = key.indexOf("::");
+      const deckId = key.slice(0, separatorIndex);
+      const cardId = key.slice(separatorIndex + 2);
+      return { id: cardId, deckId, ...rating };
     });
   }
 
-  function snapshotFingerprint(snapshot) {
-    const serialized = JSON.stringify(snapshot);
-    let hash = 2166136261;
-    for (let index = 0; index < serialized.length; index += 1) {
-      hash ^= serialized.charCodeAt(index);
-      hash = Math.imul(hash, 16777619);
-    }
-    return (hash >>> 0).toString(16).padStart(8, "0");
+  function flattenLocalState({ decks, ratings, graves }) {
+    return {
+      decks: flattenDecks(decks),
+      cards: flattenCards(decks),
+      ratings: flattenRatings(ratings),
+      graves: (graves || []).map((grave) => ({ ...grave })),
+    };
   }
 
-  function reconciliationAction({ local, remote, meta, uid }) {
-    if (!remote?.snapshot) return "upload";
-    if (!hasStudyData(local)) return "download";
-    const sameRemote = meta?.uid === uid && meta?.remoteUpdatedAtISO === remote.updatedAtISO;
-    if (!sameRemote) return "conflict";
-    return meta.dirty || meta.syncedFingerprint !== snapshotFingerprint(local) ? "upload" : "saved";
+  // ---- flat records -> local state shape (decks with nested cards, state.ratings map) ----
+
+  function hydrateDecks(records) {
+    const deckMap = new Map(records.decks.map((deck) => [deck.id, {
+      id: deck.id,
+      title: deck.title,
+      topics: deck.topics || [],
+      ...(deck.custom ? { custom: true } : {}),
+      ...(deck.sourceNote ? { sourceNote: deck.sourceNote } : {}),
+      updatedAt: deck.updatedAt,
+      cards: [],
+    }]));
+    records.cards.forEach((card) => {
+      const deck = deckMap.get(card.deckId);
+      if (!deck) return;
+      const { deckId, ...cardFields } = card;
+      deck.cards.push(cardFields);
+    });
+    return [...deckMap.values()];
   }
 
-  function hasStudyData(snapshot) {
-    return Object.keys(snapshot?.entries || {}).some((key) => (
-      key === "trilha-flashcard-state"
-      || key === "trilha-flashcard-custom-decks"
-      || key.startsWith("trilha-flashcard-deck:")
-    ));
+  function hydrateRatings(records) {
+    const ratings = {};
+    records.ratings.forEach((entry) => {
+      const { id, deckId, ...rating } = entry;
+      ratings[`${deckId}::${id}`] = rating;
+    });
+    return ratings;
+  }
+
+  // ---- per-id, last-write-wins merge (this is what replaces the old whole-blob conflict dialog) ----
+
+  function mergeById(localRecords, remoteRecords, getUpdatedAt) {
+    const byId = new Map();
+    localRecords.forEach((record) => byId.set(record.id, record));
+    remoteRecords.forEach((remoteRecord) => {
+      const localRecord = byId.get(remoteRecord.id);
+      if (!localRecord || compareTimestamps(getUpdatedAt(remoteRecord), getUpdatedAt(localRecord)) > 0) {
+        byId.set(remoteRecord.id, remoteRecord);
+      }
+    });
+    return byId;
+  }
+
+  function applyGraves(byId, graves, type, getUpdatedAt) {
+    graves
+      .filter((grave) => grave.type === type)
+      .forEach((grave) => {
+        const record = byId.get(grave.id);
+        if (record && compareTimestamps(grave.deletedAt, getUpdatedAt(record)) >= 0) {
+          byId.delete(grave.id);
+        }
+      });
+  }
+
+  function mergeGraves(localGraves, remoteGraves) {
+    const byId = new Map();
+    [...localGraves, ...remoteGraves].forEach((grave) => {
+      const existing = byId.get(grave.id);
+      if (!existing || compareTimestamps(grave.deletedAt, existing.deletedAt) > 0) {
+        byId.set(grave.id, grave);
+      }
+    });
+    return [...byId.values()];
+  }
+
+  function mergeState(local, remote) {
+    const graves = mergeGraves(local.graves, remote.graves);
+
+    const deckById = mergeById(local.decks, remote.decks, (deck) => deck.updatedAt);
+    applyGraves(deckById, graves, "deck", (deck) => deck.updatedAt);
+
+    const cardById = mergeById(local.cards, remote.cards, (card) => card.updatedAt);
+    applyGraves(cardById, graves, "card", (card) => card.updatedAt);
+    // a card whose deck was deleted has no home; drop it rather than resurrect an orphan
+    [...cardById.values()].forEach((card) => {
+      if (!deckById.has(card.deckId)) cardById.delete(card.id);
+    });
+
+    const ratingById = mergeById(local.ratings, remote.ratings, ratingUpdatedAt);
+    applyGraves(ratingById, graves, "card", ratingUpdatedAt);
+
+    return {
+      decks: [...deckById.values()],
+      cards: [...cardById.values()],
+      ratings: [...ratingById.values()],
+      graves,
+    };
+  }
+
+  // which merged records are not already identical on the remote side, i.e. need to be pushed
+  function planRemoteWrites(merged, remote) {
+    const diff = (mergedList, remoteList) => {
+      const remoteById = new Map(remoteList.map((record) => [record.id, record]));
+      return mergedList.filter((record) => JSON.stringify(record) !== JSON.stringify(remoteById.get(record.id)));
+    };
+    return {
+      decks: diff(merged.decks, remote.decks),
+      cards: diff(merged.cards, remote.cards),
+      ratings: diff(merged.ratings, remote.ratings),
+      graves: diff(merged.graves, remote.graves),
+    };
   }
 
   async function createFirebaseAdapter(config) {
@@ -78,6 +181,72 @@
     const db = firestoreApi.getFirestore(app);
     const provider = new authApi.GoogleAuthProvider();
 
+    function collectionsFor(uid) {
+      const userDoc = firestoreApi.doc(db, "flashcardUsers", uid);
+      return {
+        decks: firestoreApi.collection(userDoc, "decks"),
+        ratings: firestoreApi.collection(userDoc, "ratings"),
+        graves: firestoreApi.collection(userDoc, "graves"),
+      };
+    }
+
+    async function readAll(uid) {
+      const collections = collectionsFor(uid);
+      const [deckDocs, ratingDocs, graveDocs] = await Promise.all([
+        firestoreApi.getDocs(collections.decks),
+        firestoreApi.getDocs(collections.ratings),
+        firestoreApi.getDocs(collections.graves),
+      ]);
+      const decks = deckDocs.docs.map((docSnapshot) => ({ id: docSnapshot.id, ...docSnapshot.data() }));
+      const cardLists = await Promise.all(decks.map(async (deck) => {
+        const cardDocs = await firestoreApi.getDocs(
+          firestoreApi.collection(collections.decks, deck.id, "cards")
+        );
+        return cardDocs.docs.map((docSnapshot) => ({ id: docSnapshot.id, deckId: deck.id, ...docSnapshot.data() }));
+      }));
+      return {
+        decks,
+        cards: cardLists.flat(),
+        ratings: ratingDocs.docs.map((docSnapshot) => ({ id: docSnapshot.id, ...docSnapshot.data() })),
+        graves: graveDocs.docs.map((docSnapshot) => ({ id: docSnapshot.id, ...docSnapshot.data() })),
+      };
+    }
+
+    async function writeChanges(uid, changes) {
+      const collections = collectionsFor(uid);
+      let batch = firestoreApi.writeBatch(db);
+      const batches = [batch];
+      let opCount = 0;
+      const queue = (ref, data) => {
+        batch.set(ref, data, { merge: true });
+        opCount += 1;
+        if (opCount >= 450) {
+          batch = firestoreApi.writeBatch(db);
+          batches.push(batch);
+          opCount = 0;
+        }
+      };
+
+      changes.decks.forEach((deck) => {
+        const { id, ...fields } = deck;
+        queue(firestoreApi.doc(collections.decks, id), fields);
+      });
+      changes.cards.forEach((card) => {
+        const { id, deckId, ...fields } = card;
+        queue(firestoreApi.doc(collections.decks, deckId, "cards", id), fields);
+      });
+      changes.ratings.forEach((rating) => {
+        const { id, ...fields } = rating;
+        queue(firestoreApi.doc(collections.ratings, id), fields);
+      });
+      changes.graves.forEach((grave) => {
+        const { id, ...fields } = grave;
+        queue(firestoreApi.doc(collections.graves, id), fields);
+      });
+
+      for (const pendingBatch of batches) await pendingBatch.commit();
+    }
+
     return {
       observeUser(callback) { return authApi.onAuthStateChanged(auth, callback); },
       signIn() {
@@ -88,36 +257,17 @@
           : authApi.signInWithPopup(auth, provider);
       },
       signOut() { return authApi.signOut(auth); },
-      async read(uid) {
-        const result = await firestoreApi.getDoc(firestoreApi.doc(db, "flashcardUsers", uid));
-        return result.exists() ? result.data() : null;
-      },
-      async write(uid, snapshot, { expectedUpdatedAtISO = null, force = false } = {}) {
-        const reference = firestoreApi.doc(db, "flashcardUsers", uid);
-        const updatedAtISO = `${new Date().toISOString()}:${crypto.randomUUID()}`;
-        await firestoreApi.runTransaction(db, async (transaction) => {
-          const current = await transaction.get(reference);
-          const currentToken = current.exists() ? current.data().updatedAtISO || null : null;
-          if (!force && currentToken !== expectedUpdatedAtISO) throw new Error("cloud-conflict");
-          transaction.set(reference, {
-            ownerUid: uid,
-            snapshot,
-            updatedAt: firestoreApi.serverTimestamp(),
-            updatedAtISO,
-          });
-        });
-        return updatedAtISO;
-      },
+      readAll,
+      writeChanges,
     };
   }
 
   return {
-    applySnapshot,
+    flattenLocalState,
+    hydrateDecks,
+    hydrateRatings,
+    mergeState,
+    planRemoteWrites,
     createFirebaseAdapter,
-    createSnapshot,
-    hasStudyData,
-    isSyncableKey,
-    reconciliationAction,
-    snapshotFingerprint,
   };
 });

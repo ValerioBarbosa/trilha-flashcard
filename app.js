@@ -38,6 +38,7 @@ function scopedKey(baseKey, profileId) {
 const activeProfileId = getActiveProfileId();
 const STORAGE_KEY = scopedKey("trilha-flashcard-state", activeProfileId);
 const TRASH_STORAGE_KEY = scopedKey("trilha-flashcard-trash", activeProfileId);
+const GRAVES_STORAGE_KEY = scopedKey("trilha-flashcard-graves", activeProfileId);
 
 const deckStorage = CardStorage.createDeckStorage(localStorage, activeProfileId);
 const decks = activeProfileId === DEFAULT_PROFILE_ID
@@ -228,10 +229,6 @@ const elements = {
   cloudSignInButton: document.querySelector("#cloud-sign-in-button"),
   cloudSyncNowButton: document.querySelector("#cloud-sync-now-button"),
   cloudSignOutButton: document.querySelector("#cloud-sign-out-button"),
-  cloudConflictDialog: document.querySelector("#cloud-conflict-dialog"),
-  cloudUseLocalButton: document.querySelector("#cloud-use-local-button"),
-  cloudUseRemoteButton: document.querySelector("#cloud-use-remote-button"),
-  cloudConflictCancel: document.querySelector("#cloud-conflict-cancel"),
   studyArea: document.querySelector("#study-area"),
   emptyProfileState: document.querySelector("#empty-profile-state"),
   emptyProfileCreateButton: document.querySelector("#empty-profile-create-button"),
@@ -349,6 +346,16 @@ let trash = (() => {
     return Array.isArray(value) ? value : [];
   } catch { return []; }
 })();
+
+// Tombstones for cards/decks deleted on this device. Kept separate from (and with a much
+// higher cap than) the visible trash above, so cloud sync still knows an item was removed
+// here even after it has rolled off the recoverable trash list.
+let graves = (() => {
+  try {
+    const value = JSON.parse(localStorage.getItem(GRAVES_STORAGE_KEY) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch { return []; }
+})();
 let pendingImport = null;
 
 ensureCardIds(decks);
@@ -359,6 +366,28 @@ function persistTrash() {
   localStorage.setItem(TRASH_STORAGE_KEY, value);
   void CardDatabase.persistEntries([[TRASH_STORAGE_KEY, value]]).catch((error) => console.warn("Falha ao salvar lixeira", error));
   markCloudDirty();
+}
+
+function persistGraves() {
+  const value = JSON.stringify(graves);
+  localStorage.setItem(GRAVES_STORAGE_KEY, value);
+  void CardDatabase.persistEntries([[GRAVES_STORAGE_KEY, value]]).catch((error) => console.warn("Falha ao salvar exclusões", error));
+  markCloudDirty();
+}
+
+function recordGrave(id, type, deckId) {
+  graves.push({ id, type, deckId, deletedAt: new Date().toISOString() });
+  graves = graves.slice(-500);
+  persistGraves();
+}
+
+// Undoes a grave so a restored card/deck isn't re-deleted the next time this
+// device merges with the cloud (a grave otherwise always wins over an older record).
+function clearGrave(id) {
+  const next = graves.filter((grave) => grave.id !== id);
+  if (next.length === graves.length) return;
+  graves = next;
+  persistGraves();
 }
 
 let toastTimer;
@@ -388,107 +417,61 @@ function writeCloudMeta(meta) {
 }
 
 function markCloudDirty() {
-  const meta = readCloudMeta();
-  writeCloudMeta({ ...meta, dirty: true, localRevision: (Number(meta.localRevision) || 0) + 1 });
+  writeCloudMeta({ ...readCloudMeta(), dirty: true });
   if (!cloudReady || !cloudUser || !cloudAdapter) return;
   clearTimeout(cloudSyncTimer);
   setCloudStatus(navigator.onLine ? "Sincronizando…" : "Aguardando internet", "syncing");
-  cloudSyncTimer = setTimeout(() => void uploadCloudSnapshot(), 1400);
+  cloudSyncTimer = setTimeout(() => void syncWithCloud(), 1400);
 }
 
-async function uploadCloudSnapshot({ notify = false, force = false } = {}) {
+// Applies a merged {decks, cards, ratings, graves} result (see cloud-sync.js) back onto the
+// live in-memory decks/state, in place — no page reload needed, unlike the old whole-blob swap.
+function applyMergedState(merged) {
+  decks.splice(0, decks.length, ...CloudSync.hydrateDecks(merged));
+  state.ratings = CloudSync.hydrateRatings(merged);
+  graves = merged.graves;
+  ensureCardIds(decks);
+  const entries = deckStorage.persistDecks(decks, decks);
+  void CardDatabase.persistEntries([...entries]).catch((error) => console.warn("Falha ao salvar baralhos sincronizados", error));
+  persistGraves();
+  if (!decks.some((deck) => deck.id === state.deckId)) {
+    state.deckId = decks[0]?.id ?? null;
+    state.index = 0;
+  }
+  lastTopicDeckId = null;
+  renderDeckOptions();
+  render();
+  renderManageCards();
+}
+
+// Pulls the remote state, merges it with what's on this device record-by-record (last write
+// wins per card/deck/rating — see CloudSync.mergeState), pushes back whatever the merge
+// decided is newer locally, and applies the merged result. Because the merge is always
+// well-defined per item, there is no "pick this device or the cloud" case to ask the user about.
+async function syncWithCloud({ notify = false } = {}) {
   if (!cloudUser || !cloudAdapter) return;
   if (!navigator.onLine) {
-    setCloudStatus("Aguardando internet", "syncing", "As alterações serão enviadas automaticamente quando a conexão voltar.");
+    setCloudStatus("Aguardando internet", "syncing", "As alterações serão sincronizadas automaticamente quando a conexão voltar.");
     return;
   }
   try {
     setCloudStatus("Sincronizando…", "syncing");
-    const snapshot = CloudSync.createSnapshot(localStorage);
-    const meta = readCloudMeta();
-    const updatedAtISO = await cloudAdapter.write(cloudUser.uid, snapshot, {
-      expectedUpdatedAtISO: meta.uid === cloudUser.uid ? meta.remoteUpdatedAtISO || null : null,
-      force,
-    });
-    writeCloudMeta({
-      ...meta,
-      uid: cloudUser.uid,
-      remoteUpdatedAtISO: updatedAtISO,
-      syncedFingerprint: CloudSync.snapshotFingerprint(snapshot),
-      dirty: false,
-    });
+    const local = CloudSync.flattenLocalState({ decks, ratings: state.ratings, graves });
+    const remote = await cloudAdapter.readAll(cloudUser.uid);
+    const merged = CloudSync.mergeState(local, remote);
+    const plan = CloudSync.planRemoteWrites(merged, remote);
+    const hasChanges = plan.decks.length || plan.cards.length || plan.ratings.length || plan.graves.length;
+    if (hasChanges) await cloudAdapter.writeChanges(cloudUser.uid, plan);
+    applyMergedState(merged);
+    writeCloudMeta({ uid: cloudUser.uid, dirty: false, lastSyncedAt: new Date().toISOString() });
     cloudReady = true;
     setCloudStatus("Salvo", "saved", `Sincronizado com ${cloudUser.email || "sua conta Google"}.`);
     if (notify) showToast("Dados sincronizados na nuvem");
   } catch (error) {
-    if (error?.message === "cloud-conflict") {
-      cloudReady = false;
-      setCloudStatus("Escolha necessária", "syncing", "A nuvem mudou em outro dispositivo.");
-      await reconcileCloudData(cloudUser).catch(() => {});
-      if (notify) showToast("Revise o conflito antes de sincronizar");
-      return;
-    }
     console.error("Falha na sincronização:", error);
     setCloudStatus("Falha ao sincronizar", "error", "Seus dados continuam seguros neste aparelho. Tente novamente quando estiver online.");
     if (notify) showToast("Não foi possível sincronizar agora");
   }
-}
-
-async function applyRemoteSnapshot(remote) {
-  const rollback = CloudSync.createSnapshot(localStorage);
-  try {
-    sessionStorage.setItem("trilha-flashcard-cloud-rollback", JSON.stringify(rollback));
-    CloudSync.applySnapshot(localStorage, remote.snapshot);
-    await CardDatabase.replaceEntries(Object.entries(remote.snapshot.entries));
-    writeCloudMeta({
-      ...readCloudMeta(),
-      uid: cloudUser.uid,
-      remoteUpdatedAtISO: remote.updatedAtISO || "",
-      syncedFingerprint: CloudSync.snapshotFingerprint(remote.snapshot),
-      dirty: false,
-    });
-    location.reload();
-  } catch (error) {
-    CloudSync.applySnapshot(localStorage, rollback);
-    await CardDatabase.replaceEntries(Object.entries(rollback.entries)).catch(() => {});
-    console.error("Falha ao baixar dados da nuvem:", error);
-    setCloudStatus("Falha ao restaurar", "error");
-    showToast("Os dados deste aparelho não foram alterados");
-  }
-}
-
-async function reconcileCloudData(user) {
-  setCloudStatus("Verificando…", "syncing");
-  const remote = await cloudAdapter.read(user.uid);
-  const local = CloudSync.createSnapshot(localStorage);
-  const meta = readCloudMeta();
-
-  const action = CloudSync.reconciliationAction({ local, remote, meta, uid: user.uid });
-
-  if (action === "upload") {
-    cloudReady = true;
-    await uploadCloudSnapshot();
-    if (!remote?.snapshot) showToast("Dados deste aparelho enviados para a nuvem");
-    return;
-  }
-  if (action === "download") {
-    await applyRemoteSnapshot(remote);
-    return;
-  }
-  if (action === "saved") {
-    cloudReady = true;
-    setCloudStatus("Salvo", "saved", `Sincronizado com ${user.email || "sua conta Google"}.`);
-    return;
-  }
-
-  cloudReady = false;
-  setCloudStatus("Escolha necessária", "syncing", "Há uma versão neste aparelho e outra na nuvem.");
-  elements.cloudConflictDialog.showModal();
-  elements.cloudUseLocalButton.focus();
-  elements.cloudUseRemoteButton.onclick = () => {
-    elements.cloudConflictDialog.close();
-    void applyRemoteSnapshot(remote);
-  };
 }
 
 function updateCloudButtons(user) {
@@ -508,7 +491,10 @@ async function initializeCloudSync() {
         setCloudStatus("Somente neste aparelho", "local", "Entre com o Google para sincronizar entre dispositivos.");
         return;
       }
-      try { await reconcileCloudData(user); }
+      try {
+        cloudReady = true;
+        await syncWithCloud();
+      }
       catch (error) {
         console.error("Falha ao verificar a nuvem:", error);
         setCloudStatus("Nuvem indisponível", "error", "Seus dados continuam seguros neste aparelho.");
@@ -583,6 +569,10 @@ function ensureCardIds(deckList) {
     deck.cards.forEach((card) => {
       if (!card.id) {
         card.id = generateCardId();
+        changed = true;
+      }
+      if (!card.updatedAt) {
+        card.updatedAt = new Date().toISOString();
         changed = true;
       }
     });
@@ -1142,7 +1132,7 @@ function createNewDiscipline() {
     suffix += 1;
   }
 
-  const deck = { id, title: name, custom: true, topics, cards: [] };
+  const deck = { id, title: name, custom: true, topics, cards: [], updatedAt: new Date().toISOString() };
   decks.push(deck);
   persistDeckCards(deck);
   state.deckId = deck.id;
@@ -1522,6 +1512,7 @@ function removeCustomDeck(deckId) {
   deck.cards.forEach((card) => {
     delete state.ratings[cardKey(deck, card)];
   });
+  recordGrave(deck.id, "deck", null);
   persistDeckCards(deck);
 
   if (state.deckId === deckId) {
@@ -1711,6 +1702,7 @@ function buildCardFromForm() {
     type: elements.cardFormType.value,
     priority: elements.cardFormPriority.value,
     difficulty: elements.cardFormDifficulty.value,
+    updatedAt: new Date().toISOString(),
   };
   const subtopic = elements.cardFormSubtopic.value.trim();
   const legalBasis = elements.cardFormLegalBasis.value.trim();
@@ -1823,6 +1815,7 @@ function deleteCard(index) {
   const key = cardKey(deck, card);
   const rating = state.ratings[key];
   delete state.ratings[key];
+  recordGrave(card.id, "card", deck.id);
   trash.push({ id: `${Date.now()}-${Math.random()}`, deckId: deck.id, index, card, rating, deletedAt: new Date().toISOString() });
   persistTrash();
   deck.cards.splice(index, 1);
@@ -1841,6 +1834,7 @@ function restoreTrashItem(itemId = null) {
   if (!deck) return;
   deck.cards.splice(Math.min(item.index, deck.cards.length), 0, item.card);
   if (item.rating) state.ratings[cardKey(deck, item.card)] = item.rating;
+  clearGrave(item.card.id);
   trash.splice(trashIndex, 1);
   persistTrash();
   persistDeckCards(deck);
@@ -1944,6 +1938,7 @@ async function addImportedCards(cards, sourceLabel) {
     }
     if (!snapshots.has(deck)) snapshots.set(deck, deck.cards.slice());
     card.id = generateCardId();
+    card.updatedAt = new Date().toISOString();
     deck.cards.push(card);
     changedDecks.add(deck);
     added += 1;
@@ -2043,22 +2038,15 @@ elements.cloudSignInButton.addEventListener("click", async () => {
     }
   }
 });
-elements.cloudSyncNowButton.addEventListener("click", () => void uploadCloudSnapshot({ notify: true }));
+elements.cloudSyncNowButton.addEventListener("click", () => void syncWithCloud({ notify: true }));
 elements.cloudSignOutButton.addEventListener("click", async () => {
   clearTimeout(cloudSyncTimer);
   await cloudAdapter?.signOut();
   showToast("Sincronização desconectada");
 });
-elements.cloudUseLocalButton.addEventListener("click", async () => {
-  elements.cloudConflictDialog.close();
-  cloudReady = true;
-  await uploadCloudSnapshot({ notify: true, force: true });
-});
-elements.cloudConflictCancel.addEventListener("click", () => elements.cloudConflictDialog.close());
 window.addEventListener("online", () => {
   if (!cloudUser) return;
-  if (cloudReady) void uploadCloudSnapshot();
-  else void reconcileCloudData(cloudUser).catch(() => setCloudStatus("Nuvem indisponível", "error"));
+  void syncWithCloud().catch(() => setCloudStatus("Nuvem indisponível", "error"));
 });
 window.addEventListener("offline", () => {
   if (cloudUser) setCloudStatus("Aguardando internet", "syncing", "As alterações serão sincronizadas quando a conexão voltar.");
