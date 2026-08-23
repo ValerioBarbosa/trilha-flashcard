@@ -22,7 +22,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260821-6" />
+    <link rel="stylesheet" href="styles.css?v=20260823-1" />
     <script>
       try {
         const savedTheme = localStorage.getItem("trilha-flashcard-theme");
@@ -48,7 +48,7 @@
             <span class="brand-name">trilha</span>
             <span class="brand-kind">flashcard</span>
           </a>
-          <span class="brand-context">TRT4 · AJAJ</span>
+          <button type="button" class="brand-context" id="profile-switch-button" aria-haspopup="dialog">TRT4 · AJAJ</button>
         </div>
 
         <label class="deck-picker">
@@ -136,7 +136,7 @@
         </div>
       </header>
 
-      <section class="study-area" aria-live="polite">
+      <section class="study-area" id="study-area" aria-live="polite">
         <div class="filter-row">
           <div class="search-bar" role="search">
             <svg aria-hidden="true" viewBox="0 0 24 24" class="search-icon">
@@ -240,11 +240,7 @@
           </button>
         </div>
 
-        <div class="actions" aria-label="Ações de estudo">
-          <button class="action-button forgot" id="forgot-button" type="button">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
-            Não lembrei
-          </button>
+        <div class="reveal-row">
           <button class="action-button reveal" id="reveal-button" type="button">
             <svg aria-hidden="true" viewBox="0 0 24 24">
               <path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z" />
@@ -252,16 +248,29 @@
             </svg>
             <span>Ver resposta</span>
           </button>
-          <button class="action-button remembered" id="remembered-button" type="button">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" /></svg>
-            Lembrei
-          </button>
+        </div>
+
+        <div class="actions rating-actions" id="rating-actions" aria-label="Avaliar o cartão">
+          <button class="action-button again" id="again-button" type="button">Errei</button>
+          <button class="action-button hard" id="hard-button" type="button">Difícil</button>
+          <button class="action-button good" id="good-button" type="button">Bom</button>
+          <button class="action-button easy" id="easy-button" type="button">Fácil</button>
+        </div>
+
+        <div class="actions simulated-actions" id="simulated-actions" aria-label="Avançar no simulado" hidden>
+          <button class="action-button good" id="simulated-next-button" type="button">Próximo cartão</button>
         </div>
 
         <p class="keyboard-hint">
           <kbd>Espaço</kbd> para virar <span>·</span> <kbd>←</kbd> <kbd>→</kbd> para navegar
         </p>
         <p class="deck-source-note" id="deck-source-note"></p>
+      </section>
+
+      <section class="empty-profile-state" id="empty-profile-state" hidden>
+        <h2>Este perfil ainda não tem disciplinas</h2>
+        <p>Crie a primeira disciplina para começar a adicionar cartões neste perfil.</p>
+        <button type="button" class="review-due-button" id="empty-profile-create-button">+ Criar disciplina</button>
       </section>
     </main>
 
@@ -307,8 +316,8 @@
         <section class="review-plan" aria-labelledby="review-plan-title">
           <div>
             <span class="review-plan-label">REVISÃO ESPAÇADA</span>
-            <h3 id="review-plan-title">1 dia <span>→</span> 7 dias <span>→</span> 30 dias</h3>
-            <p>Ao avaliar um cartão, a Trilha agenda automaticamente a próxima revisão.</p>
+            <h3 id="review-plan-title">Errei <span>→</span> Difícil <span>→</span> Bom <span>→</span> Fácil</h3>
+            <p>O intervalo até a próxima revisão se ajusta ao seu desempenho real em cada cartão.</p>
           </div>
           <div class="review-plan-buttons">
             <button class="review-due-button" id="review-due-button" type="button" disabled>
@@ -326,6 +335,26 @@
             <span>cartões únicos revisados</span>
           </div>
           <div class="deck-performance" id="deck-performance"></div>
+        </section>
+
+        <section class="topic-dashboard-section" aria-labelledby="topic-dashboard-title">
+          <div class="deck-performance-title-row">
+            <h3 id="topic-dashboard-title">Desempenho por assunto</h3>
+            <span id="topic-dashboard-today">0 estudados hoje</span>
+          </div>
+
+          <div class="weekly-evolution" id="weekly-evolution" aria-label="Cartões estudados nos últimos 7 dias"></div>
+
+          <div class="topic-table" id="topic-table" role="table" aria-label="Desempenho por assunto">
+            <div class="topic-table-head" role="row">
+              <span role="columnheader">Assunto</span>
+              <span role="columnheader">Acerto</span>
+              <span role="columnheader">Atrasados</span>
+              <span role="columnheader">Prior. A pendente</span>
+            </div>
+            <div id="topic-table-body"></div>
+          </div>
+          <p class="card-list-empty" id="topic-table-empty" hidden>Estude alguns cartões para ver o desempenho por assunto.</p>
         </section>
 
         <section class="data-section" aria-labelledby="data-section-title">
@@ -402,6 +431,7 @@
         <p class="dashboard-intro" id="manage-cards-summary">Nenhum cartão neste baralho ainda.</p>
 
         <div class="data-section-buttons">
+          <button class="data-button" id="new-discipline-button" type="button">+ Nova disciplina</button>
           <button class="data-button" id="card-add-button" type="button">+ Adicionar cartão</button>
           <button class="data-button" id="card-import-button" type="button">Importar cartões (JSON ou PDF)</button>
           <input type="file" id="card-import-input" accept="application/json,.json,application/pdf,.pdf" hidden />
@@ -540,10 +570,66 @@
         </header>
         <form id="study-session-form" class="study-session-form">
           <label class="card-form-field"><span>Quantidade</span><select id="study-session-count"><option>10</option><option selected>20</option><option>30</option></select></label>
-          <label class="card-form-field"><span>Conteúdo</span><select id="study-session-scope"><option value="current">Disciplina atual</option><option value="all">Todas as disciplinas</option><option value="new">Nunca estudados</option><option value="wrong">Somente errados</option><option value="due">Revisões pendentes</option></select></label>
+          <label class="card-form-field"><span>Conteúdo</span><select id="study-session-scope"><option value="all">Todos os cartões</option><option value="new">Nunca estudados</option><option value="wrong">Somente errados</option><option value="due">Revisões pendentes</option></select></label>
           <label class="card-form-field"><span>Prioridade</span><select id="study-session-priority"><option value="">Todas</option><option value="A">Prioridade A</option><option value="B">Prioridade B</option><option value="C">Prioridade C</option></select></label>
+          <label class="card-form-field"><span>Disciplina</span><select id="study-session-discipline"><option value="">Todas as disciplinas</option></select></label>
+          <label class="card-form-field"><span>Assunto</span><select id="study-session-topic" disabled><option value="">Todos os assuntos</option></select></label>
+          <label class="study-session-simulated"><input type="checkbox" id="study-session-simulated" /> Modo simulado — não agenda novas revisões</label>
           <button class="review-due-button" type="submit">Iniciar sessão</button>
         </form>
+      </div>
+    </dialog>
+
+    <dialog class="dashboard-dialog" id="profiles-dialog" aria-labelledby="profiles-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div>
+            <span class="dashboard-kicker">PERFIS DE CONCURSO</span>
+            <h2 id="profiles-title">Trocar de perfil</h2>
+          </div>
+          <button class="dashboard-close" id="profiles-close" type="button" aria-label="Fechar">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
+          </button>
+        </header>
+
+        <p class="dashboard-intro">Cada perfil tem suas próprias disciplinas, cartões e desempenho, guardados separadamente neste dispositivo (e sincronizados juntos se você entrar com o Google).</p>
+
+        <div class="profile-list" id="profile-list"></div>
+
+        <h3 class="profile-new-title">Criar novo perfil</h3>
+        <div class="profile-presets" id="profile-presets"></div>
+        <div class="profile-new-row">
+          <input type="text" id="profile-new-name" placeholder="Nome do perfil (ex.: SEFAZ-RS)" />
+          <button type="button" class="review-due-button" id="profile-new-create">Criar e ativar</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="dashboard-dialog" id="new-discipline-dialog" aria-labelledby="new-discipline-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div>
+            <span class="dashboard-kicker">NOVA DISCIPLINA</span>
+            <h2 id="new-discipline-title">Criar disciplina</h2>
+          </div>
+          <button class="dashboard-close" id="new-discipline-close" type="button" aria-label="Fechar">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
+          </button>
+        </header>
+
+        <label class="card-form-field">
+          <span>Nome da disciplina *</span>
+          <input type="text" id="new-discipline-name" placeholder="Ex.: Direito Administrativo" />
+        </label>
+        <label class="card-form-field">
+          <span>Assuntos do edital (um por linha, ao menos um) *</span>
+          <textarea id="new-discipline-topics" rows="5" placeholder="Ex.: Atos administrativos&#10;Licitações&#10;Improbidade administrativa"></textarea>
+        </label>
+
+        <div class="card-form-actions">
+          <button type="button" class="data-button" id="new-discipline-cancel">Cancelar</button>
+          <button type="button" class="review-due-button" id="new-discipline-save">Criar disciplina</button>
+        </div>
       </div>
     </dialog>
 
@@ -575,15 +661,15 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="decks.js?v=20260820-2"></script>
-    <script src="spaced-repetition.js?v=20260820-2"></script>
+    <script src="spaced-repetition.js?v=20260823-1"></script>
     <script src="card-import.js?v=20260821-1"></script>
-    <script src="card-storage.js?v=20260821-1"></script>
+    <script src="card-storage.js?v=20260823-1"></script>
     <script src="card-database.js?v=20260822-1"></script>
     <script src="firebase-config.js?v=20260821-2"></script>
     <script src="cloud-sync.js?v=20260822-1"></script>
     <script type="module">
       try { await CardDatabase.hydrateLocalStorage(localStorage); } catch (error) { console.warn("IndexedDB indisponível", error); }
-      await import("./app.js?v=20260822-1");
+      await import("./app.js?v=20260823-1");
     </script>
   </body>
 </html>

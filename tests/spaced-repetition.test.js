@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import SpacedRepetition from "../spaced-repetition.js";
 
-const { dateKey, cardKey, computeNextRating, isDue, isWrong, getStudyStreak, REVIEW_INTERVAL_DAYS } = SpacedRepetition;
+const { dateKey, cardKey, computeNextRating, isDue, isWrong, getStudyStreak } = SpacedRepetition;
 
 describe("dateKey", () => {
   it("formats a date as YYYY-MM-DD", () => {
@@ -24,47 +24,68 @@ describe("cardKey", () => {
 describe("computeNextRating", () => {
   const now = new Date("2026-01-10T12:00:00Z");
 
-  it("starts a new card at stage 0 with a 1-day interval when remembered", () => {
-    const rating = computeNextRating(undefined, true, now);
+  function daysAhead(days) {
+    return new Date(now.getTime() + days * 86400000).toISOString();
+  }
+
+  it("starts a new card at stage 1 with a 1-day interval on 'good'", () => {
+    const rating = computeNextRating(undefined, "good", now);
     expect(rating.attempts).toBe(1);
     expect(rating.remembered).toBe(1);
     expect(rating.stage).toBe(1);
-    expect(rating.lastResult).toBe("remembered");
-    expect(rating.nextReview).toBe(new Date(now.getTime() + REVIEW_INTERVAL_DAYS[0] * 86400000).toISOString());
+    expect(rating.lastResult).toBe("good");
+    expect(rating.nextReview).toBe(daysAhead(1));
   });
 
-  it("advances through the review intervals on consecutive remembered ratings", () => {
-    let rating = computeNextRating(undefined, true, now);
-    expect(rating.stage).toBe(1);
+  it("advances through longer intervals on consecutive 'good' ratings", () => {
+    let rating = computeNextRating(undefined, "good", now);
+    expect(rating.interval).toBe(1);
 
-    rating = computeNextRating(rating, true, now);
-    expect(rating.stage).toBe(2);
-    expect(rating.nextReview).toBe(new Date(now.getTime() + REVIEW_INTERVAL_DAYS[1] * 86400000).toISOString());
+    rating = computeNextRating(rating, "good", now);
+    expect(rating.interval).toBe(6);
 
-    rating = computeNextRating(rating, true, now);
-    expect(rating.stage).toBe(3);
-    expect(rating.nextReview).toBe(new Date(now.getTime() + REVIEW_INTERVAL_DAYS[2] * 86400000).toISOString());
+    rating = computeNextRating(rating, "good", now);
+    expect(rating.interval).toBeGreaterThan(6);
   });
 
-  it("does not advance stage past the last review interval", () => {
-    let rating = { attempts: 3, remembered: 3, stage: REVIEW_INTERVAL_DAYS.length };
-    rating = computeNextRating(rating, true, now);
-    expect(rating.stage).toBe(REVIEW_INTERVAL_DAYS.length);
-    expect(rating.nextReview).toBe(
-      new Date(now.getTime() + REVIEW_INTERVAL_DAYS[REVIEW_INTERVAL_DAYS.length - 1] * 86400000).toISOString()
-    );
+  it("schedules a longer interval on 'easy' than on 'good'", () => {
+    const good = computeNextRating(undefined, "good", now);
+    const easy = computeNextRating(undefined, "easy", now);
+    expect(easy.interval).toBeGreaterThan(good.interval);
+    expect(easy.remembered).toBe(1);
   });
 
-  it("resets stage to 0 and schedules a 1-day review when forgotten", () => {
-    const advanced = computeNextRating(computeNextRating(undefined, true, now), true, now);
+  it("schedules a shorter interval on 'hard' than on 'good' once past the first step", () => {
+    let good = computeNextRating(undefined, "good", now);
+    good = computeNextRating(good, "good", now);
+
+    let hard = computeNextRating(undefined, "good", now);
+    hard = computeNextRating(hard, "hard", now);
+
+    expect(hard.interval).toBeLessThan(good.interval);
+    expect(hard.remembered).toBe(2);
+  });
+
+  it("resets stage to 0 and schedules a 1-day review when rated 'again'", () => {
+    let advanced = computeNextRating(undefined, "good", now);
+    advanced = computeNextRating(advanced, "good", now);
     expect(advanced.stage).toBe(2);
 
-    const forgotten = computeNextRating(advanced, false, now);
+    const forgotten = computeNextRating(advanced, "again", now);
     expect(forgotten.stage).toBe(0);
-    expect(forgotten.lastResult).toBe("forgot");
-    expect(forgotten.nextReview).toBe(new Date(now.getTime() + 86400000).toISOString());
+    expect(forgotten.lastResult).toBe("again");
+    expect(forgotten.nextReview).toBe(daysAhead(1));
     expect(forgotten.remembered).toBe(advanced.remembered);
     expect(forgotten.attempts).toBe(advanced.attempts + 1);
+  });
+
+  it("lowers the ease factor on 'again' and 'hard', raises it on 'easy'", () => {
+    const again = computeNextRating(undefined, "again", now);
+    const hard = computeNextRating(undefined, "hard", now);
+    const easy = computeNextRating(undefined, "easy", now);
+    expect(again.ease).toBeLessThan(2.5);
+    expect(hard.ease).toBeLessThan(2.5);
+    expect(easy.ease).toBeGreaterThan(2.5);
   });
 });
 
@@ -85,8 +106,10 @@ describe("isDue", () => {
 });
 
 describe("isWrong", () => {
-  it("is true only when lastResult is forgot", () => {
+  it("is true when lastResult is 'again' (or the legacy 'forgot')", () => {
+    expect(isWrong({ lastResult: "again" })).toBe(true);
     expect(isWrong({ lastResult: "forgot" })).toBe(true);
+    expect(isWrong({ lastResult: "good" })).toBe(false);
     expect(isWrong({ lastResult: "remembered" })).toBe(false);
     expect(isWrong(undefined)).toBe(false);
   });

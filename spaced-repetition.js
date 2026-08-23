@@ -1,6 +1,8 @@
 (function (root) {
-  const REVIEW_INTERVAL_DAYS = [1, 7, 30];
   const DAY_MS = 86400000;
+  const REVIEW_RATINGS = ["again", "hard", "good", "easy"];
+  const MIN_EASE = 1.3;
+  const DEFAULT_EASE = 2.5;
 
   function dateKey(date = new Date()) {
     const year = date.getFullYear();
@@ -13,17 +15,43 @@
     return `${deckId}::${cardFront}`;
   }
 
-  function computeNextRating(previousRating, didRemember, now = new Date()) {
-    const previous = previousRating || { attempts: 0, remembered: 0, stage: 0 };
-    const intervalIndex = Math.min(previous.stage || 0, REVIEW_INTERVAL_DAYS.length - 1);
-    const intervalDays = didRemember ? REVIEW_INTERVAL_DAYS[intervalIndex] : 1;
-    const nextReview = new Date(now.getTime() + intervalDays * DAY_MS);
+  function computeNextRating(previousRating, rating, now = new Date()) {
+    const previous = previousRating || { attempts: 0, remembered: 0, stage: 0, ease: DEFAULT_EASE, interval: 0 };
+    const ease = previous.ease || DEFAULT_EASE;
+    const stage = previous.stage || 0;
+    const previousInterval = previous.interval || 0;
+    const didRemember = rating !== "again";
+
+    let nextEase = ease;
+    let nextInterval;
+    let nextStage;
+
+    if (rating === "again") {
+      nextEase = Math.max(MIN_EASE, ease - 0.2);
+      nextInterval = 1;
+      nextStage = 0;
+    } else if (rating === "hard") {
+      nextEase = Math.max(MIN_EASE, ease - 0.15);
+      nextInterval = stage === 0 ? 1 : Math.max(1, Math.round(previousInterval * 1.2));
+      nextStage = stage + 1;
+    } else if (rating === "easy") {
+      nextEase = ease + 0.15;
+      nextInterval = stage === 0 ? 4 : Math.max(1, Math.round(previousInterval * nextEase * 1.3));
+      nextStage = stage + 1;
+    } else {
+      nextInterval = stage === 0 ? 1 : stage === 1 ? 6 : Math.max(1, Math.round(previousInterval * ease));
+      nextStage = stage + 1;
+    }
+
+    const nextReview = new Date(now.getTime() + nextInterval * DAY_MS);
 
     return {
       attempts: previous.attempts + 1,
       remembered: (previous.remembered || 0) + (didRemember ? 1 : 0),
-      stage: didRemember ? Math.min((previous.stage || 0) + 1, REVIEW_INTERVAL_DAYS.length) : 0,
-      lastResult: didRemember ? "remembered" : "forgot",
+      stage: nextStage,
+      ease: Math.round(nextEase * 100) / 100,
+      interval: nextInterval,
+      lastResult: rating,
       lastReviewed: now.toISOString(),
       nextReview: nextReview.toISOString(),
     };
@@ -34,7 +62,7 @@
   }
 
   function isWrong(rating) {
-    return rating?.lastResult === "forgot";
+    return rating?.lastResult === "again" || rating?.lastResult === "forgot";
   }
 
   function getStudyStreak(activityDates, referenceDate = new Date()) {
@@ -56,7 +84,7 @@
   }
 
   const api = {
-    REVIEW_INTERVAL_DAYS,
+    REVIEW_RATINGS,
     dateKey,
     cardKey,
     computeNextRating,
@@ -75,6 +103,6 @@
 if (typeof document !== "undefined") {
   const motionScript = document.createElement("script");
   motionScript.type = "module";
-  motionScript.src = "./motion-animations.js?v=20260820-1";
+  motionScript.src = "./motion-animations.js?v=20260822-1";
   document.head.append(motionScript);
 }
