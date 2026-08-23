@@ -81,11 +81,7 @@
     return {
       observeUser(callback) { return authApi.onAuthStateChanged(auth, callback); },
       signIn() {
-        const mobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent)
-          || window.matchMedia?.("(max-width: 720px)").matches;
-        return mobile
-          ? authApi.signInWithRedirect(auth, provider)
-          : authApi.signInWithPopup(auth, provider);
+        return authApi.signInWithPopup(auth, provider);
       },
       signOut() { return authApi.signOut(auth); },
       async read(uid) {
