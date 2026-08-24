@@ -2809,6 +2809,93 @@ kbd {
   margin: 2px 0 18px;
 }
 
+/* Fluxos de segurança, conclusão e organização */
+.cloud-status-card {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 14px 0;
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+  border-radius: 16px;
+  background: var(--line-soft);
+}
+
+.cloud-status-card > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  padding: 15px;
+  background: var(--surface);
+}
+
+.cloud-status-card span,
+.import-report-grid span,
+.session-complete-metrics span {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.cloud-status-card strong { overflow: hidden; color: var(--ink); font-size: 0.9rem; text-overflow: ellipsis; }
+.cloud-status-card[data-state="saved"] { border-color: rgba(27, 154, 92, 0.45); }
+.cloud-status-card[data-state="error"] { border-color: rgba(214, 78, 78, 0.6); }
+
+.card-bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.card-bulk-actions[hidden] { display: none; }
+.card-bulk-actions strong { margin-right: auto; }
+.card-bulk-actions select { min-height: 42px; border: 1px solid var(--line-soft); border-radius: 10px; padding: 0 10px; background: var(--surface); color: var(--ink); }
+.danger-button { color: #c94747; }
+
+.card-list-row.is-selected { border-color: var(--blue); background: rgba(65, 120, 232, 0.08); }
+.card-list-row.is-duplicate { box-shadow: inset 3px 0 0 #d68a18; }
+.card-select-control { display: grid; place-items: center; flex: 0 0 28px; }
+.card-select-control input { width: 18px; height: 18px; }
+.duplicate-badge { display: inline-flex; margin-left: 6px; border-radius: 999px; padding: 2px 7px; background: rgba(214, 138, 24, 0.14); color: #b56d00; font-size: 0.68rem; font-weight: 700; }
+.card-subtopic-group + .card-subtopic-group { border-top: 1px solid var(--line-soft); }
+.card-subtopic-title { margin: 0; padding: 10px 14px 6px; color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+
+.import-report-grid,
+.session-complete-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.import-report-grid > div,
+.session-complete-metrics > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.import-report-grid strong,
+.session-complete-metrics strong { color: var(--ink); font-size: 1.35rem; }
+.session-complete-score { margin: 12px 0 2px; color: var(--blue); font-family: "DM Serif Display", serif; font-size: clamp(3rem, 12vw, 5rem); line-height: 1; text-align: center; }
+.session-complete-metrics { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 680px) {
+  .cloud-status-card { grid-template-columns: 1fr; }
+  .card-bulk-actions { align-items: stretch; flex-direction: column; }
+  .card-bulk-actions strong { margin-right: 0; }
+  .session-complete-metrics { grid-template-columns: repeat(2, 1fr); }
+}
+
 .study-exit-button {
   display: inline-flex;
   align-items: center;

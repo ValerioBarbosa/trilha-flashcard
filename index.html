@@ -22,7 +22,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260824-4" />
+    <link rel="stylesheet" href="styles.css?v=20260824-5" />
     <script>
       try {
         const savedTheme = localStorage.getItem("trilha-flashcard-theme");
@@ -506,7 +506,11 @@
         <section class="cloud-section" aria-labelledby="cloud-section-title">
           <div class="deck-performance-title-row">
             <h3 id="cloud-section-title">Sincronização na nuvem</h3>
-            <span class="sr-only" id="cloud-sync-status" data-state="local">Somente neste aparelho</span>
+          </div>
+          <div class="cloud-status-card" id="cloud-status-card" data-state="local">
+            <div><span>Status</span><strong id="cloud-sync-status">Somente neste aparelho</strong></div>
+            <div><span>Conta</span><strong id="cloud-account">Não conectada</strong></div>
+            <div><span>Última sincronização</span><strong id="cloud-last-sync">Nunca</strong></div>
           </div>
           <p class="data-section-hint" id="cloud-sync-detail">
             Entre com o Google para manter cartões e progresso iguais no celular e no computador.
@@ -514,6 +518,7 @@
           <div class="data-section-buttons">
             <button class="data-button cloud-sign-in" id="cloud-sign-in-button" type="button">Entrar com Google</button>
             <button class="data-button" id="cloud-sync-now-button" type="button" hidden>Sincronizar agora</button>
+            <button class="data-button" id="cloud-retry-button" type="button" hidden>Tentar novamente</button>
             <button class="data-button" id="cloud-sign-out-button" type="button" hidden>Sair da nuvem</button>
           </div>
         </section>
@@ -584,9 +589,19 @@
           <div class="card-manager-results">
             <span id="card-list-result-count">0 cartões</span>
             <div>
+              <button type="button" class="card-tree-action" id="card-list-select-visible">Selecionar visíveis</button>
+              <button type="button" class="card-tree-action" id="card-list-duplicates">Ver duplicados</button>
               <button type="button" class="card-tree-action" id="card-list-expand-all">Expandir todos</button>
               <button type="button" class="card-tree-action" id="card-list-collapse-all">Recolher todos</button>
             </div>
+          </div>
+          <div class="card-bulk-actions" id="card-bulk-actions" hidden>
+            <strong id="card-bulk-count">0 selecionados</strong>
+            <select id="card-bulk-target" aria-label="Mover selecionados para outra disciplina"></select>
+            <button type="button" class="data-button" id="card-bulk-move">Mover</button>
+            <select id="card-bulk-priority" aria-label="Definir prioridade dos selecionados"><option value="A">Prioridade A</option><option value="B" selected>Prioridade B</option><option value="C">Prioridade C</option></select>
+            <button type="button" class="data-button" id="card-bulk-apply-priority">Aplicar prioridade</button>
+            <button type="button" class="data-button danger-button" id="card-bulk-delete">Excluir</button>
           </div>
         </div>
 
@@ -700,6 +715,22 @@
       </div>
     </dialog>
 
+    <dialog class="dashboard-dialog compact-dialog" id="import-report-dialog" aria-labelledby="import-report-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div><span class="dashboard-kicker">IMPORTAÇÃO CONCLUÍDA</span><h2 id="import-report-title">Relatório da importação</h2></div>
+          <button class="dashboard-close" id="import-report-close" type="button" aria-label="Fechar">✕</button>
+        </header>
+        <div class="import-report-grid">
+          <div><strong id="import-report-added">0</strong><span>adicionados</span></div>
+          <div><strong id="import-report-duplicates">0</strong><span>duplicados</span></div>
+          <div><strong id="import-report-invalid">0</strong><span>inválidos</span></div>
+        </div>
+        <p class="dashboard-intro" id="import-report-detail"></p>
+        <button class="review-due-button" id="import-report-done" type="button">Concluir</button>
+      </div>
+    </dialog>
+
     <dialog class="dashboard-dialog compact-dialog" id="trash-dialog" aria-labelledby="trash-title">
       <div class="dashboard-content">
         <header class="dashboard-header">
@@ -717,7 +748,7 @@
           <button class="dashboard-close" id="study-session-close" type="button" aria-label="Fechar">✕</button>
         </header>
         <form id="study-session-form" class="study-session-form">
-          <label class="card-form-field"><span>Quantidade</span><select id="study-session-count"><option>10</option><option selected>20</option><option>30</option></select></label>
+          <label class="card-form-field"><span>Quantidade</span><select id="study-session-count"><option>10</option><option selected>20</option><option>30</option><option>50</option></select></label>
           <label class="card-form-field"><span>Conteúdo</span><select id="study-session-scope"><option value="all">Todos os cartões</option><option value="new">Nunca estudados</option><option value="wrong">Somente errados</option><option value="due">Revisões pendentes</option></select></label>
           <label class="card-form-field"><span>Prioridade</span><select id="study-session-priority"><option value="">Todas</option><option value="A">Prioridade A</option><option value="B">Prioridade B</option><option value="C">Prioridade C</option></select></label>
           <label class="card-form-field"><span>Disciplina</span><select id="study-session-discipline"><option value="">Todas as disciplinas</option></select></label>
@@ -725,6 +756,26 @@
           <label class="study-session-simulated"><input type="checkbox" id="study-session-simulated" /> Modo simulado — não agenda novas revisões</label>
           <button class="review-due-button" type="submit">Iniciar sessão</button>
         </form>
+      </div>
+    </dialog>
+
+    <dialog class="dashboard-dialog compact-dialog session-complete-dialog" id="session-complete-dialog" aria-labelledby="session-complete-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div><span class="dashboard-kicker">SESSÃO CONCLUÍDA</span><h2 id="session-complete-title">Bom trabalho!</h2></div>
+          <button class="dashboard-close" id="session-complete-close" type="button" aria-label="Fechar">✕</button>
+        </header>
+        <div class="session-complete-score" id="session-complete-score">0%</div>
+        <div class="session-complete-metrics">
+          <div><strong id="session-complete-total">0</strong><span>estudados</span></div>
+          <div><strong id="session-complete-remembered">0</strong><span>lembrados</span></div>
+          <div><strong id="session-complete-wrong">0</strong><span>para reforçar</span></div>
+          <div><strong id="session-complete-time">0 min</strong><span>tempo</span></div>
+        </div>
+        <div class="card-form-actions">
+          <button class="data-button" id="session-complete-home" type="button">Voltar ao início</button>
+          <button class="review-due-button" id="session-complete-review-errors" type="button">Revisar somente os erros</button>
+        </div>
       </div>
     </dialog>
 
@@ -812,13 +863,13 @@
     <script src="spaced-repetition.js?v=20260823-1"></script>
     <script src="card-import.js?v=20260821-1"></script>
     <script src="card-storage.js?v=20260823-1"></script>
-    <script src="card-manager.js?v=20260823-1"></script>
+    <script src="card-manager.js?v=20260824-1"></script>
     <script src="card-database.js?v=20260822-1"></script>
     <script src="firebase-config.js?v=20260821-2"></script>
     <script src="cloud-sync.js?v=20260823-2"></script>
     <script type="module">
       try { await CardDatabase.hydrateLocalStorage(localStorage); } catch (error) { console.warn("IndexedDB indisponível", error); }
-      await import("./app.js?v=20260824-8");
+      await import("./app.js?v=20260824-9");
     </script>
   </body>
 </html>

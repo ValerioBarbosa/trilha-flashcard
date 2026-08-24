@@ -154,6 +154,10 @@ const elements = {
   dashboardClose: document.querySelector("#dashboard-close"),
   syncDataDialog: document.querySelector("#sync-data-dialog"),
   syncDataClose: document.querySelector("#sync-data-close"),
+  cloudStatusCard: document.querySelector("#cloud-status-card"),
+  cloudAccount: document.querySelector("#cloud-account"),
+  cloudLastSync: document.querySelector("#cloud-last-sync"),
+  cloudRetryButton: document.querySelector("#cloud-retry-button"),
   dashboardSummary: document.querySelector("#dashboard-summary"),
   metricReviewed: document.querySelector("#metric-reviewed"),
   metricTotal: document.querySelector("#metric-total"),
@@ -191,6 +195,15 @@ const elements = {
   cardListResultCount: document.querySelector("#card-list-result-count"),
   cardListExpandAll: document.querySelector("#card-list-expand-all"),
   cardListCollapseAll: document.querySelector("#card-list-collapse-all"),
+  cardListSelectVisible: document.querySelector("#card-list-select-visible"),
+  cardListDuplicates: document.querySelector("#card-list-duplicates"),
+  cardBulkActions: document.querySelector("#card-bulk-actions"),
+  cardBulkCount: document.querySelector("#card-bulk-count"),
+  cardBulkTarget: document.querySelector("#card-bulk-target"),
+  cardBulkMove: document.querySelector("#card-bulk-move"),
+  cardBulkPriority: document.querySelector("#card-bulk-priority"),
+  cardBulkApplyPriority: document.querySelector("#card-bulk-apply-priority"),
+  cardBulkDelete: document.querySelector("#card-bulk-delete"),
   cardForm: document.querySelector("#card-form"),
   cardFormIndex: document.querySelector("#card-form-index"),
   cardFormSourceDeck: document.querySelector("#card-form-source-deck"),
@@ -218,6 +231,13 @@ const elements = {
   importPreviewConfirm: document.querySelector("#import-preview-confirm"),
   importPreviewSummary: document.querySelector("#import-preview-summary"),
   importPreviewList: document.querySelector("#import-preview-list"),
+  importReportDialog: document.querySelector("#import-report-dialog"),
+  importReportClose: document.querySelector("#import-report-close"),
+  importReportDone: document.querySelector("#import-report-done"),
+  importReportAdded: document.querySelector("#import-report-added"),
+  importReportDuplicates: document.querySelector("#import-report-duplicates"),
+  importReportInvalid: document.querySelector("#import-report-invalid"),
+  importReportDetail: document.querySelector("#import-report-detail"),
   trashDialog: document.querySelector("#trash-dialog"),
   trashClose: document.querySelector("#trash-close"),
   trashList: document.querySelector("#trash-list"),
@@ -230,6 +250,16 @@ const elements = {
   studySessionDiscipline: document.querySelector("#study-session-discipline"),
   studySessionTopic: document.querySelector("#study-session-topic"),
   studySessionSimulated: document.querySelector("#study-session-simulated"),
+  sessionCompleteDialog: document.querySelector("#session-complete-dialog"),
+  sessionCompleteClose: document.querySelector("#session-complete-close"),
+  sessionCompleteTitle: document.querySelector("#session-complete-title"),
+  sessionCompleteScore: document.querySelector("#session-complete-score"),
+  sessionCompleteTotal: document.querySelector("#session-complete-total"),
+  sessionCompleteRemembered: document.querySelector("#session-complete-remembered"),
+  sessionCompleteWrong: document.querySelector("#session-complete-wrong"),
+  sessionCompleteTime: document.querySelector("#session-complete-time"),
+  sessionCompleteHome: document.querySelector("#session-complete-home"),
+  sessionCompleteReviewErrors: document.querySelector("#session-complete-review-errors"),
   installButton: document.querySelector("#install-app-button"),
   installDialog: document.querySelector("#install-dialog"),
   installDialogClose: document.querySelector("#install-dialog-close"),
@@ -388,6 +418,8 @@ const state = {
   sessionAttempts: 0,
   sessionRemembered: 0,
   sessionLabel: "Sessão de estudo",
+  sessionStartedAt: null,
+  sessionWrongKeys: [],
   dailyReviewCounts: savedState.dailyReviewCounts && typeof savedState.dailyReviewCounts === "object" && !Array.isArray(savedState.dailyReviewCounts)
     ? savedState.dailyReviewCounts
     : {},
@@ -402,6 +434,9 @@ let trash = (() => {
 })();
 let pendingImport = null;
 const managerOpenTopics = new Set();
+const managerSelectedCards = new Set();
+let managerDuplicatesOnly = false;
+let lastSessionWrongKeys = [];
 
 function persistTrash() {
   const value = JSON.stringify(trash.slice(-100));
@@ -421,6 +456,18 @@ let activeSurface = "home";
 
 const CLOUD_META_KEY = "trilha-flashcard-cloud-meta";
 
+function formatCloudTimestamp(value) {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return "Nunca";
+  return date.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+}
+
+function updateCloudMetaDisplay() {
+  const meta = readCloudMeta();
+  if (elements.cloudAccount) elements.cloudAccount.textContent = cloudUser?.email || "Não conectada";
+  if (elements.cloudLastSync) elements.cloudLastSync.textContent = formatCloudTimestamp(meta.remoteUpdatedAtISO);
+}
+
 function setCloudStatus(label, stateName = "local", detail = null) {
   if (!elements.cloudSyncStatus) return;
   elements.cloudSyncStatus.textContent = label;
@@ -429,7 +476,10 @@ function setCloudStatus(label, stateName = "local", detail = null) {
     elements.homeCloudStatus.textContent = label;
     elements.homeCloudButton.dataset.state = stateName;
   }
+  if (elements.cloudStatusCard) elements.cloudStatusCard.dataset.state = stateName;
+  if (elements.cloudRetryButton) elements.cloudRetryButton.hidden = stateName !== "error" || !cloudUser;
   if (detail) elements.cloudSyncDetail.textContent = detail;
+  updateCloudMetaDisplay();
 }
 
 function readCloudMeta() {
@@ -439,6 +489,20 @@ function readCloudMeta() {
 
 function writeCloudMeta(meta) {
   localStorage.setItem(CLOUD_META_KEY, JSON.stringify(meta));
+  updateCloudMetaDisplay();
+}
+
+async function retryCloudSync() {
+  if (!cloudUser || !cloudAdapter) return;
+  elements.cloudRetryButton.disabled = true;
+  try {
+    await reconcileCloudData(cloudUser);
+  } catch (error) {
+    console.error("Falha ao tentar sincronizar novamente:", error);
+    setCloudStatus("Falha ao sincronizar", "error", "Confira a internet e tente novamente. Seus dados continuam neste aparelho.");
+  } finally {
+    elements.cloudRetryButton.disabled = false;
+  }
 }
 
 function markCloudDirty() {
@@ -549,6 +613,7 @@ function updateCloudButtons(user) {
   elements.cloudSignInButton.hidden = Boolean(user);
   elements.cloudSyncNowButton.hidden = !user;
   elements.cloudSignOutButton.hidden = !user;
+  updateCloudMetaDisplay();
 }
 
 async function initializeCloudSync() {
@@ -768,6 +833,8 @@ function serializeActiveSession() {
     attempts: state.sessionAttempts,
     remembered: state.sessionRemembered,
     label: state.sessionLabel,
+    startedAt: state.sessionStartedAt,
+    wrongKeys: state.sessionWrongKeys,
     currentKey: currentCardKey(),
     updatedAt: new Date().toISOString(),
   };
@@ -791,6 +858,8 @@ function restoreActiveSession() {
   state.sessionLabel = typeof session.label === "string" && session.label.trim()
     ? session.label
     : "Sessão de estudo";
+  state.sessionStartedAt = session.startedAt || new Date().toISOString();
+  state.sessionWrongKeys = Array.isArray(session.wrongKeys) ? session.wrongKeys.filter((key) => typeof key === "string") : [];
   state.deckId = currentEntry.deck.id;
   state.index = currentEntry.index;
   state.flipped = false;
@@ -1242,6 +1311,49 @@ function resetSessionProgress(label, total) {
   state.sessionCompleted = 0;
   state.sessionAttempts = 0;
   state.sessionRemembered = 0;
+  state.sessionStartedAt = new Date().toISOString();
+  state.sessionWrongKeys = [];
+}
+
+function closeSessionComplete() {
+  if (elements.sessionCompleteDialog.open) elements.sessionCompleteDialog.close();
+  setActiveSurface("home");
+}
+
+function completeStudySession(message) {
+  const total = state.sessionTotal;
+  const attempts = state.sessionAttempts;
+  const remembered = state.sessionRemembered;
+  lastSessionWrongKeys = [...new Set(state.sessionWrongKeys)];
+  const wrong = lastSessionWrongKeys.length;
+  const score = attempts ? Math.round((remembered / attempts) * 100) : 0;
+  const elapsedMs = Math.max(0, Date.now() - new Date(state.sessionStartedAt || Date.now()).getTime());
+  const minutes = Math.max(1, Math.round(elapsedMs / 60000));
+
+  state.queueMode = null;
+  state.customQueue = [];
+  state.customSimulated = false;
+  saveProgress();
+  setActiveSurface("home");
+
+  elements.sessionCompleteTitle.textContent = message;
+  elements.sessionCompleteScore.textContent = attempts ? `${score}%` : "Concluído";
+  elements.sessionCompleteTotal.textContent = String(total);
+  elements.sessionCompleteRemembered.textContent = String(remembered);
+  elements.sessionCompleteWrong.textContent = String(wrong);
+  elements.sessionCompleteTime.textContent = `${minutes} min`;
+  elements.sessionCompleteReviewErrors.hidden = wrong === 0;
+  elements.sessionCompleteDialog.showModal();
+  elements.sessionCompleteHome.focus();
+}
+
+function reviewLastSessionErrors() {
+  const byKey = new Map(allCardEntries().map((entry) => [entry.key, entry]));
+  const entries = lastSessionWrongKeys.map((key) => byKey.get(key)).filter(Boolean);
+  elements.sessionCompleteDialog.close();
+  if (!startSession(entries, { label: "Reforço dos erros", message: `${entries.length} cartões para reforçar`, limit: entries.length })) {
+    showToast("Nenhum cartão errado disponível");
+  }
 }
 
 function uniqueEntries(entries) {
@@ -1544,6 +1656,7 @@ function rateCard(rating) {
   if (state.queueMode) {
     state.sessionAttempts += 1;
     if (rating !== "again") state.sessionRemembered += 1;
+    if (rating === "again" && !state.sessionWrongKeys.includes(key)) state.sessionWrongKeys.push(key);
   }
   elements.again.disabled = true;
   elements.hard.disabled = true;
@@ -1582,13 +1695,7 @@ function rateCard(rating) {
     const finishedMessage = state.queueMode === "custom"
       ? "Sessão personalizada concluída"
       : state.queueMode === "wrong" ? "Cartões errados revisados" : "Revisões do dia concluídas";
-    state.queueMode = null;
-    state.customQueue = [];
-    state.customSimulated = false;
-    renderProgress();
-    saveProgress();
-    setActiveSurface("home");
-    showToast(finishedMessage);
+    completeStudySession(finishedMessage);
   }, 320);
 }
 
@@ -1605,12 +1712,7 @@ function advanceSimulatedSession() {
       return;
     }
     state.sessionCompleted = state.sessionTotal;
-    state.queueMode = null;
-    state.customQueue = [];
-    state.customSimulated = false;
-    saveProgress();
-    setActiveSurface("home");
-    showToast("Simulado concluído");
+    completeStudySession("Simulado concluído");
   }, 200);
   renderCard();
 }
@@ -1878,6 +1980,8 @@ function openManageCards() {
   elements.cardListDifficulty.value = "";
   elements.cardListSort.value = "original";
   managerOpenTopics.clear();
+  managerSelectedCards.clear();
+  managerDuplicatesOnly = false;
   renderManageCards();
   elements.manageCardsDialog.showModal();
   elements.manageCardsDialog.scrollTop = 0;
@@ -1914,6 +2018,7 @@ function managerFilters() {
     priority: elements.cardListPriority.value,
     difficulty: elements.cardListDifficulty.value,
     sort: elements.cardListSort.value,
+    duplicatesOnly: managerDuplicatesOnly,
   };
 }
 
@@ -1925,6 +2030,9 @@ function renderManageCards() {
   elements.manageCardsKicker.textContent = deck.title.toUpperCase();
 
   const result = CardManager.organizeCards(deck.cards, managerFilters());
+  const duplicateCount = result.duplicateIndices.size;
+  elements.cardListDuplicates.textContent = managerDuplicatesOnly ? "Mostrar todos" : `Duplicados (${duplicateCount})`;
+  elements.cardListDuplicates.disabled = duplicateCount === 0 && !managerDuplicatesOnly;
   elements.manageCardsSummary.textContent = deck.cards.length
     ? `${deck.cards.length} ${deck.cards.length === 1 ? "cartão" : "cartões"} neste baralho.`
     : "Nenhum cartão neste baralho ainda.";
@@ -1937,14 +2045,18 @@ function renderManageCards() {
     : `${result.filtered} de ${result.total} cartões`;
 
   const filters = managerFilters();
-  const forceOpen = Boolean(filters.query.trim() || filters.topic || filters.priority || filters.difficulty);
+  const forceOpen = Boolean(filters.query.trim() || filters.topic || filters.priority || filters.difficulty || filters.duplicatesOnly);
   elements.cardList.innerHTML = result.groups.length
     ? result.groups.map((group) => {
         const isOpen = forceOpen || managerOpenTopics.has(group.name);
-        const rows = group.entries.map(({ card, index }) => `
-          <article class="card-list-row">
+        const renderRows = (entries) => entries.map(({ card, index }) => {
+          const selected = managerSelectedCards.has(index);
+          const duplicate = result.duplicateIndices.has(index);
+          return `
+          <article class="card-list-row ${selected ? "is-selected" : ""} ${duplicate ? "is-duplicate" : ""}">
+            <label class="card-select-control" aria-label="Selecionar cartão"><input type="checkbox" data-select-card="${index}" ${selected ? "checked" : ""}></label>
             <div class="card-list-row-main">
-              <span class="card-list-front">${escapeHtml(card.front)}</span>
+              <span class="card-list-front">${escapeHtml(card.front)}${duplicate ? '<span class="duplicate-badge">duplicado</span>' : ""}</span>
               <span class="card-list-topic">${[card.subtopic, card.type, card.priority ? `Prioridade ${card.priority}` : "", card.difficulty, card.legalBasis].filter(Boolean).map(escapeHtml).join(" · ") || "sem classificação"}</span>
             </div>
             <div class="card-list-row-actions">
@@ -1954,7 +2066,13 @@ function renderManageCards() {
                 <button type="button" data-delete-card="${index}">Excluir cartão</button>
               </details>
             </div>
-          </article>`).join("");
+          </article>`;
+        }).join("");
+        const rows = group.subgroups.map((subgroup) => `
+          <section class="card-subtopic-group">
+            <h4 class="card-subtopic-title">${escapeHtml(subgroup.name)}</h4>
+            ${renderRows(subgroup.entries)}
+          </section>`).join("");
         return `
           <details class="card-topic-group" data-topic="${escapeHtml(group.name)}" ${isOpen ? "open" : ""}>
             <summary>
@@ -1979,6 +2097,96 @@ function renderManageCards() {
   elements.cardList.querySelectorAll("[data-delete-card]").forEach((button) => {
     button.addEventListener("click", () => deleteCard(Number(button.dataset.deleteCard)));
   });
+  elements.cardList.querySelectorAll("[data-select-card]").forEach((input) => {
+    input.addEventListener("change", () => {
+      const index = Number(input.dataset.selectCard);
+      if (input.checked) managerSelectedCards.add(index);
+      else managerSelectedCards.delete(index);
+      renderBulkActions(deck);
+      input.closest(".card-list-row")?.classList.toggle("is-selected", input.checked);
+    });
+  });
+  renderBulkActions(deck);
+}
+
+function renderBulkActions(deck = currentDeck()) {
+  const valid = [...managerSelectedCards].filter((index) => deck.cards[index]);
+  managerSelectedCards.clear();
+  valid.forEach((index) => managerSelectedCards.add(index));
+  elements.cardBulkActions.hidden = valid.length === 0;
+  elements.cardBulkCount.textContent = `${valid.length} ${valid.length === 1 ? "selecionado" : "selecionados"}`;
+  replaceSelectOptions(elements.cardBulkTarget, decks.map((entry) => ({ value: entry.id, label: entry.title })));
+  elements.cardBulkTarget.value = deck.id;
+}
+
+function selectVisibleCards() {
+  const visible = [...elements.cardList.querySelectorAll("[data-select-card]")].map((input) => Number(input.dataset.selectCard));
+  const shouldSelect = visible.some((index) => !managerSelectedCards.has(index));
+  visible.forEach((index) => shouldSelect ? managerSelectedCards.add(index) : managerSelectedCards.delete(index));
+  renderManageCards();
+}
+
+function toggleDuplicateCards() {
+  managerDuplicatesOnly = !managerDuplicatesOnly;
+  managerSelectedCards.clear();
+  renderManageCards();
+}
+
+function moveSelectedCards() {
+  const sourceDeck = currentDeck();
+  const targetDeck = decks.find((deck) => deck.id === elements.cardBulkTarget.value);
+  if (!targetDeck || targetDeck.id === sourceDeck.id) { showToast("Escolha outra disciplina"); return; }
+  const indices = [...managerSelectedCards].filter((index) => sourceDeck.cards[index]).sort((a, b) => b - a);
+  const moved = [];
+  indices.forEach((index) => {
+    const [card] = sourceDeck.cards.splice(index, 1);
+    if (!card) return;
+    const oldKey = buildCardKey(sourceDeck.id, card.front);
+    const newKey = buildCardKey(targetDeck.id, card.front);
+    if (state.ratings[oldKey]) {
+      state.ratings[newKey] = state.ratings[oldKey];
+      delete state.ratings[oldKey];
+    }
+    targetDeck.cards.push(card);
+    moved.push(card);
+  });
+  persistDeckCards(sourceDeck);
+  persistDeckCards(targetDeck);
+  managerSelectedCards.clear();
+  lastTopicDeckId = null;
+  render();
+  renderManageCards();
+  showToast(`${moved.length} ${moved.length === 1 ? "cartão movido" : "cartões movidos"}`);
+}
+
+function applyPriorityToSelected() {
+  const deck = currentDeck();
+  const selected = [...managerSelectedCards].filter((index) => deck.cards[index]);
+  selected.forEach((index) => { deck.cards[index].priority = elements.cardBulkPriority.value; });
+  persistDeckCards(deck);
+  managerSelectedCards.clear();
+  render();
+  renderManageCards();
+  showToast(`Prioridade aplicada a ${selected.length} cartões`);
+}
+
+function deleteSelectedCards() {
+  const deck = currentDeck();
+  const indices = [...managerSelectedCards].filter((index) => deck.cards[index]).sort((a, b) => b - a);
+  if (!indices.length || !window.confirm(`Mover ${indices.length} cartões para a lixeira?`)) return;
+  indices.forEach((index) => {
+    const [card] = deck.cards.splice(index, 1);
+    if (!card) return;
+    delete state.ratings[buildCardKey(deck.id, card.front)];
+    trash.push({ id: `${Date.now()}-${index}-${Math.random()}`, deckId: deck.id, index, card, deletedAt: new Date().toISOString() });
+  });
+  persistTrash();
+  persistDeckCards(deck);
+  managerSelectedCards.clear();
+  lastTopicDeckId = null;
+  render();
+  renderManageCards();
+  showToast(`${indices.length} cartões movidos para a lixeira`);
 }
 
 function filterCardList() {
@@ -1994,6 +2202,8 @@ function changeManagerDiscipline() {
   state.topicFilter = "";
   elements.cardListTopic.value = "";
   managerOpenTopics.clear();
+  managerSelectedCards.clear();
+  managerDuplicatesOnly = false;
   renderDeckOptions();
   lastTopicDeckId = null;
   render();
@@ -2317,13 +2527,13 @@ function findImportTarget(card, fallbackDeck) {
   return decks.find((deck) => deck.id === card.discipline || normalizeDeckName(deck.title) === requested) || fallbackDeck;
 }
 
-function openImportPreview(cards, sourceLabel) {
-  pendingImport = { cards, sourceLabel };
+function openImportPreview(cards, sourceLabel, { invalid = 0, found = cards.length } = {}) {
+  pendingImport = { cards, sourceLabel, invalid, found };
   const duplicates = cards.filter((card) => {
     const deck = findImportTarget(card, currentDeck());
     return deck.cards.some((existing) => existing.front.trim().toLowerCase() === card.front.trim().toLowerCase());
   }).length;
-  elements.importPreviewSummary.textContent = `${cards.length} cartões encontrados${duplicates ? ` · ${duplicates} repetidos serão ignorados` : ""}. Desmarque o que não deseja importar.`;
+  elements.importPreviewSummary.textContent = `${found} encontrados · ${cards.length} válidos${duplicates ? ` · ${duplicates} repetidos serão ignorados` : ""}${invalid ? ` · ${invalid} inválidos` : ""}. Desmarque o que não deseja importar.`;
   elements.importPreviewList.innerHTML = cards.map((card, index) => {
     const deck = findImportTarget(card, currentDeck());
     return `<label class="import-preview-row"><input type="checkbox" data-import-index="${index}" checked><span><strong>${escapeHtml(card.front)}</strong><small>${escapeHtml(deck.title)}${card.topic ? ` · ${escapeHtml(card.topic)}` : ""}</small></span></label>`;
@@ -2365,8 +2575,16 @@ async function addImportedCards(cards, sourceLabel) {
   renderManageCards();
   lastTopicDeckId = null;
   render();
-  const duplicateMessage = duplicates ? `; ${duplicates} repetido${duplicates === 1 ? " ignorado" : "s ignorados"}` : "";
-  showToast(`${added} ${added === 1 ? "cartão importado" : "cartões importados"} do ${sourceLabel}${duplicateMessage}`);
+  return { added, duplicates, sourceLabel };
+}
+
+function showImportReport({ added, duplicates, invalid, sourceLabel }) {
+  elements.importReportAdded.textContent = String(added);
+  elements.importReportDuplicates.textContent = String(duplicates);
+  elements.importReportInvalid.textContent = String(invalid);
+  elements.importReportDetail.textContent = `${added} ${added === 1 ? "cartão foi salvo" : "cartões foram salvos"} a partir do ${sourceLabel}. Duplicados e registros inválidos não alteraram seus baralhos.`;
+  elements.importReportDialog.showModal();
+  elements.importReportDone.focus();
 }
 
 async function importCardsIntoCurrentDeck(file) {
@@ -2380,7 +2598,7 @@ async function importCardsIntoCurrentDeck(file) {
       showToast("Lendo e convertendo o PDF...");
       const cards = await extractCardsFromPdf(file);
       if (!cards.length) throw new Error("empty-pdf");
-      openImportPreview(cards, "PDF");
+      openImportPreview(cards, "PDF", { found: cards.length, invalid: 0 });
       return;
     }
 
@@ -2394,8 +2612,9 @@ async function importCardsIntoCurrentDeck(file) {
             ? deck.cards.map((card) => ({ ...card, discipline: card.discipline || deck.id || deck.title }))
             : [])
           : null;
+    const found = Array.isArray(rawCards) ? rawCards.length : 0;
     const cards = normalizeImportedCards(rawCards);
-    openImportPreview(cards, "JSON");
+    openImportPreview(cards, "JSON", { found, invalid: Math.max(0, found - cards.length) });
   } catch (error) {
     console.error("Falha ao importar cartões:", error);
     showToast(
@@ -2448,6 +2667,7 @@ elements.cloudSignInButton.addEventListener("click", async () => {
   }
 });
 elements.cloudSyncNowButton.addEventListener("click", () => void uploadCloudSnapshot({ notify: true }));
+elements.cloudRetryButton.addEventListener("click", () => void retryCloudSync());
 elements.cloudSignOutButton.addEventListener("click", async () => {
   clearTimeout(cloudSyncTimer);
   await cloudAdapter?.signOut();
@@ -2538,6 +2758,12 @@ elements.dashboardButton.addEventListener("click", openDashboard);
 elements.openStudySessionButton.addEventListener("click", openStudySession);
 elements.studySessionClose.addEventListener("click", () => elements.studySessionDialog.close());
 elements.studySessionForm.addEventListener("submit", buildCustomSession);
+elements.sessionCompleteClose.addEventListener("click", closeSessionComplete);
+elements.sessionCompleteHome.addEventListener("click", closeSessionComplete);
+elements.sessionCompleteReviewErrors.addEventListener("click", reviewLastSessionErrors);
+elements.sessionCompleteDialog.addEventListener("click", (event) => {
+  if (event.target === elements.sessionCompleteDialog) closeSessionComplete();
+});
 elements.studySessionDiscipline.addEventListener("change", () => renderStudySessionTopicOptions());
 elements.dashboardClose.addEventListener("click", closeDashboard);
 elements.syncDataClose.addEventListener("click", closeSyncData);
@@ -2596,16 +2822,23 @@ elements.importPreviewConfirm.addEventListener("click", async () => {
   const cards = [...elements.importPreviewList.querySelectorAll("[data-import-index]:checked")]
     .map((input) => pendingImport.cards[Number(input.dataset.importIndex)]);
   if (!cards.length) { showToast("Selecione pelo menos um cartão"); return; }
-  const { sourceLabel } = pendingImport;
+  const { sourceLabel, invalid = 0 } = pendingImport;
   elements.importPreviewConfirm.disabled = true;
   try {
-    await addImportedCards(cards, sourceLabel);
+    const report = await addImportedCards(cards, sourceLabel);
     pendingImport = null;
     elements.importPreviewDialog.close();
+    showImportReport({ ...report, invalid });
   } catch (error) {
     console.error(error);
     showToast("Não foi possível salvar os cartões");
   } finally { elements.importPreviewConfirm.disabled = false; }
+});
+const closeImportReport = () => elements.importReportDialog.close();
+elements.importReportClose.addEventListener("click", closeImportReport);
+elements.importReportDone.addEventListener("click", closeImportReport);
+elements.importReportDialog.addEventListener("click", (event) => {
+  if (event.target === elements.importReportDialog) closeImportReport();
 });
 elements.cardListSearch.addEventListener("input", filterCardList);
 elements.cardListDiscipline.addEventListener("change", changeManagerDiscipline);
@@ -2613,6 +2846,11 @@ elements.cardListDiscipline.addEventListener("change", changeManagerDiscipline);
   .forEach((control) => control.addEventListener("change", filterCardList));
 elements.cardListExpandAll.addEventListener("click", () => setAllManagerGroups(true));
 elements.cardListCollapseAll.addEventListener("click", () => setAllManagerGroups(false));
+elements.cardListSelectVisible.addEventListener("click", selectVisibleCards);
+elements.cardListDuplicates.addEventListener("click", toggleDuplicateCards);
+elements.cardBulkMove.addEventListener("click", moveSelectedCards);
+elements.cardBulkApplyPriority.addEventListener("click", applyPriorityToSelected);
+elements.cardBulkDelete.addEventListener("click", deleteSelectedCards);
 elements.cardFormDiscipline.addEventListener("change", () => renderTopicOptions(""));
 elements.cardFormTopic.addEventListener("change", checkTopicWarning);
 
@@ -2646,8 +2884,10 @@ document.addEventListener("keydown", (event) => {
     || elements.manageCardsDialog.open
     || elements.installDialog.open
     || elements.importPreviewDialog.open
+    || elements.importReportDialog.open
     || elements.trashDialog.open
     || elements.studySessionDialog.open
+    || elements.sessionCompleteDialog.open
     || elements.profilesDialog.open
     || elements.newDisciplineDialog.open
   ) return;
@@ -2672,7 +2912,7 @@ document.addEventListener("keydown", (event) => {
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("sw.js?v=20260823-1", { updateViaCache: "none" })
+      .register("sw.js?v=20260824-1", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {});
   });
