@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const app = readFileSync(new URL("../app.js", import.meta.url), "utf8");
 const serviceWorker = readFileSync(new URL("../sw.js", import.meta.url), "utf8");
+const styles = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
 
 describe("fluxo de estudo v2", () => {
   it("carrega o banco durável antes do aplicativo", () => {
@@ -42,5 +43,8 @@ describe("tela inicial orientada à revisão", () => {
     expect(app).toContain("function renderHomeDashboard()");
     expect(app).toContain("function continueFromHome()");
     expect(app).toContain("openDeckFromHome");
+    expect(app).toContain('setActiveSurface("decks")');
+    expect(app).toContain('surface === "home" || surface === "decks"');
+    expect(styles).toContain(".decks-active .home-hero");
   });
 });
