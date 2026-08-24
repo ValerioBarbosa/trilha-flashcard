@@ -1113,7 +1113,7 @@ function renderHomeDashboard() {
   elements.homeNewCount.textContent = String(newCount);
   elements.homeDueCount.textContent = String(dueCount);
   elements.homeStreakCount.textContent = String(streak);
-  const reviewTotal = dueCount || Math.min(newCount, 20);
+  const reviewTotal = Math.min(dueCount || newCount, 20);
   elements.homeContinueButton.disabled = entries.length === 0;
   elements.homeReviewEstimate.textContent = reviewTotal
     ? `${reviewTotal} ${reviewTotal === 1 ? "cartão selecionado" : "cartões selecionados"} · ~${Math.max(2, Math.ceil(reviewTotal * 0.75))} min`
@@ -1553,6 +1553,7 @@ function advanceSimulatedSession() {
   const key = currentCardKey();
   ratingAdvanceTimer = window.setTimeout(() => {
     ratingAdvanceTimer = null;
+    state.sessionCompleted = Math.min(state.sessionCompleted + 1, state.sessionTotal);
     state.customQueue = state.customQueue.filter((entry) => entry.key !== key);
     const nextEntry = state.customQueue[0];
     if (nextEntry) {
