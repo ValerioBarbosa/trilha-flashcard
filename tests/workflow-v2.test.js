@@ -77,7 +77,31 @@ describe("persistência da sessão ativa", () => {
     expect(app).toContain("queueKeys: state.customQueue.map");
     expect(app).toContain('setActiveSurface(resumedActiveSession ? "study" : "home")');
     expect(app).toContain('showToast("Sessão retomada")');
-    expect(html).toContain("app.js?v=20260824-7");
-    expect(serviceWorker).toContain("trilha-flashcard-v28");
+    expect(html).toContain("app.js?v=20260824-8");
+    expect(serviceWorker).toContain("trilha-flashcard-v29");
+  });
+});
+
+
+describe("Sincronização e dados isolada do desempenho", () => {
+  it("exibe apenas backup e nuvem no modal próprio", () => {
+    const syncStart = html.indexOf('id="sync-data-dialog"');
+    const syncEnd = html.indexOf('id="cloud-conflict-dialog"');
+    const syncDialog = html.slice(syncStart, syncEnd);
+    const dashboardStart = html.indexOf('id="dashboard-dialog"');
+    const dashboardEnd = html.indexOf('id="sync-data-dialog"');
+    const dashboardDialog = html.slice(dashboardStart, dashboardEnd);
+
+    expect(syncDialog).toContain('id="data-section-title">Seus dados');
+    expect(syncDialog).toContain('id="cloud-section-title">Sincronização na nuvem');
+    expect(syncDialog).toContain('id="export-button"');
+    expect(syncDialog).toContain('id="import-button"');
+    expect(syncDialog).toContain('id="cloud-sync-now-button"');
+    expect(syncDialog).toContain('id="cloud-sign-out-button"');
+    expect(syncDialog).not.toContain("Taxa de acerto");
+    expect(syncDialog).not.toContain("Progresso por disciplina");
+    expect(dashboardDialog).not.toContain('id="data-section-title"');
+    expect(app).toContain("function openSyncData()");
+    expect(app).toContain("closeHomeMore(); openSyncData();");
   });
 });

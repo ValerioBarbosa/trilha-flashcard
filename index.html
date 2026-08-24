@@ -475,10 +475,24 @@
           <p class="card-list-empty" id="topic-table-empty" hidden>Estude alguns cartões para ver o desempenho por assunto.</p>
         </section>
 
+      </div>
+    </dialog>
+
+    <dialog class="dashboard-dialog sync-data-dialog" id="sync-data-dialog" aria-labelledby="sync-data-title">
+      <div class="dashboard-content">
+        <header class="dashboard-header">
+          <div>
+            <span class="dashboard-kicker">BACKUP E NUVEM</span>
+            <h2 id="sync-data-title">Sincronização e dados</h2>
+          </div>
+          <button class="dashboard-close" id="sync-data-close" type="button" aria-label="Fechar sincronização e dados">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
+          </button>
+        </header>
+
         <section class="data-section" aria-labelledby="data-section-title">
           <div class="deck-performance-title-row">
             <h3 id="data-section-title">Seus dados</h3>
-            <span>backup local</span>
           </div>
           <p class="data-section-hint">
             Exporte um arquivo para levar seu progresso a outro dispositivo, ou importe um backup salvo antes.
@@ -493,7 +507,7 @@
         <section class="cloud-section" aria-labelledby="cloud-section-title">
           <div class="deck-performance-title-row">
             <h3 id="cloud-section-title">Sincronização na nuvem</h3>
-            <span id="cloud-sync-status" data-state="local">Somente neste aparelho</span>
+            <span class="sr-only" id="cloud-sync-status" data-state="local">Somente neste aparelho</span>
           </div>
           <p class="data-section-hint" id="cloud-sync-detail">
             Entre com o Google para manter cartões e progresso iguais no celular e no computador.
@@ -504,8 +518,6 @@
             <button class="data-button" id="cloud-sign-out-button" type="button" hidden>Sair da nuvem</button>
           </div>
         </section>
-
-
       </div>
     </dialog>
 
@@ -807,7 +819,7 @@
     <script src="cloud-sync.js?v=20260823-2"></script>
     <script type="module">
       try { await CardDatabase.hydrateLocalStorage(localStorage); } catch (error) { console.warn("IndexedDB indisponível", error); }
-      await import("./app.js?v=20260824-7");
+      await import("./app.js?v=20260824-8");
     </script>
   </body>
 </html>
