@@ -1061,16 +1061,18 @@ function renderHomeDashboard() {
 
 function setActiveSurface(surface) {
   activeSurface = surface;
-  const showHome = surface === "home";
-  document.body.classList.toggle("home-active", showHome);
-  elements.homeDashboard.hidden = !showHome;
-  elements.studyArea.hidden = showHome || decks.length === 0;
+  const showDashboard = surface === "home" || surface === "decks";
+  const selectedSurface = surface === "study" ? "home" : surface;
+  document.body.classList.toggle("home-active", showDashboard);
+  document.body.classList.toggle("decks-active", surface === "decks");
+  elements.homeDashboard.hidden = !showDashboard;
+  elements.studyArea.hidden = showDashboard || decks.length === 0;
   elements.primaryNav?.querySelectorAll("[data-home-nav]").forEach((button) => {
-    const selected = (showHome && button.dataset.homeNav === "home") || (!showHome && button.dataset.homeNav === "home");
+    const selected = button.dataset.homeNav === selectedSurface;
     if (selected) button.setAttribute("aria-current", "page");
     else button.removeAttribute("aria-current");
   });
-  if (showHome) {
+  if (showDashboard) {
     window.scrollTo({ top: 0, behavior: "smooth" });
     renderHomeDashboard();
   }
@@ -1123,7 +1125,7 @@ function render() {
   renderCard();
   renderDashboard();
   renderHomeDashboard();
-  if (activeSurface === "home") elements.studyArea.hidden = true;
+  if (activeSurface === "home" || activeSurface === "decks") elements.studyArea.hidden = true;
   saveProgress();
 }
 
@@ -2259,8 +2261,8 @@ elements.primaryNav.addEventListener("click", (event) => {
   const action = button.dataset.homeNav;
   if (action === "home") setActiveSurface("home");
   if (action === "decks") {
-    setActiveSurface("home");
-    elements.homeDeckSearch.focus();
+    elements.homeDeckSearch.value = "";
+    setActiveSurface("decks");
   }
   if (action === "cards") openManageCards();
   if (action === "progress") openDashboard();
