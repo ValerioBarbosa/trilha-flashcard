@@ -53,3 +53,15 @@ describe("tela inicial orientada à revisão", () => {
     expect(styles).toContain(".home-active:not(.decks-active) .home-deck-toolbar");
   });
 });
+
+
+test("sessão diária mantém fila e interface focada", () => {
+  assert.match(appSource, /function buildDailyQueue\(limit = 20\)/);
+  assert.match(appSource, /sessionTotal: 0/);
+  assert.match(appSource, /document\.body\.classList\.toggle\("study-active"/);
+  assert.match(appSource, /ratingActions\.hidden = inSimulatedSession \|\| !state\.flipped/);
+  assert.match(htmlSource, /id="study-exit-button"/);
+  assert.match(htmlSource, /id="study-session-header-count"/);
+  assert.match(cssSource, /\.study-active \.mobile-primary-nav/);
+  assert.match(cssSource, /grid-template-columns: repeat\(4, minmax\(0, 1fr\)\)/);
+});
