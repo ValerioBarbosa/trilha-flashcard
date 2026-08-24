@@ -2815,9 +2815,9 @@ kbd {
   gap: 6px;
   min-height: 44px;
   padding: 0 14px 0 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: 999px;
-  color: var(--text);
+  color: var(--ink);
   background: var(--surface);
   font: inherit;
   font-weight: 700;
@@ -2851,7 +2851,7 @@ kbd {
 }
 
 .study-session-title strong {
-  color: var(--text);
+  color: var(--ink);
   font-size: 1rem;
 }
 
@@ -2887,7 +2887,7 @@ kbd {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 6px;
     padding: 8px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     border-radius: 18px;
     background: color-mix(in srgb, var(--surface) 94%, transparent);
     box-shadow: 0 12px 32px rgba(5, 12, 26, .22);
