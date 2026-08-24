@@ -31,3 +31,16 @@ describe("fluxo de estudo v2", () => {
     expect(app).toContain('kind: "trilha-flashcard-full-backup"');
   });
 });
+
+
+test("home dashboard exposes the primary study workflow", () => {
+  const html = readFileSync(path.join(ROOT, "index.html"), "utf8");
+  const app = readFileSync(path.join(ROOT, "app.js"), "utf8");
+  assert.match(html, /id="home-dashboard"/);
+  assert.match(html, /id="home-continue-button"/);
+  assert.match(html, /data-home-nav="cards"/);
+  assert.match(html, /id="home-cloud-status"/);
+  assert.match(app, /function renderHomeDashboard\(\)/);
+  assert.match(app, /function continueFromHome\(\)/);
+  assert.match(app, /openDeckFromHome/);
+});
