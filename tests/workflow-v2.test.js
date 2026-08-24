@@ -31,3 +31,16 @@ describe("fluxo de estudo v2", () => {
     expect(app).toContain('kind: "trilha-flashcard-full-backup"');
   });
 });
+
+
+describe("tela inicial orientada à revisão", () => {
+  it("expõe o fluxo principal de estudo", () => {
+    expect(html).toContain('id="home-dashboard"');
+    expect(html).toContain('id="home-continue-button"');
+    expect(html).toContain('data-home-nav="cards"');
+    expect(html).toContain('id="home-cloud-status"');
+    expect(app).toContain("function renderHomeDashboard()");
+    expect(app).toContain("function continueFromHome()");
+    expect(app).toContain("openDeckFromHome");
+  });
+});

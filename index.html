@@ -22,7 +22,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260823-2" />
+    <link rel="stylesheet" href="styles.css?v=20260824-1" />
     <script>
       try {
         const savedTheme = localStorage.getItem("trilha-flashcard-theme");
@@ -136,7 +136,49 @@
         </div>
       </header>
 
-      <section class="study-area" id="study-area" aria-live="polite">
+
+      <section class="home-dashboard" id="home-dashboard" aria-labelledby="home-title">
+        <div class="home-hero">
+          <div>
+            <p class="home-greeting" id="home-greeting">Boa noite, Valério</p>
+            <h1 id="home-title">O que vamos revisar?</h1>
+            <p class="home-subtitle">Siga sua trilha. Revise hoje e fortaleça o que importa.</p>
+          </div>
+          <button class="home-cloud-chip" id="home-cloud-button" type="button" aria-label="Abrir sincronização">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .6-8A6 6 0 0 0 6.2 8.4 4.8 4.8 0 0 0 7 18Z"/><path d="m9.5 13 1.8 1.8 3.5-4"/></svg>
+            <span id="home-cloud-status">Somente neste aparelho</span>
+          </button>
+        </div>
+
+        <section class="today-focus" aria-label="Resumo de hoje">
+          <div class="today-metrics">
+            <div><strong id="home-new-count">0</strong><span>Novos</span></div>
+            <div><strong id="home-due-count">0</strong><span>Revisar</span></div>
+            <div><strong id="home-streak-count">0</strong><span>Sequência</span></div>
+          </div>
+          <button class="continue-review-button" id="home-continue-button" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></svg>
+            <span>Continuar revisão</span>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <p class="today-estimate" id="home-review-estimate">Escolha um baralho para começar</p>
+        </section>
+
+        <div class="home-deck-toolbar">
+          <label class="home-search">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.6-4.6"/></svg>
+            <span class="sr-only">Buscar cartões e assuntos</span>
+            <input id="home-deck-search" type="search" placeholder="Buscar cartões e assuntos" autocomplete="off" />
+          </label>
+          <div class="home-deck-heading">
+            <h2>Seus baralhos</h2>
+            <button id="home-study-session-button" type="button">Montar sessão</button>
+          </div>
+        </div>
+        <div class="home-deck-list" id="home-deck-list"></div>
+      </section>
+
+      <section class="study-area" id="study-area" aria-live="polite" hidden>
         <div class="filter-row">
           <div class="search-bar" role="search">
             <svg aria-hidden="true" viewBox="0 0 24 24" class="search-icon">
@@ -272,7 +314,43 @@
         <p>Crie a primeira disciplina para começar a adicionar cartões neste perfil.</p>
         <button type="button" class="review-due-button" id="empty-profile-create-button">+ Criar disciplina</button>
       </section>
+
+      <nav class="mobile-primary-nav" aria-label="Navegação principal">
+        <button type="button" data-home-nav="home" aria-current="page">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v9H6v-9"/><path d="M9 20v-6h6v6"/></svg><span>Estudar</span>
+        </button>
+        <button type="button" data-home-nav="decks">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4Z"/><path d="m4 12 8 4 8-4M4 17l8 4 8-4"/></svg><span>Baralhos</span>
+        </button>
+        <button type="button" data-home-nav="cards">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="5" width="13" height="15" rx="2"/><path d="M8 9h5M8 13h5M8 17h3M17 8h3v11a2 2 0 0 1-2 2h-8"/></svg><span>Cartões</span>
+        </button>
+        <button type="button" data-home-nav="progress">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></svg><span>Progresso</span>
+        </button>
+        <button type="button" data-home-nav="more">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg><span>Mais</span>
+        </button>
+      </nav>
+
     </main>
+
+    <dialog class="dashboard-dialog home-more-dialog" id="home-more-dialog" aria-labelledby="home-more-title">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <div><p class="dashboard-kicker">TRILHA FLASHCARD</p><h2 id="home-more-title">Mais opções</h2></div>
+          <button class="dashboard-close" id="home-more-close" type="button" aria-label="Fechar mais opções"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+        </div>
+        <div class="home-more-actions">
+          <button type="button" id="home-more-session">Montar sessão de estudo</button>
+          <button type="button" id="home-more-sync">Sincronização e dados</button>
+          <button type="button" id="home-more-theme">Alternar tema</button>
+          <button type="button" id="home-more-install">Instalar aplicativo</button>
+          <button type="button" id="home-more-profile">Trocar perfil de concurso</button>
+        </div>
+      </div>
+    </dialog>
+
 
     <dialog class="dashboard-dialog" id="dashboard-dialog" aria-labelledby="dashboard-title">
       <div class="dashboard-content">
@@ -689,7 +767,7 @@
     <script src="cloud-sync.js?v=20260823-2"></script>
     <script type="module">
       try { await CardDatabase.hydrateLocalStorage(localStorage); } catch (error) { console.warn("IndexedDB indisponível", error); }
-      await import("./app.js?v=20260823-2");
+      await import("./app.js?v=20260824-1");
     </script>
   </body>
 </html>

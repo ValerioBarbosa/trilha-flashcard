@@ -257,6 +257,26 @@ const elements = {
   profilePresets: document.querySelector("#profile-presets"),
   profileNewName: document.querySelector("#profile-new-name"),
   profileNewCreate: document.querySelector("#profile-new-create"),
+  homeDashboard: document.querySelector("#home-dashboard"),
+  homeGreeting: document.querySelector("#home-greeting"),
+  homeCloudButton: document.querySelector("#home-cloud-button"),
+  homeCloudStatus: document.querySelector("#home-cloud-status"),
+  homeNewCount: document.querySelector("#home-new-count"),
+  homeDueCount: document.querySelector("#home-due-count"),
+  homeStreakCount: document.querySelector("#home-streak-count"),
+  homeContinueButton: document.querySelector("#home-continue-button"),
+  homeReviewEstimate: document.querySelector("#home-review-estimate"),
+  homeDeckSearch: document.querySelector("#home-deck-search"),
+  homeDeckList: document.querySelector("#home-deck-list"),
+  homeStudySessionButton: document.querySelector("#home-study-session-button"),
+  primaryNav: document.querySelector(".mobile-primary-nav"),
+  homeMoreDialog: document.querySelector("#home-more-dialog"),
+  homeMoreClose: document.querySelector("#home-more-close"),
+  homeMoreSession: document.querySelector("#home-more-session"),
+  homeMoreSync: document.querySelector("#home-more-sync"),
+  homeMoreTheme: document.querySelector("#home-more-theme"),
+  homeMoreInstall: document.querySelector("#home-more-install"),
+  homeMoreProfile: document.querySelector("#home-more-profile"),
 };
 
 let deferredInstallPrompt = null;
@@ -374,6 +394,7 @@ let cloudAdapter = null;
 let cloudUser = null;
 let cloudReady = false;
 let cloudSyncTimer = null;
+let activeSurface = "home";
 
 const CLOUD_META_KEY = "trilha-flashcard-cloud-meta";
 
@@ -381,6 +402,10 @@ function setCloudStatus(label, stateName = "local", detail = null) {
   if (!elements.cloudSyncStatus) return;
   elements.cloudSyncStatus.textContent = label;
   elements.cloudSyncStatus.dataset.state = stateName;
+  if (elements.homeCloudStatus) {
+    elements.homeCloudStatus.textContent = label;
+    elements.homeCloudButton.dataset.state = stateName;
+  }
   if (detail) elements.cloudSyncDetail.textContent = detail;
 }
 
@@ -977,6 +1002,107 @@ function renderTopicDashboard() {
   }).join("");
 }
 
+
+function cleanDeckTitle(title) {
+  return String(title || "").split(" · ")[0];
+}
+
+function deckAccent(index) {
+  return ["blue", "violet", "green", "amber"][index % 4];
+}
+
+function renderHomeDashboard() {
+  if (!elements.homeDashboard) return;
+  const entries = allCardEntries();
+  const newCount = entries.filter(({ key }) => !state.ratings[key]?.attempts).length;
+  const dueCount = getDueEntries().length;
+  const streak = getStudyStreak();
+  const query = String(elements.homeDeckSearch?.value || "").trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
+  elements.homeGreeting.textContent = `${greeting}, Valério`;
+  elements.homeNewCount.textContent = String(newCount);
+  elements.homeDueCount.textContent = String(dueCount);
+  elements.homeStreakCount.textContent = String(streak);
+  const reviewTotal = dueCount || Math.min(newCount, 20);
+  elements.homeContinueButton.disabled = entries.length === 0;
+  elements.homeReviewEstimate.textContent = reviewTotal
+    ? `${reviewTotal} ${reviewTotal === 1 ? "cartão" : "cartões"} para revisar · ~${Math.max(2, Math.ceil(reviewTotal * 0.75))} min`
+    : "Tudo em dia — você pode estudar um baralho";
+  const visibleDecks = getDecksForDisplay().filter((deck) => {
+    if (!query) return true;
+    const haystack = [deck.title, ...(deck.topics || []), ...deck.cards.flatMap((card) => [card.front, card.topic, card.tag])].join(" ").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    return haystack.includes(query);
+  });
+  elements.homeDeckList.innerHTML = visibleDecks.length ? visibleDecks.map((deck, index) => {
+    const stats = getDeckStats(deck);
+    const due = deck.cards.filter((card) => isDue(state.ratings[cardKey(deck, card)], Date.now())).length;
+    const fresh = deck.cards.filter((card) => !state.ratings[cardKey(deck, card)]?.attempts).length;
+    const pending = due || fresh;
+    const progress = deck.cards.length ? Math.round((stats.reviewed / deck.cards.length) * 100) : 0;
+    return `
+      <button class="home-deck-row ${deck.id === state.deckId ? "is-active" : ""}" type="button" data-home-deck="${escapeHtml(deck.id)}">
+        <span class="home-deck-icon is-${deckAccent(index)}" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4Z"/><path d="m4 12 8 4 8-4M4 17l8 4 8-4"/></svg>
+        </span>
+        <span class="home-deck-copy">
+          <strong>${escapeHtml(cleanDeckTitle(deck.title))}</strong>
+          <small>${deck.cards.length} ${deck.cards.length === 1 ? "cartão" : "cartões"} · <em>${pending} para revisar</em></small>
+          <span class="home-deck-progress" aria-hidden="true"><i style="width:${progress}%"></i></span>
+        </span>
+        <svg class="home-deck-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    `;
+  }).join("") : '<p class="home-deck-empty">Nenhum baralho encontrado.</p>';
+  elements.homeDeckList.querySelectorAll("[data-home-deck]").forEach((button) => {
+    button.addEventListener("click", () => openDeckFromHome(button.dataset.homeDeck));
+  });
+}
+
+function setActiveSurface(surface) {
+  activeSurface = surface;
+  const showHome = surface === "home";
+  document.body.classList.toggle("home-active", showHome);
+  elements.homeDashboard.hidden = !showHome;
+  elements.studyArea.hidden = showHome || decks.length === 0;
+  elements.primaryNav?.querySelectorAll("[data-home-nav]").forEach((button) => {
+    const selected = (showHome && button.dataset.homeNav === "home") || (!showHome && button.dataset.homeNav === "home");
+    if (selected) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+  if (showHome) renderHomeDashboard();
+}
+
+function openDeckFromHome(deckId) {
+  const deck = decks.find((entry) => entry.id === deckId);
+  if (!deck) return;
+  state.deckId = deck.id;
+  state.index = 0;
+  state.flipped = false;
+  state.queueMode = null;
+  state.topicFilter = "";
+  render();
+  setActiveSurface("study");
+}
+
+function continueFromHome() {
+  const first = getDueEntries()[0] || allCardEntries()[0];
+  if (!first) return;
+  state.queueMode = getDueEntries().length ? "due" : null;
+  goToEntry(first);
+  setActiveSurface("study");
+  showToast(state.queueMode === "due" ? "Revisão do dia iniciada" : "Estudo iniciado");
+}
+
+function openHomeMore() {
+  elements.homeMoreDialog.showModal();
+  elements.homeMoreClose.focus();
+}
+
+function closeHomeMore() {
+  if (elements.homeMoreDialog.open) elements.homeMoreDialog.close();
+}
+
 function render() {
   if (decks.length === 0) {
     elements.studyArea.hidden = true;
@@ -993,6 +1119,8 @@ function render() {
   renderProgress();
   renderCard();
   renderDashboard();
+  renderHomeDashboard();
+  if (activeSurface === "home") elements.studyArea.hidden = true;
   saveProgress();
 }
 
@@ -2114,6 +2242,37 @@ window.addEventListener("appinstalled", () => {
   showToast("Trilha Flashcard instalado");
 });
 
+
+elements.homeContinueButton.addEventListener("click", continueFromHome);
+elements.homeDeckSearch.addEventListener("input", renderHomeDashboard);
+elements.homeStudySessionButton.addEventListener("click", openStudySession);
+elements.homeCloudButton.addEventListener("click", () => {
+  if (cloudUser) void uploadCloudSnapshot({ notify: true });
+  else openDashboard();
+});
+elements.primaryNav.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-home-nav]");
+  if (!button) return;
+  const action = button.dataset.homeNav;
+  if (action === "home") setActiveSurface("home");
+  if (action === "decks") {
+    setActiveSurface("home");
+    elements.homeDeckSearch.focus();
+  }
+  if (action === "cards") openManageCards();
+  if (action === "progress") openDashboard();
+  if (action === "more") openHomeMore();
+});
+elements.homeMoreClose.addEventListener("click", closeHomeMore);
+elements.homeMoreDialog.addEventListener("click", (event) => {
+  if (event.target === elements.homeMoreDialog) closeHomeMore();
+});
+elements.homeMoreSession.addEventListener("click", () => { closeHomeMore(); openStudySession(); });
+elements.homeMoreSync.addEventListener("click", () => { closeHomeMore(); openDashboard(); });
+elements.homeMoreTheme.addEventListener("click", () => { elements.themeToggle.click(); });
+elements.homeMoreInstall.addEventListener("click", () => { closeHomeMore(); openInstallDialog(); });
+elements.homeMoreProfile.addEventListener("click", () => { closeHomeMore(); elements.profileSwitchButton.click(); });
+
 elements.deckSelect.addEventListener("change", (event) => {
   state.deckId = event.target.value;
   state.index = 0;
@@ -2272,6 +2431,7 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   });
 }
 
+setActiveSurface("home");
 void initializeCloudSync();
 
 const explicitTheme = document.documentElement.getAttribute("data-theme");
