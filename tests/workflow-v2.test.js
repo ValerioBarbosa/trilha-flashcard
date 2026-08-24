@@ -67,3 +67,17 @@ describe("sessão diária focada", () => {
     expect(styles).toContain("grid-template-columns: repeat(4, minmax(0, 1fr))");
   });
 });
+
+
+describe("persistência da sessão ativa", () => {
+  it("salva e restaura fila, posição e placar", () => {
+    expect(app).toContain("function serializeActiveSession()");
+    expect(app).toContain("function restoreActiveSession()");
+    expect(app).toContain("activeSession: serializeActiveSession()");
+    expect(app).toContain("queueKeys: state.customQueue.map");
+    expect(app).toContain('setActiveSurface(resumedActiveSession ? "study" : "home")');
+    expect(app).toContain('showToast("Sessão retomada")');
+    expect(html).toContain("app.js?v=20260824-7");
+    expect(serviceWorker).toContain("trilha-flashcard-v28");
+  });
+});
