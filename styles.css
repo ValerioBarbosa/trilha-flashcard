@@ -2556,6 +2556,21 @@ kbd {
 .home-active .deck-picker,
 .home-active .topbar-actions { display: none; }
 
+.decks-active .home-hero,
+.decks-active .today-focus,
+.decks-active .home-search {
+  display: none;
+}
+
+.decks-active .home-deck-toolbar,
+.decks-active .home-deck-heading {
+  margin-top: 0;
+}
+
+.decks-active .home-dashboard {
+  margin-top: 28px;
+}
+
 .home-more-dialog { width: min(460px, calc(100vw - 24px)); }
 .home-more-actions { display: grid; gap: 10px; margin-top: 20px; }
 .home-more-actions button {
