@@ -2798,3 +2798,116 @@ kbd {
   .home-deck-copy strong { white-space: normal; line-height: 1.15; }
   .mobile-primary-nav { bottom: max(6px, env(safe-area-inset-bottom)); width: calc(100vw - 16px); border-radius: 17px; padding: 6px; }
 }
+
+
+/* Sessão de estudo focada */
+.study-session-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 2px 0 18px;
+}
+
+.study-exit-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--surface);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.study-exit-button svg {
+  width: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.study-session-title {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  min-width: 0;
+}
+
+.study-session-title span {
+  max-width: min(52vw, 420px);
+  overflow: hidden;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.study-session-title strong {
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.study-active .topbar,
+.study-active .filter-row,
+.study-active .mobile-primary-nav {
+  display: none;
+}
+
+.study-active .app-shell {
+  padding-top: max(14px, env(safe-area-inset-top));
+}
+
+.reveal-row[hidden],
+.rating-actions[hidden],
+.simulated-actions[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 660px) {
+  .study-active .study-area {
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .study-active .progress-heading {
+    margin-top: 0;
+  }
+
+  .study-active .rating-actions {
+    position: sticky;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 25;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    box-shadow: 0 12px 32px rgba(5, 12, 26, .22);
+    backdrop-filter: blur(18px);
+  }
+
+  .study-active .rating-actions .action-button {
+    min-width: 0;
+    min-height: 50px;
+    padding: 8px 3px;
+    font-size: .78rem;
+  }
+
+  .study-active .simulated-actions {
+    position: sticky;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 25;
+  }
+
+  .study-active .keyboard-hint {
+    display: none;
+  }
+}

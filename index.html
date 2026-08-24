@@ -22,7 +22,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260824-3" />
+    <link rel="stylesheet" href="styles.css?v=20260824-4" />
     <script>
       try {
         const savedTheme = localStorage.getItem("trilha-flashcard-theme");
@@ -208,6 +208,17 @@
       </section>
 
       <section class="study-area" id="study-area" aria-live="polite" hidden>
+        <header class="study-session-header">
+          <button id="study-exit-button" class="study-exit-button" type="button" aria-label="Sair da sessão">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+            <span>Sair</span>
+          </button>
+          <div class="study-session-title">
+            <span id="study-session-label">Sessão de estudo</span>
+            <strong id="study-session-header-count">1 de 20</strong>
+          </div>
+        </header>
+
         <div class="filter-row">
           <div class="search-bar" role="search">
             <svg aria-hidden="true" viewBox="0 0 24 24" class="search-icon">
@@ -311,7 +322,7 @@
           </button>
         </div>
 
-        <div class="reveal-row">
+        <div class="reveal-row" id="reveal-row">
           <button class="action-button reveal" id="reveal-button" type="button">
             <svg aria-hidden="true" viewBox="0 0 24 24">
               <path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z" />
@@ -796,7 +807,7 @@
     <script src="cloud-sync.js?v=20260823-2"></script>
     <script type="module">
       try { await CardDatabase.hydrateLocalStorage(localStorage); } catch (error) { console.warn("IndexedDB indisponível", error); }
-      await import("./app.js?v=20260824-5");
+      await import("./app.js?v=20260824-6");
     </script>
   </body>
 </html>

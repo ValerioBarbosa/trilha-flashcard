@@ -132,7 +132,11 @@ const elements = {
   next: document.querySelector("#next-button"),
   shuffle: document.querySelector("#shuffle-button"),
   reveal: document.querySelector("#reveal-button"),
+  revealRow: document.querySelector("#reveal-row"),
   ratingActions: document.querySelector("#rating-actions"),
+  studyExitButton: document.querySelector("#study-exit-button"),
+  studySessionLabel: document.querySelector("#study-session-label"),
+  studySessionHeaderCount: document.querySelector("#study-session-header-count"),
   again: document.querySelector("#again-button"),
   hard: document.querySelector("#hard-button"),
   good: document.querySelector("#good-button"),
@@ -377,6 +381,11 @@ const state = {
   queueMode: null,
   customQueue: [],
   customSimulated: false,
+  sessionTotal: 0,
+  sessionCompleted: 0,
+  sessionAttempts: 0,
+  sessionRemembered: 0,
+  sessionLabel: "Sessão de estudo",
   dailyReviewCounts: savedState.dailyReviewCounts && typeof savedState.dailyReviewCounts === "object" && !Array.isArray(savedState.dailyReviewCounts)
     ? savedState.dailyReviewCounts
     : {},
@@ -771,35 +780,38 @@ function renderDeckOptions() {
 
 function renderProgress() {
   const deck = currentDeck();
+  const inQueue = Boolean(state.queueMode && state.sessionTotal);
   const indices = getFilteredIndices();
-  const total = indices.length;
+  const total = inQueue ? state.sessionTotal : indices.length;
   const stats = getDeckStats(deck, indices.map((index) => deck.cards[index]));
-  const position = indices.indexOf(state.index);
-  elements.progressLabel.textContent = total === 0 ? "Sem cartões" : `${(position === -1 ? 0 : position) + 1} de ${total}`;
-  elements.sessionScore.textContent = stats.attempts === 0
+  const deckPosition = indices.indexOf(state.index);
+  const position = inQueue
+    ? Math.min(state.sessionCompleted + 1, Math.max(total, 1))
+    : (deckPosition === -1 ? 0 : deckPosition) + 1;
+  const reviewed = inQueue ? state.sessionCompleted : stats.reviewed;
+  const remembered = inQueue ? state.sessionRemembered : stats.remembered;
+  const attempts = inQueue ? state.sessionAttempts : stats.attempts;
+  const countText = total === 0 ? "Sem cartões" : `${position} de ${total}`;
+
+  elements.progressLabel.textContent = countText;
+  elements.studySessionHeaderCount.textContent = countText;
+  elements.studySessionLabel.textContent = inQueue ? state.sessionLabel : cleanDeckTitle(deck.title);
+  elements.sessionScore.textContent = attempts === 0
     ? "0 estudados"
-    : `${stats.remembered} de ${stats.attempts} lembrados`;
+    : `${remembered} de ${attempts} lembrados`;
   elements.progressTrack.style.setProperty("--segments", total);
   elements.progressTrack.setAttribute("aria-valuemax", String(total));
-  elements.progressTrack.setAttribute("aria-valuenow", String(stats.reviewed));
-  elements.progressTrack.setAttribute("aria-valuetext", `${stats.reviewed} de ${total} cartões revisados`);
-  elements.progressTrack.innerHTML = indices
-    .map((cardIndex) => {
-      const card = deck.cards[cardIndex];
-      const wasReviewed = Boolean(state.ratings[cardKey(deck, card)]?.attempts);
-      const status = cardIndex === state.index ? "current" : wasReviewed ? "complete" : "";
-      return `<span class="progress-segment ${status}" aria-hidden="true"></span>`;
-    })
-    .join("");
-  elements.sessionCount.textContent = total === 0 ? "0 de 0" : `${(position === -1 ? 0 : position) + 1} de ${total}`;
-  elements.sessionDots.innerHTML = indices
-    .map((cardIndex) => {
-      const card = deck.cards[cardIndex];
-      const wasReviewed = Boolean(state.ratings[cardKey(deck, card)]?.attempts);
-      const status = cardIndex === state.index ? "current" : wasReviewed ? "complete" : "";
-      return `<span class="session-dot ${status}"></span>`;
-    })
-    .join("");
+  elements.progressTrack.setAttribute("aria-valuenow", String(reviewed));
+  elements.progressTrack.setAttribute("aria-valuetext", `${reviewed} de ${total} cartões revisados`);
+  elements.progressTrack.innerHTML = Array.from({ length: total }, (_, index) => {
+    const status = index === position - 1 ? "current" : index < reviewed ? "complete" : "";
+    return `<span class="progress-segment ${status}" aria-hidden="true"></span>`;
+  }).join("");
+  elements.sessionCount.textContent = total === 0 ? "0 de 0" : countText;
+  elements.sessionDots.innerHTML = Array.from({ length: total }, (_, index) => {
+    const status = index === position - 1 ? "current" : index < reviewed ? "complete" : "";
+    return `<span class="session-dot ${status}"></span>`;
+  }).join("");
 }
 
 function fillCallout(wrapper, textEl, value) {
@@ -819,12 +831,13 @@ function renderCard() {
   elements.good.disabled = ratingDisabled;
   elements.easy.disabled = ratingDisabled;
   elements.simulatedNextButton.disabled = ratingDisabled;
-  elements.previous.disabled = isEmpty;
-  elements.next.disabled = isEmpty;
+  elements.previous.disabled = isEmpty || Boolean(state.queueMode);
+  elements.next.disabled = isEmpty || Boolean(state.queueMode);
 
   const inSimulatedSession = state.queueMode === "custom" && state.customSimulated;
-  elements.ratingActions.hidden = inSimulatedSession;
-  elements.simulatedActions.hidden = !inSimulatedSession;
+  elements.revealRow.hidden = isEmpty || state.flipped;
+  elements.ratingActions.hidden = inSimulatedSession || !state.flipped || isEmpty;
+  elements.simulatedActions.hidden = !inSimulatedSession || !state.flipped || isEmpty;
 
   if (isEmpty) {
     elements.front.textContent = "Este baralho ainda não tem cartões.";
@@ -1062,14 +1075,16 @@ function startHomeQueue(entries, mode, message, emptyMessage) {
     showToast(emptyMessage);
     return;
   }
-  if (mode === "custom") {
-    state.customQueue = entries.slice(0, 20);
-    state.customSimulated = false;
-  }
-  state.queueMode = mode;
-  goToEntry(entries[0]);
-  setActiveSurface("study");
-  showToast(message);
+  const labels = {
+    due: "Revisões de hoje",
+    wrong: "Reforçar erros",
+    custom: "Novos cartões",
+  };
+  startSession(entries, {
+    label: labels[mode] || "Sessão de estudo",
+    message,
+    limit: 20,
+  });
 }
 
 function startHomeDueReview() {
@@ -1098,7 +1113,7 @@ function renderHomeDashboard() {
   elements.homeNewCount.textContent = String(newCount);
   elements.homeDueCount.textContent = String(dueCount);
   elements.homeStreakCount.textContent = String(streak);
-  const reviewTotal = dueCount || Math.min(newCount, 20);
+  const reviewTotal = Math.min(dueCount || newCount, 20);
   elements.homeContinueButton.disabled = entries.length === 0;
   elements.homeReviewEstimate.textContent = reviewTotal
     ? `${reviewTotal} ${reviewTotal === 1 ? "cartão selecionado" : "cartões selecionados"} · ~${Math.max(2, Math.ceil(reviewTotal * 0.75))} min`
@@ -1165,6 +1180,7 @@ function setActiveSurface(surface) {
   const selectedSurface = surface === "study" ? "home" : surface;
   document.body.classList.toggle("home-active", showDashboard);
   document.body.classList.toggle("decks-active", surface === "decks");
+  document.body.classList.toggle("study-active", surface === "study");
   elements.homeDashboard.hidden = !showDashboard;
   elements.studyArea.hidden = showDashboard || decks.length === 0;
   elements.primaryNav?.querySelectorAll("[data-home-nav]").forEach((button) => {
@@ -1178,25 +1194,80 @@ function setActiveSurface(surface) {
   }
 }
 
+function resetSessionProgress(label, total) {
+  state.sessionLabel = label;
+  state.sessionTotal = total;
+  state.sessionCompleted = 0;
+  state.sessionAttempts = 0;
+  state.sessionRemembered = 0;
+}
+
+function uniqueEntries(entries) {
+  const seen = new Set();
+  return entries.filter(({ key }) => {
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function priorityRank(card) {
+  return ({ A: 0, B: 1, C: 2 })[card.priority] ?? 3;
+}
+
+function buildDailyQueue(limit = 20) {
+  const entries = allCardEntries();
+  const due = getDueEntries();
+  const wrong = getWrongEntries();
+  const fresh = entries
+    .filter(({ key }) => !state.ratings[key]?.attempts)
+    .sort((a, b) => priorityRank(a.card) - priorityRank(b.card));
+  const remaining = entries
+    .filter(({ key }) => state.ratings[key]?.attempts)
+    .sort((a, b) => priorityRank(a.card) - priorityRank(b.card));
+  return uniqueEntries([...due, ...wrong, ...fresh, ...remaining]).slice(0, limit);
+}
+
+function startSession(entries, { label, message, simulated = false, limit = 20 } = {}) {
+  const queue = uniqueEntries(entries).slice(0, limit);
+  if (!queue.length) return false;
+  state.customQueue = queue;
+  state.queueMode = "custom";
+  state.customSimulated = simulated;
+  resetSessionProgress(label || "Sessão de estudo", queue.length);
+  goToEntry(queue[0]);
+  setActiveSurface("study");
+  showToast(message || `Sessão iniciada com ${queue.length} cartões`);
+  return true;
+}
+
+function exitStudySession() {
+  state.queueMode = null;
+  state.customQueue = [];
+  state.customSimulated = false;
+  state.flipped = false;
+  setActiveSurface("home");
+}
+
 function openDeckFromHome(deckId) {
   const deck = decks.find((entry) => entry.id === deckId);
   if (!deck) return;
-  state.deckId = deck.id;
-  state.index = 0;
-  state.flipped = false;
-  state.queueMode = null;
-  state.topicFilter = "";
-  render();
-  setActiveSurface("study");
+  const entries = deck.cards.map((card, index) => ({ deck, card, index, key: cardKey(deck, card) }));
+  startSession(entries, {
+    label: cleanDeckTitle(deck.title),
+    message: `${deck.cards.length} ${deck.cards.length === 1 ? "cartão" : "cartões"} no baralho`,
+    limit: deck.cards.length,
+  });
 }
 
 function continueFromHome() {
-  const first = getDueEntries()[0] || allCardEntries()[0];
-  if (!first) return;
-  state.queueMode = getDueEntries().length ? "due" : null;
-  goToEntry(first);
-  setActiveSurface("study");
-  showToast(state.queueMode === "due" ? "Revisão do dia iniciada" : "Estudo iniciado");
+  const queue = buildDailyQueue(20);
+  if (!queue.length) return;
+  startSession(queue, {
+    label: "Sessão diária",
+    message: `Sessão diária iniciada com ${queue.length} cartões`,
+    limit: 20,
+  });
 }
 
 function openHomeMore() {
@@ -1427,6 +1498,10 @@ function rateCard(rating) {
   if (!key || ratingAdvanceTimer !== null) return;
   const now = new Date();
   state.ratings[key] = computeNextRating(state.ratings[key], rating, now);
+  if (state.queueMode) {
+    state.sessionAttempts += 1;
+    if (rating !== "again") state.sessionRemembered += 1;
+  }
   elements.again.disabled = true;
   elements.hard.disabled = true;
   elements.good.disabled = true;
@@ -1450,6 +1525,7 @@ function rateCard(rating) {
       return;
     }
 
+    state.sessionCompleted = Math.min(state.sessionCompleted + 1, state.sessionTotal);
     const queue = state.queueMode === "custom"
       ? state.customQueue.filter((entry) => entry.key !== key)
       : state.queueMode === "wrong" ? getWrongEntries() : getDueEntries();
@@ -1464,8 +1540,10 @@ function rateCard(rating) {
       ? "Sessão personalizada concluída"
       : state.queueMode === "wrong" ? "Cartões errados revisados" : "Revisões do dia concluídas";
     state.queueMode = null;
+    state.customQueue = [];
     state.customSimulated = false;
-    move(1);
+    renderProgress();
+    setActiveSurface("home");
     showToast(finishedMessage);
   }, 320);
 }
@@ -1475,15 +1553,18 @@ function advanceSimulatedSession() {
   const key = currentCardKey();
   ratingAdvanceTimer = window.setTimeout(() => {
     ratingAdvanceTimer = null;
+    state.sessionCompleted = Math.min(state.sessionCompleted + 1, state.sessionTotal);
     state.customQueue = state.customQueue.filter((entry) => entry.key !== key);
     const nextEntry = state.customQueue[0];
     if (nextEntry) {
       goToEntry(nextEntry);
       return;
     }
+    state.sessionCompleted = state.sessionTotal;
     state.queueMode = null;
+    state.customQueue = [];
     state.customSimulated = false;
-    move(1);
+    setActiveSurface("home");
     showToast("Simulado concluído");
   }, 200);
   renderCard();
@@ -1516,21 +1597,17 @@ function closeDashboard() {
 }
 
 function startDueReview() {
-  const firstDue = getDueEntries()[0];
-  if (!firstDue) return;
-  state.queueMode = "due";
+  const due = getDueEntries();
+  if (!due.length) return;
   closeDashboard();
-  goToEntry(firstDue);
-  showToast("Revisão do dia iniciada");
+  startSession(due, { label: "Revisões de hoje", message: "Revisão do dia iniciada", limit: 20 });
 }
 
 function startWrongReview() {
-  const firstWrong = getWrongEntries()[0];
-  if (!firstWrong) return;
-  state.queueMode = "wrong";
+  const wrong = getWrongEntries();
+  if (!wrong.length) return;
   closeDashboard();
-  goToEntry(firstWrong);
-  showToast("Revisão dos errados iniciada");
+  startSession(wrong, { label: "Reforçar erros", message: "Revisão dos errados iniciada", limit: 20 });
 }
 
 function renderStudySessionDisciplineOptions() {
@@ -1580,11 +1657,13 @@ function buildCustomSession(event) {
     showToast("Nenhum cartão corresponde aos filtros");
     return;
   }
-  state.queueMode = "custom";
-  state.customSimulated = simulated;
   elements.studySessionDialog.close();
-  goToEntry(state.customQueue[0]);
-  showToast(`Sessão iniciada com ${state.customQueue.length} cartões${simulated ? " (modo simulado)" : ""}`);
+  startSession(state.customQueue, {
+    label: simulated ? "Simulado" : "Sessão personalizada",
+    message: `Sessão iniciada com ${state.customQueue.length} cartões${simulated ? " (modo simulado)" : ""}`,
+    simulated,
+    limit: state.customQueue.length,
+  });
 }
 
 function escapeHtml(value) {
@@ -2392,6 +2471,7 @@ elements.deckSelect.addEventListener("change", (event) => {
 
 elements.flashcard.addEventListener("click", toggleCard);
 elements.reveal.addEventListener("click", toggleCard);
+elements.studyExitButton.addEventListener("click", exitStudySession);
 elements.previous.addEventListener("click", () => move(-1));
 elements.next.addEventListener("click", () => move(1));
 elements.shuffle.addEventListener("click", shuffleCards);
