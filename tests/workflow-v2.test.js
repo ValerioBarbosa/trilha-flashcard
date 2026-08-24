@@ -33,14 +33,14 @@ describe("fluxo de estudo v2", () => {
 });
 
 
-test("home dashboard exposes the primary study workflow", () => {
-  const html = readFileSync(path.join(ROOT, "index.html"), "utf8");
-  const app = readFileSync(path.join(ROOT, "app.js"), "utf8");
-  assert.match(html, /id="home-dashboard"/);
-  assert.match(html, /id="home-continue-button"/);
-  assert.match(html, /data-home-nav="cards"/);
-  assert.match(html, /id="home-cloud-status"/);
-  assert.match(app, /function renderHomeDashboard\(\)/);
-  assert.match(app, /function continueFromHome\(\)/);
-  assert.match(app, /openDeckFromHome/);
+describe("tela inicial orientada à revisão", () => {
+  it("expõe o fluxo principal de estudo", () => {
+    expect(html).toContain('id="home-dashboard"');
+    expect(html).toContain('id="home-continue-button"');
+    expect(html).toContain('data-home-nav="cards"');
+    expect(html).toContain('id="home-cloud-status"');
+    expect(app).toContain("function renderHomeDashboard()");
+    expect(app).toContain("function continueFromHome()");
+    expect(app).toContain("openDeckFromHome");
+  });
 });
