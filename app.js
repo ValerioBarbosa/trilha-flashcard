@@ -756,14 +756,54 @@ function getStudyStreak() {
   return computeStudyStreak(state.activity);
 }
 
+function serializeActiveSession() {
+  if (!state.queueMode || !state.customQueue.length) return null;
+  return {
+    queueKeys: state.customQueue.map(({ key }) => key),
+    simulated: state.customSimulated,
+    total: state.sessionTotal,
+    completed: state.sessionCompleted,
+    attempts: state.sessionAttempts,
+    remembered: state.sessionRemembered,
+    label: state.sessionLabel,
+    currentKey: currentCardKey(),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+function restoreActiveSession() {
+  const session = savedState.activeSession;
+  if (!session || !Array.isArray(session.queueKeys) || !session.queueKeys.length) return false;
+  const entriesByKey = new Map(allCardEntries().map((entry) => [entry.key, entry]));
+  const queue = session.queueKeys.map((key) => entriesByKey.get(key)).filter(Boolean);
+  if (!queue.length) return false;
+  const currentEntry = entriesByKey.get(session.currentKey) || queue[0];
+  if (!queue.some(({ key }) => key === currentEntry.key)) queue.unshift(currentEntry);
+  state.customQueue = uniqueEntries(queue);
+  state.queueMode = "custom";
+  state.customSimulated = Boolean(session.simulated);
+  state.sessionCompleted = Math.max(0, Number(session.completed) || 0);
+  state.sessionTotal = state.sessionCompleted + state.customQueue.length;
+  state.sessionAttempts = Math.max(0, Number(session.attempts) || 0);
+  state.sessionRemembered = Math.min(state.sessionAttempts, Math.max(0, Number(session.remembered) || 0));
+  state.sessionLabel = typeof session.label === "string" && session.label.trim()
+    ? session.label
+    : "Sessão de estudo";
+  state.deckId = currentEntry.deck.id;
+  state.index = currentEntry.index;
+  state.flipped = false;
+  return true;
+}
+
 function saveProgress() {
   const value = JSON.stringify({
-    version: 2,
+    version: 3,
     deckId: state.deckId,
     index: state.index,
     ratings: state.ratings,
     activity: state.activity,
     dailyReviewCounts: state.dailyReviewCounts,
+    activeSession: serializeActiveSession(),
   });
   if (localStorage.getItem(STORAGE_KEY) === value) return;
   localStorage.setItem(STORAGE_KEY, value);
@@ -1246,6 +1286,7 @@ function exitStudySession() {
   state.customQueue = [];
   state.customSimulated = false;
   state.flipped = false;
+  saveProgress();
   setActiveSurface("home");
 }
 
@@ -1543,6 +1584,7 @@ function rateCard(rating) {
     state.customQueue = [];
     state.customSimulated = false;
     renderProgress();
+    saveProgress();
     setActiveSurface("home");
     showToast(finishedMessage);
   }, 320);
@@ -1564,6 +1606,7 @@ function advanceSimulatedSession() {
     state.queueMode = null;
     state.customQueue = [];
     state.customSimulated = false;
+    saveProgress();
     setActiveSurface("home");
     showToast("Simulado concluído");
   }, 200);
@@ -2620,7 +2663,9 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   });
 }
 
-setActiveSurface("home");
+const resumedActiveSession = restoreActiveSession();
+setActiveSurface(resumedActiveSession ? "study" : "home");
+if (resumedActiveSession) showToast("Sessão retomada");
 void initializeCloudSync();
 
 const explicitTheme = document.documentElement.getAttribute("data-theme");
