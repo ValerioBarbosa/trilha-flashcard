@@ -152,6 +152,8 @@ const elements = {
   openStudySessionButton: document.querySelector("#open-study-session-button"),
   dashboardDialog: document.querySelector("#dashboard-dialog"),
   dashboardClose: document.querySelector("#dashboard-close"),
+  syncDataDialog: document.querySelector("#sync-data-dialog"),
+  syncDataClose: document.querySelector("#sync-data-close"),
   dashboardSummary: document.querySelector("#dashboard-summary"),
   metricReviewed: document.querySelector("#metric-reviewed"),
   metricTotal: document.querySelector("#metric-total"),
@@ -1639,6 +1641,16 @@ function closeDashboard() {
   elements.dashboardButton.focus();
 }
 
+function openSyncData() {
+  elements.syncDataDialog.showModal();
+  elements.syncDataDialog.scrollTop = 0;
+  elements.syncDataClose.focus();
+}
+
+function closeSyncData() {
+  if (elements.syncDataDialog.open) elements.syncDataDialog.close();
+}
+
 function startDueReview() {
   const due = getDueEntries();
   if (!due.length) return;
@@ -2478,8 +2490,7 @@ elements.homePlanNew.addEventListener("click", startHomeNewStudy);
 elements.homePlanWrong.addEventListener("click", startHomeWrongReview);
 elements.homeRecommended.addEventListener("click", () => openDeckFromHome(elements.homeRecommended.dataset.deckId));
 elements.homeCloudButton.addEventListener("click", () => {
-  if (cloudUser) void uploadCloudSnapshot({ notify: true });
-  else openDashboard();
+  openSyncData();
 });
 elements.primaryNav.addEventListener("click", (event) => {
   const button = event.target.closest("[data-home-nav]");
@@ -2499,7 +2510,7 @@ elements.homeMoreDialog.addEventListener("click", (event) => {
   if (event.target === elements.homeMoreDialog) closeHomeMore();
 });
 elements.homeMoreSession.addEventListener("click", () => { closeHomeMore(); openStudySession(); });
-elements.homeMoreSync.addEventListener("click", () => { closeHomeMore(); openDashboard(); });
+elements.homeMoreSync.addEventListener("click", () => { closeHomeMore(); openSyncData(); });
 elements.homeMoreTheme.addEventListener("click", () => { elements.themeToggle.click(); });
 elements.homeMoreInstall.addEventListener("click", () => { closeHomeMore(); openInstallDialog(); });
 elements.homeMoreProfile.addEventListener("click", () => { closeHomeMore(); elements.profileSwitchButton.click(); });
@@ -2529,6 +2540,10 @@ elements.studySessionClose.addEventListener("click", () => elements.studySession
 elements.studySessionForm.addEventListener("submit", buildCustomSession);
 elements.studySessionDiscipline.addEventListener("change", () => renderStudySessionTopicOptions());
 elements.dashboardClose.addEventListener("click", closeDashboard);
+elements.syncDataClose.addEventListener("click", closeSyncData);
+elements.syncDataDialog.addEventListener("click", (event) => {
+  if (event.target === elements.syncDataDialog) closeSyncData();
+});
 elements.reviewDue.addEventListener("click", startDueReview);
 elements.reviewWrong.addEventListener("click", startWrongReview);
 elements.dashboardDialog.addEventListener("click", (event) => {
