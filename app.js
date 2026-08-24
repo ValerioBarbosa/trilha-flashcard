@@ -269,6 +269,18 @@ const elements = {
   homeDeckSearch: document.querySelector("#home-deck-search"),
   homeDeckList: document.querySelector("#home-deck-list"),
   homeStudySessionButton: document.querySelector("#home-study-session-button"),
+  homePlanDue: document.querySelector("#home-plan-due"),
+  homePlanDueDetail: document.querySelector("#home-plan-due-detail"),
+  homePlanDueAction: document.querySelector("#home-plan-due-action"),
+  homePlanNew: document.querySelector("#home-plan-new"),
+  homePlanNewDetail: document.querySelector("#home-plan-new-detail"),
+  homePlanNewAction: document.querySelector("#home-plan-new-action"),
+  homePlanWrong: document.querySelector("#home-plan-wrong"),
+  homePlanWrongDetail: document.querySelector("#home-plan-wrong-detail"),
+  homePlanWrongAction: document.querySelector("#home-plan-wrong-action"),
+  homeRecommended: document.querySelector("#home-recommended"),
+  homeRecommendedDeck: document.querySelector("#home-recommended-deck"),
+  homeRecommendedTopic: document.querySelector("#home-recommended-topic"),
   primaryNav: document.querySelector(".mobile-primary-nav"),
   homeMoreDialog: document.querySelector("#home-more-dialog"),
   homeMoreClose: document.querySelector("#home-more-close"),
@@ -1011,6 +1023,68 @@ function deckAccent(index) {
   return ["blue", "violet", "green", "amber"][index % 4];
 }
 
+function getRecommendedFocus() {
+  const groups = new Map();
+  allCardEntries().forEach(({ deck, card, key }) => {
+    const topic = card.topic || "Revisão geral";
+    const groupKey = `${deck.id}::${topic}`;
+    const group = groups.get(groupKey) || {
+      deck,
+      topic,
+      total: 0,
+      pending: 0,
+      due: 0,
+      wrong: 0,
+      attempts: 0,
+      remembered: 0,
+    };
+    const rating = state.ratings[key];
+    group.total += 1;
+    if (!rating?.attempts) group.pending += 1;
+    if (isDue(rating, Date.now())) group.due += 1;
+    if (isWrong(rating)) group.wrong += 1;
+    group.attempts += rating?.attempts || 0;
+    group.remembered += rating?.remembered || 0;
+    groups.set(groupKey, group);
+  });
+
+  return [...groups.values()].sort((first, second) => {
+    const firstAccuracyGap = first.attempts ? 1 - (first.remembered / first.attempts) : 0;
+    const secondAccuracyGap = second.attempts ? 1 - (second.remembered / second.attempts) : 0;
+    const firstScore = first.wrong * 8 + first.due * 5 + first.pending * 2 + firstAccuracyGap * 4;
+    const secondScore = second.wrong * 8 + second.due * 5 + second.pending * 2 + secondAccuracyGap * 4;
+    return secondScore - firstScore || second.total - first.total;
+  })[0] || null;
+}
+
+function startHomeQueue(entries, mode, message, emptyMessage) {
+  if (!entries.length) {
+    showToast(emptyMessage);
+    return;
+  }
+  if (mode === "custom") {
+    state.customQueue = entries.slice(0, 20);
+    state.customSimulated = false;
+  }
+  state.queueMode = mode;
+  goToEntry(entries[0]);
+  setActiveSurface("study");
+  showToast(message);
+}
+
+function startHomeDueReview() {
+  startHomeQueue(getDueEntries(), "due", "Revisão do dia iniciada", "Revisões em dia");
+}
+
+function startHomeNewStudy() {
+  const entries = allCardEntries().filter(({ key }) => !state.ratings[key]?.attempts);
+  startHomeQueue(entries, "custom", "Estudo de novos cartões iniciado", "Nenhum cartão novo");
+}
+
+function startHomeWrongReview() {
+  startHomeQueue(getWrongEntries(), "wrong", "Reforço dos erros iniciado", "Nenhum erro pendente");
+}
+
 function renderHomeDashboard() {
   if (!elements.homeDashboard) return;
   const entries = allCardEntries();
@@ -1027,8 +1101,34 @@ function renderHomeDashboard() {
   const reviewTotal = dueCount || Math.min(newCount, 20);
   elements.homeContinueButton.disabled = entries.length === 0;
   elements.homeReviewEstimate.textContent = reviewTotal
-    ? `${reviewTotal} ${reviewTotal === 1 ? "cartão" : "cartões"} para revisar · ~${Math.max(2, Math.ceil(reviewTotal * 0.75))} min`
+    ? `${reviewTotal} ${reviewTotal === 1 ? "cartão selecionado" : "cartões selecionados"} · ~${Math.max(2, Math.ceil(reviewTotal * 0.75))} min`
     : "Tudo em dia — você pode estudar um baralho";
+  const newEntries = entries.filter(({ key }) => !state.ratings[key]?.attempts);
+  const wrongEntries = getWrongEntries();
+  elements.homePlanDue.classList.toggle("is-done", dueCount === 0);
+  elements.homePlanDueDetail.textContent = dueCount
+    ? `${dueCount} ${dueCount === 1 ? "cartão pendente" : "cartões pendentes"}`
+    : "Tudo em dia";
+  elements.homePlanDueAction.textContent = dueCount ? "Revisar" : "Concluído";
+  elements.homePlanNew.classList.toggle("is-done", newEntries.length === 0);
+  elements.homePlanNewDetail.textContent = newEntries.length
+    ? `${Math.min(newEntries.length, 20)} selecionados · ~${Math.max(2, Math.ceil(Math.min(newEntries.length, 20) * 0.75))} min`
+    : "Nenhum cartão novo";
+  elements.homePlanNewAction.textContent = newEntries.length ? "Começar" : "Concluído";
+  elements.homePlanWrong.classList.toggle("is-done", wrongEntries.length === 0);
+  elements.homePlanWrongDetail.textContent = wrongEntries.length
+    ? `${wrongEntries.length} ${wrongEntries.length === 1 ? "cartão para reforçar" : "cartões para reforçar"}`
+    : "Nenhum erro pendente";
+  elements.homePlanWrongAction.textContent = wrongEntries.length ? "Praticar" : "Concluído";
+
+  const recommended = getRecommendedFocus();
+  elements.homeRecommended.hidden = !recommended;
+  if (recommended) {
+    elements.homeRecommended.dataset.deckId = recommended.deck.id;
+    elements.homeRecommendedDeck.textContent = cleanDeckTitle(recommended.deck.title);
+    elements.homeRecommendedTopic.textContent = recommended.topic;
+  }
+
   const visibleDecks = getDecksForDisplay().filter((deck) => deck.cards.length > 0).filter((deck) => {
     if (!query) return true;
     const haystack = [deck.title, ...(deck.topics || []), ...deck.cards.flatMap((card) => [card.front, card.topic, card.tag])].join(" ").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -2251,6 +2351,10 @@ window.addEventListener("appinstalled", () => {
 elements.homeContinueButton.addEventListener("click", continueFromHome);
 elements.homeDeckSearch.addEventListener("input", renderHomeDashboard);
 elements.homeStudySessionButton.addEventListener("click", openStudySession);
+elements.homePlanDue.addEventListener("click", startHomeDueReview);
+elements.homePlanNew.addEventListener("click", startHomeNewStudy);
+elements.homePlanWrong.addEventListener("click", startHomeWrongReview);
+elements.homeRecommended.addEventListener("click", () => openDeckFromHome(elements.homeRecommended.dataset.deckId));
 elements.homeCloudButton.addEventListener("click", () => {
   if (cloudUser) void uploadCloudSnapshot({ notify: true });
   else openDashboard();

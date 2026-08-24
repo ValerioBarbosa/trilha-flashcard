@@ -46,5 +46,10 @@ describe("tela inicial orientada à revisão", () => {
     expect(app).toContain('setActiveSurface("decks")');
     expect(app).toContain('surface === "home" || surface === "decks"');
     expect(styles).toContain(".decks-active .home-hero");
+    expect(html).toContain('id="home-study-plan-title"');
+    expect(html).toContain('id="home-recommended"');
+    expect(app).toContain("function getRecommendedFocus()");
+    expect(app).toContain("function startHomeNewStudy()");
+    expect(styles).toContain(".home-active:not(.decks-active) .home-deck-toolbar");
   });
 });
