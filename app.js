@@ -1029,7 +1029,7 @@ function renderHomeDashboard() {
   elements.homeReviewEstimate.textContent = reviewTotal
     ? `${reviewTotal} ${reviewTotal === 1 ? "cartão" : "cartões"} para revisar · ~${Math.max(2, Math.ceil(reviewTotal * 0.75))} min`
     : "Tudo em dia — você pode estudar um baralho";
-  const visibleDecks = getDecksForDisplay().filter((deck) => {
+  const visibleDecks = getDecksForDisplay().filter((deck) => deck.cards.length > 0).filter((deck) => {
     if (!query) return true;
     const haystack = [deck.title, ...(deck.topics || []), ...deck.cards.flatMap((card) => [card.front, card.topic, card.tag])].join(" ").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     return haystack.includes(query);
