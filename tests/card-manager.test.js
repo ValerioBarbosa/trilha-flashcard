@@ -26,4 +26,19 @@ describe("organização do gerenciador de cartões", () => {
   it("faz busca sem depender de acentos", () => {
     expect(CardManager.organizeCards(cards, { query: "prescricao" }).filtered).toBe(2);
   });
+
+  it("detecta enunciados duplicados ignorando acentos, espaços e caixa", () => {
+    const repeated = [...cards, { front: "  PRAZO   PRESCRICIONAL ", back: "Outro", topic: "Prescrição" }];
+    expect([...CardManager.findDuplicateIndices(repeated)]).toEqual([0, 3]);
+    expect(CardManager.organizeCards(repeated, { duplicatesOnly: true }).filtered).toBe(2);
+  });
+
+  it("cria subgrupos por subassunto", () => {
+    const result = CardManager.organizeCards([
+      { front: "A", back: "1", topic: "Judiciário", subtopic: "Justiça do Trabalho" },
+      { front: "B", back: "2", topic: "Judiciário", subtopic: "STF" },
+      { front: "C", back: "3", topic: "Judiciário" },
+    ]);
+    expect(result.groups[0].subgroups.map((group) => group.name)).toEqual(["Justiça do Trabalho", "STF", "Geral"]);
+  });
 });

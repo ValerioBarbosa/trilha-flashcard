@@ -77,8 +77,31 @@ describe("persistência da sessão ativa", () => {
     expect(app).toContain("queueKeys: state.customQueue.map");
     expect(app).toContain('setActiveSurface(resumedActiveSession ? "study" : "home")');
     expect(app).toContain('showToast("Sessão retomada")');
-    expect(html).toContain("app.js?v=20260824-8");
-    expect(serviceWorker).toContain("trilha-flashcard-v30");
+    expect(html).toContain("app.js?v=20260824-9");
+    expect(serviceWorker).toContain("trilha-flashcard-v31");
+  });
+});
+
+describe("fluxos de segurança e produtividade", () => {
+  it("torna a sincronização diagnosticável e recuperável", () => {
+    ["cloud-account", "cloud-last-sync", "cloud-retry-button"].forEach((id) => expect(html).toContain(`id="${id}"`));
+    expect(app).toContain("function retryCloudSync()");
+    expect(app).toContain("function formatCloudTimestamp");
+  });
+
+  it("fecha a sessão com resultado e reforço dos erros", () => {
+    expect(html).toContain('id="session-complete-dialog"');
+    expect(html).toContain('id="session-complete-review-errors"');
+    expect(app).toContain("function completeStudySession");
+    expect(app).toContain("sessionWrongKeys");
+    expect(html).toContain("<option>50</option>");
+  });
+
+  it("oferece ações em massa, duplicados e relatório de importação", () => {
+    ["card-list-select-visible", "card-list-duplicates", "card-bulk-actions", "import-report-dialog"].forEach((id) => expect(html).toContain(`id="${id}"`));
+    expect(app).toContain("function moveSelectedCards");
+    expect(app).toContain("function deleteSelectedCards");
+    expect(app).toContain("function showImportReport");
   });
 });
 

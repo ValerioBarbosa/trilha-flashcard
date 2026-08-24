@@ -7,12 +7,28 @@
     return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   }
 
+  function duplicateKey(card) {
+    return normalize(card?.front).replace(/\s+/g, " ").trim();
+  }
+
+  function findDuplicateIndices(cards) {
+    const groups = new Map();
+    cards.forEach((card, index) => {
+      const key = duplicateKey(card);
+      if (!key) return;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(index);
+    });
+    return new Set([...groups.values()].filter((indices) => indices.length > 1).flat());
+  }
+
   function organizeCards(cards, filters = {}) {
     const query = normalize(filters.query).trim();
     const topic = filters.topic || "";
     const priority = filters.priority || "";
     const difficulty = filters.difficulty || "";
     const sort = filters.sort || "original";
+    const duplicateIndices = findDuplicateIndices(cards);
 
     const entries = cards.map((card, index) => ({
       card,
@@ -34,6 +50,7 @@
       && (!topic || entry.topic === topic)
       && (!priority || entry.card.priority === priority)
       && (!difficulty || entry.card.difficulty === difficulty)
+      && (!filters.duplicatesOnly || duplicateIndices.has(entry.index))
     ));
 
     const priorityRank = { A: 0, B: 1, C: 2 };
@@ -58,9 +75,22 @@
     return {
       total: cards.length,
       filtered: entries.length,
-      groups: [...grouped].map(([name, groupEntries]) => ({ name, entries: groupEntries })),
+      duplicateIndices,
+      groups: [...grouped].map(([name, groupEntries]) => {
+        const subgroups = new Map();
+        groupEntries.forEach((entry) => {
+          const subtopic = entry.card.subtopic || "Geral";
+          if (!subgroups.has(subtopic)) subgroups.set(subtopic, []);
+          subgroups.get(subtopic).push(entry);
+        });
+        return {
+          name,
+          entries: groupEntries,
+          subgroups: [...subgroups].map(([subtopic, subgroupEntries]) => ({ name: subtopic, entries: subgroupEntries })),
+        };
+      }),
     };
   }
 
-  return { normalize, organizeCards };
+  return { normalize, organizeCards, duplicateKey, findDuplicateIndices };
 });
