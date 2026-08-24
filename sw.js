@@ -1,4 +1,4 @@
-const CACHE_NAME = "trilha-flashcard-v29";
+const CACHE_NAME = "trilha-flashcard-v30";
 const CORE_ASSETS = [
   "./",
   "./index.html",
