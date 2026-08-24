@@ -55,13 +55,15 @@ describe("tela inicial orientada à revisão", () => {
 });
 
 
-test("sessão diária mantém fila e interface focada", () => {
-  assert.match(appSource, /function buildDailyQueue\(limit = 20\)/);
-  assert.match(appSource, /sessionTotal: 0/);
-  assert.match(appSource, /document\.body\.classList\.toggle\("study-active"/);
-  assert.match(appSource, /ratingActions\.hidden = inSimulatedSession \|\| !state\.flipped/);
-  assert.match(htmlSource, /id="study-exit-button"/);
-  assert.match(htmlSource, /id="study-session-header-count"/);
-  assert.match(cssSource, /\.study-active \.mobile-primary-nav/);
-  assert.match(cssSource, /grid-template-columns: repeat\(4, minmax\(0, 1fr\)\)/);
+describe("sessão diária focada", () => {
+  it("mantém fila, progresso e controles de estudo", () => {
+    expect(app).toContain("function buildDailyQueue(limit = 20)");
+    expect(app).toContain("sessionTotal: 0");
+    expect(app).toContain('document.body.classList.toggle("study-active"');
+    expect(app).toContain("ratingActions.hidden = inSimulatedSession || !state.flipped");
+    expect(html).toContain('id="study-exit-button"');
+    expect(html).toContain('id="study-session-header-count"');
+    expect(styles).toContain(".study-active .mobile-primary-nav");
+    expect(styles).toContain("grid-template-columns: repeat(4, minmax(0, 1fr))");
+  });
 });
