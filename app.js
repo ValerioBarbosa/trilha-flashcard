@@ -1070,7 +1070,10 @@ function setActiveSurface(surface) {
     if (selected) button.setAttribute("aria-current", "page");
     else button.removeAttribute("aria-current");
   });
-  if (showHome) renderHomeDashboard();
+  if (showHome) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    renderHomeDashboard();
+  }
 }
 
 function openDeckFromHome(deckId) {
