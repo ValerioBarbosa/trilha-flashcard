@@ -103,6 +103,6 @@
 if (typeof document !== "undefined") {
   const motionScript = document.createElement("script");
   motionScript.type = "module";
-  motionScript.src = "./motion-animations.js?v=20260822-1";
+  motionScript.src = "./motion-animations.js?v=20260824-1";
   document.head.append(motionScript);
 }
