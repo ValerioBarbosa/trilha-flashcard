@@ -476,7 +476,10 @@ function setCloudStatus(label, stateName = "local", detail = null) {
     elements.homeCloudStatus.textContent = label;
     elements.homeCloudButton.dataset.state = stateName;
   }
-  if (elements.cloudStatusCard) elements.cloudStatusCard.dataset.state = stateName;
+  if (elements.cloudStatusCard) {
+    elements.cloudStatusCard.dataset.state = stateName;
+    if (stateName !== "error") delete elements.cloudStatusCard.dataset.errorCode;
+  }
   if (elements.cloudRetryButton) elements.cloudRetryButton.hidden = stateName !== "error" || !cloudUser;
   if (detail) elements.cloudSyncDetail.textContent = detail;
   updateCloudMetaDisplay();
@@ -492,14 +495,55 @@ function writeCloudMeta(meta) {
   updateCloudMetaDisplay();
 }
 
+function cloudFailurePresentation(error) {
+  const code = CloudSync.firebaseErrorCode(error);
+  const failures = {
+    "permission-denied": {
+      label: "Permissão da nuvem bloqueada",
+      detail: "O Firestore recusou a gravação. As regras de acesso do projeto precisam permitir o documento desta conta.",
+    },
+    unauthenticated: {
+      label: "Sessão Google expirada",
+      detail: "Entre novamente com o Google para renovar a autorização da sincronização.",
+    },
+    "resource-exhausted": {
+      label: "Limite da nuvem atingido",
+      detail: "O Firebase recusou a gravação por limite de uso ou tamanho. Seus dados continuam neste aparelho.",
+    },
+    "invalid-argument": {
+      label: "Dados incompatíveis",
+      detail: "A nuvem recusou o formato dos dados. Baixe um backup antes de tentar novamente.",
+    },
+  };
+  return { code, ...(failures[code] || {
+    label: "Falha ao sincronizar",
+    detail: navigator.onLine
+      ? "A conexão com o Firebase foi interrompida. Tente novamente; seus dados continuam neste aparelho."
+      : "Sem internet. Seus dados serão enviados quando a conexão voltar.",
+  }) };
+}
+
+async function writeCloudSnapshotWithRetry(snapshot, options) {
+  try {
+    return await cloudAdapter.write(cloudUser.uid, snapshot, options);
+  } catch (error) {
+    if (!CloudSync.isRetryableError(error)) throw error;
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    return cloudAdapter.write(cloudUser.uid, snapshot, options);
+  }
+}
+
 async function retryCloudSync() {
   if (!cloudUser || !cloudAdapter) return;
   elements.cloudRetryButton.disabled = true;
   try {
+    await cloudAdapter.refreshAuth?.();
     await reconcileCloudData(cloudUser);
   } catch (error) {
     console.error("Falha ao tentar sincronizar novamente:", error);
-    setCloudStatus("Falha ao sincronizar", "error", "Confira a internet e tente novamente. Seus dados continuam neste aparelho.");
+    const failure = cloudFailurePresentation(error);
+    setCloudStatus(failure.label, "error", failure.detail);
+    elements.cloudStatusCard.dataset.errorCode = failure.code;
   } finally {
     elements.cloudRetryButton.disabled = false;
   }
@@ -524,7 +568,7 @@ async function uploadCloudSnapshot({ notify = false, force = false } = {}) {
     setCloudStatus("Sincronizando…", "syncing");
     const snapshot = CloudSync.createSnapshot(localStorage);
     const meta = readCloudMeta();
-    const updatedAtISO = await cloudAdapter.write(cloudUser.uid, snapshot, {
+    const updatedAtISO = await writeCloudSnapshotWithRetry(snapshot, {
       expectedUpdatedAtISO: meta.uid === cloudUser.uid ? meta.remoteUpdatedAtISO || null : null,
       force,
     });
@@ -547,7 +591,9 @@ async function uploadCloudSnapshot({ notify = false, force = false } = {}) {
       return;
     }
     console.error("Falha na sincronização:", error);
-    setCloudStatus("Falha ao sincronizar", "error", "Seus dados continuam seguros neste aparelho. Tente novamente quando estiver online.");
+    const failure = cloudFailurePresentation(error);
+    setCloudStatus(failure.label, "error", failure.detail);
+    elements.cloudStatusCard.dataset.errorCode = failure.code;
     if (notify) showToast("Não foi possível sincronizar agora");
   }
 }
@@ -630,7 +676,9 @@ async function initializeCloudSync() {
       try { await reconcileCloudData(user); }
       catch (error) {
         console.error("Falha ao verificar a nuvem:", error);
-        setCloudStatus("Nuvem indisponível", "error", "Seus dados continuam seguros neste aparelho.");
+        const failure = cloudFailurePresentation(error);
+        setCloudStatus(failure.label, "error", failure.detail);
+        elements.cloudStatusCard.dataset.errorCode = failure.code;
       }
     });
   } catch (error) {
@@ -2912,7 +2960,7 @@ document.addEventListener("keydown", (event) => {
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("sw.js?v=20260824-1", { updateViaCache: "none" })
+      .register("sw.js?v=20260824-2", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {});
   });

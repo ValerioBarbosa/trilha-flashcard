@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import CloudSync from "../cloud-sync.js";
 
-const { applySnapshot, createFirebaseAdapter, createSnapshot, hasStudyData, isSyncableKey, reconciliationAction, snapshotFingerprint } = CloudSync;
+const { applySnapshot, createFirebaseAdapter, createSnapshot, firebaseErrorCode, hasStudyData, isRetryableError, isSyncableKey, reconciliationAction, snapshotFingerprint } = CloudSync;
 
 function memoryStorage(initial = {}) {
   const data = new Map(Object.entries(initial));
@@ -20,6 +20,21 @@ describe("cloud sync", () => {
     const adapterSource = createFirebaseAdapter.toString();
     expect(adapterSource).toContain("signInWithPopup");
     expect(adapterSource).not.toContain("signInWithRedirect");
+  });
+
+  it("ativa detecção automática de long polling para Safari e redes móveis", () => {
+    const adapterSource = createFirebaseAdapter.toString();
+    expect(adapterSource).toContain("initializeFirestore");
+    expect(adapterSource).toContain("experimentalAutoDetectLongPolling: true");
+    expect(adapterSource).toContain("getDocFromServer");
+    expect(adapterSource).toContain("getIdToken(true)");
+  });
+
+  it("classifica falhas transitórias sem repetir erros permanentes", () => {
+    expect(firebaseErrorCode({ code: "firestore/permission-denied" })).toBe("permission-denied");
+    expect(firebaseErrorCode({ code: "auth/network-request-failed" })).toBe("network-request-failed");
+    expect(isRetryableError({ code: "firestore/unavailable" })).toBe(true);
+    expect(isRetryableError({ code: "firestore/permission-denied" })).toBe(false);
   });
 
   it("exporta apenas dados de estudo e exclui preferências locais", () => {

@@ -77,8 +77,8 @@ describe("persistência da sessão ativa", () => {
     expect(app).toContain("queueKeys: state.customQueue.map");
     expect(app).toContain('setActiveSurface(resumedActiveSession ? "study" : "home")');
     expect(app).toContain('showToast("Sessão retomada")');
-    expect(html).toContain("app.js?v=20260824-9");
-    expect(serviceWorker).toContain("trilha-flashcard-v31");
+    expect(html).toContain("app.js?v=20260824-10");
+    expect(serviceWorker).toContain("trilha-flashcard-v32");
   });
 });
 
@@ -87,6 +87,8 @@ describe("fluxos de segurança e produtividade", () => {
     ["cloud-account", "cloud-last-sync", "cloud-retry-button"].forEach((id) => expect(html).toContain(`id="${id}"`));
     expect(app).toContain("function retryCloudSync()");
     expect(app).toContain("function formatCloudTimestamp");
+    expect(app).toContain("function cloudFailurePresentation");
+    expect(app).toContain("function writeCloudSnapshotWithRetry");
   });
 
   it("fecha a sessão com resultado e reforço dos erros", () => {

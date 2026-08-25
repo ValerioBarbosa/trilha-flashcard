@@ -65,6 +65,17 @@
     ));
   }
 
+  function firebaseErrorCode(error) {
+    return String(error?.code || error?.message || "unknown")
+      .replace(/^firestore\//, "")
+      .replace(/^auth\//, "");
+  }
+
+  function isRetryableError(error) {
+    return ["aborted", "cancelled", "deadline-exceeded", "internal", "network-request-failed", "unavailable", "unknown"]
+      .includes(firebaseErrorCode(error));
+  }
+
   async function createFirebaseAdapter(config) {
     if (!config?.apiKey || !config?.projectId || !config?.appId) throw new Error("firebase-not-configured");
     const version = "10.14.1";
@@ -75,7 +86,9 @@
     ]);
     const app = initializeApp(config);
     const auth = authApi.getAuth(app);
-    const db = firestoreApi.getFirestore(app);
+    const db = firestoreApi.initializeFirestore(app, {
+      experimentalAutoDetectLongPolling: true,
+    });
     const provider = new authApi.GoogleAuthProvider();
 
     return {
@@ -84,24 +97,33 @@
         return authApi.signInWithPopup(auth, provider);
       },
       signOut() { return authApi.signOut(auth); },
+      async refreshAuth() {
+        if (!auth.currentUser) throw new Error("unauthenticated");
+        await auth.currentUser.getIdToken(true);
+      },
       async read(uid) {
-        const result = await firestoreApi.getDoc(firestoreApi.doc(db, "flashcardUsers", uid));
+        const reference = firestoreApi.doc(db, "flashcardUsers", uid);
+        const result = firestoreApi.getDocFromServer
+          ? await firestoreApi.getDocFromServer(reference)
+          : await firestoreApi.getDoc(reference);
         return result.exists() ? result.data() : null;
       },
       async write(uid, snapshot, { expectedUpdatedAtISO = null, force = false } = {}) {
         const reference = firestoreApi.doc(db, "flashcardUsers", uid);
-        const updatedAtISO = `${new Date().toISOString()}:${crypto.randomUUID()}`;
+        const updatedAtISO = new Date().toISOString();
+        const payload = {
+          ownerUid: uid,
+          snapshot,
+          updatedAt: firestoreApi.serverTimestamp(),
+          updatedAtISO,
+        };
+
         await firestoreApi.runTransaction(db, async (transaction) => {
           const current = await transaction.get(reference);
           const currentToken = current.exists() ? current.data().updatedAtISO || null : null;
           if (!force && currentToken !== expectedUpdatedAtISO) throw new Error("cloud-conflict");
-          transaction.set(reference, {
-            ownerUid: uid,
-            snapshot,
-            updatedAt: firestoreApi.serverTimestamp(),
-            updatedAtISO,
-          });
-        });
+          transaction.set(reference, payload);
+        }, { maxAttempts: 3 });
         return updatedAtISO;
       },
     };
@@ -113,6 +135,8 @@
     createSnapshot,
     hasStudyData,
     isSyncableKey,
+    firebaseErrorCode,
+    isRetryableError,
     reconciliationAction,
     snapshotFingerprint,
   };
