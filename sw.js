@@ -1,4 +1,4 @@
-const CACHE_NAME = "trilha-flashcard-v32";
+const CACHE_NAME = "trilha-flashcard-v33";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -14,7 +14,7 @@ const CORE_ASSETS = [
   "./vendor/pdf.worker.mjs?v=4.10.38",
   "./decks.js?v=20260820-2",
   "./spaced-repetition.js?v=20260823-1",
-  "./motion-animations.js?v=20260823-1",
+  "./motion-animations.js?v=20260824-1",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",

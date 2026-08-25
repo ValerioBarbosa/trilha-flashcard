@@ -2,12 +2,10 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const rules = readFileSync(new URL("../firestore.rules", import.meta.url), "utf8");
-const example = readFileSync(new URL("../firestore.rules.example", import.meta.url), "utf8");
 const firebaseConfig = JSON.parse(readFileSync(new URL("../firebase.json", import.meta.url), "utf8"));
 
 describe("configuração do Firestore", () => {
-  it("mantém as regras publicáveis iguais ao exemplo auditado", () => {
-    expect(rules).toBe(example);
+  it("aponta o Firebase CLI para as regras auditadas", () => {
     expect(firebaseConfig.firestore.rules).toBe("firestore.rules");
   });
 

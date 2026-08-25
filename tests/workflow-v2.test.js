@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const app = readFileSync(new URL("../app.js", import.meta.url), "utf8");
 const serviceWorker = readFileSync(new URL("../sw.js", import.meta.url), "utf8");
+const spacedRepetition = readFileSync(new URL("../spaced-repetition.js", import.meta.url), "utf8");
 const styles = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
 
 describe("fluxo de estudo v2", () => {
@@ -78,7 +79,9 @@ describe("persistência da sessão ativa", () => {
     expect(app).toContain('setActiveSurface(resumedActiveSession ? "study" : "home")');
     expect(app).toContain('showToast("Sessão retomada")');
     expect(html).toContain("app.js?v=20260824-10");
-    expect(serviceWorker).toContain("trilha-flashcard-v32");
+    expect(serviceWorker).toContain("trilha-flashcard-v33");
+    expect(serviceWorker).toContain("motion-animations.js?v=20260824-1");
+    expect(spacedRepetition).toContain("motion-animations.js?v=20260824-1");
   });
 });
 

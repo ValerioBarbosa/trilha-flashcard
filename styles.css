@@ -2308,12 +2308,6 @@ kbd {
   letter-spacing: -.025em;
 }
 
-.home-subtitle {
-  margin: 14px 0 0;
-  color: #b9c8df;
-  font-size: .96rem;
-}
-
 .home-cloud-chip {
   display: inline-flex;
   flex: 0 0 auto;
@@ -2777,7 +2771,6 @@ kbd {
   .home-dashboard { width: 100%; margin: 16px auto 96px; }
   .home-hero { margin: 0 -14px; border-radius: 0; padding: 28px 18px 78px; }
   .home-hero h1 { max-width: 330px; font-size: 3rem; }
-  .home-subtitle { max-width: 320px; font-size: .84rem; }
   .home-cloud-chip { min-width: 42px; width: 42px; padding: 0; justify-content: center; }
   .home-cloud-chip span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .today-focus { width: calc(100% - 12px); padding: 18px 14px; }
