@@ -62,11 +62,17 @@ Edições em baralhos por disciplina ficam salvas no navegador (via `localStorag
 
 1. Crie um projeto no Firebase e um aplicativo Web.
 2. Ative **Authentication > Google**.
-3. Crie o banco **Cloud Firestore** e publique as regras de `firestore.rules.example`.
+3. Crie o banco **Cloud Firestore** e publique `firestore.rules` (o `firebase.json` já aponta para esse arquivo).
 4. Adicione `valeriobarbosa.github.io` aos domínios autorizados do Authentication.
 5. Copie a configuração Web para `firebase-config.js`, substituindo `null` pelo objeto `firebaseConfig`.
 
 Os documentos ficam em `flashcardUsers/{uid}`. As regras permitem que cada usuário leia e altere somente o próprio documento. Na primeira conexão, os dados locais são enviados automaticamente se a nuvem estiver vazia. Se existirem duas versões, o aplicativo exige uma escolha antes de substituir qualquer dado.
+
+Para publicar as regras pelo Firebase CLI:
+
+```bash
+firebase deploy --only firestore:rules --project trilha-flashcard
+```
 
 ## Importar seu próprio baralho
 
