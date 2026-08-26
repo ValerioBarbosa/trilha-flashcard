@@ -5,6 +5,8 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function createCloudSyncApi() {
   const SYNC_PREFIXES = ["trilha-flashcard-"];
   const EXCLUDED_KEYS = new Set(["trilha-flashcard-theme", "trilha-flashcard-cloud-meta"]);
+  const CLOUD_SNAPSHOT_VERSION = 2;
+  const DEFAULT_CHUNK_BYTES = 240000;
 
   function isSyncableKey(key) {
     return SYNC_PREFIXES.some((prefix) => key.startsWith(prefix)) && !EXCLUDED_KEYS.has(key);
@@ -47,6 +49,44 @@
       hash = Math.imul(hash, 16777619);
     }
     return (hash >>> 0).toString(16).padStart(8, "0");
+  }
+
+  function splitUtf8(value, maxBytes = DEFAULT_CHUNK_BYTES) {
+    const text = String(value || "");
+    if (!text) return [""];
+    const encoder = new TextEncoder();
+    const chunks = [];
+    let current = "";
+    let currentBytes = 0;
+    for (const character of text) {
+      const size = encoder.encode(character).length;
+      if (current && currentBytes + size > maxBytes) {
+        chunks.push(current);
+        current = "";
+        currentBytes = 0;
+      }
+      current += character;
+      currentBytes += size;
+    }
+    if (current || !chunks.length) chunks.push(current);
+    return chunks;
+  }
+
+  function serializeSnapshotChunks(snapshot, maxBytes = DEFAULT_CHUNK_BYTES) {
+    return splitUtf8(JSON.stringify(snapshot), maxBytes);
+  }
+
+  function deserializeSnapshotChunks(chunks) {
+    try {
+      const snapshot = JSON.parse((chunks || []).join(""));
+      if (!snapshot || snapshot.version !== 1 || typeof snapshot.entries !== "object") {
+        throw new Error("invalid-cloud-snapshot");
+      }
+      return snapshot;
+    } catch (error) {
+      if (error?.message === "invalid-cloud-snapshot") throw error;
+      throw new Error("invalid-cloud-snapshot", { cause: error });
+    }
   }
 
   function reconciliationAction({ local, remote, meta, uid }) {
@@ -106,23 +146,52 @@
         const result = firestoreApi.getDocFromServer
           ? await firestoreApi.getDocFromServer(reference)
           : await firestoreApi.getDoc(reference);
-        return result.exists() ? result.data() : null;
+        if (!result.exists()) return null;
+        const remote = result.data();
+        if (remote.snapshot) return remote;
+        if (remote.snapshotVersion !== CLOUD_SNAPSHOT_VERSION || !Number.isInteger(remote.chunkCount) || remote.chunkCount < 1) {
+          throw new Error("invalid-cloud-snapshot");
+        }
+        const chunkReads = Array.from({ length: remote.chunkCount }, (_, index) => {
+          const chunkReference = firestoreApi.doc(db, "flashcardUsers", uid, "chunks", String(index).padStart(5, "0"));
+          return firestoreApi.getDocFromServer
+            ? firestoreApi.getDocFromServer(chunkReference)
+            : firestoreApi.getDoc(chunkReference);
+        });
+        const chunks = await Promise.all(chunkReads);
+        if (chunks.some((chunk) => !chunk.exists())) throw new Error("invalid-cloud-snapshot");
+        return {
+          ...remote,
+          snapshot: deserializeSnapshotChunks(chunks.map((chunk) => chunk.data().data)),
+        };
       },
       async write(uid, snapshot, { expectedUpdatedAtISO = null, force = false } = {}) {
         const reference = firestoreApi.doc(db, "flashcardUsers", uid);
         const updatedAtISO = new Date().toISOString();
+        const chunks = serializeSnapshotChunks(snapshot);
         const payload = {
           ownerUid: uid,
-          snapshot,
+          snapshotVersion: CLOUD_SNAPSHOT_VERSION,
+          chunkCount: chunks.length,
           updatedAt: firestoreApi.serverTimestamp(),
           updatedAtISO,
         };
 
         await firestoreApi.runTransaction(db, async (transaction) => {
           const current = await transaction.get(reference);
-          const currentToken = current.exists() ? current.data().updatedAtISO || null : null;
+          const currentData = current.exists() ? current.data() : null;
+          const currentToken = currentData?.updatedAtISO || null;
           if (!force && currentToken !== expectedUpdatedAtISO) throw new Error("cloud-conflict");
           transaction.set(reference, payload);
+          chunks.forEach((data, index) => {
+            const chunkReference = firestoreApi.doc(db, "flashcardUsers", uid, "chunks", String(index).padStart(5, "0"));
+            transaction.set(chunkReference, { ownerUid: uid, index, data, updatedAtISO });
+          });
+          const previousChunkCount = Number.isInteger(currentData?.chunkCount) ? currentData.chunkCount : 0;
+          for (let index = chunks.length; index < previousChunkCount; index += 1) {
+            const staleReference = firestoreApi.doc(db, "flashcardUsers", uid, "chunks", String(index).padStart(5, "0"));
+            transaction.delete(staleReference);
+          }
         }, { maxAttempts: 3 });
         return updatedAtISO;
       },
@@ -133,11 +202,13 @@
     applySnapshot,
     createFirebaseAdapter,
     createSnapshot,
+    deserializeSnapshotChunks,
     hasStudyData,
     isSyncableKey,
     firebaseErrorCode,
     isRetryableError,
     reconciliationAction,
+    serializeSnapshotChunks,
     snapshotFingerprint,
   };
 });

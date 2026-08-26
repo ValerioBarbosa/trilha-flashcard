@@ -1,29 +1,38 @@
 const THEME_STORAGE_KEY = "trilha-flashcard-theme";
-const { dateKey, cardKey: buildCardKey, computeNextRating, isDue, isWrong, getStudyStreak: computeStudyStreak } = SpacedRepetition;
+const { dateKey, computeNextRating, isDue, isWrong, getStudyStreak: computeStudyStreak } = SpacedRepetition;
 
 const PROFILES_KEY = "trilha-flashcard-profiles";
 const ACTIVE_PROFILE_KEY = "trilha-flashcard-active-profile";
 const DEFAULT_PROFILE_ID = CardStorage.DEFAULT_PROFILE_ID;
 const DEFAULT_PROFILE_NAME = "TRT-4 · AJAJ";
 const PROFILE_PRESETS = ["SEFAZ-RS", "Receita Federal", "ABIN"];
+const DEFAULT_PROFILE = {
+  id: DEFAULT_PROFILE_ID,
+  name: DEFAULT_PROFILE_NAME,
+  builtin: true,
+  role: "Analista Judiciário · Área Judiciária",
+  board: "FCC",
+  editalYear: "2026",
+};
 
 function loadProfileList() {
   try {
     const value = JSON.parse(localStorage.getItem(PROFILES_KEY) || "[]");
-    return Array.isArray(value)
-      ? value.filter((profile) => profile && typeof profile.id === "string" && typeof profile.name === "string")
-      : [];
+    return Array.isArray(value) ? value.map(DataModel.sanitizeProfile).filter(Boolean) : [];
   } catch {
     return [];
   }
 }
 
 function saveProfileList(profiles) {
-  localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
+  const value = JSON.stringify(profiles.map(DataModel.sanitizeProfile).filter(Boolean));
+  localStorage.setItem(PROFILES_KEY, value);
+  void CardDatabase.persistEntries([[PROFILES_KEY, value]]).catch((error) => console.warn("Falha ao salvar perfis", error));
+  markCloudDirty();
 }
 
 function getAllProfiles() {
-  return [{ id: DEFAULT_PROFILE_ID, name: DEFAULT_PROFILE_NAME, builtin: true }, ...loadProfileList()];
+  return [DEFAULT_PROFILE, ...loadProfileList()];
 }
 
 function getActiveProfileId() {
@@ -46,6 +55,8 @@ const decks = activeProfileId === DEFAULT_PROFILE_ID
 
 function switchToProfile(profileId) {
   localStorage.setItem(ACTIVE_PROFILE_KEY, profileId);
+  void CardDatabase.persistEntries([[ACTIVE_PROFILE_KEY, profileId]]).catch((error) => console.warn("Falha ao salvar perfil ativo", error));
+  markCloudDirty();
   location.reload();
 }
 
@@ -58,7 +69,7 @@ function slugify(value) {
     .replace(/^-+|-+$/g, "");
 }
 
-function createProfile(name) {
+function createProfile(name, metadata = {}) {
   const trimmed = name.trim();
   if (!trimmed) return null;
   const profiles = loadProfileList();
@@ -70,22 +81,39 @@ function createProfile(name) {
     id = `${baseId}-${suffix}`;
     suffix += 1;
   }
-  const profile = { id, name: trimmed, builtin: false };
+  const profile = DataModel.sanitizeProfile({
+    id,
+    name: trimmed,
+    builtin: false,
+    role: metadata.role,
+    board: metadata.board,
+    editalYear: metadata.editalYear,
+  });
   saveProfileList([...profiles, profile]);
   return profile;
 }
 
-function deleteProfile(profileId) {
+async function deleteProfile(profileId) {
   if (profileId === DEFAULT_PROFILE_ID) return;
-  [
-    scopedKey("trilha-flashcard-state", profileId),
-    scopedKey("trilha-flashcard-trash", profileId),
-    `${CardStorage.CUSTOM_DECKS_KEY}::${profileId}`,
-  ].forEach((key) => localStorage.removeItem(key));
-  saveProfileList(loadProfileList().filter((profile) => profile.id !== profileId));
-  if (getActiveProfileId() === profileId) {
-    localStorage.setItem(ACTIVE_PROFILE_KEY, DEFAULT_PROFILE_ID);
+  const wasActive = localStorage.getItem(ACTIVE_PROFILE_KEY) === profileId;
+  const scope = CardStorage.profileStorageScope(profileId);
+  const localKeys = [];
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (key && scope.prefixes.some((prefix) => key.startsWith(prefix))) localKeys.push(key);
   }
+  const keys = [...new Set([...scope.exactKeys, ...localKeys])];
+  keys.forEach((key) => localStorage.removeItem(key));
+  await Promise.all([
+    CardDatabase.deleteEntries(keys),
+    CardDatabase.deleteByPrefixes(scope.prefixes),
+  ]);
+  saveProfileList(loadProfileList().filter((profile) => profile.id !== profileId));
+  if (wasActive) {
+    localStorage.setItem(ACTIVE_PROFILE_KEY, DEFAULT_PROFILE_ID);
+    await CardDatabase.persistEntries([[ACTIVE_PROFILE_KEY, DEFAULT_PROFILE_ID]]);
+  }
+  markCloudDirty();
 }
 
 function persistDeckCards(deck) {
@@ -106,6 +134,8 @@ function persistDeckCards(deck) {
     }
   });
 })();
+
+const cardIdentityMigration = DataModel.ensureDeckCardIds(decks);
 
 const elements = {
   deckSelect: document.querySelector("#deck-select"),
@@ -283,6 +313,7 @@ const elements = {
   newDisciplineDialog: document.querySelector("#new-discipline-dialog"),
   newDisciplineClose: document.querySelector("#new-discipline-close"),
   newDisciplineName: document.querySelector("#new-discipline-name"),
+  newDisciplineWeight: document.querySelector("#new-discipline-weight"),
   newDisciplineTopics: document.querySelector("#new-discipline-topics"),
   newDisciplineCancel: document.querySelector("#new-discipline-cancel"),
   newDisciplineSave: document.querySelector("#new-discipline-save"),
@@ -292,6 +323,9 @@ const elements = {
   profileList: document.querySelector("#profile-list"),
   profilePresets: document.querySelector("#profile-presets"),
   profileNewName: document.querySelector("#profile-new-name"),
+  profileNewRole: document.querySelector("#profile-new-role"),
+  profileNewBoard: document.querySelector("#profile-new-board"),
+  profileNewYear: document.querySelector("#profile-new-year"),
   profileNewCreate: document.querySelector("#profile-new-create"),
   homeDashboard: document.querySelector("#home-dashboard"),
   homeGreeting: document.querySelector("#home-greeting"),
@@ -304,6 +338,7 @@ const elements = {
   homeReviewEstimate: document.querySelector("#home-review-estimate"),
   homeDeckSearch: document.querySelector("#home-deck-search"),
   homeDeckList: document.querySelector("#home-deck-list"),
+  homeProfileSummary: document.querySelector("#home-profile-summary"),
   homeStudySessionButton: document.querySelector("#home-study-session-button"),
   homePlanDue: document.querySelector("#home-plan-due"),
   homePlanDueDetail: document.querySelector("#home-plan-due-detail"),
@@ -398,6 +433,7 @@ function loadSavedState() {
 }
 
 const savedState = loadSavedState();
+DataModel.migrateStudyState(savedState, cardIdentityMigration.keyMap);
 const state = {
   deckId: savedState.deckId && decks.some((deck) => deck.id === savedState.deckId)
     ? savedState.deckId
@@ -730,7 +766,7 @@ function currentCard() {
 }
 
 function cardKey(deck, card) {
-  return buildCardKey(deck.id, card.front);
+  return DataModel.ratingKey(deck.id, card);
 }
 
 function currentCardKey() {
@@ -759,6 +795,7 @@ function getDeckStats(deck, cards = deck.cards) {
 }
 
 function getDeckWeight(deck) {
+  if (Number.isFinite(Number(deck.weight))) return Number(deck.weight);
   const match = deck.title.match(/·\s*([\d,]+)\s*%/);
   return match ? parseFloat(match[1].replace(",", ".")) : null;
 }
@@ -1303,7 +1340,7 @@ function renderHomeDashboard() {
     elements.homeRecommendedTopic.textContent = recommended.topic;
   }
 
-  const visibleDecks = getDecksForDisplay().filter((deck) => deck.cards.length > 0).filter((deck) => {
+  const visibleDecks = getDecksForDisplay().filter((deck) => {
     if (!query) return true;
     const haystack = [deck.title, ...(deck.topics || []), ...deck.cards.flatMap((card) => [card.front, card.topic, card.tag])].join(" ").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     return haystack.includes(query);
@@ -1314,20 +1351,24 @@ function renderHomeDashboard() {
     const fresh = deck.cards.filter((card) => !state.ratings[cardKey(deck, card)]?.attempts).length;
     const pending = due || fresh;
     const progress = deck.cards.length ? Math.round((stats.reviewed / deck.cards.length) * 100) : 0;
+    const weight = getDeckWeight(deck);
+    const details = deck.cards.length
+      ? `${deck.cards.length} ${deck.cards.length === 1 ? "cartão" : "cartões"} · <em>${pending} para revisar</em>`
+      : `${deck.topics?.length || 0} assuntos cadastrados · pronta para cartões`;
     return `
       <button class="home-deck-row ${deck.id === state.deckId ? "is-active" : ""}" type="button" data-home-deck="${escapeHtml(deck.id)}">
         <span class="home-deck-icon is-${deckAccent(index)}" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4Z"/><path d="m4 12 8 4 8-4M4 17l8 4 8-4"/></svg>
         </span>
         <span class="home-deck-copy">
-          <strong>${escapeHtml(cleanDeckTitle(deck.title))}</strong>
-          <small>${deck.cards.length} ${deck.cards.length === 1 ? "cartão" : "cartões"} · <em>${pending} para revisar</em></small>
+          <strong>${escapeHtml(cleanDeckTitle(deck.title))}${weight !== null ? ` <span class="home-deck-weight">${String(weight).replace(".", ",")}%</span>` : ""}</strong>
+          <small>${details}</small>
           <span class="home-deck-progress" aria-hidden="true"><i style="width:${progress}%"></i></span>
         </span>
         <svg class="home-deck-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
       </button>
     `;
-  }).join("") : '<p class="home-deck-empty">Nenhum baralho encontrado.</p>';
+  }).join("") : '<p class="home-deck-empty">Nenhuma matéria encontrada.</p>';
   elements.homeDeckList.querySelectorAll("[data-home-deck]").forEach((button) => {
     button.addEventListener("click", () => openDeckFromHome(button.dataset.homeDeck));
   });
@@ -1516,7 +1557,12 @@ function getActiveProfile() {
 }
 
 function renderProfileSwitchButton() {
-  elements.profileSwitchButton.textContent = getActiveProfile().name;
+  const profile = getActiveProfile();
+  const summary = DataModel.profileSummary(profile);
+  elements.profileSwitchButton.textContent = profile.name;
+  if (elements.homeProfileSummary) {
+    elements.homeProfileSummary.textContent = summary || "Disciplinas e cartões do perfil ativo";
+  }
 }
 
 function renderProfilesDialog() {
@@ -1524,8 +1570,8 @@ function renderProfilesDialog() {
   elements.profileList.innerHTML = profiles.map((profile) => `
     <article class="profile-row ${profile.id === activeProfileId ? "is-active" : ""}">
       <span class="profile-row-name">
-        ${escapeHtml(profile.name)}
-        ${profile.id === activeProfileId ? '<span class="profile-row-badge">ATIVO</span>' : ""}
+        <strong>${escapeHtml(profile.name)} ${profile.id === activeProfileId ? '<span class="profile-row-badge">ATIVO</span>' : ""}</strong>
+        ${DataModel.profileSummary(profile) ? `<small>${escapeHtml(DataModel.profileSummary(profile))}</small>` : ""}
       </span>
       <span class="profile-row-actions">
         ${profile.id === activeProfileId ? "" : `<button type="button" class="data-button" data-activate-profile="${escapeHtml(profile.id)}">Ativar</button>`}
@@ -1538,12 +1584,12 @@ function renderProfilesDialog() {
     button.addEventListener("click", () => switchToProfile(button.dataset.activateProfile));
   });
   elements.profileList.querySelectorAll("[data-delete-profile]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       const profile = profiles.find((entry) => entry.id === button.dataset.deleteProfile);
       if (!profile) return;
       if (!window.confirm(`Excluir o perfil "${profile.name}"? Todas as disciplinas, cartões e o desempenho dele serão apagados.`)) return;
       const wasActive = profile.id === activeProfileId;
-      deleteProfile(profile.id);
+      await deleteProfile(profile.id);
       if (wasActive) {
         location.reload();
         return;
@@ -1566,6 +1612,9 @@ function renderProfilesDialog() {
 
 function openProfilesDialog() {
   elements.profileNewName.value = "";
+  elements.profileNewRole.value = "";
+  elements.profileNewBoard.value = "";
+  elements.profileNewYear.value = "";
   renderProfilesDialog();
   elements.profilesDialog.showModal();
   elements.profilesDialog.scrollTop = 0;
@@ -1578,7 +1627,16 @@ function closeProfilesDialog() {
 }
 
 function createProfileAndActivate() {
-  const profile = createProfile(elements.profileNewName.value);
+  const year = elements.profileNewYear.value.trim();
+  if (year && !/^\d{4}$/.test(year)) {
+    showToast("Informe o ano do edital com quatro números");
+    return;
+  }
+  const profile = createProfile(elements.profileNewName.value, {
+    role: elements.profileNewRole.value,
+    board: elements.profileNewBoard.value,
+    editalYear: year,
+  });
   if (!profile) {
     showToast("Informe o nome do novo perfil");
     return;
@@ -1588,6 +1646,7 @@ function createProfileAndActivate() {
 
 function openNewDisciplineDialog() {
   elements.newDisciplineName.value = "";
+  elements.newDisciplineWeight.value = "";
   elements.newDisciplineTopics.value = "";
   elements.newDisciplineDialog.showModal();
   elements.newDisciplineDialog.scrollTop = 0;
@@ -1620,7 +1679,15 @@ function createNewDiscipline() {
     suffix += 1;
   }
 
-  const deck = { id, title: name, custom: true, topics, cards: [] };
+  const weightValue = Number(String(elements.newDisciplineWeight.value).replace(",", "."));
+  const deck = {
+    id,
+    title: name,
+    custom: true,
+    topics,
+    cards: [],
+    ...(Number.isFinite(weightValue) && weightValue > 0 ? { weight: weightValue } : {}),
+  };
   decks.push(deck);
   persistDeckCards(deck);
   state.deckId = deck.id;
@@ -1984,6 +2051,10 @@ async function importProgress(file) {
           }
           if (deck && Array.isArray(savedDeck.cards)) deck.cards = savedDeck.cards;
         });
+        const migration = DataModel.ensureDeckCardIds(decks);
+        const importedState = { ratings: state.ratings };
+        DataModel.migrateStudyState(importedState, migration.keyMap);
+        state.ratings = importedState.ratings;
         const entries = deckStorage.persistDecks(decks, decks);
         await CardDatabase.persistEntries([...entries]);
       }
@@ -2006,7 +2077,7 @@ function removeCustomDeck(deckId) {
 
   decks.splice(decks.indexOf(deck), 1);
   deck.cards.forEach((card) => {
-    delete state.ratings[buildCardKey(deck.id, card.front)];
+    delete state.ratings[cardKey(deck, card)];
   });
   persistDeckCards(deck);
 
@@ -2189,8 +2260,8 @@ function moveSelectedCards() {
   indices.forEach((index) => {
     const [card] = sourceDeck.cards.splice(index, 1);
     if (!card) return;
-    const oldKey = buildCardKey(sourceDeck.id, card.front);
-    const newKey = buildCardKey(targetDeck.id, card.front);
+    const oldKey = cardKey(sourceDeck, card);
+    const newKey = cardKey(targetDeck, card);
     if (state.ratings[oldKey]) {
       state.ratings[newKey] = state.ratings[oldKey];
       delete state.ratings[oldKey];
@@ -2225,7 +2296,7 @@ function deleteSelectedCards() {
   indices.forEach((index) => {
     const [card] = deck.cards.splice(index, 1);
     if (!card) return;
-    delete state.ratings[buildCardKey(deck.id, card.front)];
+    delete state.ratings[cardKey(deck, card)];
     trash.push({ id: `${Date.now()}-${index}-${Math.random()}`, deckId: deck.id, index, card, deletedAt: new Date().toISOString() });
   });
   persistTrash();
@@ -2373,6 +2444,7 @@ function buildCardFromForm() {
   if (!front || !back || !disciplineId || !topic) return null;
 
   const card = {
+    id: DataModel.createId("card"),
     front,
     back,
     topic,
@@ -2430,8 +2502,9 @@ function handleCardFormSubmit(event) {
       showToast("Cartão original não encontrado");
       return;
     }
-    const previousKey = buildCardKey(sourceDeck.id, previousCard.front);
-    const newKey = buildCardKey(targetDeck.id, newCard.front);
+    newCard.id = previousCard.id || newCard.id;
+    const previousKey = cardKey(sourceDeck, previousCard);
+    const newKey = cardKey(targetDeck, newCard);
     if (state.ratings[previousKey]) {
       state.ratings[newKey] = state.ratings[previousKey];
       if (previousKey !== newKey) delete state.ratings[previousKey];
@@ -2486,7 +2559,7 @@ function deleteCard(index) {
   const preview = card.front.length > 60 ? `${card.front.slice(0, 60)}…` : card.front;
   if (!window.confirm(`Excluir o cartão "${preview}"?`)) return;
 
-  delete state.ratings[buildCardKey(deck.id, card.front)];
+  delete state.ratings[cardKey(deck, card)];
   trash.push({ id: `${Date.now()}-${Math.random()}`, deckId: deck.id, index, card, deletedAt: new Date().toISOString() });
   persistTrash();
   deck.cards.splice(index, 1);
@@ -2503,6 +2576,7 @@ function restoreTrashItem(itemId = null) {
   if (!item) return;
   const deck = decks.find((entry) => entry.id === item.deckId);
   if (!deck) return;
+  DataModel.ensureCardId(item.card, deck.id, item.index, new Set(allCardEntries().map(({ card }) => card.id).filter(Boolean)));
   deck.cards.splice(Math.min(item.index, deck.cards.length), 0, item.card);
   trash.splice(trashIndex, 1);
   persistTrash();
@@ -2597,6 +2671,7 @@ async function addImportedCards(cards, sourceLabel) {
   const snapshots = new Map();
   let added = 0;
   let duplicates = 0;
+  const usedCardIds = new Set(allCardEntries().map(({ card }) => card.id).filter(Boolean));
   cards.forEach((importedCard) => {
     const deck = findImportTarget(importedCard, fallbackDeck);
     const { discipline, ...card } = importedCard;
@@ -2606,6 +2681,7 @@ async function addImportedCards(cards, sourceLabel) {
       return;
     }
     if (!snapshots.has(deck)) snapshots.set(deck, deck.cards.slice());
+    DataModel.ensureCardId(card, deck.id, deck.cards.length, usedCardIds);
     deck.cards.push(card);
     changedDecks.add(deck);
     added += 1;
@@ -2960,7 +3036,7 @@ document.addEventListener("keydown", (event) => {
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("sw.js?v=20260824-2", { updateViaCache: "none" })
+      .register("sw.js?v=20260826-2", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {});
   });

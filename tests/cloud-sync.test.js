@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import CloudSync from "../cloud-sync.js";
 
-const { applySnapshot, createFirebaseAdapter, createSnapshot, firebaseErrorCode, hasStudyData, isRetryableError, isSyncableKey, reconciliationAction, snapshotFingerprint } = CloudSync;
+const { applySnapshot, createFirebaseAdapter, createSnapshot, deserializeSnapshotChunks, firebaseErrorCode, hasStudyData, isRetryableError, isSyncableKey, reconciliationAction, serializeSnapshotChunks, snapshotFingerprint } = CloudSync;
 
 function memoryStorage(initial = {}) {
   const data = new Map(Object.entries(initial));
@@ -28,6 +28,22 @@ describe("cloud sync", () => {
     expect(adapterSource).toContain("experimentalAutoDetectLongPolling: true");
     expect(adapterSource).toContain("getDocFromServer");
     expect(adapterSource).toContain("getIdToken(true)");
+  });
+
+  it("divide backups grandes em documentos e reconstrói Unicode sem perda", () => {
+    const snapshot = { version: 1, entries: { "trilha-flashcard-state": JSON.stringify({ texto: "ação 📚 ".repeat(80) }) } };
+    const chunks = serializeSnapshotChunks(snapshot, 80);
+
+    expect(chunks.length).toBeGreaterThan(1);
+    expect(chunks.every((chunk) => new TextEncoder().encode(chunk).length <= 80)).toBe(true);
+    expect(deserializeSnapshotChunks(chunks)).toEqual(snapshot);
+  });
+
+  it("mantém leitura do documento antigo e usa chunks no novo formato", () => {
+    const adapterSource = createFirebaseAdapter.toString();
+    expect(adapterSource).toContain("if (remote.snapshot) return remote");
+    expect(adapterSource).toContain('"chunks"');
+    expect(adapterSource).toContain("snapshotVersion");
   });
 
   it("classifica falhas transitórias sem repetir erros permanentes", () => {

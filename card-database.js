@@ -41,6 +41,23 @@
     });
   }
 
+  async function deleteEntries(keys) {
+    const uniqueKeys = [...new Set((keys || []).filter((key) => typeof key === "string" && key))];
+    if (!uniqueKeys.length) return;
+    await transaction("readwrite", (store) => uniqueKeys.forEach((key) => store.delete(key)));
+  }
+
+  async function deleteByPrefixes(prefixes) {
+    const validPrefixes = (prefixes || []).filter((prefix) => typeof prefix === "string" && prefix);
+    if (!validPrefixes.length) return;
+    await transaction("readwrite", (store) => {
+      const request = store.getAllKeys();
+      request.onsuccess = () => request.result.forEach((key) => {
+        if (typeof key === "string" && validPrefixes.some((prefix) => key.startsWith(prefix))) store.delete(key);
+      });
+    });
+  }
+
   async function hydrateLocalStorage(storage) {
     const database = await openDatabase();
     const entries = await new Promise((resolve, reject) => {
@@ -63,5 +80,5 @@
     });
   }
 
-  root.CardDatabase = { persistEntries, replaceEntries, hydrateLocalStorage };
+  root.CardDatabase = { persistEntries, replaceEntries, deleteEntries, deleteByPrefixes, hydrateLocalStorage };
 })(typeof globalThis !== "undefined" ? globalThis : this);

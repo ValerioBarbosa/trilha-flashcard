@@ -49,6 +49,17 @@ describe("persistência dos baralhos", () => {
 });
 
 describe("perfis de concurso", () => {
+  it("descreve todas as chaves exclusivas que devem ser apagadas com um perfil", () => {
+    expect(CardStorage.profileStorageScope("sefaz-rs")).toEqual({
+      exactKeys: [
+        "trilha-flashcard-custom-decks::sefaz-rs",
+        "trilha-flashcard-state::sefaz-rs",
+        "trilha-flashcard-trash::sefaz-rs",
+      ],
+      prefixes: ["trilha-flashcard-deck:sefaz-rs::"],
+    });
+  });
+
   it("usa as mesmas chaves de sempre para o perfil padrão", () => {
     const storage = createFakeStorage();
     const api = CardStorage.createDeckStorage(storage, CardStorage.DEFAULT_PROFILE_ID);

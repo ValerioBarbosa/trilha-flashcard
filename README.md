@@ -1,6 +1,11 @@
 # Trilha Flashcard — Estudos para concursos públicos
 
-Um leitor de flashcards local, responsivo e sem instalação, personalizado para o primeiro concurso TRT4 - Analista Judiciário, Área Judiciária. O app inclui:
+Um leitor de flashcards local, responsivo e instalável para organizar estudos de diferentes concursos públicos. O perfil inicial continua preparado para TRT4 — Analista Judiciário, Área Judiciária, mas cada novo concurso pode ter banco de matérias, cartões e desempenho próprios.
+
+O app inclui:
+
+- perfis separados por concurso, com cargo, banca e ano do edital;
+- Banco de Matérias com disciplinas mesmo antes de terem cartões, peso no edital, assuntos e subassuntos;
 
 - um baralho inicial com formato histórico, prioridades e alerta pré-edital;
 - doze baralhos por disciplina, seguindo o edital verticalizado, prontos para receber os cartões (os cartões ficam a cargo de quem estuda, conforme o edital atualizado);
@@ -8,7 +13,7 @@ Um leitor de flashcards local, responsivo e sem instalação, personalizado para
 - navegação por botões ou teclado;
 - marcação “Lembrei” e “Não lembrei”;
 - progresso por disciplina e embaralhamento;
-- retomada automática do último cartão usando `localStorage`;
+- retomada automática do último cartão usando armazenamento local e IndexedDB;
 - histórico persistente de tentativas e taxa de acerto;
 - revisão espaçada em 1, 7 e 30 dias, incluindo um modo "revisar errados";
 - painel de desempenho com sequência de estudos e revisões pendentes;
@@ -17,13 +22,19 @@ Um leitor de flashcards local, responsivo e sem instalação, personalizado para
 - exportação e importação do progresso em arquivo `.json`, para levar o histórico a outro dispositivo;
 - importação de baralhos próprios em `.json`, sem precisar editar código;
 - gerenciamento de cartões pelo próprio navegador: adicionar, editar, excluir e importar/exportar cartões de qualquer baralho (incluindo os baralhos por disciplina), sem editar `decks.js`;
-- instalação como app (PWA) e uso offline após o primeiro carregamento.
+- instalação como app (PWA) e uso offline após o primeiro carregamento;
 - armazenamento durável em IndexedDB, com migração automática do conteúdo local;
 - conferência dos cartões antes de confirmar uma importação;
 - lixeira com restauração e desfazer exclusão;
 - backup completo de cartões, desempenho e lixeira;
-- sincronização opcional com Google e Firebase, com modo offline e escolha segura em caso de conflito;
+- sincronização opcional com Google e Firebase, com backup dividido em partes para crescer além do limite de um único documento, modo offline e escolha segura em caso de conflito;
 - sessões personalizadas por quantidade, escopo e prioridade.
+
+## Banco de Matérias
+
+Abra **Matérias** na navegação principal. Ali você pode criar uma disciplina, registrar o peso percentual previsto no edital e colar os assuntos, um por linha. A disciplina aparece no banco mesmo vazia e pode receber cartões depois.
+
+Em **Mais > Perfis de concurso**, crie um perfil para cada certame. Concurso, cargo, banca e ano ajudam a identificar o edital ativo. A exclusão de um perfil também remove seus dados locais e a cópia durável no IndexedDB, sem afetar os demais perfis.
 
 ## Como abrir
 
@@ -43,10 +54,10 @@ Depois acesse `http://localhost:4173`.
 Os cartões ficam definidos em `decks.js` e podem ser editados sem alterar a interface. Cada baralho começa vazio (`cards: []`); adicione cartões no formato:
 
 ```js
-{ front: "Pergunta", back: "Resposta", topic: "Assunto (opcional, usado no filtro)", example: "Observação opcional" }
+{ id: "card-id-permanente", front: "Pergunta", back: "Resposta", topic: "Assunto (opcional, usado no filtro)", example: "Observação opcional" }
 ```
 
-Campos opcionais adicionais usados pelo leitor: `tag` (rótulo curto no topo do cartão), `complement`, `pitfall` e `mnemonic` (blocos extras exibidos no verso).
+O `id` é criado automaticamente pelo aplicativo e mantém o histórico do cartão mesmo quando a pergunta é editada. Arquivos antigos, sem `id`, são migrados automaticamente. Campos opcionais adicionais: `tag` (rótulo curto no topo), `complement`, `pitfall` e `mnemonic` (blocos extras no verso).
 
 Cada baralho já tem um array `topics` com os assuntos do edital verticalizado (usado pelo filtro de Assunto na barra de busca). Para o filtro funcionar, use exatamente uma dessas strings no campo `topic` de cada cartão que você adicionar.
 
@@ -66,7 +77,7 @@ Edições em baralhos por disciplina ficam salvas no navegador (via `localStorag
 4. Adicione `valeriobarbosa.github.io` aos domínios autorizados do Authentication.
 5. Copie a configuração Web para `firebase-config.js`, substituindo `null` pelo objeto `firebaseConfig`.
 
-Os documentos ficam em `flashcardUsers/{uid}`. As regras permitem que cada usuário leia e altere somente o próprio documento. Na primeira conexão, os dados locais são enviados automaticamente se a nuvem estiver vazia. Se existirem duas versões, o aplicativo exige uma escolha antes de substituir qualquer dado.
+Os metadados ficam em `flashcardUsers/{uid}` e o conteúdo é dividido em `flashcardUsers/{uid}/chunks/{chunkId}`. Isso evita concentrar todo o banco no limite de um único documento do Firestore. O leitor continua compatível com backups antigos que ainda tenham o campo `snapshot`. As regras permitem que cada usuário leia e altere somente os próprios documentos. Na primeira conexão, os dados locais são enviados automaticamente se a nuvem estiver vazia. Se existirem duas versões, o aplicativo exige uma escolha antes de substituir qualquer dado.
 
 Para publicar as regras pelo Firebase CLI:
 
@@ -76,7 +87,7 @@ firebase deploy --only firestore:rules --project trilha-flashcard
 
 ## Importar seu próprio baralho
 
-No painel de Desempenho, em "Meus baralhos", importe um arquivo `.json` no formato:
+Na área **Cartões**, use **Importar cartões** para adicionar um arquivo `.json` no formato:
 
 ```json
 {
@@ -92,7 +103,7 @@ Baralhos importados ficam salvos no navegador e podem ser removidos a qualquer m
 
 ## Testes
 
-O projeto usa [Vitest](https://vitest.dev) para testar a lógica de repetição espaçada (`spaced-repetition.js`):
+O projeto usa [Vitest](https://vitest.dev) para testar repetição espaçada, importação, armazenamento, identidade dos cartões, perfis, sincronização e os fluxos principais da interface:
 
 ```bash
 npm install

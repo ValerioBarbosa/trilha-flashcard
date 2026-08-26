@@ -8,6 +8,17 @@
   const BUILTIN_DECK_KEY_PREFIX = "trilha-flashcard-deck:";
   const DEFAULT_PROFILE_ID = "trt4";
 
+  function profileStorageScope(profileId) {
+    return {
+      exactKeys: [
+        `${CUSTOM_DECKS_KEY}::${profileId}`,
+        `trilha-flashcard-state::${profileId}`,
+        `trilha-flashcard-trash::${profileId}`,
+      ],
+      prefixes: [`${BUILTIN_DECK_KEY_PREFIX}${profileId}::`],
+    };
+  }
+
   function parseJson(value, fallback) {
     try {
       return value ? JSON.parse(value) : fallback;
@@ -79,5 +90,5 @@
     return { loadCustomDecks, loadBuiltinOverride, persistDecks };
   }
 
-  return { createDeckStorage, CUSTOM_DECKS_KEY, LEGACY_BUILTIN_OVERRIDES_KEY, BUILTIN_DECK_KEY_PREFIX, DEFAULT_PROFILE_ID };
+  return { createDeckStorage, profileStorageScope, CUSTOM_DECKS_KEY, LEGACY_BUILTIN_OVERRIDES_KEY, BUILTIN_DECK_KEY_PREFIX, DEFAULT_PROFILE_ID };
 });

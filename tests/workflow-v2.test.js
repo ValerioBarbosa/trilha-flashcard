@@ -11,7 +11,9 @@ describe("fluxo de estudo v2", () => {
   it("carrega o banco durável antes do aplicativo", () => {
     expect(html.indexOf("card-database.js")).toBeGreaterThan(-1);
     expect(html.indexOf("hydrateLocalStorage")).toBeLessThan(html.indexOf('import("./app.js'));
-    expect(serviceWorker).toContain("card-database.js?v=20260822-1");
+    expect(serviceWorker).toContain("card-database.js?v=20260826-1");
+    expect(html.indexOf("data-model.js")).toBeGreaterThan(-1);
+    expect(serviceWorker).toContain("data-model.js?v=20260826-2");
   });
 
   it("expõe filtros e árvore no gerenciador de cartões", () => {
@@ -78,8 +80,8 @@ describe("persistência da sessão ativa", () => {
     expect(app).toContain("queueKeys: state.customQueue.map");
     expect(app).toContain('setActiveSurface(resumedActiveSession ? "study" : "home")');
     expect(app).toContain('showToast("Sessão retomada")');
-    expect(html).toContain("app.js?v=20260824-10");
-    expect(serviceWorker).toContain("trilha-flashcard-v33");
+    expect(html).toContain("app.js?v=20260826-2");
+    expect(serviceWorker).toContain("trilha-flashcard-v35");
     expect(serviceWorker).toContain("motion-animations.js?v=20260824-1");
     expect(spacedRepetition).toContain("motion-animations.js?v=20260824-1");
   });
@@ -131,5 +133,24 @@ describe("Sincronização e dados isolada do desempenho", () => {
     expect(dashboardDialog).not.toContain('id="data-section-title"');
     expect(app).toContain("function openSyncData()");
     expect(app).toContain("closeHomeMore(); openSyncData();");
+  });
+});
+
+describe("banco de matérias e perfis", () => {
+  it("organiza disciplinas vazias e registra peso no edital", () => {
+    expect(html).toContain("Banco de Matérias");
+    expect(html).toContain('id="new-discipline-weight"');
+    expect(html).toContain('id="home-profile-summary"');
+    expect(app).toContain("assuntos cadastrados · pronta para cartões");
+    expect(app).toContain('Number.isFinite(weightValue) && weightValue > 0 ? { weight: weightValue }');
+  });
+
+  it("mantém concurso, cargo, banca e ano em perfis isolados", () => {
+    ["profile-new-name", "profile-new-role", "profile-new-board", "profile-new-year"].forEach((id) => {
+      expect(html).toContain(`id="${id}"`);
+    });
+    expect(app).toContain("DataModel.sanitizeProfile");
+    expect(app).toContain("CardStorage.profileStorageScope");
+    expect(app).toContain("CardDatabase.deleteByPrefixes");
   });
 });

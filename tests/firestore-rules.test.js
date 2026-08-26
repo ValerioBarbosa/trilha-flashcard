@@ -15,4 +15,11 @@ describe("configuração do Firestore", () => {
     expect(rules).toContain("request.resource.data.ownerUid == userId");
     expect(rules).toContain("allow delete: if false");
   });
+
+  it("guarda snapshots grandes em chunks pertencentes ao mesmo usuário", () => {
+    expect(rules).toContain("match /chunks/{chunkId}");
+    expect(rules).toContain("request.resource.data.snapshotVersion == 2");
+    expect(rules).toContain("request.resource.data.chunkCount <= 500");
+    expect(rules).toContain("request.resource.data.ownerUid == userId");
+  });
 });

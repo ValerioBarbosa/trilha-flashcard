@@ -22,7 +22,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260824-5" />
+    <link rel="stylesheet" href="styles.css?v=20260826-2" />
     <script>
       try {
         const savedTheme = localStorage.getItem("trilha-flashcard-theme");
@@ -196,11 +196,14 @@
         <div class="home-deck-toolbar">
           <label class="home-search">
             <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.6-4.6"/></svg>
-            <span class="sr-only">Buscar cartões e assuntos</span>
-            <input id="home-deck-search" type="search" placeholder="Buscar cartões e assuntos" autocomplete="off" />
+            <span class="sr-only">Buscar matérias, cartões e assuntos</span>
+            <input id="home-deck-search" type="search" placeholder="Buscar matérias, cartões e assuntos" autocomplete="off" />
           </label>
           <div class="home-deck-heading">
-            <h2>Seus baralhos</h2>
+            <div>
+              <h2>Banco de Matérias</h2>
+              <p id="home-profile-summary">Disciplinas e cartões do perfil ativo</p>
+            </div>
             <button id="home-study-session-button" type="button">Montar sessão</button>
           </div>
         </div>
@@ -797,8 +800,13 @@
 
         <h3 class="profile-new-title">Criar novo perfil</h3>
         <div class="profile-presets" id="profile-presets"></div>
+        <div class="profile-new-grid">
+          <input type="text" id="profile-new-name" placeholder="Concurso (ex.: SEFAZ-RS)" />
+          <input type="text" id="profile-new-role" placeholder="Cargo (opcional)" />
+          <input type="text" id="profile-new-board" placeholder="Banca (opcional)" />
+          <input type="text" id="profile-new-year" inputmode="numeric" maxlength="4" placeholder="Ano do edital" />
+        </div>
         <div class="profile-new-row">
-          <input type="text" id="profile-new-name" placeholder="Nome do perfil (ex.: SEFAZ-RS)" />
           <button type="button" class="review-due-button" id="profile-new-create">Criar e ativar</button>
         </div>
       </div>
@@ -819,6 +827,10 @@
         <label class="card-form-field">
           <span>Nome da disciplina *</span>
           <input type="text" id="new-discipline-name" placeholder="Ex.: Direito Administrativo" />
+        </label>
+        <label class="card-form-field">
+          <span>Peso no edital (%)</span>
+          <input type="number" id="new-discipline-weight" min="0" max="100" step="0.1" inputmode="decimal" placeholder="Ex.: 16,7" />
         </label>
         <label class="card-form-field">
           <span>Assuntos do edital (um por linha, ao menos um) *</span>
@@ -861,15 +873,16 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="decks.js?v=20260820-2"></script>
     <script src="spaced-repetition.js?v=20260823-1"></script>
-    <script src="card-import.js?v=20260821-1"></script>
-    <script src="card-storage.js?v=20260823-1"></script>
+    <script src="card-import.js?v=20260826-1"></script>
+    <script src="card-storage.js?v=20260826-1"></script>
     <script src="card-manager.js?v=20260824-1"></script>
-    <script src="card-database.js?v=20260822-1"></script>
+    <script src="card-database.js?v=20260826-1"></script>
+    <script src="data-model.js?v=20260826-2"></script>
     <script src="firebase-config.js?v=20260821-2"></script>
-    <script src="cloud-sync.js?v=20260824-3"></script>
+    <script src="cloud-sync.js?v=20260826-1"></script>
     <script type="module">
       try { await CardDatabase.hydrateLocalStorage(localStorage); } catch (error) { console.warn("IndexedDB indisponível", error); }
-      await import("./app.js?v=20260824-10");
+      await import("./app.js?v=20260826-2");
     </script>
   </body>
 </html>

@@ -4,6 +4,7 @@
   if (root) root.CardImport = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function createCardImport() {
   const FIELD_ALIASES = {
+    id: ["id", "cardId", "cartaoId", "cartãoId"],
     front: ["front", "pergunta", "question", "frente", "enunciado"],
     back: ["back", "resposta", "answer", "verso", "gabarito"],
     discipline: ["disciplineId", "disciplinaId", "discipline", "disciplina", "deckId", "baralho"],

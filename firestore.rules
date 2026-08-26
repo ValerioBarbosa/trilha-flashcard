@@ -11,17 +11,41 @@ service cloud.firestore {
         && request.resource.data.ownerUid == userId
         && request.resource.data.keys().hasOnly([
           'ownerUid',
-          'snapshot',
+          'snapshotVersion',
+          'chunkCount',
           'updatedAt',
           'updatedAtISO'
         ])
-        && request.resource.data.snapshot is map
-        && request.resource.data.snapshot.version == 1
-        && request.resource.data.snapshot.entries is map
+        && request.resource.data.snapshotVersion == 2
+        && request.resource.data.chunkCount is int
+        && request.resource.data.chunkCount > 0
+        && request.resource.data.chunkCount <= 500
         && request.resource.data.updatedAt is timestamp
         && request.resource.data.updatedAtISO is string;
 
       allow delete: if false;
+
+      match /chunks/{chunkId} {
+        allow read: if request.auth != null
+          && request.auth.uid == userId;
+
+        allow create, update: if request.auth != null
+          && request.auth.uid == userId
+          && request.resource.data.ownerUid == userId
+          && request.resource.data.keys().hasOnly([
+            'ownerUid',
+            'index',
+            'data',
+            'updatedAtISO'
+          ])
+          && request.resource.data.index is int
+          && request.resource.data.index >= 0
+          && request.resource.data.data is string
+          && request.resource.data.updatedAtISO is string;
+
+        allow delete: if request.auth != null
+          && request.auth.uid == userId;
+      }
     }
 
     match /{document=**} {
