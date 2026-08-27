@@ -60,6 +60,27 @@
     return rows;
   }
 
+  function observeAuthUser(auth, callback) {
+    let active = true;
+    let lastUserKey = Symbol("initial-auth-state");
+    const { data } = auth.onAuthStateChange((_event, session) => {
+      const user = session?.user || null;
+      const userKey = user?.id || null;
+      if (userKey === lastUserKey) return;
+      lastUserKey = userKey;
+      queueMicrotask(() => {
+        if (!active) return;
+        Promise.resolve(callback(user)).catch((error) => {
+          console.error("Falha ao processar mudança de autenticação Supabase", error);
+        });
+      });
+    });
+    return () => {
+      active = false;
+      data.subscription.unsubscribe();
+    };
+  }
+
   async function createSupabaseAdapter(config) {
     if (!config?.url || !config?.publishableKey) throw new Error("supabase-not-configured");
     const { createClient } = await import("./vendor/supabase-js.mjs");
@@ -81,13 +102,7 @@
     return {
       provider: "supabase",
       observeUser(callback) {
-        let active = true;
-        client.auth.getSession().then(({ data, error }) => {
-          if (error) console.warn("Falha ao restaurar sessão Supabase", error);
-          if (active) callback(data?.session?.user || null);
-        });
-        const { data } = client.auth.onAuthStateChange((_event, session) => callback(session?.user || null));
-        return () => { active = false; data.subscription.unsubscribe(); };
+        return observeAuthUser(client.auth, callback);
       },
       async signIn() {
         const { data, error } = await client.auth.signInWithOAuth({
@@ -134,5 +149,5 @@
     };
   }
 
-  return { buildChangedRows, contentHash, createSupabaseAdapter, rowsToRemote };
+  return { buildChangedRows, contentHash, createSupabaseAdapter, observeAuthUser, rowsToRemote };
 });

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import SupabaseSync from "../supabase-sync.js";
 
-const { buildChangedRows, contentHash, rowsToRemote } = SupabaseSync;
+const { buildChangedRows, contentHash, observeAuthUser, rowsToRemote } = SupabaseSync;
 
 describe("sincronização incremental Supabase", () => {
   it("converte somente registros ativos em snapshot local", () => {
@@ -35,5 +35,27 @@ describe("sincronização incremental Supabase", () => {
       storage_value: null,
       deleted: true,
     })]);
+  });
+
+  it("reconcilia uma única vez quando a sessão inicial se repete", async () => {
+    let authCallback;
+    let unsubscribed = false;
+    const auth = {
+      onAuthStateChange(callback) {
+        authCallback = callback;
+        return { data: { subscription: { unsubscribe: () => { unsubscribed = true; } } } };
+      },
+    };
+    const users = [];
+    const stop = observeAuthUser(auth, async (user) => users.push(user?.id || null));
+
+    authCallback("INITIAL_SESSION", { user: { id: "user-1" } });
+    authCallback("SIGNED_IN", { user: { id: "user-1" } });
+    authCallback("TOKEN_REFRESHED", { user: { id: "user-1" } });
+    await new Promise((resolve) => queueMicrotask(resolve));
+
+    expect(users).toEqual(["user-1"]);
+    stop();
+    expect(unsubscribed).toBe(true);
   });
 });
