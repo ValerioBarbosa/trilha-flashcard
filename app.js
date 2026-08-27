@@ -698,9 +698,16 @@ function updateCloudButtons(user) {
   updateCloudMetaDisplay();
 }
 
+async function createConfiguredCloudAdapter() {
+  if (globalThis.TrilhaSupabaseConfig?.url && globalThis.TrilhaSupabaseConfig?.publishableKey) {
+    return SupabaseSync.createSupabaseAdapter(globalThis.TrilhaSupabaseConfig);
+  }
+  return CloudSync.createFirebaseAdapter(globalThis.TrilhaFirebaseConfig);
+}
+
 async function initializeCloudSync() {
   try {
-    cloudAdapter = await CloudSync.createFirebaseAdapter(globalThis.TrilhaFirebaseConfig);
+    cloudAdapter = await createConfiguredCloudAdapter();
     cloudAdapter.observeUser(async (user) => {
       cloudUser = user;
       updateCloudButtons(user);
@@ -2689,6 +2696,7 @@ async function addImportedCards(cards, sourceLabel) {
   try {
     const entries = deckStorage.persistDecks(changedDecks, decks);
     await CardDatabase.persistEntries([...entries]);
+    if (added > 0) markCloudDirty();
   } catch (error) {
     snapshots.forEach((snapshot, deck) => {
       deck.cards = snapshot;

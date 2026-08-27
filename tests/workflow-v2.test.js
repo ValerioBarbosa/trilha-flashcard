@@ -81,7 +81,7 @@ describe("persistência da sessão ativa", () => {
     expect(app).toContain('setActiveSurface(resumedActiveSession ? "study" : "home")');
     expect(app).toContain('showToast("Sessão retomada")');
     expect(html).toContain("app.js?v=20260826-2");
-    expect(serviceWorker).toContain("trilha-flashcard-v35");
+    expect(serviceWorker).toContain("trilha-flashcard-v36");
     expect(serviceWorker).toContain("motion-animations.js?v=20260824-1");
     expect(spacedRepetition).toContain("motion-animations.js?v=20260824-1");
   });
@@ -109,6 +109,7 @@ describe("fluxos de segurança e produtividade", () => {
     expect(app).toContain("function moveSelectedCards");
     expect(app).toContain("function deleteSelectedCards");
     expect(app).toContain("function showImportReport");
+    expect(app).toMatch(/await CardDatabase\.persistEntries\(\[\.\.\.entries\]\);\s+if \(added > 0\) markCloudDirty\(\);/);
   });
 });
 
