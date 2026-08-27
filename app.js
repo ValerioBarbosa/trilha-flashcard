@@ -575,6 +575,14 @@ function ensureCardIds(deckList) {
         card.updatedAt = new Date().toISOString();
         changed = true;
       }
+      // Cards created before the rich-text editor stored plain text, but the flashcard display
+      // now renders front/back as HTML — escape that text once so "<"/"&" don't break rendering.
+      if (!card.richContent) {
+        card.front = escapeHtml(card.front);
+        card.back = escapeHtml(card.back);
+        card.richContent = true;
+        changed = true;
+      }
     });
     if (changed) {
       const entries = deckStorage.persistDecks([deck], decks);
@@ -825,8 +833,8 @@ function renderCard() {
     return;
   }
 
-  elements.front.textContent = card.front;
-  elements.back.textContent = card.back;
+  elements.front.innerHTML = card.front;
+  elements.back.innerHTML = card.back;
   elements.example.textContent = card.example || "";
   elements.tagFront.textContent = card.tag || "";
   elements.tagBack.textContent = card.tag || "";
@@ -834,9 +842,11 @@ function renderCard() {
   fillCallout(elements.complement, elements.complementText, card.complement);
   fillCallout(elements.pitfall, elements.pitfallText, card.pitfall);
   fillCallout(elements.mnemonic, elements.mnemonicText, card.mnemonic);
-  elements.front.classList.toggle("is-medium", card.front.length > 34 && card.front.length <= 76);
-  elements.front.classList.toggle("is-long", card.front.length > 76);
-  elements.back.classList.toggle("is-long", card.back.length > 105 || Boolean(card.complement || card.pitfall || card.mnemonic));
+  const frontLength = htmlToPlainText(card.front).length;
+  const backLength = htmlToPlainText(card.back).length;
+  elements.front.classList.toggle("is-medium", frontLength > 34 && frontLength <= 76);
+  elements.front.classList.toggle("is-long", frontLength > 76);
+  elements.back.classList.toggle("is-long", backLength > 105 || Boolean(card.complement || card.pitfall || card.mnemonic));
   elements.flashcard.classList.toggle("is-flipped", state.flipped);
   elements.flashcard.setAttribute("aria-label", state.flipped ? "Mostrar enunciado" : "Revelar gabarito");
   elements.reveal.querySelector("span").textContent = state.flipped ? "Ver enunciado" : "Ver gabarito";
@@ -1382,6 +1392,45 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
+function htmlToPlainText(html) {
+  const container = document.createElement("div");
+  container.innerHTML = html || "";
+  return container.textContent || "";
+}
+
+// Cards render their front/back as innerHTML (so formatting like <b>/<i>/lists shows up), so any
+// content that ends up there — typed, pasted, or imported — must be rebuilt from a tag whitelist
+// first. Unknown tags (span, div, a, img, script...) are unwrapped rather than dropped whole, so
+// pasted text from Word/Google Docs/a webpage keeps its words, just not its styling.
+const RICH_TEXT_ALLOWED_TAGS = new Set(["B", "STRONG", "I", "EM", "U", "UL", "OL", "LI", "BR"]);
+const RICH_TEXT_BLOCK_TAGS = new Set(["DIV", "P"]);
+
+function sanitizeRichTextNode(source, target) {
+  [...source.childNodes].forEach((child) => {
+    if (child.nodeType === Node.TEXT_NODE) {
+      target.appendChild(document.createTextNode(child.textContent));
+      return;
+    }
+    if (child.nodeType !== Node.ELEMENT_NODE) return;
+    if (RICH_TEXT_ALLOWED_TAGS.has(child.tagName)) {
+      const clean = document.createElement(child.tagName);
+      sanitizeRichTextNode(child, clean);
+      target.appendChild(clean);
+    } else {
+      sanitizeRichTextNode(child, target);
+      if (RICH_TEXT_BLOCK_TAGS.has(child.tagName)) target.appendChild(document.createElement("br"));
+    }
+  });
+}
+
+function sanitizeRichText(html) {
+  const source = document.createElement("div");
+  source.innerHTML = html || "";
+  const clean = document.createElement("div");
+  sanitizeRichTextNode(source, clean);
+  return clean.innerHTML.trim();
+}
+
 function normalizeText(value) {
   return (value || "").toString().toLowerCase();
 }
@@ -1401,7 +1450,7 @@ function renderSearchResults(rawQuery) {
 
   const matches = allCardEntries()
     .filter(({ deck, card }) => {
-      const haystack = [card.front, card.back, card.tag, card.topic, deck.title].map(normalizeText).join(" ");
+      const haystack = [htmlToPlainText(card.front), htmlToPlainText(card.back), card.tag, card.topic, deck.title].map(normalizeText).join(" ");
       return haystack.includes(query);
     })
     .slice(0, 30);
@@ -1411,7 +1460,7 @@ function renderSearchResults(rawQuery) {
         .map(
           (entry, index) => `
             <button type="button" class="search-result" data-result-index="${index}" role="option">
-              <span class="search-result-front">${escapeHtml(entry.card.front)}</span>
+              <span class="search-result-front">${escapeHtml(htmlToPlainText(entry.card.front))}</span>
               <span class="search-result-meta">${escapeHtml(entry.deck.title)}${entry.card.tag ? ` · ${escapeHtml(entry.card.tag)}` : ""}</span>
             </button>
           `
@@ -1556,11 +1605,12 @@ function renderManageCards() {
   elements.cardList.innerHTML = deck.cards.length
     ? deck.cards
         .map((card, index) => {
-          const searchValue = [card.front, card.back, card.topic, card.subtopic, card.legalBasis, card.type, card.priority, card.difficulty].filter(Boolean).join(" ").toLowerCase();
+          const frontText = htmlToPlainText(card.front);
+          const searchValue = [frontText, htmlToPlainText(card.back), card.topic, card.subtopic, card.legalBasis, card.type, card.priority, card.difficulty].filter(Boolean).join(" ").toLowerCase();
           return `
             <article class="card-list-row" data-search="${escapeHtml(searchValue)}">
               <div class="card-list-row-main">
-                <span class="card-list-front">${escapeHtml(card.front)}</span>
+                <span class="card-list-front">${escapeHtml(frontText)}</span>
                 <span class="card-list-topic">${[card.topic, card.subtopic, card.type, card.priority ? `Prioridade ${card.priority}` : "", card.difficulty].filter(Boolean).map(escapeHtml).join(" · ") || "sem classificação"}</span>
               </div>
               <div class="card-list-row-actions">
@@ -1660,8 +1710,8 @@ function openCardForm(index) {
   elements.cardFormSourceDeck.value = sourceDeck.id;
   renderDisciplineOptions(selectedDeckId, card ? sourceDeck : null);
   renderTopicOptions(card?.topic || "");
-  elements.cardFormFront.value = card?.front || "";
-  elements.cardFormBack.value = card?.back || "";
+  elements.cardFormFront.innerHTML = card?.front || "";
+  elements.cardFormBack.innerHTML = card?.back || "";
   elements.cardFormSubtopic.value = card?.subtopic || "";
   elements.cardFormLegalBasis.value = card?.legalBasis || "";
   elements.cardFormType.value = card?.type || "Conceito";
@@ -1683,17 +1733,19 @@ function openCardForm(index) {
 function closeCardForm() {
   elements.cardForm.hidden = true;
   elements.cardForm.reset();
+  elements.cardFormFront.innerHTML = "";
+  elements.cardFormBack.innerHTML = "";
   elements.cardFormIndex.value = "";
   elements.cardFormSourceDeck.value = "";
   elements.cardFormTopicWarning.hidden = true;
 }
 
 function buildCardFromForm() {
-  const front = elements.cardFormFront.value.trim();
-  const back = elements.cardFormBack.value.trim();
+  const front = sanitizeRichText(elements.cardFormFront.innerHTML);
+  const back = sanitizeRichText(elements.cardFormBack.innerHTML);
   const disciplineId = elements.cardFormDiscipline.value;
   const topic = elements.cardFormTopic.value;
-  if (!front || !back || !disciplineId || !topic) return null;
+  if (!htmlToPlainText(front).trim() || !htmlToPlainText(back).trim() || !disciplineId || !topic) return null;
 
   const card = {
     front,
@@ -1703,6 +1755,7 @@ function buildCardFromForm() {
     priority: elements.cardFormPriority.value,
     difficulty: elements.cardFormDifficulty.value,
     updatedAt: new Date().toISOString(),
+    richContent: true,
   };
   const subtopic = elements.cardFormSubtopic.value.trim();
   const legalBasis = elements.cardFormLegalBasis.value.trim();
@@ -1740,9 +1793,10 @@ function handleCardFormSubmit(event) {
   const indexValue = elements.cardFormIndex.value;
   const isEdit = indexValue !== "";
   const editingIndex = isEdit ? Number(indexValue) : -1;
+  const newFrontText = htmlToPlainText(newCard.front).trim().toLowerCase();
   const duplicateIndex = targetDeck.cards.findIndex(
     (card, index) => !(isEdit && targetDeck.id === sourceDeck.id && index === editingIndex)
-      && card.front.trim().toLowerCase() === newCard.front.trim().toLowerCase()
+      && htmlToPlainText(card.front).trim().toLowerCase() === newFrontText
   );
   if (duplicateIndex !== -1 && !window.confirm("Já existe um cartão com este enunciado nesta disciplina. Salvar mesmo assim?")) {
     return;
@@ -1809,7 +1863,8 @@ function deleteCard(index) {
   const deck = currentDeck();
   const card = deck.cards[index];
   if (!card) return;
-  const preview = card.front.length > 60 ? `${card.front.slice(0, 60)}…` : card.front;
+  const frontText = htmlToPlainText(card.front);
+  const preview = frontText.length > 60 ? `${frontText.slice(0, 60)}…` : frontText;
   if (!window.confirm(`Excluir o cartão "${preview}"?`)) return;
 
   const key = cardKey(deck, card);
@@ -1849,7 +1904,7 @@ function renderTrash() {
   elements.trashList.innerHTML = trash.length
     ? [...trash].reverse().map((item) => `
       <article class="card-list-row">
-        <div class="card-list-row-main"><span class="card-list-front">${escapeHtml(item.card.front)}</span><span class="card-list-topic">${escapeHtml(decks.find((deck) => deck.id === item.deckId)?.title || item.deckId)}</span></div>
+        <div class="card-list-row-main"><span class="card-list-front">${escapeHtml(htmlToPlainText(item.card.front))}</span><span class="card-list-topic">${escapeHtml(decks.find((deck) => deck.id === item.deckId)?.title || item.deckId)}</span></div>
         <button class="data-button" type="button" data-restore-trash="${escapeHtml(item.id)}">Restaurar</button>
       </article>`).join("")
     : '<p class="card-list-empty">A lixeira está vazia.</p>';
@@ -1910,7 +1965,8 @@ function openImportPreview(cards, sourceLabel) {
   pendingImport = { cards, sourceLabel };
   const duplicates = cards.filter((card) => {
     const deck = findImportTarget(card, currentDeck());
-    return deck.cards.some((existing) => existing.front.trim().toLowerCase() === card.front.trim().toLowerCase());
+    const importedFrontText = card.front.trim().toLowerCase();
+    return deck.cards.some((existing) => htmlToPlainText(existing.front).trim().toLowerCase() === importedFrontText);
   }).length;
   elements.importPreviewSummary.textContent = `${cards.length} cartões encontrados${duplicates ? ` · ${duplicates} repetidos serão ignorados` : ""}. Desmarque o que não deseja importar.`;
   elements.importPreviewList.innerHTML = cards.map((card, index) => {
@@ -1931,7 +1987,8 @@ async function addImportedCards(cards, sourceLabel) {
   cards.forEach((importedCard) => {
     const deck = findImportTarget(importedCard, fallbackDeck);
     const { discipline, ...card } = importedCard;
-    const duplicate = deck.cards.some((existing) => existing.front.trim().toLowerCase() === card.front.trim().toLowerCase());
+    const importedFrontText = card.front.trim().toLowerCase();
+    const duplicate = deck.cards.some((existing) => htmlToPlainText(existing.front).trim().toLowerCase() === importedFrontText);
     if (duplicate) {
       duplicates += 1;
       return;
@@ -1939,6 +1996,9 @@ async function addImportedCards(cards, sourceLabel) {
     if (!snapshots.has(deck)) snapshots.set(deck, deck.cards.slice());
     card.id = generateCardId();
     card.updatedAt = new Date().toISOString();
+    card.front = escapeHtml(card.front);
+    card.back = escapeHtml(card.back);
+    card.richContent = true;
     deck.cards.push(card);
     changedDecks.add(deck);
     added += 1;
@@ -2110,6 +2170,32 @@ elements.manageCardsDialog.addEventListener("click", (event) => {
 elements.cardAddButton.addEventListener("click", () => openCardForm(null));
 elements.cardFormCancel.addEventListener("click", closeCardForm);
 elements.cardForm.addEventListener("submit", handleCardFormSubmit);
+
+function setupRichEditor(surface) {
+  const toolbar = surface.parentElement.querySelector(".rich-editor-toolbar");
+  toolbar.querySelectorAll("[data-rich-command]").forEach((button) => {
+    const runCommand = () => {
+      surface.focus();
+      document.execCommand(button.dataset.richCommand, false, null);
+    };
+    button.addEventListener("mousedown", (event) => event.preventDefault());
+    button.addEventListener("click", runCommand);
+    button.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      runCommand();
+    });
+  });
+  surface.addEventListener("paste", (event) => {
+    event.preventDefault();
+    const html = event.clipboardData?.getData("text/html");
+    const text = event.clipboardData?.getData("text/plain") || "";
+    document.execCommand("insertHTML", false, html ? sanitizeRichText(html) : escapeHtml(text));
+  });
+}
+
+setupRichEditor(elements.cardFormFront);
+setupRichEditor(elements.cardFormBack);
 elements.cardImportButton.addEventListener("click", () => elements.cardImportInput.click());
 elements.cardImportInput.addEventListener("change", (event) => {
   const file = event.target.files?.[0];

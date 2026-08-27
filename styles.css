@@ -1590,6 +1590,84 @@ kbd {
   outline-offset: 1px;
 }
 
+.rich-editor {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow: hidden;
+  font-weight: 400;
+}
+
+.rich-editor:focus-within {
+  outline: 3px solid rgba(18, 89, 241, 0.26);
+  outline-offset: 1px;
+}
+
+.rich-editor-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+/*
+ * These are <span role="button"> rather than <button> on purpose: a native <button> sitting
+ * next to an *empty* contenteditable throws off Chrome's "what style should new text get"
+ * inference, silently wrapping the very first typed character in <b> even when nothing was
+ * ever selected or toggled. Spans don't trigger it.
+ */
+.rich-editor-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 28px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rich-editor-tool:hover,
+.rich-editor-tool:focus-visible {
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+.rich-editor-tool[data-rich-command="bold"] { font-weight: 700; }
+.rich-editor-tool[data-rich-command="italic"] { font-style: italic; }
+.rich-editor-tool[data-rich-command="underline"] { text-decoration: underline; }
+
+
+.rich-editor-surface {
+  min-height: 2.6em;
+  padding: 9px 12px;
+  font: inherit;
+  font-weight: 400;
+  color: var(--ink);
+  outline: none;
+}
+
+.rich-editor-surface-tall {
+  min-height: 4.2em;
+}
+
+.rich-editor-surface ul,
+.rich-editor-surface ol {
+  margin: 0;
+  padding-left: 1.3em;
+}
+
+.rich-editor-surface:empty::before {
+  content: attr(data-placeholder);
+  color: var(--muted);
+}
+
 .card-form-actions {
   display: flex;
   justify-content: flex-end;

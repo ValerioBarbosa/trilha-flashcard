@@ -475,11 +475,27 @@
 
           <label class="card-form-field">
             <span>Enunciado (frente) *</span>
-            <textarea id="card-form-front" required rows="2"></textarea>
+            <div class="rich-editor">
+              <div class="rich-editor-toolbar" role="toolbar" aria-label="Formatação do enunciado">
+                <span class="rich-editor-tool" role="button" tabindex="0" data-rich-command="bold" aria-label="Negrito">N</span>
+                <span class="rich-editor-tool" role="button" tabindex="0" data-rich-command="italic" aria-label="Itálico">I</span>
+                <span class="rich-editor-tool" role="button" tabindex="0" data-rich-command="underline" aria-label="Sublinhado">S</span>
+                <span class="rich-editor-tool" role="button" tabindex="0" data-rich-command="insertUnorderedList" aria-label="Lista com marcadores">☰</span>
+              </div>
+              <div id="card-form-front" class="rich-editor-surface" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Enunciado (frente)" data-placeholder="Digite ou cole o enunciado…"></div>
+            </div>
           </label>
           <label class="card-form-field">
             <span>Gabarito (verso) *</span>
-            <textarea id="card-form-back" required rows="3"></textarea>
+            <div class="rich-editor">
+              <div class="rich-editor-toolbar" role="toolbar" aria-label="Formatação do gabarito">
+                <span class="rich-editor-tool" role="button" tabindex="0" data-rich-command="bold" aria-label="Negrito">N</span>
+                <span class="rich-editor-tool" role="button" tabindex="0" data-rich-command="italic" aria-label="Itálico">I</span>
+                <span class="rich-editor-tool" role="button" tabindex="0" data-rich-command="underline" aria-label="Sublinhado">S</span>
+                <span class="rich-editor-tool" role="button" tabindex="0" data-rich-command="insertUnorderedList" aria-label="Lista com marcadores">☰</span>
+              </div>
+              <div id="card-form-back" class="rich-editor-surface rich-editor-surface-tall" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Gabarito (verso)" data-placeholder="Digite ou cole o gabarito…"></div>
+            </div>
           </label>
           <label class="card-form-field">
             <span>Tag (rótulo curto, opcional)</span>
