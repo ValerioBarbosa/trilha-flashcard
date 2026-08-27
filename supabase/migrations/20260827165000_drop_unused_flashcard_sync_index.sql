@@ -1,0 +1,1 @@
+drop index if exists public.flashcard_sync_entries_user_updated_idx;

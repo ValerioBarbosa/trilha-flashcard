@@ -28,6 +28,7 @@ O app inclui:
 - lixeira com restauração e desfazer exclusão;
 - backup completo de cartões, desempenho e lixeira;
 - sincronização opcional com Google e Firebase, com backup dividido em partes para crescer além do limite de um único documento, modo offline e escolha segura em caso de conflito;
+- sincronização incremental opcional com Supabase, mantendo o Firebase como compatibilidade durante a migração;
 - sessões personalizadas por quantidade, escopo e prioridade.
 
 ## Banco de Matérias
@@ -70,6 +71,20 @@ O JSON aceita tanto `front`/`back` quanto `pergunta`/`resposta`. Os campos `disc
 Edições em baralhos por disciplina ficam salvas no navegador (via `localStorage`) por cima do conteúdo original de `decks.js`; ao editar `decks.js` diretamente, essas edições salvas continuam valendo até serem removidas ou sobrescritas.
 
 ## Ativar sincronização na nuvem
+
+### Supabase (recomendado)
+
+1. Crie um projeto no Supabase e execute a migration em `supabase/migrations`.
+2. Em **Authentication > Providers**, ative o Google.
+3. Configure `https://valeriobarbosa.github.io/trilha-flashcard/` como Site URL e redirect permitido.
+4. Copie a URL e a **publishable key** do projeto para `supabase-config.js`.
+5. Nunca use `service_role`, secret key ou senha do banco no navegador.
+
+O Supabase armazena cada chave de estudo separadamente em `flashcard_sync_entries`. Somente chaves alteradas são enviadas, e exclusões usam tombstones para que dados antigos não reapareçam em outro dispositivo. As políticas RLS restringem leitura e escrita ao proprietário autenticado.
+
+Durante a transição, deixe `firebase-config.js` intacto. Com `supabase-config.js` vazio, o aplicativo continua usando Firebase; ao preencher a configuração Supabase, passa a usar o novo banco. Faça a primeira conexão no aparelho que contém a cópia local mais completa e confirme um backup JSON antes da troca.
+
+### Firebase (compatibilidade)
 
 1. Crie um projeto no Firebase e um aplicativo Web.
 2. Ative **Authentication > Google**.

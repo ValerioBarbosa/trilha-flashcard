@@ -3,10 +3,18 @@
   "private": true,
   "version": "1.0.0",
   "description": "Leitor de flashcards para estudos de concursos públicos.",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
+    "build:vendor": "esbuild node_modules/@supabase/supabase-js/dist/index.mjs --bundle --format=esm --platform=browser --target=es2020 --minify --outfile=vendor/supabase-js.mjs",
     "test": "vitest run"
   },
   "devDependencies": {
+    "esbuild": "0.28.2",
     "vitest": "^4.1.11"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.112.4"
   }
 }
