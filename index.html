@@ -22,7 +22,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260826-2" />
+    <link rel="stylesheet" href="styles.css?v=20260828-1" />
     <script>
       try {
         const savedTheme = localStorage.getItem("trilha-flashcard-theme");
@@ -430,7 +430,7 @@
           <article class="metric-card">
             <span>Sequência</span>
             <strong id="metric-streak">0 dias</strong>
-            <small>de estudo ativo</small>
+            <div class="streak-heatmap" id="streak-heatmap" aria-label="Dias estudados nas últimas cinco semanas"></div>
           </article>
         </section>
 
@@ -464,7 +464,10 @@
             <span id="topic-dashboard-today">0 estudados hoje</span>
           </div>
 
-          <div class="weekly-evolution" id="weekly-evolution" aria-label="Cartões estudados nos últimos 7 dias"></div>
+          <div class="weekly-evolution-wrap">
+            <svg class="weekly-evolution-accuracy" id="weekly-evolution-accuracy" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+            <div class="weekly-evolution" id="weekly-evolution" aria-label="Cartões estudados e taxa de acerto nos últimos 7 dias"></div>
+          </div>
 
           <div class="topic-table" id="topic-table" role="table" aria-label="Desempenho por assunto">
             <div class="topic-table-head" role="row">
@@ -877,14 +880,14 @@
     <script src="card-storage.js?v=20260826-1"></script>
     <script src="card-manager.js?v=20260824-1"></script>
     <script src="card-database.js?v=20260826-1"></script>
-    <script src="data-model.js?v=20260826-2"></script>
+    <script src="data-model.js?v=20260828-1"></script>
     <script src="supabase-config.js?v=20260827-1"></script>
     <script src="supabase-sync.js?v=20260827-1"></script>
     <script src="firebase-config.js?v=20260821-2"></script>
     <script src="cloud-sync.js?v=20260826-1"></script>
     <script type="module">
       try { await CardDatabase.hydrateLocalStorage(localStorage); } catch (error) { console.warn("IndexedDB indisponível", error); }
-      await import("./app.js?v=20260826-2");
+      await import("./app.js?v=20260828-1");
     </script>
   </body>
 </html>
