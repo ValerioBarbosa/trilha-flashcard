@@ -60,6 +60,13 @@
     return rows;
   }
 
+  // app.js reads cloudUser.uid everywhere (a holdover from when Firebase, whose User.uid is
+  // the id field, was the only backend). Supabase's user object only has .id, so without this
+  // alias every read/write went out as user_id=eq.undefined and PostgREST rejected it with 400.
+  function withUidAlias(user) {
+    return user ? { ...user, uid: user.id } : null;
+  }
+
   function observeAuthUser(auth, callback) {
     let active = true;
     let lastUserKey = Symbol("initial-auth-state");
@@ -70,7 +77,7 @@
       lastUserKey = userKey;
       queueMicrotask(() => {
         if (!active) return;
-        Promise.resolve(callback(user)).catch((error) => {
+        Promise.resolve(callback(withUidAlias(user))).catch((error) => {
           console.error("Falha ao processar mudança de autenticação Supabase", error);
         });
       });

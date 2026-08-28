@@ -58,4 +58,23 @@ describe("sincronização incremental Supabase", () => {
     stop();
     expect(unsubscribed).toBe(true);
   });
+
+  it("expõe uid como alias de id (app.js ainda lê cloudUser.uid, herdado do Firebase)", async () => {
+    let authCallback;
+    const auth = {
+      onAuthStateChange(callback) {
+        authCallback = callback;
+        return { data: { subscription: { unsubscribe() {} } } };
+      },
+    };
+    let received;
+    observeAuthUser(auth, async (user) => { received = user; });
+
+    authCallback("SIGNED_IN", { user: { id: "user-1", email: "a@b.com" } });
+    await new Promise((resolve) => queueMicrotask(resolve));
+
+    expect(received.uid).toBe("user-1");
+    expect(received.id).toBe("user-1");
+    expect(received.email).toBe("a@b.com");
+  });
 });
