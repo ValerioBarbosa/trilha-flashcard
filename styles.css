@@ -950,10 +950,34 @@ button:focus-visible {
   margin-top: 28px;
 }
 
+.weekly-evolution-wrap {
+  position: relative;
+}
+
+/* Points sit at column centers, (i + 0.5) / 7 — the grid (not flex+gap) is what keeps those
+   7 columns at exact 1/7-width fractions so the overlaid line lines up with the bars below it. */
+.weekly-evolution-accuracy {
+  position: absolute;
+  inset: 0 2px;
+  width: calc(100% - 4px);
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.weekly-evolution-accuracy polyline {
+  fill: none;
+  stroke: var(--amber-dark);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
 .weekly-evolution {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: end;
   height: 64px;
   margin: 14px 0 18px;
   padding: 0 2px;
@@ -961,12 +985,12 @@ button:focus-visible {
 
 .weekly-evolution-day {
   display: flex;
-  flex: 1;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
   gap: 6px;
   height: 100%;
+  padding: 0 4px;
 }
 
 .weekly-evolution-bar {
@@ -984,6 +1008,23 @@ button:focus-visible {
   color: var(--muted);
   font-size: 0.68rem;
   text-transform: uppercase;
+}
+
+.streak-heatmap {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  margin-top: 8px;
+}
+
+.streak-cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: var(--line);
+}
+
+.streak-cell.is-active {
+  background: var(--green-dark);
 }
 
 .topic-table {

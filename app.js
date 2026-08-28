@@ -195,11 +195,13 @@ const elements = {
   metricDue: document.querySelector("#metric-due"),
   metricNextReview: document.querySelector("#metric-next-review"),
   metricStreak: document.querySelector("#metric-streak"),
+  streakHeatmap: document.querySelector("#streak-heatmap"),
   reviewDue: document.querySelector("#review-due-button"),
   reviewWrong: document.querySelector("#review-wrong-button"),
   deckPerformance: document.querySelector("#deck-performance"),
   topicDashboardToday: document.querySelector("#topic-dashboard-today"),
   weeklyEvolution: document.querySelector("#weekly-evolution"),
+  weeklyEvolutionAccuracy: document.querySelector("#weekly-evolution-accuracy"),
   topicTableBody: document.querySelector("#topic-table-body"),
   topicTableEmpty: document.querySelector("#topic-table-empty"),
   exportButton: document.querySelector("#export-button"),
@@ -458,6 +460,9 @@ const state = {
   sessionWrongKeys: [],
   dailyReviewCounts: savedState.dailyReviewCounts && typeof savedState.dailyReviewCounts === "object" && !Array.isArray(savedState.dailyReviewCounts)
     ? savedState.dailyReviewCounts
+    : {},
+  dailyOutcomes: savedState.dailyOutcomes && typeof savedState.dailyOutcomes === "object" && !Array.isArray(savedState.dailyOutcomes)
+    ? savedState.dailyOutcomes
     : {},
   topicFilter: "",
 };
@@ -889,15 +894,24 @@ function getNextReview() {
     .sort((first, second) => first - second)[0] || null;
 }
 
-function registerActivity() {
+function registerActivity(remembered) {
   const today = dateKey();
   if (!state.activity.includes(today)) state.activity.push(today);
   state.activity = state.activity.slice(-366);
 
   state.dailyReviewCounts[today] = (state.dailyReviewCounts[today] || 0) + 1;
+
+  const outcome = state.dailyOutcomes[today] || { attempts: 0, remembered: 0 };
+  outcome.attempts += 1;
+  if (remembered) outcome.remembered += 1;
+  state.dailyOutcomes[today] = outcome;
+
   const cutoff = dateKey(new Date(Date.now() - 60 * 86400000));
   Object.keys(state.dailyReviewCounts).forEach((key) => {
     if (key < cutoff) delete state.dailyReviewCounts[key];
+  });
+  Object.keys(state.dailyOutcomes).forEach((key) => {
+    if (key < cutoff) delete state.dailyOutcomes[key];
   });
 }
 
@@ -906,9 +920,23 @@ function getLastNDaysCounts(days) {
   for (let offset = days - 1; offset >= 0; offset -= 1) {
     const date = new Date(Date.now() - offset * 86400000);
     const key = dateKey(date);
-    result.push({ date: key, weekday: date.toLocaleDateString("pt-BR", { weekday: "short" }), count: state.dailyReviewCounts[key] || 0, isToday: offset === 0 });
+    const outcome = state.dailyOutcomes[key];
+    const accuracy = outcome?.attempts ? Math.round((outcome.remembered / outcome.attempts) * 100) : null;
+    result.push({ date: key, weekday: date.toLocaleDateString("pt-BR", { weekday: "short" }), count: state.dailyReviewCounts[key] || 0, accuracy, isToday: offset === 0 });
   }
   return result;
+}
+
+function renderStreakHeatmap() {
+  const days = 35;
+  const cells = [];
+  for (let offset = days - 1; offset >= 0; offset -= 1) {
+    const date = new Date(Date.now() - offset * 86400000);
+    const studied = state.activity.includes(dateKey(date));
+    const label = date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+    cells.push(`<span class="streak-cell ${studied ? "is-active" : ""}" title="${escapeHtml(label)}${studied ? " · estudado" : ""}"></span>`);
+  }
+  elements.streakHeatmap.innerHTML = cells.join("");
 }
 
 function getStudyStreak() {
@@ -966,6 +994,7 @@ function saveProgress() {
     ratings: state.ratings,
     activity: state.activity,
     dailyReviewCounts: state.dailyReviewCounts,
+    dailyOutcomes: state.dailyOutcomes,
     activeSession: serializeActiveSession(),
   });
   if (localStorage.getItem(STORAGE_KEY) === value) return;
@@ -1106,6 +1135,7 @@ function renderDashboard() {
   elements.metricDue.textContent = String(dueEntries.length);
   elements.metricNextReview.textContent = formatNextReview(getNextReview());
   elements.metricStreak.textContent = `${streak} ${streak === 1 ? "dia" : "dias"}`;
+  renderStreakHeatmap();
   elements.dashboardSummary.textContent = reviewed
     ? `${reviewed} ${reviewed === 1 ? "cartão revisado" : "cartões revisados"} em ${state.activity.length} ${state.activity.length === 1 ? "dia de estudo" : "dias de estudo"}.`
     : "Seu histórico fica salvo neste navegador e alimenta as próximas revisões.";
@@ -1120,26 +1150,31 @@ function renderDashboard() {
     ? `Revisar ${wrongEntries.length} ${wrongEntries.length === 1 ? "errado" : "errados"}`
     : "Nenhum cartão errado";
 
-  elements.deckPerformance.innerHTML = getDecksForDisplay().map((deck) => {
-    const stats = getDeckStats(deck);
-    const progress = deck.cards.length ? Math.round((stats.reviewed / deck.cards.length) * 100) : 0;
-    const deckAccuracy = stats.attempts ? Math.round((stats.remembered / stats.attempts) * 100) : 0;
-    const coverage = getTopicCoverage(deck);
-    const coverageText = coverage ? ` · ${coverage.covered} de ${coverage.total} assuntos` : "";
-    return `
-      <article class="deck-performance-row">
-        <div class="deck-performance-heading">
-          <span>${escapeHtml(deck.title)}</span>
-          ${deck.custom ? `<button type="button" class="deck-remove-button" data-remove-deck="${escapeHtml(deck.id)}" aria-label="Remover baralho ${escapeHtml(deck.title)}">✕</button>` : ""}
-          <strong>${stats.reviewed}/${deck.cards.length}</strong>
-        </div>
-        <div class="deck-performance-track" aria-hidden="true">
-          <span style="width: ${progress}%"></span>
-        </div>
-        <small>${deck.cards.length === 0 ? "sem cartões" : stats.attempts ? `${deckAccuracy}% de acerto` : "ainda não iniciado"}${coverageText}</small>
-      </article>
-    `;
-  }).join("");
+  // Baralhos do edital ainda vazios só poluem a lista (não há como excluí-los); baralhos
+  // personalizados vazios continuam aparecendo para que o botão de remover fique acessível.
+  const performanceDecks = getDecksForDisplay().filter((deck) => deck.cards.length > 0 || deck.custom);
+  elements.deckPerformance.innerHTML = performanceDecks.length
+    ? performanceDecks.map((deck) => {
+        const stats = getDeckStats(deck);
+        const progress = deck.cards.length ? Math.round((stats.reviewed / deck.cards.length) * 100) : 0;
+        const deckAccuracy = stats.attempts ? Math.round((stats.remembered / stats.attempts) * 100) : 0;
+        const coverage = getTopicCoverage(deck);
+        const coverageText = coverage ? ` · ${coverage.covered} de ${coverage.total} assuntos` : "";
+        return `
+          <article class="deck-performance-row">
+            <div class="deck-performance-heading">
+              <span>${escapeHtml(deck.title)}</span>
+              ${deck.custom ? `<button type="button" class="deck-remove-button" data-remove-deck="${escapeHtml(deck.id)}" aria-label="Remover baralho ${escapeHtml(deck.title)}">✕</button>` : ""}
+              <strong>${stats.reviewed}/${deck.cards.length}</strong>
+            </div>
+            <div class="deck-performance-track" aria-hidden="true">
+              <span style="width: ${progress}%"></span>
+            </div>
+            <small>${deck.cards.length === 0 ? "sem cartões" : stats.attempts ? `${deckAccuracy}% de acerto` : "ainda não iniciado"}${coverageText}</small>
+          </article>
+        `;
+      }).join("")
+    : '<p class="card-list-empty">Adicione cartões a alguma disciplina para acompanhar o progresso aqui.</p>';
   elements.deckPerformance.querySelectorAll("[data-remove-deck]").forEach((button) => {
     button.addEventListener("click", () => removeCustomDeck(button.dataset.removeDeck));
   });
@@ -1192,6 +1227,18 @@ function getTopicStats() {
   return [...map.values()];
 }
 
+// Draws the accuracy trend as a line over the volume bars instead of a second chart, so you
+// can see whether accuracy is improving even on a day you studied very few cards.
+function renderWeeklyAccuracyLine(days) {
+  const points = days
+    .map((day, index) => (day.accuracy === null ? null : { x: ((index + 0.5) / days.length) * 100, y: 100 - day.accuracy }))
+    .filter(Boolean);
+
+  elements.weeklyEvolutionAccuracy.innerHTML = points.length < 2
+    ? ""
+    : `<polyline points="${points.map((point) => `${point.x},${point.y}`).join(" ")}" />`;
+}
+
 function renderTopicDashboard() {
   const today = dateKey();
   elements.topicDashboardToday.textContent = `${state.dailyReviewCounts[today] || 0} estudados hoje`;
@@ -1200,10 +1247,11 @@ function renderTopicDashboard() {
   const maxCount = Math.max(1, ...days.map((day) => day.count));
   elements.weeklyEvolution.innerHTML = days.map((day) => `
     <div class="weekly-evolution-day ${day.isToday ? "is-today" : ""}">
-      <div class="weekly-evolution-bar" style="height: ${Math.max(6, Math.round((day.count / maxCount) * 100))}%" title="${day.count} cartões"></div>
+      <div class="weekly-evolution-bar" style="height: ${Math.max(6, Math.round((day.count / maxCount) * 100))}%" title="${day.count} cartões${day.accuracy === null ? "" : ` · ${day.accuracy}% de acerto`}"></div>
       <span class="weekly-evolution-label">${escapeHtml(day.weekday.replace(".", ""))}</span>
     </div>
   `).join("");
+  renderWeeklyAccuracyLine(days);
 
   const stats = getTopicStats().filter((entry) => entry.total > 0);
   const ranked = [...stats].sort((a, b) => {
@@ -1784,7 +1832,7 @@ function rateCard(rating) {
   elements.hard.disabled = true;
   elements.good.disabled = true;
   elements.easy.disabled = true;
-  registerActivity();
+  registerActivity(rating !== "again");
   renderProgress();
   renderDashboard();
   saveProgress();
