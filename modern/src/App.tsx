@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ModernWorkspace } from './app/ModernWorkspace';
 import { useAuth } from './auth/AuthContext';
+import { CardManagerLauncher } from './cards/CardManagerLauncher';
 import './styles.css';
 
 export function App() {
@@ -16,7 +17,14 @@ export function App() {
     }
   }
 
-  if (user) return <ModernWorkspace user={user} onSignOut={signOut} />;
+  if (user) {
+    return (
+      <>
+        <ModernWorkspace user={user} onSignOut={signOut} />
+        <CardManagerLauncher user={user} />
+      </>
+    );
+  }
 
   return (
     <main className="auth-screen">
