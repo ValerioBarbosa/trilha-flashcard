@@ -19,7 +19,7 @@ button { font: inherit; }
 }
 
 .pilot-card {
-  width: min(680px, 100%);
+  width: min(760px, 100%);
   background: white;
   border: 1px solid #d8e5dc;
   border-radius: 24px;
@@ -39,7 +39,8 @@ button { font: inherit; }
 }
 
 h1 { margin: 16px 0 8px; font-size: clamp(32px, 7vw, 52px); line-height: 1; }
-.pilot-subtitle, .pilot-note { color: #617068; line-height: 1.6; }
+h2 { margin: 0; font-size: 20px; }
+.pilot-subtitle, .pilot-note, .section-heading p { color: #617068; line-height: 1.6; }
 
 .status-grid {
   display: grid;
@@ -47,6 +48,8 @@ h1 { margin: 16px 0 8px; font-size: clamp(32px, 7vw, 52px); line-height: 1; }
   gap: 12px;
   margin: 28px 0;
 }
+
+.status-grid.compact { margin: 18px 0; }
 
 .status-grid > div {
   border: 1px solid #e2ebe5;
@@ -80,11 +83,26 @@ button:disabled { opacity: .55; cursor: not-allowed; }
   font-weight: 700;
 }
 
+.sync-panel {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid #e2ebe5;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.section-heading p { margin: 6px 0 0; }
 .pilot-note { margin: 22px 0 0; font-size: 13px; }
 
 @media (max-width: 560px) {
   .pilot-card { padding: 22px; border-radius: 20px; }
   .status-grid { grid-template-columns: 1fr; }
   .status-wide { grid-column: auto; }
-  .pilot-actions button { width: 100%; }
+  .pilot-actions button, .section-heading button { width: 100%; }
+  .section-heading { flex-direction: column; }
 }
