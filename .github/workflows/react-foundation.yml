@@ -1,0 +1,36 @@
+name: React foundation
+
+on:
+  pull_request:
+    paths:
+      - 'modern/**'
+      - 'src/**'
+      - '.github/workflows/react-foundation.yml'
+  push:
+    branches:
+      - feature/react-typescript-foundation
+    paths:
+      - 'modern/**'
+      - 'src/**'
+      - '.github/workflows/react-foundation.yml'
+
+jobs:
+  modern-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install legacy dependencies
+        run: npm ci
+      - name: Install React laboratory dependencies
+        working-directory: modern
+        run: npm install --no-audit --no-fund
+      - name: Typecheck React laboratory
+        working-directory: modern
+        run: npm run typecheck
+      - name: Build React laboratory
+        working-directory: modern
+        run: npm run build
