@@ -61,20 +61,46 @@ export function QuestionBankPreview({ user, onClose }: Props) {
   const [loading, setLoading] = useState(Boolean(user));
 
   useEffect(() => {
-    if (!user) return;
-    setLoading(true);
-    void getSupabaseClient().from('questions')
-      .select('id,statement,alternatives,correct_answer,explanation,legal_basis,board,exam,exam_year,source,source_url,subject_id,topic_id,tags')
-      .eq('user_id', user.id).is('deleted_at', null).order('created_at', { ascending: false }).limit(200)
-      .then(({ data, error }) => {
+    let cancelled = false;
+
+    async function loadQuestions() {
+      if (!user) {
+        setQuestions([]);
+        setSelectedId(DEMO_QUESTION.id);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const { data, error } = await getSupabaseClient()
+          .from('questions')
+          .select('id,statement,alternatives,correct_answer,explanation,legal_basis,board,exam,exam_year,source,source_url,subject_id,topic_id,tags')
+          .eq('user_id', user.id)
+          .is('deleted_at', null)
+          .order('created_at', { ascending: false })
+          .limit(200);
+
         if (error) throw error;
-        const rows = (data || []) as Question[];
+        if (cancelled) return;
+
+        const rows = (data ?? []) as Question[];
         setQuestions(rows);
-        setSelectedId(rows[0]?.id || DEMO_QUESTION.id);
-      })
-      .catch(() => { setQuestions([]); setSelectedId(DEMO_QUESTION.id); })
-      .finally(() => setLoading(false));
-  }, [user?.id]);
+        setSelectedId(rows[0]?.id ?? DEMO_QUESTION.id);
+      } catch {
+        if (cancelled) return;
+        setQuestions([]);
+        setSelectedId(DEMO_QUESTION.id);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void loadQuestions();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const pool = questions.length ? questions : [DEMO_QUESTION];
   const sources = useMemo(() => [...new Set(pool.map((item) => item.source).filter(Boolean))] as string[], [pool]);
