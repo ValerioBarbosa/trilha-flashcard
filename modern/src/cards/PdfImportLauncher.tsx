@@ -4,6 +4,7 @@ import { getSupabaseClient } from '../lib/supabase-client';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
 import { importCards, markImportDuplicates, type ImportCandidate } from './card-manager-repository';
 import { parsePdfImport } from './pdf-import';
+import './pdf-import.css';
 
 export function PdfImportLauncher({ user }: { user: User }) {
   const workspace = useStudyWorkspace(user);
@@ -22,13 +23,7 @@ export function PdfImportLauncher({ user }: { user: User }) {
     if (!workspace.profile || !effectiveSubject || !effectiveDeck) return;
     setBusy(true); setStatus('Lendo PDF…'); setRows([]);
     try {
-      const parsed = await parsePdfImport(file, {
-        subjects: workspace.subjects,
-        topics: workspace.topics,
-        decks: workspace.decks,
-        defaultSubjectId: effectiveSubject,
-        defaultDeckId: effectiveDeck,
-      });
+      const parsed = await parsePdfImport(file, { subjects: workspace.subjects, topics: workspace.topics, decks: workspace.decks, defaultSubjectId: effectiveSubject, defaultDeckId: effectiveDeck });
       const marked = await markImportDuplicates(getSupabaseClient(), workspace.profile.id, parsed);
       setRows(marked);
       setStatus(`${marked.length} cartões encontrados · ${marked.filter((row) => row.duplicate).length} duplicados bloqueados.`);
@@ -44,8 +39,7 @@ export function PdfImportLauncher({ user }: { user: User }) {
       const result = await importCards(getSupabaseClient(), user, workspace.profile.id, rows);
       setStatus(`${result.inserted} cartões importados · ${result.duplicates} duplicados ignorados · ${result.failed} falhas.`);
       await workspace.refresh();
-      const remarked = await markImportDuplicates(getSupabaseClient(), workspace.profile.id, rows);
-      setRows(remarked);
+      setRows(await markImportDuplicates(getSupabaseClient(), workspace.profile.id, rows));
     } finally { setBusy(false); }
   }
 
