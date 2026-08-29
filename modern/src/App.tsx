@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from './auth/AuthContext';
+import { SyncPanel } from './sync/SyncPanel';
 import './styles.css';
 
 export function App() {
@@ -21,7 +22,7 @@ export function App() {
         <div className="pilot-badge">LABORATÓRIO REACT</div>
         <h1 id="pilot-title">Trilha Flashcard</h1>
         <p className="pilot-subtitle">
-          Piloto isolado para validar autenticação Supabase antes da migração da interface principal.
+          Piloto isolado para validar autenticação e sincronização Supabase antes da migração da interface principal.
         </p>
 
         <dl className="status-grid">
@@ -60,8 +61,10 @@ export function App() {
           )}
         </div>
 
+        {user ? <SyncPanel user={user} /> : null}
+
         <p className="pilot-note">
-          Este módulo não substitui o app atual e não altera cartões, IndexedDB ou Firebase.
+          Este módulo não substitui o app atual. IndexedDB e Firebase permanecem preservados durante a migração.
         </p>
       </section>
     </main>
