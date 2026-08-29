@@ -1,13 +1,26 @@
 import type { SyncSnapshot } from '../../../src/types/sync';
 
 const PREFIX = 'trilha-flashcard-';
+const EXCLUDED_KEYS = new Set([
+  'trilha-flashcard-theme',
+  'trilha-flashcard-cloud-meta',
+]);
+
+export function isSyncableKey(key: string): boolean {
+  return key.startsWith(PREFIX) && !EXCLUDED_KEYS.has(key);
+}
 
 export function readLegacyLocalSnapshot(storage: Storage = window.localStorage): SyncSnapshot {
   const entries: Record<string, string> = {};
+  const keys: string[] = [];
 
   for (let index = 0; index < storage.length; index += 1) {
     const key = storage.key(index);
-    if (!key || !key.startsWith(PREFIX)) continue;
+    if (key && isSyncableKey(key)) keys.push(key);
+  }
+
+  keys.sort();
+  for (const key of keys) {
     const value = storage.getItem(key);
     if (value !== null) entries[key] = value;
   }
@@ -19,12 +32,16 @@ export function applyLegacyLocalSnapshot(
   snapshot: SyncSnapshot,
   storage: Storage = window.localStorage,
 ): void {
-  const incomingKeys = new Set(Object.keys(snapshot.entries));
+  if (!snapshot || snapshot.version !== 1 || !snapshot.entries) {
+    throw new Error('invalid-cloud-snapshot');
+  }
+
+  const incomingKeys = new Set(Object.keys(snapshot.entries).filter(isSyncableKey));
   const existingKeys: string[] = [];
 
   for (let index = 0; index < storage.length; index += 1) {
     const key = storage.key(index);
-    if (key?.startsWith(PREFIX)) existingKeys.push(key);
+    if (key && isSyncableKey(key)) existingKeys.push(key);
   }
 
   for (const key of existingKeys) {
@@ -32,7 +49,7 @@ export function applyLegacyLocalSnapshot(
   }
 
   for (const [key, value] of Object.entries(snapshot.entries)) {
-    if (!key.startsWith(PREFIX)) continue;
+    if (!isSyncableKey(key) || typeof value !== 'string') continue;
     storage.setItem(key, value);
   }
 }
