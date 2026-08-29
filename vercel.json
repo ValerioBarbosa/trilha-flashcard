@@ -1,3 +1,6 @@
 {
-  "framework": null
+  "framework": "vite",
+  "installCommand": "npm install --prefix modern --no-audit --no-fund",
+  "buildCommand": "npm run build --prefix modern",
+  "outputDirectory": "modern/dist"
 }
