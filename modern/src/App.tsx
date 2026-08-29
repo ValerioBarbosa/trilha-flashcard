@@ -4,6 +4,7 @@ import { useAuth } from './auth/AuthContext';
 import { CardManagerLauncher } from './cards/CardManagerLauncher';
 import { PdfImportLauncher } from './cards/PdfImportLauncher';
 import { ErrorNotebookLauncher } from './errors/ErrorNotebookLauncher';
+import { QuestionManagerLauncher } from './questions/QuestionManagerLauncher';
 import './styles.css';
 
 export function App() {
@@ -23,6 +24,7 @@ export function App() {
     return (
       <>
         <ModernWorkspace user={user} onSignOut={signOut} />
+        <QuestionManagerLauncher user={user} />
         <ErrorNotebookLauncher user={user} />
         <PdfImportLauncher user={user} />
         <CardManagerLauncher user={user} />
