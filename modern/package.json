@@ -4,8 +4,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "generate:legacy": "node scripts/generate-legacy-decks.mjs",
+    "predev": "npm run generate:legacy",
     "dev": "vite",
+    "prebuild": "npm run generate:legacy",
     "build": "tsc -b && vite build",
+    "pretypecheck": "npm run generate:legacy",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

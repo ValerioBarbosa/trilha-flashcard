@@ -1,83 +1,46 @@
 import { useState } from 'react';
+import { ModernWorkspace } from './app/ModernWorkspace';
 import { useAuth } from './auth/AuthContext';
-import { LegacyMigrationPanel } from './migration/LegacyMigrationPanel';
-import { StudyDashboard } from './study/StudyDashboard';
-import { SyncPanel } from './sync/SyncPanel';
 import './styles.css';
 
 export function App() {
-  const { user, loading, initialized, error, signIn, signOut, refresh } = useAuth();
+  const { user, loading, initialized, error, signIn, signOut } = useAuth();
   const [actionError, setActionError] = useState<string | null>(null);
-  const [studyRefreshSignal, setStudyRefreshSignal] = useState(0);
 
-  async function run(action: () => Promise<unknown>) {
+  async function handleSignIn() {
     setActionError(null);
     try {
-      await action();
+      await signIn();
     } catch (cause) {
       setActionError(cause instanceof Error ? cause.message : String(cause));
     }
   }
 
+  if (user) return <ModernWorkspace user={user} onSignOut={signOut} />;
+
   return (
-    <main className="pilot-shell">
-      <section className="pilot-card" aria-labelledby="pilot-title">
-        <div className="pilot-badge">TRILHA MODERNA</div>
-        <h1 id="pilot-title">Trilha Flashcard</h1>
-        <p className="pilot-subtitle">
-          Fundação React + TypeScript conectada ao Supabase, preservando o app local-first durante a migração.
-        </p>
-
-        <dl className="status-grid">
-          <div>
-            <dt>Estado</dt>
-            <dd>{loading ? 'Carregando' : initialized ? 'Pronto' : 'Inicializando'}</dd>
-          </div>
-          <div>
-            <dt>Sessão</dt>
-            <dd>{user ? 'Conectada' : 'Desconectada'}</dd>
-          </div>
-          <div className="status-wide">
-            <dt>Usuário</dt>
-            <dd>{user?.email ?? 'Nenhum usuário autenticado'}</dd>
-          </div>
-        </dl>
-
-        {(error || actionError) ? (
-          <p className="pilot-error" role="alert">{actionError ?? error}</p>
-        ) : null}
-
-        <div className="pilot-actions">
-          {user ? (
-            <>
-              <button type="button" onClick={() => void run(refresh)} disabled={loading}>
-                Atualizar sessão
-              </button>
-              <button type="button" className="secondary" onClick={() => void run(signOut)} disabled={loading}>
-                Sair
-              </button>
-            </>
-          ) : (
-            <button type="button" onClick={() => void run(signIn)} disabled={loading || Boolean(error)}>
-              Entrar com Google
-            </button>
-          )}
+    <main className="auth-screen">
+      <section className="auth-visual">
+        <div className="auth-brand"><span>T</span><strong>Trilha Concursos</strong></div>
+        <div className="auth-copy">
+          <span className="page-eyebrow">ESTUDE O QUE MAIS IMPORTA</span>
+          <h1>Seu edital vira uma trilha de aprovação.</h1>
+          <p>Flashcards, questões, jurisprudência, revisão e desempenho no mesmo lugar — com seus dados sincronizados.</p>
         </div>
-
-        {user ? (
-          <>
-            <StudyDashboard user={user} refreshSignal={studyRefreshSignal} />
-            <LegacyMigrationPanel
-              user={user}
-              onMigrated={() => setStudyRefreshSignal((value) => value + 1)}
-            />
-            <SyncPanel user={user} />
-          </>
-        ) : null}
-
-        <p className="pilot-note">
-          O armazenamento legado continua preservado. A migração relacional copia os dados e pode ser reexecutada sem apagar o banco local.
-        </p>
+        <div className="auth-proof"><strong>Local-first</strong><span>Você continua estudando mesmo quando a conexão falha.</span></div>
+      </section>
+      <section className="auth-panel">
+        <div className="login-card">
+          <span className="brand-mark large">T</span>
+          <h2>Entrar na Trilha</h2>
+          <p>Use sua conta Google para acessar estudos e sincronização.</p>
+          {(error || actionError) ? <div className="notice error"><span>{actionError ?? error}</span></div> : null}
+          <button className="google-button" onClick={() => void handleSignIn()} disabled={loading || !initialized}>
+            <span className="google-g">G</span>
+            {loading ? 'Conectando…' : 'Continuar com Google'}
+          </button>
+          <small className="auth-note">A versão moderna usa o mesmo projeto Supabase e preserva o armazenamento local durante a migração.</small>
+        </div>
       </section>
     </main>
   );
