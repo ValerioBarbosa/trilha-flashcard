@@ -3,6 +3,7 @@ import { ModernWorkspace } from './app/ModernWorkspace';
 import { useAuth } from './auth/AuthContext';
 import { CardManagerLauncher } from './cards/CardManagerLauncher';
 import { PdfImportLauncher } from './cards/PdfImportLauncher';
+import { ErrorNotebookLauncher } from './errors/ErrorNotebookLauncher';
 import './styles.css';
 
 export function App() {
@@ -22,6 +23,7 @@ export function App() {
     return (
       <>
         <ModernWorkspace user={user} onSignOut={signOut} />
+        <ErrorNotebookLauncher user={user} />
         <PdfImportLauncher user={user} />
         <CardManagerLauncher user={user} />
       </>
