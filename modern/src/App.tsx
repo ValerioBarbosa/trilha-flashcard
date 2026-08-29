@@ -4,12 +4,14 @@ import { useAuth } from './auth/AuthContext';
 import { CardManagerLauncher } from './cards/CardManagerLauncher';
 import { PdfImportLauncher } from './cards/PdfImportLauncher';
 import { ErrorNotebookLauncher } from './errors/ErrorNotebookLauncher';
+import { QuestionBankPreview } from './questions/QuestionBankPreview';
 import { QuestionManagerLauncher } from './questions/QuestionManagerLauncher';
 import './styles.css';
 
 export function App() {
   const { user, loading, initialized, error, signIn, signOut } = useAuth();
   const [actionError, setActionError] = useState<string | null>(null);
+  const questionPreview = new URLSearchParams(window.location.search).get('questoes') === 'preview';
 
   async function handleSignIn() {
     setActionError(null);
@@ -18,6 +20,19 @@ export function App() {
     } catch (cause) {
       setActionError(cause instanceof Error ? cause.message : String(cause));
     }
+  }
+
+  if (questionPreview) {
+    return (
+      <QuestionBankPreview
+        user={user}
+        onClose={() => {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('questoes');
+          window.location.assign(url.toString());
+        }}
+      />
+    );
   }
 
   if (user) {
@@ -40,6 +55,7 @@ export function App() {
           <span className="page-eyebrow">ESTUDE O QUE MAIS IMPORTA</span>
           <h1>Seu edital vira uma trilha de aprovação.</h1>
           <p>Flashcards, questões, jurisprudência, revisão e desempenho no mesmo lugar — com seus dados sincronizados.</p>
+          <a className="preview-link" href="?questoes=preview">Ver demonstração do banco de questões →</a>
         </div>
         <div className="auth-proof"><strong>Local-first</strong><span>Você continua estudando mesmo quando a conexão falha.</span></div>
       </section>
