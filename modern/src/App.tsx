@@ -4,6 +4,7 @@ import { useAuth } from './auth/AuthContext';
 import { CardManagerLauncher } from './cards/CardManagerLauncher';
 import { PdfImportLauncher } from './cards/PdfImportLauncher';
 import { ErrorNotebookLauncher } from './errors/ErrorNotebookLauncher';
+import { QuestionBankLauncher } from './questions/QuestionBankLauncher';
 import { QuestionBankPreview } from './questions/QuestionBankPreview';
 import { QuestionManagerLauncher } from './questions/QuestionManagerLauncher';
 import './styles.css';
@@ -39,6 +40,7 @@ export function App() {
     return (
       <>
         <ModernWorkspace user={user} onSignOut={signOut} />
+        <QuestionBankLauncher user={user} />
         <QuestionManagerLauncher user={user} />
         <ErrorNotebookLauncher user={user} />
         <PdfImportLauncher user={user} />
