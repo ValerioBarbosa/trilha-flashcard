@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useAuth } from './auth/AuthContext';
-import { SyncPanel } from './sync/SyncPanel';
+import { LegacyMigrationPanel } from './migration/LegacyMigrationPanel';
 import { StudyDashboard } from './study/StudyDashboard';
+import { SyncPanel } from './sync/SyncPanel';
 import './styles.css';
 
 export function App() {
   const { user, loading, initialized, error, signIn, signOut, refresh } = useAuth();
   const [actionError, setActionError] = useState<string | null>(null);
+  const [studyRefreshSignal, setStudyRefreshSignal] = useState(0);
 
   async function run(action: () => Promise<unknown>) {
     setActionError(null);
@@ -64,13 +66,17 @@ export function App() {
 
         {user ? (
           <>
-            <StudyDashboard user={user} />
+            <StudyDashboard user={user} refreshSignal={studyRefreshSignal} />
+            <LegacyMigrationPanel
+              user={user}
+              onMigrated={() => setStudyRefreshSignal((value) => value + 1)}
+            />
             <SyncPanel user={user} />
           </>
         ) : null}
 
         <p className="pilot-note">
-          O armazenamento legado continua preservado. A nova base relacional passa a ser preenchida de forma gradual, sem apagar cartões existentes.
+          O armazenamento legado continua preservado. A migração relacional copia os dados e pode ser reexecutada sem apagar o banco local.
         </p>
       </section>
     </main>

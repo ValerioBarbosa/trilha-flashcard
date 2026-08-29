@@ -3,7 +3,7 @@ import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { ensureDefaultProfile, loadStudyMetrics, type StudyMetrics, type StudyProfile } from './study-repository';
 
-type Props = { user: User };
+type Props = { user: User; refreshSignal?: number };
 
 type State = {
   loading: boolean;
@@ -14,7 +14,7 @@ type State = {
 
 const EMPTY: State = { loading: true, error: null, profile: null, metrics: null };
 
-export function StudyDashboard({ user }: Props) {
+export function StudyDashboard({ user, refreshSignal = 0 }: Props) {
   const [state, setState] = useState<State>(EMPTY);
 
   async function refresh() {
@@ -35,14 +35,14 @@ export function StudyDashboard({ user }: Props) {
 
   useEffect(() => {
     void refresh();
-  }, [user.id]);
+  }, [user.id, refreshSignal]);
 
   return (
     <section className="study-dashboard" aria-labelledby="study-dashboard-title">
       <div className="section-heading">
         <div>
           <h2 id="study-dashboard-title">Base de estudos</h2>
-          <p>Primeira leitura real do novo modelo relacional no Supabase.</p>
+          <p>Leitura real do novo modelo relacional no Supabase.</p>
         </div>
         <button type="button" className="secondary" onClick={() => void refresh()} disabled={state.loading}>
           {state.loading ? 'Atualizando…' : 'Atualizar'}
