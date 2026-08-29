@@ -72,6 +72,11 @@ export type QuestionRow = {
   correct_answer: string | null;
   explanation: string | null;
   legal_basis: string | null;
+  source: string | null;
+  source_provider: string | null;
+  external_id: string | null;
+  source_url: string | null;
+  tags: string[];
 };
 
 export type JurisprudenceRow = {
@@ -177,10 +182,11 @@ export async function saveReview(
 
 export async function listQuestions(client: SupabaseClient, profileId: string): Promise<QuestionRow[]> {
   return requireData(client.from('questions')
-    .select('id,subject_id,topic_id,board,exam,exam_year,statement,alternatives,correct_answer,explanation,legal_basis')
+    .select('id,subject_id,topic_id,board,exam,exam_year,statement,alternatives,correct_answer,explanation,legal_basis,source,source_provider,external_id,source_url,tags')
     .eq('profile_id', profileId)
+    .is('deleted_at', null)
     .order('created_at', { ascending: false })
-    .limit(100));
+    .limit(200));
 }
 
 export async function saveQuestionAttempt(
