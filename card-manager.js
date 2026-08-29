@@ -22,6 +22,24 @@
     return new Set([...groups.values()].filter((indices) => indices.length > 1).flat());
   }
 
+  function classifyImportCards(cards, resolveDeck) {
+    const acceptedKeys = new Set();
+    return cards.map((card) => {
+      const deck = resolveDeck(card);
+      const key = duplicateKey(card);
+      const scopedKey = `${deck?.id || ""}\u0000${key}`;
+      const alreadyIncluded = Boolean(key && deck?.cards?.some((existing) => duplicateKey(existing) === key));
+      const repeatedInFile = Boolean(key && !alreadyIncluded && acceptedKeys.has(scopedKey));
+      if (key && !alreadyIncluded && !repeatedInFile) acceptedKeys.add(scopedKey);
+      return {
+        card,
+        deck,
+        duplicate: alreadyIncluded || repeatedInFile,
+        reason: alreadyIncluded ? "included" : repeatedInFile ? "file" : "",
+      };
+    });
+  }
+
   function organizeCards(cards, filters = {}) {
     const query = normalize(filters.query).trim();
     const topic = filters.topic || "";
@@ -92,5 +110,5 @@
     };
   }
 
-  return { normalize, organizeCards, duplicateKey, findDuplicateIndices };
+  return { normalize, organizeCards, duplicateKey, findDuplicateIndices, classifyImportCards };
 });

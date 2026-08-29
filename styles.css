@@ -1618,6 +1618,26 @@ kbd {
 .import-preview-row span { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
 .import-preview-row strong { color: var(--ink); font-size: 0.86rem; }
 .import-preview-row small { color: var(--muted); }
+.import-preview-row.is-duplicate {
+  border-color: color-mix(in srgb, var(--coral) 65%, var(--line));
+  background: color-mix(in srgb, var(--coral) 10%, var(--surface));
+  cursor: not-allowed;
+}
+.import-preview-row.is-duplicate input { accent-color: var(--coral); }
+.import-preview-row.is-duplicate strong,
+.import-preview-row.is-duplicate small { color: color-mix(in srgb, var(--coral) 82%, var(--ink)); }
+.import-duplicate-badge {
+  display: inline-flex;
+  margin-left: 6px;
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: var(--coral);
+  color: white;
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 800;
+  vertical-align: 1px;
+}
 
 .card-form {
   display: flex;

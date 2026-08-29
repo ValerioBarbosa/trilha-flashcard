@@ -33,6 +33,23 @@ describe("organização do gerenciador de cartões", () => {
     expect(CardManager.organizeCards(repeated, { duplicatesOnly: true }).filtered).toBe(2);
   });
 
+  it("bloqueia na importação cartões já incluídos e repetições do mesmo arquivo", () => {
+    const deck = { id: "trabalho", cards: [{ front: "Prazo prescricional", back: "Cinco anos" }] };
+    const candidates = CardManager.classifyImportCards([
+      { front: " PRAZO   PRESCRICIONAL ", back: "Outra resposta" },
+      { front: "Jus postulandi", back: "Regra geral" },
+      { front: "jus  postulandi", back: "Resposta repetida" },
+      { front: "Competência territorial", back: "CLT" },
+    ], () => deck);
+
+    expect(candidates.map(({ duplicate, reason }) => [duplicate, reason])).toEqual([
+      [true, "included"],
+      [false, ""],
+      [true, "file"],
+      [false, ""],
+    ]);
+  });
+
   it("cria subgrupos por subassunto", () => {
     const result = CardManager.organizeCards([
       { front: "A", back: "1", topic: "Judiciário", subtopic: "Justiça do Trabalho" },

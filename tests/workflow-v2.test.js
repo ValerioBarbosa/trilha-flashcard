@@ -80,8 +80,8 @@ describe("persistência da sessão ativa", () => {
     expect(app).toContain("queueKeys: state.customQueue.map");
     expect(app).toContain('setActiveSurface(resumedActiveSession ? "study" : "home")');
     expect(app).toContain('showToast("Sessão retomada")');
-    expect(html).toContain("app.js?v=20260828-1");
-    expect(serviceWorker).toContain("trilha-flashcard-v38");
+    expect(html).toContain("app.js?v=20260829-dup1");
+    expect(serviceWorker).toContain("trilha-flashcard-v39");
     expect(serviceWorker).toContain("motion-animations.js?v=20260824-1");
     expect(spacedRepetition).toContain("motion-animations.js?v=20260824-1");
   });
@@ -110,6 +110,9 @@ describe("fluxos de segurança e produtividade", () => {
     expect(app).toContain("function deleteSelectedCards");
     expect(app).toContain("function showImportReport");
     expect(app).toMatch(/await CardDatabase\.persistEntries\(\[\.\.\.entries\]\);\s+if \(added > 0\) markCloudDirty\(\);/);
+    expect(app).toContain("CardManager.classifyImportCards");
+    expect(app).toContain('duplicate ? " disabled" : " checked"');
+    expect(styles).toContain(".import-preview-row.is-duplicate");
   });
 });
 

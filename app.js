@@ -2705,16 +2705,17 @@ function findImportTarget(card, fallbackDeck) {
 }
 
 function openImportPreview(cards, sourceLabel, { invalid = 0, found = cards.length } = {}) {
-  pendingImport = { cards, sourceLabel, invalid, found };
-  const duplicates = cards.filter((card) => {
-    const deck = findImportTarget(card, currentDeck());
-    return deck.cards.some((existing) => existing.front.trim().toLowerCase() === card.front.trim().toLowerCase());
-  }).length;
-  elements.importPreviewSummary.textContent = `${found} encontrados · ${cards.length} válidos${duplicates ? ` · ${duplicates} repetidos serão ignorados` : ""}${invalid ? ` · ${invalid} inválidos` : ""}. Desmarque o que não deseja importar.`;
-  elements.importPreviewList.innerHTML = cards.map((card, index) => {
-    const deck = findImportTarget(card, currentDeck());
-    return `<label class="import-preview-row"><input type="checkbox" data-import-index="${index}" checked><span><strong>${escapeHtml(card.front)}</strong><small>${escapeHtml(deck.title)}${card.topic ? ` · ${escapeHtml(card.topic)}` : ""}</small></span></label>`;
+  const fallbackDeck = currentDeck();
+  const candidates = CardManager.classifyImportCards(cards, (card) => findImportTarget(card, fallbackDeck));
+  const duplicateCount = candidates.filter((candidate) => candidate.duplicate).length;
+  const importableCount = candidates.length - duplicateCount;
+  pendingImport = { cards, candidates, sourceLabel, invalid, found };
+  elements.importPreviewSummary.textContent = `${found} encontrados · ${importableCount} prontos para importar${duplicateCount ? ` · ${duplicateCount} já incluídos ou repetidos` : ""}${invalid ? ` · ${invalid} inválidos` : ""}.${importableCount ? " Desmarque o que não deseja importar." : " Nenhum cartão novo será incluído."}`;
+  elements.importPreviewList.innerHTML = candidates.map(({ card, deck, duplicate, reason }, index) => {
+    const duplicateLabel = reason === "included" ? "Já incluído" : "Repetido no arquivo";
+    return `<label class="import-preview-row${duplicate ? " is-duplicate" : ""}"><input type="checkbox" data-import-index="${index}"${duplicate ? " disabled" : " checked"}><span><strong>${escapeHtml(card.front)}${duplicate ? ` <em class="import-duplicate-badge">${duplicateLabel}</em>` : ""}</strong><small>${escapeHtml(deck.title)}${card.topic ? ` · ${escapeHtml(card.topic)}` : ""}</small></span></label>`;
   }).join("");
+  elements.importPreviewConfirm.disabled = importableCount === 0;
   elements.importPreviewDialog.showModal();
 }
 
@@ -2730,7 +2731,8 @@ async function addImportedCards(cards, sourceLabel) {
   cards.forEach((importedCard) => {
     const deck = findImportTarget(importedCard, fallbackDeck);
     const { discipline, ...card } = importedCard;
-    const duplicate = deck.cards.some((existing) => existing.front.trim().toLowerCase() === card.front.trim().toLowerCase());
+    const duplicateKey = CardManager.duplicateKey(card);
+    const duplicate = deck.cards.some((existing) => CardManager.duplicateKey(existing) === duplicateKey);
     if (duplicate) {
       duplicates += 1;
       return;
@@ -2995,7 +2997,7 @@ elements.newDisciplineSave.addEventListener("click", createNewDiscipline);
 elements.newDisciplineDialog.addEventListener("click", (event) => {
   if (event.target === elements.newDisciplineDialog) closeNewDisciplineDialog();
 });
-elements.importPreviewClose.addEventListener("click", () => elements.importPreviewDialog.close());
+elements.importPreviewClose.addEventListener("click", () => { pendingImport = null; elements.importPreviewDialog.close(); });
 elements.importPreviewCancel.addEventListener("click", () => { pendingImport = null; elements.importPreviewDialog.close(); showToast("Importação cancelada"); });
 elements.importPreviewConfirm.addEventListener("click", async () => {
   if (!pendingImport) return;
@@ -3012,7 +3014,11 @@ elements.importPreviewConfirm.addEventListener("click", async () => {
   } catch (error) {
     console.error(error);
     showToast("Não foi possível salvar os cartões");
-  } finally { elements.importPreviewConfirm.disabled = false; }
+  } finally {
+    if (pendingImport) {
+      elements.importPreviewConfirm.disabled = !elements.importPreviewList.querySelector("[data-import-index]:checked:not(:disabled)");
+    }
+  }
 });
 const closeImportReport = () => elements.importReportDialog.close();
 elements.importReportClose.addEventListener("click", closeImportReport);

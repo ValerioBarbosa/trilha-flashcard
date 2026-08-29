@@ -1,12 +1,12 @@
-const CACHE_NAME = "trilha-flashcard-v38";
+const CACHE_NAME = "trilha-flashcard-v39";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=20260828-1",
-  "./app.js?v=20260828-1",
+  "./styles.css?v=20260829-dup1",
+  "./app.js?v=20260829-dup1",
   "./card-import.js?v=20260826-1",
   "./card-storage.js?v=20260826-1",
-  "./card-manager.js?v=20260824-1",
+  "./card-manager.js?v=20260829-dup1",
   "./card-database.js?v=20260826-1",
   "./data-model.js?v=20260826-2",
   "./supabase-config.js?v=20260827-1",
