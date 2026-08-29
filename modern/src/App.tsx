@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from './auth/AuthContext';
 import { SyncPanel } from './sync/SyncPanel';
+import { StudyDashboard } from './study/StudyDashboard';
 import './styles.css';
 
 export function App() {
@@ -19,10 +20,10 @@ export function App() {
   return (
     <main className="pilot-shell">
       <section className="pilot-card" aria-labelledby="pilot-title">
-        <div className="pilot-badge">LABORATÓRIO REACT</div>
+        <div className="pilot-badge">TRILHA MODERNA</div>
         <h1 id="pilot-title">Trilha Flashcard</h1>
         <p className="pilot-subtitle">
-          Piloto isolado para validar autenticação e sincronização Supabase antes da migração da interface principal.
+          Fundação React + TypeScript conectada ao Supabase, preservando o app local-first durante a migração.
         </p>
 
         <dl className="status-grid">
@@ -61,10 +62,15 @@ export function App() {
           )}
         </div>
 
-        {user ? <SyncPanel user={user} /> : null}
+        {user ? (
+          <>
+            <StudyDashboard user={user} />
+            <SyncPanel user={user} />
+          </>
+        ) : null}
 
         <p className="pilot-note">
-          Este módulo não substitui o app atual. IndexedDB e Firebase permanecem preservados durante a migração.
+          O armazenamento legado continua preservado. A nova base relacional passa a ser preenchida de forma gradual, sem apagar cartões existentes.
         </p>
       </section>
     </main>
