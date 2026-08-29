@@ -6,13 +6,11 @@ import { PdfImportLauncher } from './cards/PdfImportLauncher';
 import { ErrorNotebookLauncher } from './errors/ErrorNotebookLauncher';
 import { QuestionBankPreview } from './questions/QuestionBankPreview';
 import { QuestionManagerLauncher } from './questions/QuestionManagerLauncher';
-import './questions/question-bank-launcher.css';
 import './styles.css';
 
 export function App() {
   const { user, loading, initialized, error, signIn, signOut } = useAuth();
   const [actionError, setActionError] = useState<string | null>(null);
-  const [questionBankOpen, setQuestionBankOpen] = useState(false);
   const questionPreview = new URLSearchParams(window.location.search).get('questoes') === 'preview';
 
   async function handleSignIn() {
@@ -40,23 +38,7 @@ export function App() {
   if (user) {
     return (
       <>
-        <div
-          onClickCapture={(event) => {
-            const target = event.target as HTMLElement;
-            const button = target.closest('button');
-            if (!button?.textContent?.includes('Questões')) return;
-            event.preventDefault();
-            event.stopPropagation();
-            setQuestionBankOpen(true);
-          }}
-        >
-          <ModernWorkspace user={user} onSignOut={signOut} />
-        </div>
-        {questionBankOpen ? (
-          <div className="question-bank-overlay" role="dialog" aria-modal="true" aria-label="Banco de questões">
-            <QuestionBankPreview user={user} onClose={() => setQuestionBankOpen(false)} />
-          </div>
-        ) : null}
+        <ModernWorkspace user={user} onSignOut={signOut} />
         <QuestionManagerLauncher user={user} />
         <ErrorNotebookLauncher user={user} />
         <PdfImportLauncher user={user} />
