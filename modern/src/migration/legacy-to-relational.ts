@@ -29,7 +29,7 @@ type LegacyCard = {
   pitfall?: string;
   mnemonic?: string;
   source?: string;
-  sourcePage?: number;
+  sourcePage?: number | string;
 };
 
 type LegacyDeck = {
@@ -68,16 +68,6 @@ function parseJson<T>(value: string | null, fallback: T): T {
   }
 }
 
-function slugify(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 100) || `item-${Date.now()}`;
-}
-
 function stableHash(value: string): string {
   let hash = 2166136261;
   for (let index = 0; index < value.length; index += 1) {
@@ -85,6 +75,21 @@ function stableHash(value: string): string {
     hash = Math.imul(hash, 16777619);
   }
   return (hash >>> 0).toString(36);
+}
+
+function slugify(value: string): string {
+  const normalized = value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 100);
+  return normalized || `item-${stableHash(value)}`;
+}
+
+function profileSlug(profile: LegacyProfile): string {
+  return profile.id === DEFAULT_PROFILE.id ? 'trt4-ajaj' : slugify(profile.id || profile.name);
 }
 
 function normalizedPriority(value?: string): 'A' | 'B' | 'C' | null {
@@ -136,7 +141,7 @@ function readDeckOverrides(storage: Storage, profileId: string): LegacyDeck[] {
 }
 
 async function upsertProfile(client: SupabaseClient, user: User, profile: LegacyProfile) {
-  const slug = slugify(profile.id || profile.name);
+  const slug = profileSlug(profile);
   const { data, error } = await client
     .from('study_profiles')
     .upsert({
@@ -232,6 +237,11 @@ function cardTags(card: LegacyCard): string[] {
   return [...tags].filter(Boolean);
 }
 
+function sourcePage(value: LegacyCard['sourcePage']): number | null {
+  const parsed = typeof value === 'string' ? Number(value) : value;
+  return Number.isInteger(parsed) && Number(parsed) > 0 ? Number(parsed) : null;
+}
+
 export async function migrateLegacyLocalData(
   client: SupabaseClient,
   user: User,
@@ -323,7 +333,7 @@ export async function migrateLegacyLocalData(
             difficulty: normalizedDifficulty(card.difficulty),
             tags: cardTags(card),
             source: card.source || deck.sourceNote || deck.source || null,
-            source_page: Number.isInteger(card.sourcePage) ? card.sourcePage : null,
+            source_page: sourcePage(card.sourcePage),
             deleted_at: null,
           }, { onConflict: 'user_id,deck_id,legacy_id' });
         if (error) throw error;
