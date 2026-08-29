@@ -2,19 +2,17 @@ import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { LegacyMigrationPanel } from '../migration/LegacyMigrationPanel';
+import { ProductionQuestionsPage } from '../questions/ProductionQuestionsPage';
 import { SyncPanel } from '../sync/SyncPanel';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
 import {
   listCards,
   listJurisprudence,
-  listQuestions,
   loadPerformance,
-  saveQuestionAttempt,
   saveReview,
   type CardRow,
   type JurisprudenceRow,
   type PerformanceSummary,
-  type QuestionRow,
 } from '../study/domain-repository';
 
 type PageId = 'home' | 'study' | 'edital' | 'questions' | 'jurisprudence' | 'performance' | 'data';
@@ -100,7 +98,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
             {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} /> : null}
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} decks={workspace.decks} /> : null}
             {page === 'edital' ? <EditalPage workspace={workspace} /> : null}
-            {page === 'questions' ? <QuestionsPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} /> : null}
+            {page === 'questions' ? <ProductionQuestionsPage user={user} profileId={workspace.profile.id} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} subjects={workspace.subjects} /> : null}
             {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} /> : null}
             {page === 'data' ? <DataPage user={user} onMigrated={workspace.refresh} /> : null}
@@ -295,42 +293,6 @@ function EditalPage({ workspace }: { workspace: ReturnType<typeof useStudyWorksp
       </div>
     </div>
   );
-}
-
-function QuestionsPage({ user, profileId, subjects }: { user: User; profileId: string; subjects: Array<{id:string;name:string}> }) {
-  const [questions, setQuestions] = useState<QuestionRow[]>([]);
-  const [subjectId, setSubjectId] = useState('all');
-  const [index, setIndex] = useState(0);
-  const [answer, setAnswer] = useState('');
-  const [checked, setChecked] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [startedAt, setStartedAt] = useState(Date.now());
-
-  useEffect(() => { void listQuestions(getSupabaseClient(), profileId).then(setQuestions).finally(() => setLoading(false)); }, [profileId]);
-  const filtered = subjectId === 'all' ? questions : questions.filter((question) => question.subject_id === subjectId);
-  const question = filtered[index];
-  const alternatives = normalizeAlternatives(question?.alternatives);
-
-  async function checkAnswer() {
-    if (!question || !answer) return;
-    const correct = question.correct_answer ? normalizeAnswer(answer) === normalizeAnswer(question.correct_answer) : false;
-    await saveQuestionAttempt(getSupabaseClient(), user, profileId, question.id, answer, correct, Date.now() - startedAt);
-    setChecked(true);
-  }
-
-  function nextQuestion() {
-    setIndex((index + 1) % Math.max(filtered.length, 1));
-    setAnswer(''); setChecked(false); setStartedAt(Date.now());
-  }
-
-  return <div className="page-wrap"><PageHeader eyebrow="BANCO DE QUESTÕES" title="Questões" subtitle="Resolva, confira o fundamento e transforme erros em revisão." action={<select className="header-select" value={subjectId} onChange={(event) => { setSubjectId(event.target.value); setIndex(0); }}><option value="all">Todas as disciplinas</option>{subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}</select>} />{loading ? <div className="study-empty">Carregando questões…</div> : !question ? <EmptyFeature title="Seu banco de questões está pronto para receber conteúdo." text="A estrutura relacional já está ativa. A próxima importação de questões poderá ser vinculada diretamente ao edital e ao caderno de erros." /> : <section className="question-card"><div className="question-topline"><span>{question.board || 'Banca'}</span><span>{question.exam_year || 'Ano'}</span><span>Questão {index + 1} de {filtered.length}</span></div><h2>{question.statement}</h2><div className="alternatives">{alternatives.length ? alternatives.map((option) => <label key={option.key} className={answer === option.key ? 'selected' : ''}><input type="radio" name="answer" value={option.key} checked={answer === option.key} onChange={() => !checked && setAnswer(option.key)} /><strong>{option.key}</strong><span>{option.text}</span></label>) : <label className={answer === 'Certo' ? 'selected' : ''}><input type="radio" name="answer" checked={answer === 'Certo'} onChange={() => !checked && setAnswer('Certo')} /><strong>C</strong><span>Certo</span></label>}</div>{checked ? <div className="answer-feedback"><strong>Gabarito: {question.correct_answer || 'não cadastrado'}</strong>{question.explanation ? <p>{question.explanation}</p> : null}{question.legal_basis ? <small>Base legal: {question.legal_basis}</small> : null}</div> : null}<div className="question-actions">{!checked ? <button disabled={!answer} onClick={() => void checkAnswer()}>Responder</button> : <button onClick={nextQuestion}>Próxima questão →</button>}</div></section>}</div>;
-}
-
-function normalizeAnswer(value: string) { return value.trim().toLowerCase().replace(/[).\s]/g, ''); }
-function normalizeAlternatives(value: unknown): Array<{key:string;text:string}> {
-  if (Array.isArray(value)) return value.map((item, index) => typeof item === 'string' ? { key: String.fromCharCode(65 + index), text: item } : item && typeof item === 'object' ? { key: String((item as any).key || (item as any).label || String.fromCharCode(65 + index)), text: String((item as any).text || (item as any).value || '') } : null).filter(Boolean) as Array<{key:string;text:string}>;
-  if (value && typeof value === 'object') return Object.entries(value as Record<string, unknown>).map(([key, text]) => ({ key, text: String(text) }));
-  return [];
 }
 
 function JurisprudencePage({ profileId, subjects }: { profileId: string; subjects: Array<{id:string;name:string}> }) {
