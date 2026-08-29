@@ -1,12 +1,15 @@
 const trt4Decks = [
   {
     id: "trt4-overview",
-    title: "Comece aqui · TRT4 AJAJ",
+    title: "Comece aqui · TRT4 AJAJ · Edital V3",
+    sourceNote: "Pré-edital TRT-4 AJAJ — versão 3.0, atualizado em 29/08/2026. Estudo de Caso confirmado pelo TRT-4 em 14/08/2026; banca e conteúdo do novo edital ainda pendentes.",
     topics: [
+      "Situação oficial do concurso em 2026",
       "Dashboard de preparação por disciplina",
-      "Estrutura, pesos e mínimos eliminatórios",
+      "Estrutura histórica, pesos e mínimos de 2022",
       "Prioridades A/B/C e núcleo duro",
-      "Edital 2022 × atualização 2026",
+      "Base 2022 × atualização operacional 2026",
+      "Estudo de Caso Jurídico",
     ],
     cards: [
           {
@@ -38,16 +41,45 @@ const trt4Decks = [
           },
           {
                 "front": "Qual deve ser a prioridade inicial no TRT-4 AJAJ?",
-                "back": "Comece pelas disciplinas de maior peso e maior recorrência, sem abandonar o núcleo básico.",
+                "back": "Comece por Processo do Trabalho, Direito do Trabalho, Português, Administrativo, Constitucional e Processo Civil, incluindo treino semanal de Estudo de Caso.",
                 "topic": "Prioridades A/B/C e núcleo duro",
                 "tag": "ESTRATÉGIA",
-                "complement": "Processo do Trabalho, Português, Direito Administrativo e Direito do Trabalho concentram a maior parte da preparação indicada no aplicativo."
+                "complement": "Os percentuais exibidos continuam sendo a fotografia histórica da prova de 2022, não a distribuição confirmada do novo concurso."
           },
           {
                 "front": "Para que serve o painel Desempenho?",
                 "back": "Para acompanhar cartões revisados, taxa de acerto, revisões pendentes, sequência e cobertura por disciplina.",
                 "topic": "Dashboard de preparação por disciplina",
                 "tag": "DESEMPENHO"
+          },
+          {
+                "front": "Qual prova discursiva foi confirmada para Analista Judiciário - Área Judiciária no novo concurso do TRT-4?",
+                "back": "Estudo de Caso Jurídico.",
+                "topic": "Situação oficial do concurso em 2026",
+                "tag": "CONFIRMADO 2026",
+                "legalBasis": "Notícia oficial do TRT-4 publicada em 14/08/2026.",
+                "pitfall": "Para AJAJ, o treino principal não deve continuar centrado em redação dissertativo-argumentativa genérica."
+          },
+          {
+                "front": "A banca do novo concurso TRT-4 já está oficialmente confirmada?",
+                "back": "Não. A FCC permanece como banca-base histórica até a contratação oficial da organizadora.",
+                "topic": "Situação oficial do concurso em 2026",
+                "tag": "PRÉ-EDITAL",
+                "pitfall": "Não trate padrão FCC, pesos de 2022 ou conteúdo histórico como regras definitivas de 2026."
+          },
+          {
+                "front": "Os pesos e mínimos eliminatórios de 2022 já valem para o novo concurso?",
+                "back": "Não. Eles são referência histórica e deverão ser substituídos pelas regras do novo edital.",
+                "topic": "Estrutura histórica, pesos e mínimos de 2022",
+                "tag": "ESTRATÉGIA",
+                "complement": "Em 2022 houve 30 questões gerais de peso 1, 30 específicas de peso 2 e mínimo de 150 pontos padronizados no somatório."
+          },
+          {
+                "front": "Qual é a estrutura essencial de uma resposta de Estudo de Caso Jurídico?",
+                "back": "Problema jurídico, fundamento normativo, aplicação da regra aos fatos e conclusão objetiva.",
+                "topic": "Estudo de Caso Jurídico",
+                "tag": "DISCURSIVA",
+                "mnemonic": "P-F-A-C: problema, fundamento, aplicação e conclusão."
           }
     ],
   },
@@ -558,18 +590,109 @@ const trt4Decks = [
   },
   {
     id: "fcc-writing",
-    title: "Redação FCC · protocolo",
+    title: "Estudo de Caso Jurídico · AJAJ",
+    sourceNote: "Etapa confirmada pelo TRT-4 em 14/08/2026 para Analista Judiciário - Área Judiciária. Critérios completos dependerão do novo edital.",
     topics: [
-      "Comando",
-      "Tese",
-      "Projeto",
-      "Argumentação",
-      "Coesão",
-      "Norma-padrão",
-      "Fechamento",
-      "Treino",
+      "Leitura e delimitação do problema",
+      "Identificação do comando",
+      "Fundamentação constitucional e legal",
+      "Jurisprudência aplicável",
+      "Aplicação da norma aos fatos",
+      "Conclusão objetiva",
+      "Controle de competência, prazo e legitimidade",
+      "Revisão formal e gestão do tempo",
+      "Treino por disciplinas jurídicas",
     ],
-    cards: [],
+    cards: [
+      {
+        front: "Qual é a primeira providência ao iniciar um Estudo de Caso Jurídico?",
+        back: "Identificar sujeitos, fatos relevantes, pedido, controvérsia e os comandos que precisam ser respondidos.",
+        topic: "Leitura e delimitação do problema",
+        tag: "MÉTODO",
+        priority: "A",
+        pitfall: "Começar a escrever antes de delimitar o problema costuma gerar resposta correta para a pergunta errada."
+      },
+      {
+        front: "Como transformar o enunciado do Estudo de Caso em um roteiro de resposta?",
+        back: "Converta cada verbo de comando em um item do roteiro e associe a ele o fato relevante e o fundamento jurídico correspondente.",
+        topic: "Identificação do comando",
+        tag: "MÉTODO",
+        priority: "A"
+      },
+      {
+        front: "Quais fontes devem fundamentar prioritariamente um Estudo de Caso para AJAJ?",
+        back: "Constituição, CLT, CPC, legislação especial, Regimento do TRT-4 e jurisprudência pertinente ao problema.",
+        topic: "Fundamentação constitucional e legal",
+        tag: "FUNDAMENTO",
+        priority: "A",
+        pitfall: "Não invente número de artigo. Se não houver segurança, descreva corretamente a regra jurídica."
+      },
+      {
+        front: "Basta citar a norma para obter uma boa nota no Estudo de Caso?",
+        back: "Não. É necessário explicar a regra e demonstrar como ela se aplica aos fatos apresentados.",
+        topic: "Aplicação da norma aos fatos",
+        tag: "APLICAÇÃO",
+        priority: "A"
+      },
+      {
+        front: "Qual é a sequência recomendada para responder ao Estudo de Caso?",
+        back: "Problema jurídico, fundamento, aplicação aos fatos e conclusão.",
+        topic: "Aplicação da norma aos fatos",
+        tag: "ESTRUTURA",
+        priority: "A",
+        mnemonic: "P-F-A-C: problema, fundamento, aplicação e conclusão."
+      },
+      {
+        front: "Como deve ser a conclusão do Estudo de Caso?",
+        back: "Direta, coerente com a fundamentação e completa em relação a todos os comandos do enunciado.",
+        topic: "Conclusão objetiva",
+        tag: "CONCLUSÃO",
+        priority: "A"
+      },
+      {
+        front: "Quais pontos processuais devem ser conferidos antes de concluir a resposta?",
+        back: "Competência, cabimento, legitimidade, prazo, procedimento, efeitos e solução pedida.",
+        topic: "Controle de competência, prazo e legitimidade",
+        tag: "CHECKLIST",
+        priority: "A"
+      },
+      {
+        front: "Como usar jurisprudência no Estudo de Caso?",
+        back: "Vincule o entendimento ao problema e à solução, verificando vigência, aderência e eventuais modulações.",
+        topic: "Jurisprudência aplicável",
+        tag: "JURISPRUDÊNCIA",
+        priority: "A",
+        pitfall: "Memorizar número de súmula sem compreender a hipótese de incidência não resolve o caso."
+      },
+      {
+        front: "O que deve ser reservado para os minutos finais da prova discursiva?",
+        back: "Revisão dos comandos, coerência da conclusão, correção gramatical, legibilidade e conferência dos fundamentos.",
+        topic: "Revisão formal e gestão do tempo",
+        tag: "REVISÃO",
+        priority: "A"
+      },
+      {
+        front: "Quais disciplinas devem orientar os primeiros treinos de Estudo de Caso para AJAJ?",
+        back: "Processo do Trabalho, Direito do Trabalho, Constitucional, Administrativo e Processo Civil.",
+        topic: "Treino por disciplinas jurídicas",
+        tag: "TREINO",
+        priority: "A"
+      },
+      {
+        front: "Qual frequência mínima de treino escrito é recomendada no pré-edital?",
+        back: "Ao menos um Estudo de Caso curto por semana, com correção e reescrita quando ficar abaixo da meta.",
+        topic: "Treino por disciplinas jurídicas",
+        tag: "ROTINA",
+        priority: "A"
+      },
+      {
+        front: "O que fazer após corrigir um Estudo de Caso abaixo da meta?",
+        back: "Classificar as falhas, revisar os fundamentos e reescrever a resposta dentro do tempo previsto.",
+        topic: "Revisão formal e gestão do tempo",
+        tag: "CADERNO DE ERROS",
+        priority: "A"
+      }
+    ],
   },
   {
     id: "labor-justice-organs",
@@ -579,3 +702,5 @@ const trt4Decks = [
     cards: [],
   },
 ];
+
+if (typeof module === "object" && module.exports) module.exports = { trt4Decks };
