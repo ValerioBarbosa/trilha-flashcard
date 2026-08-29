@@ -22,7 +22,12 @@ type Question = {
   tags: string[];
 };
 
-type Props = { user: User | null; onClose: () => void };
+type Props = {
+  user: User | null;
+  onClose?: () => void;
+  profileId?: string | null;
+  embedded?: boolean;
+};
 
 const DEMO_QUESTION: Question = {
   id: 'demo-question',
@@ -55,9 +60,9 @@ function normalizeAlternatives(value: unknown): string[] {
   return [];
 }
 
-export function QuestionBankPreview({ user, onClose }: Props) {
+export function QuestionBankPreview({ user, onClose, profileId: providedProfileId = null, embedded = false }: Props) {
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [profileId, setProfileId] = useState<string | null>(null);
+  const [resolvedProfileId, setResolvedProfileId] = useState<string | null>(providedProfileId);
   const [selectedId, setSelectedId] = useState('');
   const [answer, setAnswer] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -74,7 +79,7 @@ export function QuestionBankPreview({ user, onClose }: Props) {
     async function loadQuestions() {
       if (!user) {
         setQuestions([]);
-        setProfileId(null);
+        setResolvedProfileId(null);
         setSelectedId(DEMO_QUESTION.id);
         setLoading(false);
         return;
@@ -83,15 +88,20 @@ export function QuestionBankPreview({ user, onClose }: Props) {
       setLoading(true);
       try {
         const client = getSupabaseClient();
-        const { data: profiles, error: profileError } = await client
-          .from('study_profiles')
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('is_archived', false)
-          .order('created_at')
-          .limit(1);
-        if (profileError) throw profileError;
-        const activeProfileId = profiles?.[0]?.id ?? null;
+        let activeProfileId = providedProfileId;
+
+        if (!activeProfileId) {
+          const { data: profiles, error: profileError } = await client
+            .from('study_profiles')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('is_archived', false)
+            .order('created_at')
+            .limit(1);
+          if (profileError) throw profileError;
+          activeProfileId = profiles?.[0]?.id ?? null;
+        }
+
         if (!activeProfileId) throw new Error('Nenhum perfil de estudos disponível.');
 
         const { data, error } = await client
@@ -106,13 +116,13 @@ export function QuestionBankPreview({ user, onClose }: Props) {
         if (cancelled) return;
 
         const rows = (data ?? []) as Question[];
-        setProfileId(activeProfileId);
+        setResolvedProfileId(activeProfileId);
         setQuestions(rows);
         setSelectedId(rows[0]?.id ?? DEMO_QUESTION.id);
       } catch {
         if (cancelled) return;
         setQuestions([]);
-        setProfileId(null);
+        setResolvedProfileId(providedProfileId);
         setSelectedId(DEMO_QUESTION.id);
       } finally {
         if (!cancelled) setLoading(false);
@@ -121,7 +131,7 @@ export function QuestionBankPreview({ user, onClose }: Props) {
 
     void loadQuestions();
     return () => { cancelled = true; };
-  }, [user]);
+  }, [user, providedProfileId]);
 
   const pool = useMemo(() => (questions.length ? questions : [DEMO_QUESTION]), [questions]);
   const sources = useMemo(() => [...new Set(pool.map((item) => item.source_provider || item.source).filter(Boolean))] as string[], [pool]);
@@ -155,13 +165,13 @@ export function QuestionBankPreview({ user, onClose }: Props) {
     setAnswer(letter);
     setSaveError(null);
 
-    if (!user || !profileId || selected.id === DEMO_QUESTION.id) return;
+    if (!user || !resolvedProfileId || selected.id === DEMO_QUESTION.id) return;
     setSaving(true);
     try {
       const isCorrect = correct ? letter === correct : false;
       const { error } = await getSupabaseClient().from('question_attempts').insert({
         user_id: user.id,
-        profile_id: profileId,
+        profile_id: resolvedProfileId,
         question_id: selected.id,
         answer: letter,
         is_correct: isCorrect,
@@ -176,11 +186,13 @@ export function QuestionBankPreview({ user, onClose }: Props) {
   }
 
   return (
-    <div className="qb-shell">
-      <header className="qb-topbar">
-        <div><strong>Questões</strong><span>{questions.length ? `${questions.length} do perfil atual` : 'Modo demonstração'}</span></div>
-        <button type="button" onClick={onClose}>Voltar à Trilha ×</button>
-      </header>
+    <div className={`qb-shell ${embedded ? 'embedded' : ''}`}>
+      {!embedded ? (
+        <header className="qb-topbar">
+          <div><strong>Questões</strong><span>{questions.length ? `${questions.length} do perfil atual` : 'Modo demonstração'}</span></div>
+          {onClose ? <button type="button" onClick={onClose}>Voltar à Trilha ×</button> : null}
+        </header>
+      ) : null}
 
       <div className="qb-layout">
         <aside className="qb-filters">
