@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
 import { CardManagerPage } from './CardManagerPage';
+import './card-manager.css';
 
 export function CardManagerLauncher({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
