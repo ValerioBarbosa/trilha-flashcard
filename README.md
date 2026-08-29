@@ -7,8 +7,8 @@ O app inclui:
 - perfis separados por concurso, com cargo, banca e ano do edital;
 - Banco de Matérias com disciplinas mesmo antes de terem cartões, peso no edital, assuntos e subassuntos;
 
-- um baralho inicial com formato histórico, prioridades e alerta pré-edital;
-- doze baralhos por disciplina, seguindo o edital verticalizado, prontos para receber os cartões (os cartões ficam a cargo de quem estuda, conforme o edital atualizado);
+- um baralho inicial atualizado para a versão 3.0, com situação oficial de 2026, prioridades e alerta pré-edital;
+- doze baralhos por disciplina, seguindo o edital verticalizado, incluindo um baralho de Estudo de Caso Jurídico com protocolo e cartões de treino;
 - virada animada do cartão;
 - navegação por botões ou teclado;
 - marcação “Lembrei” e “Não lembrei”;
@@ -129,4 +129,8 @@ Um workflow do GitHub Actions (`.github/workflows/ci.yml`) roda os testes a cada
 
 ## Atenção ao status do concurso
 
-O PDF fornecido é a versão 2.0 de um material **pré-edital 2026**, baseado no Edital TRT4 nº 1/2022 e na prova FCC de 2022. O próprio documento informa que a banca e o formato do novo certame ainda precisam de confirmação oficial. Quando o novo edital for publicado, ele prevalece e os baralhos devem ser revisados.
+O banco TRT-4 AJAJ acompanha a versão 3.0 do material **pré-edital 2026**, atualizada em 29/08/2026. O TRT-4 confirmou em 14/08/2026 que Analista Judiciário - Área Judiciária terá **Estudo de Caso** como prova discursiva. Por isso, o antigo baralho de Redação FCC foi convertido em Estudo de Caso Jurídico, preservando o identificador interno para não romper o histórico dos usuários.
+
+A banca, os pesos, os mínimos e o conteúdo programático do novo edital ainda dependem de publicação oficial. Os percentuais exibidos no aplicativo continuam sendo a fotografia histórica da prova FCC de 2022. Quando o novo edital for publicado, ele prevalecerá e o banco será revisado.
+
+Fonte oficial: [TRT-RS avança no planejamento do novo concurso público](https://www.trt4.jus.br/portais/trt4/modulos/noticias/51064882).
