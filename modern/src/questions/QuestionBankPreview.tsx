@@ -22,6 +22,14 @@ type Question = {
   tags: string[];
 };
 
+type Attempt = {
+  question_id: string;
+  is_correct: boolean;
+  created_at: string;
+};
+
+type AttemptFilter = 'all' | 'unanswered' | 'wrong' | 'correct';
+
 type Props = {
   user: User | null;
   onClose?: () => void;
@@ -62,12 +70,14 @@ function normalizeAlternatives(value: unknown): string[] {
 
 export function QuestionBankPreview({ user, onClose, profileId: providedProfileId = null, embedded = false }: Props) {
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [resolvedProfileId, setResolvedProfileId] = useState<string | null>(providedProfileId);
   const [selectedId, setSelectedId] = useState('');
   const [answer, setAnswer] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [source, setSource] = useState('all');
   const [board, setBoard] = useState('all');
+  const [attemptFilter, setAttemptFilter] = useState<AttemptFilter>('all');
   const [loading, setLoading] = useState(Boolean(user));
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -79,6 +89,7 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
     async function loadQuestions() {
       if (!user) {
         setQuestions([]);
+        setAttempts([]);
         setResolvedProfileId(null);
         setSelectedId(DEMO_QUESTION.id);
         setLoading(false);
@@ -104,24 +115,35 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
 
         if (!activeProfileId) throw new Error('Nenhum perfil de estudos disponível.');
 
-        const { data, error } = await client
-          .from('questions')
-          .select('id,statement,alternatives,correct_answer,explanation,legal_basis,board,exam,exam_year,source,source_provider,external_id,source_url,subject_id,topic_id,tags')
-          .eq('profile_id', activeProfileId)
-          .is('deleted_at', null)
-          .order('created_at', { ascending: false })
-          .limit(200);
+        const [questionResult, attemptResult] = await Promise.all([
+          client
+            .from('questions')
+            .select('id,statement,alternatives,correct_answer,explanation,legal_basis,board,exam,exam_year,source,source_provider,external_id,source_url,subject_id,topic_id,tags')
+            .eq('profile_id', activeProfileId)
+            .is('deleted_at', null)
+            .order('created_at', { ascending: false })
+            .limit(200),
+          client
+            .from('question_attempts')
+            .select('question_id,is_correct,created_at')
+            .eq('profile_id', activeProfileId)
+            .order('created_at', { ascending: false })
+            .limit(2000),
+        ]);
 
-        if (error) throw error;
+        if (questionResult.error) throw questionResult.error;
+        if (attemptResult.error) throw attemptResult.error;
         if (cancelled) return;
 
-        const rows = (data ?? []) as Question[];
+        const rows = (questionResult.data ?? []) as Question[];
         setResolvedProfileId(activeProfileId);
         setQuestions(rows);
+        setAttempts((attemptResult.data ?? []) as Attempt[]);
         setSelectedId(rows[0]?.id ?? DEMO_QUESTION.id);
       } catch {
         if (cancelled) return;
         setQuestions([]);
+        setAttempts([]);
         setResolvedProfileId(providedProfileId);
         setSelectedId(DEMO_QUESTION.id);
       } finally {
@@ -134,25 +156,39 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
   }, [user, providedProfileId]);
 
   const pool = useMemo(() => (questions.length ? questions : [DEMO_QUESTION]), [questions]);
+  const latestAttemptByQuestion = useMemo(() => {
+    const map = new Map<string, Attempt>();
+    for (const attempt of attempts) if (!map.has(attempt.question_id)) map.set(attempt.question_id, attempt);
+    return map;
+  }, [attempts]);
+  const answeredIds = useMemo(() => new Set(attempts.map((attempt) => attempt.question_id)), [attempts]);
+  const correctAttempts = useMemo(() => attempts.filter((attempt) => attempt.is_correct).length, [attempts]);
+  const accuracy = attempts.length ? Math.round((correctAttempts / attempts.length) * 100) : 0;
   const sources = useMemo(() => [...new Set(pool.map((item) => item.source_provider || item.source).filter(Boolean))] as string[], [pool]);
   const boards = useMemo(() => [...new Set(pool.map((item) => item.board).filter(Boolean))] as string[], [pool]);
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     return pool.filter((item) => {
       const provider = item.source_provider || item.source || 'Trilha';
+      const latest = latestAttemptByQuestion.get(item.id);
       if (source !== 'all' && provider !== source) return false;
       if (board !== 'all' && item.board !== board) return false;
+      if (attemptFilter === 'unanswered' && latest) return false;
+      if (attemptFilter === 'wrong' && (!latest || latest.is_correct)) return false;
+      if (attemptFilter === 'correct' && (!latest || !latest.is_correct)) return false;
       if (!term) return true;
       return [item.statement, item.board, item.exam, item.source, item.source_provider, item.external_id, ...item.tags]
         .filter(Boolean).some((value) => String(value).toLowerCase().includes(term));
     });
-  }, [pool, search, source, board]);
+  }, [pool, search, source, board, attemptFilter, latestAttemptByQuestion]);
 
   const selected = filtered.find((item) => item.id === selectedId) || filtered[0] || pool[0];
   const alternatives = normalizeAlternatives(selected?.alternatives);
   const correct = selected?.correct_answer?.trim().toUpperCase() || null;
   const answered = answer !== null;
   const provider = selected?.source_provider || selected?.source || 'Trilha';
+  const selectedHistory = selected ? attempts.filter((attempt) => attempt.question_id === selected.id) : [];
+  const selectedLatest = selected ? latestAttemptByQuestion.get(selected.id) : undefined;
 
   useEffect(() => {
     setAnswer(null);
@@ -169,6 +205,7 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
     setSaving(true);
     try {
       const isCorrect = correct ? letter === correct : false;
+      const createdAt = new Date().toISOString();
       const { error } = await getSupabaseClient().from('question_attempts').insert({
         user_id: user.id,
         profile_id: resolvedProfileId,
@@ -178,6 +215,7 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
         response_ms: Date.now() - startedAt,
       });
       if (error) throw error;
+      setAttempts((current) => [{ question_id: selected.id, is_correct: isCorrect, created_at: createdAt }, ...current]);
     } catch (cause) {
       setSaveError(cause instanceof Error ? cause.message : String(cause));
     } finally {
@@ -194,10 +232,20 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
         </header>
       ) : null}
 
+      {questions.length ? (
+        <div className="qb-stats" aria-label="Desempenho em questões">
+          <div><span>Banco ativo</span><strong>{questions.length}</strong><small>questões</small></div>
+          <div><span>Respondidas</span><strong>{answeredIds.size}</strong><small>{Math.max(questions.length - answeredIds.size, 0)} pendentes</small></div>
+          <div><span>Tentativas</span><strong>{attempts.length}</strong><small>{correctAttempts} acertos</small></div>
+          <div><span>Precisão</span><strong>{accuracy}%</strong><small>histórico registrado</small></div>
+        </div>
+      ) : null}
+
       <div className="qb-layout">
         <aside className="qb-filters">
           <h2>Filtros</h2>
           <label><span>Busca</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Enunciado, banca, prova, ID…" /></label>
+          <label><span>Situação</span><select value={attemptFilter} onChange={(event) => setAttemptFilter(event.target.value as AttemptFilter)}><option value="all">Todas</option><option value="unanswered">Não respondidas</option><option value="wrong">Última tentativa errada</option><option value="correct">Última tentativa correta</option></select></label>
           <label><span>Fonte</span><select value={source} onChange={(event) => setSource(event.target.value)}><option value="all">Todas</option>{sources.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
           <label><span>Banca</span><select value={board} onChange={(event) => setBoard(event.target.value)}><option value="all">Todas</option>{boards.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
           <div className="qb-source-policy"><strong>Fonte externa</strong><p>O Trilha guarda origem, identificador e link. Conteúdo de terceiros só entra quando houver uso autorizado ou importação feita pelo usuário.</p></div>
@@ -205,17 +253,21 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
 
         <section className="qb-list" aria-label="Lista de questões">
           <div className="qb-list-head"><strong>{filtered.length} questões</strong><span>{loading ? 'Atualizando…' : 'Mais recentes'}</span></div>
-          {filtered.map((item) => (
-            <button key={item.id} className={item.id === selected?.id ? 'active' : ''} onClick={() => setSelectedId(item.id)}>
-              <div><strong>{item.board || 'Sem banca'} · {item.exam_year || '—'}</strong><small>{item.exam || item.source || 'Questão cadastrada'}</small></div>
-              <p>{item.statement}</p><span>{item.source_provider || item.source || 'Trilha'}</span>
-            </button>
-          ))}
+          {filtered.map((item) => {
+            const latest = latestAttemptByQuestion.get(item.id);
+            return (
+              <button key={item.id} className={item.id === selected?.id ? 'active' : ''} onClick={() => setSelectedId(item.id)}>
+                <div><strong>{item.board || 'Sem banca'} · {item.exam_year || '—'}</strong><small>{item.exam || item.source || 'Questão cadastrada'}</small></div>
+                <p>{item.statement}</p>
+                <div className="qb-list-tags"><span>{item.source_provider || item.source || 'Trilha'}</span>{latest ? <span className={latest.is_correct ? 'attempt-correct' : 'attempt-wrong'}>{latest.is_correct ? 'Acertou' : 'Errou'}</span> : <span className="attempt-pending">Pendente</span>}</div>
+              </button>
+            );
+          })}
         </section>
 
         <main className="qb-question">
           {!selected ? <div className="qb-empty">Nenhuma questão encontrada.</div> : <>
-            <div className="qb-question-head"><div className="qb-pills"><span>{provider}</span><span>{selected.board || 'Sem banca'}</span><span>{selected.exam_year || 'Ano —'}</span></div>{selected.source_url ? <a href={selected.source_url} target="_blank" rel="noreferrer">Abrir na fonte ↗</a> : null}</div>
+            <div className="qb-question-head"><div className="qb-pills"><span>{provider}</span><span>{selected.board || 'Sem banca'}</span><span>{selected.exam_year || 'Ano —'}</span>{selectedLatest ? <span>{selectedLatest.is_correct ? 'Última: correta' : 'Última: errada'}</span> : null}</div>{selected.source_url ? <a href={selected.source_url} target="_blank" rel="noreferrer">Abrir na fonte ↗</a> : null}</div>
             <h1>{selected.statement}</h1>
             <div className="qb-alternatives">
               {alternatives.map((alternative, index) => {
@@ -233,7 +285,7 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
 
         <aside className="qb-reference">
           <h2>Fonte e referência</h2>
-          <dl><div><dt>Fonte</dt><dd>{provider}</dd></div><div><dt>ID externo</dt><dd>{selected?.external_id || '—'}</dd></div><div><dt>Banca</dt><dd>{selected?.board || '—'}</dd></div><div><dt>Prova</dt><dd>{selected?.exam || '—'}</dd></div><div><dt>Ano</dt><dd>{selected?.exam_year || '—'}</dd></div></dl>
+          <dl><div><dt>Fonte</dt><dd>{provider}</dd></div><div><dt>ID externo</dt><dd>{selected?.external_id || '—'}</dd></div><div><dt>Banca</dt><dd>{selected?.board || '—'}</dd></div><div><dt>Prova</dt><dd>{selected?.exam || '—'}</dd></div><div><dt>Ano</dt><dd>{selected?.exam_year || '—'}</dd></div><div><dt>Tentativas</dt><dd>{selectedHistory.length}</dd></div></dl>
           <div className="qb-note"><strong>Identidade da questão</strong><code>source_provider · external_id · source_url</code></div>
           {!questions.length ? <div className="qb-demo-warning"><strong>Demonstração</strong><span>A questão exibida é ilustrativa e criada pelo próprio Trilha.</span></div> : null}
         </aside>
