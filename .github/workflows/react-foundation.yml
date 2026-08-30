@@ -15,6 +15,9 @@ on:
       - 'src/**'
       - '.github/workflows/react-foundation.yml'
 
+permissions:
+  contents: write
+
 jobs:
   modern-build:
     runs-on: ubuntu-latest
@@ -50,3 +53,16 @@ jobs:
           path: modern/dist
           if-no-files-found: error
           retention-days: 7
+      - name: Publish React preview
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          find react-preview -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+          cp -R modern/dist/. react-preview/
+          touch react-preview/.nojekyll
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add react-preview
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: atualizar preview React [skip ci]"
+            git push
+          fi
