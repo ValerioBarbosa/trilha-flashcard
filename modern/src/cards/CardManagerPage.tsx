@@ -32,6 +32,14 @@ const EMPTY_FORM: FormState = {
   deckId: '', subjectId: '', topicId: '', front: '', back: '', legalBasis: '', example: '', complement: '', pitfall: '', mnemonic: '', priority: '', difficulty: '', tags: [], tagsText: '', cardType: '', source: '',
 };
 
+function isImportableCandidate(candidate: ImportCandidate): boolean {
+  return !candidate.duplicate
+    && Boolean(candidate.subjectId)
+    && Boolean(candidate.deckId)
+    && Boolean(candidate.front.trim())
+    && Boolean(candidate.back.trim());
+}
+
 export function CardManagerPage({ user, profileId, subjects, topics, decks, onChanged }: Props) {
   const [cards, setCards] = useState<ManagedCard[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,11 +132,14 @@ export function CardManagerPage({ user, profileId, subjects, topics, decks, onCh
     setImportCandidates([]);
     try {
       const text = await file.text();
-      const defaults = { subjectId: subjects[0]?.id || '', deckId: decks[0]?.id || '' };
-      const parsed = parseJsonImport(text, defaults);
+      const subjectId = subjects[0]?.id || '';
+      const deckId = decks.find((deck) => deck.subject_id === subjectId)?.id || decks[0]?.id || '';
+      const parsed = parseJsonImport(text, { subjectId, deckId });
       const marked = await markImportDuplicates(getSupabaseClient(), profileId, parsed);
+      const duplicateCount = marked.filter((row) => row.duplicate).length;
+      const invalidCount = marked.filter((row) => !row.duplicate && !isImportableCandidate(row)).length;
       setImportCandidates(marked);
-      setImportStatus(`${marked.length} cartões analisados. ${marked.filter((row) => row.duplicate).length} duplicados bloqueados.`);
+      setImportStatus(`${marked.length} cartões analisados. ${duplicateCount} duplicados bloqueados${invalidCount ? ` · ${invalidCount} inválidos` : ''}.`);
     } catch (cause) {
       setImportStatus(`Falha ao ler arquivo: ${cause instanceof Error ? cause.message : String(cause)}`);
     }
@@ -139,7 +150,13 @@ export function CardManagerPage({ user, profileId, subjects, topics, decks, onCh
     setImportStatus(`${result.inserted} incluídos · ${result.duplicates} duplicados ignorados · ${result.failed} falhas.`);
     await refresh();
     await onChanged?.();
-    if (!result.failed) setImportCandidates((current) => current.map((row) => ({ ...row, duplicate: true, duplicateReason: row.duplicateReason || 'Importado com sucesso.' })));
+    if (!result.failed) {
+      setImportCandidates((current) => current.map((row) => (
+        isImportableCandidate(row)
+          ? { ...row, duplicate: true, duplicateReason: 'Importado com sucesso.' }
+          : row
+      )));
+    }
   }
 
   return (
@@ -172,7 +189,7 @@ export function CardManagerPage({ user, profileId, subjects, topics, decks, onCh
 
       {editorOpen ? <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setEditorOpen(false)}><div className="modal-card card-editor-modal" role="dialog" aria-modal="true" aria-labelledby="card-editor-title"><div className="modal-heading"><div><span className="page-eyebrow">{form.id ? 'EDITAR' : 'NOVO'}</span><h2 id="card-editor-title">{form.id ? 'Editar cartão' : 'Novo cartão'}</h2></div><button className="modal-close" onClick={() => setEditorOpen(false)}>×</button></div><div className="form-grid"><label><span>Disciplina *</span><select value={form.subjectId} onChange={(event) => { const subjectId = event.target.value; const deckId = decks.find((deck) => deck.subject_id === subjectId)?.id || ''; setForm((current) => ({ ...current, subjectId, deckId, topicId: '' })); }}><option value="">Selecione</option>{subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}</select></label><label><span>Assunto</span><select value={form.topicId || ''} onChange={(event) => setForm((current) => ({ ...current, topicId: event.target.value }))}><option value="">Sem assunto</option>{subjectTopics.map((topic) => <option key={topic.id} value={topic.id}>{topic.name}</option>)}</select></label><label className="full"><span>Baralho *</span><select value={form.deckId} onChange={(event) => setForm((current) => ({ ...current, deckId: event.target.value }))}><option value="">Selecione</option>{subjectDecks.map((deck) => <option key={deck.id} value={deck.id}>{deck.name}</option>)}</select></label><label className="full"><span>Pergunta *</span><textarea rows={3} value={form.front} onChange={(event) => setForm((current) => ({ ...current, front: event.target.value }))} /></label><label className="full"><span>Resposta *</span><textarea rows={5} value={form.back} onChange={(event) => setForm((current) => ({ ...current, back: event.target.value }))} /></label><label className="full"><span>Base legal</span><input value={form.legalBasis || ''} onChange={(event) => setForm((current) => ({ ...current, legalBasis: event.target.value }))} placeholder="Ex.: CF, art. 111" /></label><label><span>Prioridade</span><select value={form.priority || ''} onChange={(event) => setForm((current) => ({ ...current, priority: event.target.value as FormState['priority'] }))}><option value="">Sem prioridade</option><option>A</option><option>B</option><option>C</option></select></label><label><span>Dificuldade</span><select value={form.difficulty || ''} onChange={(event) => setForm((current) => ({ ...current, difficulty: event.target.value as FormState['difficulty'] }))}><option value="">Não definida</option><option value="easy">Fácil</option><option value="medium">Média</option><option value="hard">Difícil</option></select></label><label className="full"><span>Tags</span><input value={form.tagsText} onChange={(event) => setForm((current) => ({ ...current, tagsText: event.target.value }))} placeholder="trt4, fcc, justiça-do-trabalho" /></label><details className="advanced-fields full"><summary>Campos avançados</summary><div className="form-grid inner"><label className="full"><span>Complemento</span><textarea rows={2} value={form.complement || ''} onChange={(event) => setForm((current) => ({ ...current, complement: event.target.value }))} /></label><label className="full"><span>Pegadinha</span><textarea rows={2} value={form.pitfall || ''} onChange={(event) => setForm((current) => ({ ...current, pitfall: event.target.value }))} /></label><label className="full"><span>Mnemônico</span><textarea rows={2} value={form.mnemonic || ''} onChange={(event) => setForm((current) => ({ ...current, mnemonic: event.target.value }))} /></label><label className="full"><span>Exemplo</span><textarea rows={2} value={form.example || ''} onChange={(event) => setForm((current) => ({ ...current, example: event.target.value }))} /></label></div></details></div>{message ? <p className="pilot-error">{message}</p> : null}<div className="modal-actions"><button className="secondary-outline" onClick={() => setEditorOpen(false)}>Cancelar</button><button className="primary-action" onClick={() => void save()}>Salvar cartão</button></div></div></div> : null}
 
-      {importOpen ? <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setImportOpen(false)}><div className="modal-card import-modal" role="dialog" aria-modal="true"><div className="modal-heading"><div><span className="page-eyebrow">IMPORTAÇÃO</span><h2>Importar cartões</h2><p>Arquivos JSON são analisados antes da inclusão. Duplicados ficam destacados em vermelho e não entram no banco.</p></div><button className="modal-close" onClick={() => setImportOpen(false)}>×</button></div><label className="file-drop"><input type="file" accept="application/json,.json" onChange={(event) => event.target.files?.[0] && void handleImportFile(event.target.files[0])} /><strong>Escolher arquivo JSON</strong><span>Formatos: array de cartões ou objeto com propriedade cards.</span></label>{importStatus ? <p className="import-status">{importStatus}</p> : null}{importCandidates.length ? <div className="import-preview"><div className="import-preview-head"><strong>Pré-visualização</strong><span>{importCandidates.filter((row) => !row.duplicate).length} aptos para importar</span></div>{importCandidates.slice(0, 100).map((row) => <div key={row.row} className={`import-row ${row.duplicate ? 'duplicate' : ''}`}><span>{row.row}</span><div><strong>{row.front || 'Pergunta vazia'}</strong><small>{row.back || 'Resposta vazia'}</small>{row.duplicateReason ? <em>{row.duplicateReason}</em> : null}</div><span>{row.duplicate ? 'Duplicado' : 'Novo'}</span></div>)}</div> : null}<div className="modal-actions"><button className="secondary-outline" onClick={() => setImportOpen(false)}>Fechar</button><button className="primary-action" disabled={!importCandidates.some((row) => !row.duplicate)} onClick={() => void confirmImport()}>Importar válidos</button></div></div></div> : null}
+      {importOpen ? <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setImportOpen(false)}><div className="modal-card import-modal" role="dialog" aria-modal="true"><div className="modal-heading"><div><span className="page-eyebrow">IMPORTAÇÃO</span><h2>Importar cartões</h2><p>Arquivos JSON são analisados antes da inclusão. Duplicados e linhas inválidas ficam destacados e não entram no banco.</p></div><button className="modal-close" onClick={() => setImportOpen(false)}>×</button></div><label className="file-drop"><input type="file" accept="application/json,.json" onChange={(event) => event.target.files?.[0] && void handleImportFile(event.target.files[0])} /><strong>Escolher arquivo JSON</strong><span>Formatos: array de cartões ou objeto com propriedade cards.</span></label>{importStatus ? <p className="import-status">{importStatus}</p> : null}{importCandidates.length ? <div className="import-preview"><div className="import-preview-head"><strong>Pré-visualização</strong><span>{importCandidates.filter(isImportableCandidate).length} aptos para importar</span></div>{importCandidates.slice(0, 100).map((row) => { const importable = isImportableCandidate(row); return <div key={row.row} className={`import-row ${row.duplicate || !importable ? 'duplicate' : ''}`}><span>{row.row}</span><div><strong>{row.front || 'Pergunta vazia'}</strong><small>{row.back || 'Resposta vazia'}</small>{row.duplicateReason ? <em>{row.duplicateReason}</em> : !importable ? <em>Disciplina, baralho, pergunta e resposta são obrigatórios.</em> : null}</div><span>{row.duplicate ? 'Duplicado' : importable ? 'Novo' : 'Inválido'}</span></div>; })}</div> : null}<div className="modal-actions"><button className="secondary-outline" onClick={() => setImportOpen(false)}>Fechar</button><button className="primary-action" disabled={!importCandidates.some(isImportableCandidate)} onClick={() => void confirmImport()}>Importar válidos</button></div></div></div> : null}
     </div>
   );
 }
