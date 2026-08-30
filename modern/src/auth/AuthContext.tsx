@@ -8,7 +8,7 @@ import {
   type PropsWithChildren,
 } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { AuthStore, type AuthStoreSnapshot } from '../../../src/state/auth-store';
+import { AuthStore, type AuthStoreSnapshot } from '@core/features/auth/auth-store';
 import { getSupabaseClient } from '../lib/supabase-client';
 
 export type AuthContextValue = AuthStoreSnapshot & {
