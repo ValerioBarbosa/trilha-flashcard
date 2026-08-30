@@ -8,6 +8,7 @@ on:
       - '.github/workflows/react-foundation.yml'
   push:
     branches:
+      - main
       - feature/react-typescript-foundation
     paths:
       - 'modern/**'
@@ -25,12 +26,27 @@ jobs:
           cache: npm
       - name: Install legacy dependencies
         run: npm ci
-      - name: Install React laboratory dependencies
+      - name: Install React app dependencies
         working-directory: modern
         run: npm install --no-audit --no-fund
-      - name: Typecheck React laboratory
+      - name: Typecheck React app
         working-directory: modern
         run: npm run typecheck
-      - name: Build React laboratory
+      - name: Build React app
         working-directory: modern
         run: npm run build
+      - name: Production shell smoke check
+        run: |
+          test -f modern/dist/index.html
+          test -f modern/dist/manifest.webmanifest
+          test -f modern/dist/sw.js
+          test -f modern/dist/icons/icon-192.png
+          test -f modern/dist/icons/icon-512.png
+          grep -q "Trilha Concursos" modern/dist/index.html
+      - name: Upload production candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: trilha-modern-production-candidate
+          path: modern/dist
+          if-no-files-found: error
+          retention-days: 7
