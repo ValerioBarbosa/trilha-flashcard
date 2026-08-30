@@ -1,1 +1,1 @@
-export * from '@core/legacy/local-snapshot';
+export * from '../../../src/legacy/local-snapshot';
