@@ -1,4 +1,4 @@
-import { getSupabaseClient } from '../lib/supabase-client';
+import { getSupabaseClient } from '../../infrastructure/supabase/client';
 
 export type QuestApiQuestionFilters = {
   page?: number;
