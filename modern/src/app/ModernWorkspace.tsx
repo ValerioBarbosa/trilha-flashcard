@@ -1,19 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
+import { loadPerformance, type PerformanceSummary } from '@core/features/performance/performance-repository';
+import { listCards, saveReview, type CardRow } from '../study/domain-repository';
+import { EditalPage } from '../edital/EditalPage';
+import { JurisprudencePage } from '../jurisprudence/JurisprudencePage';
+import { PerformancePage } from '../performance/PerformancePage';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { LegacyMigrationPanel } from '../migration/LegacyMigrationPanel';
 import { ProductionQuestionsPage } from '../questions/ProductionQuestionsPage';
+import { MetricTile } from '../shared/MetricTile';
+import { PageHeader } from '../shared/PageHeader';
 import { SyncPanel } from '../sync/SyncPanel';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
-import {
-  listCards,
-  listJurisprudence,
-  loadPerformance,
-  saveReview,
-  type CardRow,
-  type JurisprudenceRow,
-  type PerformanceSummary,
-} from '../study/domain-repository';
 
 type PageId = 'home' | 'study' | 'edital' | 'questions' | 'jurisprudence' | 'performance' | 'data';
 
@@ -45,36 +43,12 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
   return (
     <div className="modern-app">
       <aside className={`app-sidebar ${menuOpen ? 'open' : ''}`}>
-        <div className="brand-block">
-          <span className="brand-mark">T</span>
-          <div>
-            <strong>Trilha</strong>
-            <small>Concursos</small>
-          </div>
-        </div>
-
+        <div className="brand-block"><span className="brand-mark">T</span><div><strong>Trilha</strong><small>Concursos</small></div></div>
         <nav className="app-nav" aria-label="Navegação principal">
-          {NAV.map((item) => (
-            <button
-              type="button"
-              key={item.id}
-              className={page === item.id ? 'active' : ''}
-              onClick={() => selectPage(item.id)}
-            >
-              <span aria-hidden="true">{item.icon}</span>
-              {item.label}
-            </button>
-          ))}
+          {NAV.map((item) => <button type="button" key={item.id} className={page === item.id ? 'active' : ''} onClick={() => selectPage(item.id)}><span aria-hidden="true">{item.icon}</span>{item.label}</button>)}
         </nav>
-
         <div className="sidebar-footer">
-          <div className="account-chip">
-            <span className="account-avatar">{(user.email || 'U').slice(0, 1).toUpperCase()}</span>
-            <div>
-              <strong>{user.user_metadata?.full_name || 'Estudante'}</strong>
-              <small>{user.email}</small>
-            </div>
-          </div>
+          <div className="account-chip"><span className="account-avatar">{(user.email || 'U').slice(0, 1).toUpperCase()}</span><div><strong>{user.user_metadata?.full_name || 'Estudante'}</strong><small>{user.email}</small></div></div>
           <button type="button" className="text-button" onClick={() => void onSignOut()}>Sair</button>
         </div>
       </aside>
@@ -82,11 +56,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
       {menuOpen ? <button className="sidebar-scrim" aria-label="Fechar menu" onClick={() => setMenuOpen(false)} /> : null}
 
       <main className="app-main">
-        <header className="mobile-topbar">
-          <button type="button" className="menu-button" onClick={() => setMenuOpen(true)} aria-label="Abrir menu">☰</button>
-          <strong>Trilha Concursos</strong>
-        </header>
-
+        <header className="mobile-topbar"><button type="button" className="menu-button" onClick={() => setMenuOpen(true)} aria-label="Abrir menu">☰</button><strong>Trilha Concursos</strong></header>
         {workspace.error ? (
           <div className="page-wrap"><div className="notice error"><strong>Não foi possível carregar os estudos.</strong><span>{workspace.error}</span><button onClick={() => void workspace.refresh()}>Tentar novamente</button></div></div>
         ) : workspace.loading ? (
@@ -97,9 +67,9 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
           <>
             {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} /> : null}
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} decks={workspace.decks} /> : null}
-            {page === 'edital' ? <EditalPage workspace={workspace} /> : null}
+            {page === 'edital' ? <EditalPage subjects={workspace.subjects} topics={workspace.topics} /> : null}
             {page === 'questions' ? <ProductionQuestionsPage user={user} profileId={workspace.profile.id} /> : null}
-            {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} subjects={workspace.subjects} /> : null}
+            {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
             {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} /> : null}
             {page === 'data' ? <DataPage user={user} onMigrated={workspace.refresh} /> : null}
           </>
@@ -110,26 +80,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
 }
 
 function LoadingView({ seeding }: { seeding: boolean }) {
-  return (
-    <div className="page-wrap loading-page">
-      <div className="loading-orb" />
-      <h2>{seeding ? 'Preparando seus baralhos…' : 'Carregando sua trilha…'}</h2>
-      <p>{seeding ? 'O catálogo oficial está sendo organizado no novo banco. Isso acontece apenas na primeira vez.' : 'Sincronizando estrutura e progresso.'}</p>
-    </div>
-  );
-}
-
-function PageHeader({ eyebrow, title, subtitle, action }: { eyebrow?: string; title: string; subtitle?: string; action?: React.ReactNode }) {
-  return (
-    <div className="page-header">
-      <div>
-        {eyebrow ? <span className="page-eyebrow">{eyebrow}</span> : null}
-        <h1>{title}</h1>
-        {subtitle ? <p>{subtitle}</p> : null}
-      </div>
-      {action ? <div className="page-header-action">{action}</div> : null}
-    </div>
-  );
+  return <div className="page-wrap loading-page"><div className="loading-orb" /><h2>{seeding ? 'Preparando seus baralhos…' : 'Carregando sua trilha…'}</h2><p>{seeding ? 'O catálogo oficial está sendo organizado no novo banco. Isso acontece apenas na primeira vez.' : 'Sincronizando estrutura e progresso.'}</p></div>;
 }
 
 function HomePage({ user, workspace, onNavigate }: { user: User; workspace: ReturnType<typeof useStudyWorkspace>; onNavigate: (page: PageId) => void }) {
@@ -151,60 +102,15 @@ function HomePage({ user, workspace, onNavigate }: { user: User; workspace: Retu
 
   return (
     <div className="page-wrap">
-      <PageHeader
-        eyebrow="SEU PAINEL"
-        title={`Bom estudo${user.user_metadata?.given_name ? `, ${user.user_metadata.given_name}` : ''}.`}
-        subtitle={`${workspace.profile?.name} · ${workspace.profile?.board || 'Banca em acompanhamento'} · Edital ${workspace.profile?.edital_year || 'atual'}`}
-        action={<button className="primary-action" onClick={() => onNavigate('study')}>Continuar estudando →</button>}
-      />
-
-      <section className="hero-study-card">
-        <div>
-          <span className="hero-kicker">PRÓXIMA AÇÃO</span>
-          <h2>Transforme pendências em pontos.</h2>
-          <p>Estude um baralho, responda sem revelar e registre a dificuldade. O desempenho passa a alimentar sua trilha.</p>
-          <button onClick={() => onNavigate('study')}>Iniciar sessão</button>
-        </div>
-        <div className="hero-stat">
-          <strong>{performance?.reviewedToday ?? 0}</strong>
-          <span>revisões hoje</span>
-        </div>
-      </section>
-
-      <div className="dashboard-grid four">
-        <MetricTile label="Cartões ativos" value={cardCount} helper="No perfil atual" />
-        <MetricTile label="Precisão" value={`${performance?.accuracy ?? 0}%`} helper={`${performance?.totalReviews ?? 0} revisões`} />
-        <MetricTile label="Disciplinas" value={workspace.subjects.length} helper="Organizadas pelo edital" />
-        <MetricTile label="Erros abertos" value={performance?.openErrors ?? 0} helper="Para atacar na revisão" />
-      </div>
-
+      <PageHeader eyebrow="SEU PAINEL" title={`Bom estudo${user.user_metadata?.given_name ? `, ${user.user_metadata.given_name}` : ''}.`} subtitle={`${workspace.profile?.name} · ${workspace.profile?.board || 'Banca em acompanhamento'} · Edital ${workspace.profile?.edital_year || 'atual'}`} action={<button className="primary-action" onClick={() => onNavigate('study')}>Continuar estudando →</button>} />
+      <section className="hero-study-card"><div><span className="hero-kicker">PRÓXIMA AÇÃO</span><h2>Transforme pendências em pontos.</h2><p>Estude um baralho, responda sem revelar e registre a dificuldade. O desempenho passa a alimentar sua trilha.</p><button onClick={() => onNavigate('study')}>Iniciar sessão</button></div><div className="hero-stat"><strong>{performance?.reviewedToday ?? 0}</strong><span>revisões hoje</span></div></section>
+      <div className="dashboard-grid four"><MetricTile label="Cartões ativos" value={cardCount} helper="No perfil atual" /><MetricTile label="Precisão" value={`${performance?.accuracy ?? 0}%`} helper={`${performance?.totalReviews ?? 0} revisões`} /><MetricTile label="Disciplinas" value={workspace.subjects.length} helper="Organizadas pelo edital" /><MetricTile label="Erros abertos" value={performance?.openErrors ?? 0} helper="Para atacar na revisão" /></div>
       <div className="content-grid two-one">
-        <section className="panel-card">
-          <div className="panel-heading"><div><span>BARALHOS</span><h2>Continuar por disciplina</h2></div><button className="link-button" onClick={() => onNavigate('study')}>Ver todos</button></div>
-          <div className="deck-list-clean">
-            {topDecks.map((deck, index) => (
-              <button key={deck.id} onClick={() => onNavigate('study')}>
-                <span className="deck-number">{String(index + 1).padStart(2, '0')}</span>
-                <span className="deck-copy"><strong>{deck.name}</strong><small>{deck.is_builtin ? 'Baralho oficial' : 'Baralho personalizado'}</small></span>
-                <span className="chevron">›</span>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="panel-card accent-panel">
-          <span className="panel-label">FOCO DA SEMANA</span>
-          <h2>Lei seca + questões + revisão.</h2>
-          <p>Use o Edital para escolher o tópico e volte ao cartão depois da resolução de questões.</p>
-          <button onClick={() => onNavigate('edital')}>Abrir edital</button>
-        </section>
+        <section className="panel-card"><div className="panel-heading"><div><span>BARALHOS</span><h2>Continuar por disciplina</h2></div><button className="link-button" onClick={() => onNavigate('study')}>Ver todos</button></div><div className="deck-list-clean">{topDecks.map((deck, index) => <button key={deck.id} onClick={() => onNavigate('study')}><span className="deck-number">{String(index + 1).padStart(2, '0')}</span><span className="deck-copy"><strong>{deck.name}</strong><small>{deck.is_builtin ? 'Baralho oficial' : 'Baralho personalizado'}</small></span><span className="chevron">›</span></button>)}</div></section>
+        <section className="panel-card accent-panel"><span className="panel-label">FOCO DA SEMANA</span><h2>Lei seca + questões + revisão.</h2><p>Use o Edital para escolher o tópico e volte ao cartão depois da resolução de questões.</p><button onClick={() => onNavigate('edital')}>Abrir edital</button></section>
       </div>
     </div>
   );
-}
-
-function MetricTile({ label, value, helper }: { label: string; value: string | number; helper: string }) {
-  return <div className="metric-tile"><span>{label}</span><strong>{value}</strong><small>{helper}</small></div>;
 }
 
 function StudyPage({ user, profileId, subjects, decks }: { user: User; profileId: string; subjects: Array<{id:string;name:string}>; decks: Array<{id:string;name:string;subject_id:string|null}> }) {
@@ -251,71 +157,13 @@ function StudyPage({ user, profileId, subjects, decks }: { user: User; profileId
   return (
     <div className="page-wrap study-page">
       <PageHeader eyebrow="SESSÃO DE ESTUDO" title="Estudar" subtitle="Recupere a resposta antes de revelar. Depois, registre o nível de lembrança." />
-
-      <div className="study-toolbar">
-        <label><span>Disciplina</span><select value={subjectId} onChange={(event) => setSubjectId(event.target.value)}><option value="all">Todas</option>{subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}</select></label>
-        <label><span>Baralho</span><select value={deckId} onChange={(event) => setDeckId(event.target.value)}>{filteredDecks.map((deck) => <option key={deck.id} value={deck.id}>{deck.name}</option>)}</select></label>
-        <div className="session-counter"><span>Progresso</span><strong>{cards.length ? `${index + 1}/${cards.length}` : '0/0'}</strong></div>
-      </div>
-
-      {loading ? <div className="study-empty">Carregando cartões…</div> : !card ? <div className="study-empty"><strong>Nenhum cartão neste baralho.</strong><span>Importe cartões ou escolha outro baralho.</span></div> : (
-        <>
-          <button className={`flashcard-modern ${revealed ? 'revealed' : ''}`} onClick={() => setRevealed(true)}>
-            <div className="card-meta"><span>{card.priority ? `Prioridade ${card.priority}` : 'Flashcard'}</span>{card.tags?.[0] ? <span>{card.tags[0]}</span> : null}</div>
-            <div className="card-question"><small>PERGUNTA</small><h2>{card.front}</h2></div>
-            {revealed ? <div className="card-answer"><small>RESPOSTA</small><p>{card.back}</p>{card.legal_basis ? <div className="legal-basis"><strong>Base legal</strong><span>{card.legal_basis}</span></div> : null}{card.pitfall ? <div className="pitfall"><strong>Pegadinha</strong><span>{card.pitfall}</span></div> : null}{card.mnemonic ? <div className="mnemonic"><strong>Mnemônico</strong><span>{card.mnemonic}</span></div> : null}</div> : <div className="reveal-hint">Toque no cartão para revelar</div>}
-          </button>
-
-          {revealed ? <div className="rating-row"><button className="rating again" onClick={() => void rate(1)}><strong>Errei</strong><span>rever logo</span></button><button className="rating hard" onClick={() => void rate(2)}><strong>Difícil</strong><span>1 dia</span></button><button className="rating good" onClick={() => void rate(3)}><strong>Bom</strong><span>7 dias</span></button><button className="rating easy" onClick={() => void rate(4)}><strong>Fácil</strong><span>30 dias</span></button></div> : null}
-
-          <div className="study-navigation"><button className="secondary-action" onClick={() => { setIndex((index - 1 + cards.length) % cards.length); setRevealed(false); setStartedAt(Date.now()); }}>← Anterior</button><button className="secondary-action" onClick={() => { setIndex((index + 1) % cards.length); setRevealed(false); setStartedAt(Date.now()); }}>Próximo →</button></div>
-        </>
-      )}
+      <div className="study-toolbar"><label><span>Disciplina</span><select value={subjectId} onChange={(event) => setSubjectId(event.target.value)}><option value="all">Todas</option>{subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}</select></label><label><span>Baralho</span><select value={deckId} onChange={(event) => setDeckId(event.target.value)}>{filteredDecks.map((deck) => <option key={deck.id} value={deck.id}>{deck.name}</option>)}</select></label><div className="session-counter"><span>Progresso</span><strong>{cards.length ? `${index + 1}/${cards.length}` : '0/0'}</strong></div></div>
+      {loading ? <div className="study-empty">Carregando cartões…</div> : !card ? <div className="study-empty"><strong>Nenhum cartão neste baralho.</strong><span>Importe cartões ou escolha outro baralho.</span></div> : <><button className={`flashcard-modern ${revealed ? 'revealed' : ''}`} onClick={() => setRevealed(true)}><div className="card-meta"><span>{card.priority ? `Prioridade ${card.priority}` : 'Flashcard'}</span>{card.tags?.[0] ? <span>{card.tags[0]}</span> : null}</div><div className="card-question"><small>PERGUNTA</small><h2>{card.front}</h2></div>{revealed ? <div className="card-answer"><small>RESPOSTA</small><p>{card.back}</p>{card.legal_basis ? <div className="legal-basis"><strong>Base legal</strong><span>{card.legal_basis}</span></div> : null}{card.pitfall ? <div className="pitfall"><strong>Pegadinha</strong><span>{card.pitfall}</span></div> : null}{card.mnemonic ? <div className="mnemonic"><strong>Mnemônico</strong><span>{card.mnemonic}</span></div> : null}</div> : <div className="reveal-hint">Toque no cartão para revelar</div>}</button>{revealed ? <div className="rating-row"><button className="rating again" onClick={() => void rate(1)}><strong>Errei</strong><span>rever logo</span></button><button className="rating hard" onClick={() => void rate(2)}><strong>Difícil</strong><span>1 dia</span></button><button className="rating good" onClick={() => void rate(3)}><strong>Bom</strong><span>7 dias</span></button><button className="rating easy" onClick={() => void rate(4)}><strong>Fácil</strong><span>30 dias</span></button></div> : null}<div className="study-navigation"><button className="secondary-action" onClick={() => { setIndex((index - 1 + cards.length) % cards.length); setRevealed(false); setStartedAt(Date.now()); }}>← Anterior</button><button className="secondary-action" onClick={() => { setIndex((index + 1) % cards.length); setRevealed(false); setStartedAt(Date.now()); }}>Próximo →</button></div></>}
       {message ? <p className="toast-note">{message}</p> : null}
     </div>
   );
 }
 
-function EditalPage({ workspace }: { workspace: ReturnType<typeof useStudyWorkspace> }) {
-  const [query, setQuery] = useState('');
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const subjects = workspace.subjects.filter((subject) => subject.name.toLowerCase().includes(query.toLowerCase()) || workspace.topics.some((topic) => topic.subject_id === subject.id && topic.name.toLowerCase().includes(query.toLowerCase())));
-
-  return (
-    <div className="page-wrap">
-      <PageHeader eyebrow="EDITAL VERTICALIZADO" title="Mapa do edital" subtitle="Disciplinas e tópicos transformados em uma árvore de estudo, com base legal e prioridade quando disponíveis." action={<div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar no edital" /></div>} />
-      <div className="edital-tree">
-        {subjects.map((subject, index) => {
-          const topics = workspace.topics.filter((topic) => topic.subject_id === subject.id && !topic.parent_id);
-          const open = expanded.has(subject.id);
-          return <section key={subject.id} className="edital-subject"><button className="edital-subject-head" onClick={() => setExpanded((current) => { const next = new Set(current); open ? next.delete(subject.id) : next.add(subject.id); return next; })}><span className="subject-index">{String(index + 1).padStart(2, '0')}</span><span className="subject-title"><strong>{subject.name}</strong><small>{topics.length} tópicos {subject.priority ? `· Prioridade ${subject.priority}` : ''}</small></span>{subject.weight ? <span className="weight-pill">{subject.weight}%</span> : null}<span className="expand-icon">{open ? '−' : '+'}</span></button>{open ? <div className="topic-list">{topics.map((topic) => <div key={topic.id} className="topic-row"><span className="topic-check">○</span><div><strong>{topic.name}</strong>{topic.edital_text ? <p>{topic.edital_text}</p> : null}{topic.legal_basis ? <small>Base legal: {topic.legal_basis}</small> : null}</div>{topic.priority ? <span className={`priority-pill priority-${topic.priority.toLowerCase()}`}>{topic.priority}</span> : null}</div>)}</div> : null}</section>;
-        })}
-      </div>
-    </div>
-  );
-}
-
-function JurisprudencePage({ profileId, subjects }: { profileId: string; subjects: Array<{id:string;name:string}> }) {
-  const [rows, setRows] = useState<JurisprudenceRow[]>([]);
-  const [query, setQuery] = useState('');
-  const [loading, setLoading] = useState(true);
-  useEffect(() => { void listJurisprudence(getSupabaseClient(), profileId).then(setRows).finally(() => setLoading(false)); }, [profileId]);
-  const filtered = rows.filter((row) => `${row.court} ${row.theme || ''} ${row.thesis} ${row.summary || ''}`.toLowerCase().includes(query.toLowerCase()));
-  return <div className="page-wrap"><PageHeader eyebrow="JURISPRUDÊNCIA VIVA" title="Jurisprudência" subtitle="Teses ligadas ao edital, com foco de cobrança e status de atualização." action={<div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar tese ou tribunal" /></div>} />{loading ? <div className="study-empty">Carregando jurisprudência…</div> : !filtered.length ? <EmptyFeature title="Área de jurisprudência pronta." text="Quando teses forem cadastradas, elas aparecerão aqui vinculadas à disciplina, tema, base legal e forma provável de cobrança." /> : <div className="juris-grid">{filtered.map((row) => <article key={row.id} className="juris-card"><div className="juris-meta"><span>{row.court}</span><span className={`status status-${row.status}`}>{row.status}</span></div><h2>{row.theme || 'Tese jurisprudencial'}</h2><p>{row.summary || row.thesis}</p><details><summary>Ver tese completa</summary><blockquote>{row.thesis}</blockquote>{row.exam_angle ? <p><strong>Como pode cair:</strong> {row.exam_angle}</p> : null}{row.pitfall ? <p><strong>Pegadinha:</strong> {row.pitfall}</p> : null}{row.legal_basis ? <small>Base legal: {row.legal_basis}</small> : null}</details></article>)}</div>}</div>;
-}
-
-function PerformancePage({ user, profileId }: { user: User; profileId: string }) {
-  const [summary, setSummary] = useState<PerformanceSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => { void loadPerformance(getSupabaseClient(), user, profileId).then(setSummary).finally(() => setLoading(false)); }, [user.id, profileId]);
-  if (loading) return <div className="page-wrap"><PageHeader eyebrow="ANÁLISE" title="Desempenho" /><div className="study-empty">Calculando desempenho…</div></div>;
-  return <div className="page-wrap"><PageHeader eyebrow="ANÁLISE" title="Desempenho" subtitle="Métricas reais das revisões e questões gravadas no Supabase." /><div className="dashboard-grid four"><MetricTile label="Revisões" value={summary?.totalReviews ?? 0} helper={`${summary?.reviewedToday ?? 0} hoje`} /><MetricTile label="Acerto nos cartões" value={`${summary?.accuracy ?? 0}%`} helper={`${summary?.correctReviews ?? 0} respostas boas/fáceis`} /><MetricTile label="Questões" value={summary?.attemptedQuestions ?? 0} helper={`${summary?.questionAccuracy ?? 0}% de acerto`} /><MetricTile label="Caderno de erros" value={summary?.openErrors ?? 0} helper="pendências abertas" /></div><div className="content-grid two-one"><section className="panel-card"><span className="panel-label">LEITURA DO MOMENTO</span><h2>{(summary?.accuracy ?? 0) >= 80 ? 'Consistência forte.' : (summary?.totalReviews ?? 0) === 0 ? 'Comece a registrar revisões.' : 'Há espaço claro para ganho.'}</h2><p>{(summary?.totalReviews ?? 0) === 0 ? 'Faça uma sessão de cartões para iniciar sua série histórica.' : `Sua taxa atual nos cartões é ${summary?.accuracy ?? 0}%. O próximo ganho vem de revisar os itens difíceis e cruzá-los com questões.`}</p></section><section className="panel-card accent-panel"><span className="panel-label">PRÓXIMO FOCO</span><h2>Erros primeiro.</h2><p>O caderno de erros será o ponto de encontro entre cartões, questões e jurisprudência.</p></section></div></div>;
-}
-
 function DataPage({ user, onMigrated }: { user: User; onMigrated: () => Promise<void> }) {
   return <div className="page-wrap"><PageHeader eyebrow="CONTA E DADOS" title="Sincronização" subtitle="Migre o legado, confira a nuvem e mantenha uma cópia local durante a transição." /><LegacyMigrationPanel user={user} onMigrated={onMigrated} /><SyncPanel user={user} /></div>;
-}
-
-function EmptyFeature({ title, text }: { title: string; text: string }) {
-  return <div className="empty-feature"><div className="empty-icon">＋</div><h2>{title}</h2><p>{text}</p></div>;
 }
