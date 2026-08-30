@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { createSupabaseSyncAdapter } from '../../../src/services/sync/supabase-sync-adapter';
-import type { RemoteSnapshot } from '../../../src/types/sync';
-import { applyLegacyLocalSnapshot, readLegacyLocalSnapshot } from './local-snapshot';
+import { createSupabaseSyncAdapter } from '@core/infrastructure/sync/supabase-sync-adapter';
+import type { RemoteSnapshot } from '@core/types/sync';
+import { applyLegacyLocalSnapshot, readLegacyLocalSnapshot } from '@core/legacy/local-snapshot';
 
 export type SyncStatus = {
   busy: boolean;
