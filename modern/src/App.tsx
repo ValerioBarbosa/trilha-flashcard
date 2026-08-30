@@ -6,7 +6,9 @@ import { PdfImportLauncher } from './cards/PdfImportLauncher';
 import { ErrorNotebookLauncher } from './errors/ErrorNotebookLauncher';
 import { QuestionBankPreview } from './questions/QuestionBankPreview';
 import { QuestionManagerLauncher } from './questions/QuestionManagerLauncher';
+import { QuickActions } from './shared/QuickActions';
 import './styles.css';
+import './shared/quick-actions.css';
 
 export function App() {
   const { user, loading, initialized, error, signIn, signOut } = useAuth();
@@ -39,6 +41,7 @@ export function App() {
     return (
       <>
         <ModernWorkspace user={user} onSignOut={signOut} />
+        <QuickActions onSignOut={signOut} />
         <QuestionManagerLauncher user={user} />
         <ErrorNotebookLauncher user={user} />
         <PdfImportLauncher user={user} />
