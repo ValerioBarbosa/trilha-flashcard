@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { SyncController, type SyncStatus } from './sync-controller';
@@ -20,6 +20,24 @@ export function SyncPanel({ user }: Props) {
   const controller = useMemo(() => new SyncController(getSupabaseClient()), []);
   const [status, setStatus] = useState<SyncStatus>(INITIAL_STATUS);
   const [remoteToken, setRemoteToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    void controller.inspect(user.id)
+      .then((result) => {
+        if (!active) return;
+        setStatus(result.status);
+        setRemoteToken(result.remote?.updatedAtISO ?? null);
+      })
+      .catch(() => {
+        if (active) setStatus(controller.getStatus());
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [controller, user.id]);
 
   async function inspect() {
     try {
@@ -76,7 +94,7 @@ export function SyncPanel({ user }: Props) {
           <p>Validação segura do fluxo local-first usando a mesma tabela da versão atual.</p>
         </div>
         <button type="button" className="secondary" onClick={() => void inspect()} disabled={status.busy}>
-          Verificar
+          {status.busy ? 'Verificando…' : 'Verificar'}
         </button>
       </div>
 
@@ -91,7 +109,7 @@ export function SyncPanel({ user }: Props) {
         </div>
         <div className="status-wide">
           <dt>Última versão remota</dt>
-          <dd>{status.remoteUpdatedAt ? new Date(status.remoteUpdatedAt).toLocaleString('pt-BR') : 'Ainda não verificada'}</dd>
+          <dd>{status.remoteUpdatedAt ? new Date(status.remoteUpdatedAt).toLocaleString('pt-BR') : status.busy ? 'Verificando…' : 'Nenhuma cópia encontrada'}</dd>
         </div>
       </dl>
 
@@ -101,13 +119,13 @@ export function SyncPanel({ user }: Props) {
         <button type="button" onClick={() => void pushLocal()} disabled={status.busy}>
           Enviar este dispositivo
         </button>
-        <button type="button" className="secondary" onClick={() => void pullRemote()} disabled={status.busy}>
+        <button type="button" className="secondary" onClick={() => void pullRemote()} disabled={status.busy || !status.remoteUpdatedAt}>
           Recuperar da nuvem
         </button>
       </div>
 
       <p className="pilot-note">
-        O envio usa controle de conflito. A recuperação pede confirmação antes de substituir dados sincronizáveis locais.
+        O envio usa controle de conflito. A recuperação só fica disponível quando existe uma cópia remota confirmada.
       </p>
     </section>
   );
