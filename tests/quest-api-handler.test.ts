@@ -7,7 +7,18 @@ const secrets: Record<string, string> = {
   QUEST_API_KEY_HEADER: 'x-api-key',
 };
 
-function request(body: unknown, authorization = 'Bearer user-jwt') {
+function jwt(claims: Record<string, unknown>) {
+  const encode = (value: unknown) => btoa(JSON.stringify(value))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+  return `${encode({ alg: 'HS256', typ: 'JWT' })}.${encode(claims)}.test-signature`;
+}
+
+const authenticatedJwt = jwt({ role: 'authenticated', sub: 'user-1' });
+const anonymousJwt = jwt({ role: 'anon' });
+
+function request(body: unknown, authorization = `Bearer ${authenticatedJwt}`) {
   return new Request('https://project.supabase.co/functions/v1/quest-api', {
     method: 'POST',
     headers: { authorization, 'content-type': 'application/json' },
@@ -20,6 +31,15 @@ describe('Quest.API Edge Function', () => {
     const handler = createQuestApiHandler({ getEnv: (name) => secrets[name] });
     const response = await handler(request({ resource: 'questions' }, ''));
     expect(response.status).toBe(401);
+  });
+
+  it('rejeita o JWT público legado com role anon', async () => {
+    const fetchImpl = vi.fn();
+    const handler = createQuestApiHandler({ getEnv: (name) => secrets[name], fetchImpl });
+    const response = await handler(request({ resource: 'questions' }, `Bearer ${anonymousJwt}`));
+
+    expect(response.status).toBe(401);
+    expect(fetchImpl).not.toHaveBeenCalled();
   });
 
   it('mantém a chave no servidor, aplica allowlist e limita per_page', async () => {
