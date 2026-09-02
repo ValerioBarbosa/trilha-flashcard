@@ -13,48 +13,50 @@ Modernizar o Trilha Flashcard sem reescrever o produto, preservando a interface 
 
 ## Fases
 
-### 1. Fundação tipada — em andamento
+### 1. Fundação tipada — concluída
 - [x] contratos TypeScript de autenticação e sincronização;
 - [x] serviço Supabase baseado em `user.id`;
 - [x] adaptador de sincronização Supabase tipado;
 - [x] store de autenticação independente da UI;
 - [x] testes unitários do serviço de autenticação e da store;
-- [ ] toolchain React/TypeScript executável no CI;
-- [ ] `AuthContext` React consumindo a store;
-- [ ] componente piloto sem substituir a interface atual.
+- [x] toolchain React/TypeScript executável no CI (`.github/workflows/react-foundation.yml`);
+- [x] `AuthContext` React consumindo a store (`modern/src/auth/AuthContext.tsx`);
+- [x] componente piloto sem substituir a interface atual — hoje já é o workspace React completo (`modern/src/app/ModernWorkspace.tsx`).
 
-### 2. Autenticação e sincronização
-- ligar o `AuthContext` à store;
-- manter Firebase apenas como compatibilidade durante a migração;
-- validar login Google, refresh, logout e restauração de sessão;
-- validar conflito local/remoto e recuperação em outro dispositivo.
+### 2. Autenticação e sincronização — implementada, validação de produção pendente
+- [x] `AuthContext` ligado à store;
+- [x] Firebase mantido apenas como compatibilidade durante a migração (login/sync legado intactos em `firebase-config.js`/`cloud-sync.js`);
+- [ ] validar login Google, refresh, logout e restauração de sessão **no domínio final de produção** (critério do gate em `docs/PRODUCTION_CUTOVER.md`);
+- [ ] validar conflito local/remoto e recuperação em outro dispositivo **no domínio final de produção** (idem).
 
-### 3. Features React isoladas
-Migrar uma feature por vez, começando pelas áreas com menos dependências globais:
-1. status de sincronização;
-2. autenticação;
-3. gerenciador de cartões;
-4. matérias/edital;
-5. estudo e revisão;
-6. desempenho.
+### 3. Features React isoladas — concluída
+Todas as áreas previstas já têm página/componente próprio em `modern/src`, consumindo repositories de `src/features`:
+1. [x] status de sincronização (`sync/SyncPanel.tsx`);
+2. [x] autenticação (`auth/AuthContext.tsx`);
+3. [x] gerenciador de cartões (`cards/CardManagerLauncher.tsx`, `cards/PdfImportLauncher.tsx`);
+4. [x] matérias/edital (`edital/EditalPage.tsx`);
+5. [x] estudo e revisão (`app/ModernWorkspace.tsx` → `StudyPage`);
+6. [x] desempenho (`performance/PerformancePage.tsx`).
 
-### 4. Banco relacional Supabase
-Adicionar tabelas de domínio sem remover imediatamente `flashcard_sync_entries`:
-- concursos;
-- disciplinas;
-- tópicos;
-- cartões;
-- revisões;
-- questões e tentativas;
-- jurisprudência;
-- caderno de erros.
+Também já cobertos além do escopo inicial: banco de questões (`questions/ProductionQuestionsPage.tsx`, integrado à Quest.API) e jurisprudência (`jurisprudence/JurisprudencePage.tsx` — componente pronto, hoje exibe estado vazio por falta de conteúdo cadastrado, não por lógica pendente).
 
-### 5. Encerramento do legado
-Somente depois de paridade funcional e testes:
-- reduzir dependências do `app.js`;
-- retirar adaptadores temporários Firebase/Supabase;
-- tornar React a entrada principal;
-- manter migração dos dados antigos.
+### 4. Banco relacional Supabase — concluída
+Tabelas de domínio já existem em `supabase/migrations/20260829183000_normalized_study_domain.sql` e seguintes, sem remover `flashcard_sync_entries`:
+- [x] concursos/perfis (`study_profiles`);
+- [x] disciplinas (`subjects`);
+- [x] tópicos (`topics`);
+- [x] cartões (`cards`);
+- [x] revisões (`reviews`);
+- [x] questões e tentativas (`questions`, `question_attempts`);
+- [x] jurisprudência (`jurisprudence`);
+- [x] caderno de erros (`error_notebook`).
+
+### 5. Encerramento do legado — em aberto
+Esta é a etapa que falta hoje. Depende da paridade funcional já implementada ser **validada em produção** (ver `docs/PRODUCTION_CUTOVER.md`):
+- [ ] promover `modern/dist` a entrypoint publicado no lugar de `index.html`/`app.js`;
+- [ ] retirar Firebase e adaptadores temporários Firebase/Supabase;
+- [ ] reduzir/aposentar `app.js` e os demais módulos legados da raiz;
+- [ ] arquivar dados antigos migrados após confirmação de paridade.
 
 ## Critérios antes de qualquer merge estrutural
 1. `npm ci` sem erro;

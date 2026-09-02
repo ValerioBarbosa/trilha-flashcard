@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
-import { AuthStore } from '../src/state/auth-store';
+import { AuthStore } from '../src/features/auth/auth-store';
 
 function makeClient() {
   let authCallback: ((event: string, session: { user: User } | null) => void) | undefined;
