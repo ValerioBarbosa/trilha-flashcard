@@ -71,6 +71,10 @@ O proxy permite apenas os parâmetros de catálogo já documentados publicamente
 - `ano`
 - `codigo`
 - `tipo`
+- `alternative_type`
+- `tem_gabarito`
+- `tem_anexos`
+- `include_gabarito`
 
 Parâmetros desconhecidos são descartados antes da chamada externa.
 
@@ -85,8 +89,12 @@ const result = await listQuestApiQuestions({
   ano: 2026,
   page: 1,
   per_page: 10,
+  tem_gabarito: true,
+  include_gabarito: true,
 });
 ```
+
+O Banco de Questões oferece essa consulta somente para usuários autenticados. Ele exibe até 10 resultados por busca e mantém o conteúdo e as tentativas externas apenas na memória da página.
 
 ## Política de dados
 

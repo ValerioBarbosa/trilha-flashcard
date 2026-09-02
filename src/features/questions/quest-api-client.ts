@@ -11,6 +11,36 @@ export type QuestApiQuestionFilters = {
   ano?: number;
   codigo?: string;
   tipo?: string;
+  alternative_type?: 'MULTIPLA_ESCOLHA' | 'CERTO_ERRADO';
+  tem_gabarito?: boolean;
+  tem_anexos?: boolean;
+  include_gabarito?: boolean;
+};
+
+export type QuestApiQuestionItem = {
+  id: string;
+  numero?: string | null;
+  enunciado: string;
+  alternativas?: Array<{ letra?: string; texto?: string; imagens?: unknown[] }>;
+  gabarito?: string | null;
+  prova?: {
+    id?: string;
+    orgao?: string | null;
+    cargo?: string | null;
+    ano?: string | number | null;
+    banca?: string | null;
+    alternative_type?: string | null;
+  } | null;
+  classificacao?: { materia?: string | null } | null;
+  textos_associados?: string[];
+};
+
+export type QuestApiQuestionPage = {
+  total: number;
+  page: number;
+  per_page: number;
+  next_cursor?: string | null;
+  items: QuestApiQuestionItem[];
 };
 
 export type QuestApiEnvelope<T = unknown> = {
@@ -25,7 +55,7 @@ export type QuestApiEnvelope<T = unknown> = {
 
 export async function listQuestApiQuestions(filters: QuestApiQuestionFilters = {}) {
   const client = getSupabaseClient();
-  const { data, error } = await client.functions.invoke<QuestApiEnvelope>('quest-api', {
+  const { data, error } = await client.functions.invoke<QuestApiEnvelope<QuestApiQuestionPage>>('quest-api', {
     body: {
       resource: 'questions',
       params: filters,
