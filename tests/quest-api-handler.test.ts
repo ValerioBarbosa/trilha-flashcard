@@ -70,6 +70,23 @@ describe('Quest.API Edge Function', () => {
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 
+  it('encaminha somente filtros booleanos válidos para solicitar gabarito', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(new Response(JSON.stringify({ data: { items: [] } }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    }));
+    const handler = createQuestApiHandler({ getEnv: (name) => secrets[name], fetchImpl });
+    const response = await handler(request({
+      resource: 'questions',
+      params: { tem_gabarito: true, include_gabarito: true, alternative_type: 'CERTO_ERRADO' },
+    }));
+
+    expect(response.status).toBe(200);
+    expect(String(fetchImpl.mock.calls[0][0])).toContain('tem_gabarito=true');
+    expect(String(fetchImpl.mock.calls[0][0])).toContain('include_gabarito=true');
+    expect(String(fetchImpl.mock.calls[0][0])).toContain('alternative_type=CERTO_ERRADO');
+  });
+
   it('não devolve texto inesperado do provedor ao navegador', async () => {
     const fetchImpl = vi.fn().mockResolvedValue(new Response('internal upstream detail', {
       status: 500,

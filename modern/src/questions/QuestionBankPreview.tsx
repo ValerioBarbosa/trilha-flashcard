@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabase-client';
+import { listQuestApiQuestions, type QuestApiQuestionItem } from './quest-api-client';
 import './question-bank-preview.css';
+import './quest-api-toolbar.css';
 
 type Question = {
   id: string;
@@ -20,6 +22,7 @@ type Question = {
   subject_id: string | null;
   topic_id: string | null;
   tags: string[];
+  external_transient?: boolean;
 };
 
 type Attempt = {
@@ -35,6 +38,8 @@ type Props = {
   onClose?: () => void;
   profileId?: string | null;
   embedded?: boolean;
+  defaultBoard?: string | null;
+  subjects?: string[];
 };
 
 const DEMO_QUESTION: Question = {
@@ -62,14 +67,60 @@ const DEMO_QUESTION: Question = {
   tags: ['constitucional', 'poder-constituinte'],
 };
 
-function normalizeAlternatives(value: unknown): string[] {
-  if (Array.isArray(value)) return value.map((item) => typeof item === 'string' ? item : String((item as { text?: unknown })?.text ?? ''));
-  if (value && typeof value === 'object') return Object.values(value as Record<string, unknown>).map(String);
+type NormalizedAlternative = { key: string; text: string };
+
+function normalizeAlternatives(value: unknown): NormalizedAlternative[] {
+  if (Array.isArray(value)) {
+    return value.map((item, index) => {
+      if (typeof item === 'string') return { key: String.fromCharCode(65 + index), text: item };
+      const record = item && typeof item === 'object' ? item as Record<string, unknown> : {};
+      return {
+        key: String(record.letra ?? record.key ?? record.label ?? String.fromCharCode(65 + index)).trim().toUpperCase(),
+        text: String(record.texto ?? record.text ?? ''),
+      };
+    }).filter((item) => item.text.trim());
+  }
+  if (value && typeof value === 'object') {
+    return Object.entries(value as Record<string, unknown>).map(([key, text]) => ({ key: key.toUpperCase(), text: String(text) }));
+  }
   return [];
 }
 
-export function QuestionBankPreview({ user, onClose, profileId: providedProfileId = null, embedded = false }: Props) {
+function toQuestion(item: QuestApiQuestionItem): Question {
+  const associated = (item.textos_associados ?? []).filter((text): text is string => typeof text === 'string' && Boolean(text.trim()));
+  const parsedYear = Number(item.prova?.ano);
+  const tags = [item.classificacao?.materia, item.prova?.alternative_type].filter((value): value is string => Boolean(value));
+
+  return {
+    id: `quest-api:${item.id}`,
+    statement: [...associated, item.enunciado].filter(Boolean).join('\n\n'),
+    alternatives: item.alternativas ?? [],
+    correct_answer: item.gabarito ? String(item.gabarito).trim().toUpperCase() : null,
+    explanation: null,
+    legal_basis: null,
+    board: item.prova?.banca ?? null,
+    exam: [item.prova?.orgao, item.prova?.cargo].filter(Boolean).join(' · ') || null,
+    exam_year: Number.isInteger(parsedYear) ? parsedYear : null,
+    source: 'Quest.API',
+    source_provider: 'quest-api',
+    external_id: String(item.id),
+    source_url: 'https://quest.api.br',
+    subject_id: null,
+    topic_id: null,
+    tags,
+    external_transient: true,
+  };
+}
+
+export function QuestionBankPreview({ user, onClose, profileId: providedProfileId = null, embedded = false, defaultBoard = null, subjects = [] }: Props) {
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [externalQuestions, setExternalQuestions] = useState<Question[]>([]);
+  const [externalTotal, setExternalTotal] = useState(0);
+  const [externalLoading, setExternalLoading] = useState(false);
+  const [externalError, setExternalError] = useState<string | null>(null);
+  const [apiBoard, setApiBoard] = useState(defaultBoard ?? '');
+  const [apiSubject, setApiSubject] = useState('');
+  const [apiYear, setApiYear] = useState('');
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [resolvedProfileId, setResolvedProfileId] = useState<string | null>(providedProfileId);
   const [selectedId, setSelectedId] = useState('');
@@ -155,7 +206,8 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
     return () => { cancelled = true; };
   }, [user, providedProfileId]);
 
-  const pool = useMemo(() => (questions.length ? questions : [DEMO_QUESTION]), [questions]);
+  const realQuestions = useMemo(() => [...externalQuestions, ...questions], [externalQuestions, questions]);
+  const pool = useMemo(() => (realQuestions.length ? realQuestions : [DEMO_QUESTION]), [realQuestions]);
   const latestAttemptByQuestion = useMemo(() => {
     const map = new Map<string, Attempt>();
     for (const attempt of attempts) if (!map.has(attempt.question_id)) map.set(attempt.question_id, attempt);
@@ -196,12 +248,47 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
     setStartedAt(Date.now());
   }, [selected?.id]);
 
+  async function consultQuestApi() {
+    if (!user || externalLoading) return;
+    const year = apiYear.trim() ? Number(apiYear) : undefined;
+    if (year !== undefined && (!Number.isInteger(year) || year < 1900 || year > 2100)) {
+      setExternalError('Informe um ano entre 1900 e 2100.');
+      return;
+    }
+
+    setExternalLoading(true);
+    setExternalError(null);
+    try {
+      const response = await listQuestApiQuestions({
+        page: 1,
+        per_page: 10,
+        banca: apiBoard.trim() || undefined,
+        materia: apiSubject.trim() || undefined,
+        ano: year,
+        tem_gabarito: true,
+        include_gabarito: true,
+      });
+      const page = response?.data;
+      const mapped = (page?.items ?? []).map(toQuestion);
+      setExternalQuestions(mapped);
+      setExternalTotal(page?.total ?? mapped.length);
+      if (mapped[0]) setSelectedId(mapped[0].id);
+      if (!mapped.length) setExternalError('Nenhuma questão encontrada com esses filtros.');
+    } catch (cause) {
+      setExternalQuestions([]);
+      setExternalTotal(0);
+      setExternalError(cause instanceof Error ? cause.message : 'Não foi possível consultar a Quest.API.');
+    } finally {
+      setExternalLoading(false);
+    }
+  }
+
   async function answerQuestion(letter: string) {
     if (answered || saving || !selected) return;
     setAnswer(letter);
     setSaveError(null);
 
-    if (!user || !resolvedProfileId || selected.id === DEMO_QUESTION.id) return;
+    if (!user || !resolvedProfileId || selected.id === DEMO_QUESTION.id || selected.external_transient) return;
     setSaving(true);
     try {
       const isCorrect = correct ? letter === correct : false;
@@ -227,18 +314,29 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
     <div className={`qb-shell ${embedded ? 'embedded' : ''}`}>
       {!embedded ? (
         <header className="qb-topbar">
-          <div><strong>Questões</strong><span>{questions.length ? `${questions.length} do perfil atual` : 'Modo demonstração'}</span></div>
+          <div><strong>Questões</strong><span>{realQuestions.length ? `${realQuestions.length} disponíveis` : 'Modo demonstração'}</span></div>
           {onClose ? <button type="button" onClick={onClose}>Voltar à Trilha ×</button> : null}
         </header>
       ) : null}
 
-      {questions.length ? (
+      {realQuestions.length ? (
         <div className="qb-stats" aria-label="Desempenho em questões">
-          <div><span>Banco ativo</span><strong>{questions.length}</strong><small>questões</small></div>
+          <div><span>Banco ativo</span><strong>{realQuestions.length}</strong><small>{externalTotal ? `${externalTotal} na consulta externa` : 'questões locais'}</small></div>
           <div><span>Respondidas</span><strong>{answeredIds.size}</strong><small>{Math.max(questions.length - answeredIds.size, 0)} pendentes</small></div>
           <div><span>Tentativas</span><strong>{attempts.length}</strong><small>{correctAttempts} acertos</small></div>
           <div><span>Precisão</span><strong>{accuracy}%</strong><small>histórico registrado</small></div>
         </div>
+      ) : null}
+
+      {user ? (
+        <section className="qb-api-toolbar" aria-label="Consulta à Quest.API">
+          <div className="qb-api-intro"><strong>Buscar na Quest.API</strong><span>Consulta segura em tempo real; a chave permanece somente no servidor.</span></div>
+          <label><span>Banca</span><input value={apiBoard} onChange={(event) => setApiBoard(event.target.value)} placeholder="Ex.: CEBRASPE" /></label>
+          <label><span>Matéria</span><input list="qb-api-subjects" value={apiSubject} onChange={(event) => setApiSubject(event.target.value)} placeholder="Ex.: Direito Constitucional" /><datalist id="qb-api-subjects">{subjects.map((subject) => <option key={subject} value={subject} />)}</datalist></label>
+          <label><span>Ano</span><input inputMode="numeric" value={apiYear} onChange={(event) => setApiYear(event.target.value)} placeholder="Ex.: 2025" /></label>
+          <button type="button" onClick={() => void consultQuestApi()} disabled={externalLoading}>{externalLoading ? 'Buscando…' : 'Buscar questões'}</button>
+          {externalError ? <p className="qb-api-error" role="status">{externalError}</p> : null}
+        </section>
       ) : null}
 
       <div className="qb-layout">
@@ -252,7 +350,7 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
         </aside>
 
         <section className="qb-list" aria-label="Lista de questões">
-          <div className="qb-list-head"><strong>{filtered.length} questões</strong><span>{loading ? 'Atualizando…' : 'Mais recentes'}</span></div>
+          <div className="qb-list-head"><strong>{filtered.length} questões</strong><span>{loading || externalLoading ? 'Atualizando…' : 'Mais recentes'}</span></div>
           {filtered.map((item) => {
             const latest = latestAttemptByQuestion.get(item.id);
             return (
@@ -270,15 +368,15 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
             <div className="qb-question-head"><div className="qb-pills"><span>{provider}</span><span>{selected.board || 'Sem banca'}</span><span>{selected.exam_year || 'Ano —'}</span>{selectedLatest ? <span>{selectedLatest.is_correct ? 'Última: correta' : 'Última: errada'}</span> : null}</div>{selected.source_url ? <a href={selected.source_url} target="_blank" rel="noreferrer">Abrir na fonte ↗</a> : null}</div>
             <h1>{selected.statement}</h1>
             <div className="qb-alternatives">
-              {alternatives.map((alternative, index) => {
-                const letter = String.fromCharCode(65 + index);
+              {alternatives.map((alternative) => {
+                const letter = alternative.key;
                 const isSelected = answer === letter;
                 const isCorrect = answered && correct === letter;
                 const isWrong = answered && isSelected && correct !== letter;
-                return <button key={`${selected.id}-${letter}`} className={`${isSelected ? 'selected' : ''} ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''}`} onClick={() => void answerQuestion(letter)} disabled={answered || saving}><span>{letter}</span><p>{alternative}</p></button>;
+                return <button key={`${selected.id}-${letter}`} className={`${isSelected ? 'selected' : ''} ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''}`} onClick={() => void answerQuestion(letter)} disabled={answered || saving}><span>{letter}</span><p>{alternative.text}</p></button>;
               })}
             </div>
-            {answered ? <div className={`qb-result ${answer === correct ? 'success' : 'error'}`}><strong>{answer === correct ? 'Resposta correta' : `Resposta incorreta · gabarito ${correct || 'não informado'}`}</strong>{selected.explanation ? <p>{selected.explanation}</p> : null}{selected.legal_basis ? <small>{selected.legal_basis}</small> : null}</div> : null}
+            {answered ? <div className={`qb-result ${answer === correct ? 'success' : 'error'}`}><strong>{answer === correct ? 'Resposta correta' : `Resposta incorreta · gabarito ${correct || 'não informado'}`}</strong>{selected.explanation ? <p>{selected.explanation}</p> : null}{selected.legal_basis ? <small>{selected.legal_basis}</small> : null}{selected.external_transient ? <small>Consulta em tempo real: esta tentativa não foi armazenada.</small> : null}</div> : null}
             {saveError ? <div className="qb-result error"><strong>Não foi possível registrar a tentativa.</strong><p>{saveError}</p></div> : null}
           </>}
         </main>
@@ -287,7 +385,7 @@ export function QuestionBankPreview({ user, onClose, profileId: providedProfileI
           <h2>Fonte e referência</h2>
           <dl><div><dt>Fonte</dt><dd>{provider}</dd></div><div><dt>ID externo</dt><dd>{selected?.external_id || '—'}</dd></div><div><dt>Banca</dt><dd>{selected?.board || '—'}</dd></div><div><dt>Prova</dt><dd>{selected?.exam || '—'}</dd></div><div><dt>Ano</dt><dd>{selected?.exam_year || '—'}</dd></div><div><dt>Tentativas</dt><dd>{selectedHistory.length}</dd></div></dl>
           <div className="qb-note"><strong>Identidade da questão</strong><code>source_provider · external_id · source_url</code></div>
-          {!questions.length ? <div className="qb-demo-warning"><strong>Demonstração</strong><span>A questão exibida é ilustrativa e criada pelo próprio Trilha.</span></div> : null}
+          {!realQuestions.length ? <div className="qb-demo-warning"><strong>Demonstração</strong><span>A questão exibida é ilustrativa e criada pelo próprio Trilha.</span></div> : null}
         </aside>
       </div>
     </div>

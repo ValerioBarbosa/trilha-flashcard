@@ -15,9 +15,10 @@ const DEFAULT_TIMEOUT_MS = 12_000;
 const MAX_PER_PAGE = 50;
 const MAX_TEXT_FILTER_LENGTH = 160;
 
-const textParams = new Set(['after_id', 'banca', 'orgao', 'cargo', 'materia', 'codigo', 'tipo']);
+const textParams = new Set(['after_id', 'banca', 'orgao', 'cargo', 'materia', 'codigo', 'tipo', 'alternative_type']);
 const numericParams = new Set(['page', 'per_page', 'ano']);
-const allowedQuestionParams = new Set([...textParams, ...numericParams]);
+const booleanParams = new Set(['tem_gabarito', 'tem_anexos', 'include_gabarito']);
+const allowedQuestionParams = new Set([...textParams, ...numericParams, ...booleanParams]);
 
 function corsHeaders() {
   return {
@@ -64,6 +65,14 @@ function normalizeParams(params: Record<string, unknown> | undefined): URLSearch
 
     if (key === 'ano') {
       normalized.set(key, String(parsePositiveInteger(value, key, 2100)));
+      continue;
+    }
+
+    if (booleanParams.has(key)) {
+      if (value !== true && value !== false && value !== 'true' && value !== 'false') {
+        throw new Error(`${key} deve ser verdadeiro ou falso.`);
+      }
+      normalized.set(key, String(value));
       continue;
     }
 

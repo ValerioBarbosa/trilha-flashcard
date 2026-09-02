@@ -68,7 +68,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
             {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} /> : null}
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} /> : null}
             {page === 'edital' ? <EditalPage subjects={workspace.subjects} topics={workspace.topics} /> : null}
-            {page === 'questions' ? <ProductionQuestionsPage user={user} profileId={workspace.profile.id} /> : null}
+            {page === 'questions' ? <ProductionQuestionsPage user={user} profileId={workspace.profile.id} defaultBoard={workspace.profile.board} subjects={workspace.subjects.map((subject) => subject.name)} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
             {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} /> : null}
             {page === 'data' ? <DataPage user={user} onMigrated={workspace.refresh} /> : null}
