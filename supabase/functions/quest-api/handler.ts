@@ -90,6 +90,27 @@ function readConfiguration(getEnv: EnvReader) {
   return { baseUrl, apiKey, apiKeyHeader };
 }
 
+function hasAuthenticatedUserClaims(request: Request): boolean {
+  const authorization = request.headers.get('authorization');
+  if (!authorization?.startsWith('Bearer ')) return false;
+
+  try {
+    const token = authorization.slice('Bearer '.length).trim();
+    const payloadPart = token.split('.')[1];
+    if (!payloadPart) return false;
+
+    const normalized = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+    const claims = JSON.parse(atob(padded)) as { role?: unknown; sub?: unknown };
+
+    // A assinatura e a validade são verificadas pela plataforma (`verify_jwt = true`).
+    // Aqui distinguimos um JWT de usuário do JWT público legado com role `anon`.
+    return claims.role === 'authenticated' && typeof claims.sub === 'string' && claims.sub.length > 0;
+  } catch {
+    return false;
+  }
+}
+
 export function createQuestApiHandler({
   getEnv,
   fetchImpl = fetch,
@@ -99,9 +120,7 @@ export function createQuestApiHandler({
     if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders() });
     if (request.method !== 'POST') return json({ error: 'Método não permitido.' }, 405);
 
-    // A plataforma valida o JWT antes de executar a função. Esta checagem mantém
-    // uma falha segura caso a configuração de implantação seja alterada por engano.
-    if (!request.headers.get('authorization')?.startsWith('Bearer ')) {
+    if (!hasAuthenticatedUserClaims(request)) {
       return json({ error: 'Autenticação necessária.' }, 401);
     }
 

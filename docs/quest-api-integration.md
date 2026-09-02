@@ -40,7 +40,7 @@ Os secrets ficam disponíveis imediatamente para funções já publicadas; alter
 
 ## Controles de segurança
 
-- JWT de usuário Supabase obrigatório (`verify_jwt = true`);
+- JWT de usuário Supabase obrigatório (`verify_jwt = true`), com `role = authenticated` e `sub`; o JWT público legado com `role = anon` é rejeitado;
 - chave B2B adicionada somente pela Edge Function;
 - somente `POST` e filtros previamente permitidos;
 - `per_page` limitado a 50;
