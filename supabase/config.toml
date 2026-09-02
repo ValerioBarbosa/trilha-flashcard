@@ -1,0 +1,4 @@
+project_id = "rslehgcmskalwkwkotbv"
+
+[functions.quest-api]
+verify_jwt = true

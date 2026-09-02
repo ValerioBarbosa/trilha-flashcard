@@ -1,1 +1,12 @@
 node_modules/
+
+# Segredos locais — nunca versionar
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Estado local do Supabase CLI
+supabase/.temp/
