@@ -10,3 +10,7 @@ node_modules/
 
 # Estado local do Supabase CLI
 supabase/.temp/
+
+# Artefatos gerados/instalados do laboratório React (modern/)
+modern/package-lock.json
+modern/src/generated/
