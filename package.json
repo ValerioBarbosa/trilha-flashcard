@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build:vendor": "esbuild node_modules/@supabase/supabase-js/dist/index.mjs --bundle --format=esm --platform=browser --target=es2020 --minify --outfile=vendor/supabase-js.mjs",
+    "pretest": "node modern/scripts/generate-legacy-decks.mjs",
     "test": "vitest run"
   },
   "devDependencies": {

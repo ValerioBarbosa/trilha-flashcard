@@ -5,7 +5,7 @@ import {
   refreshSession,
   signInWithGoogle,
   signOut,
-} from '../src/services/auth/supabase-auth';
+} from '../src/infrastructure/supabase/auth';
 
 function fakeUser(id = 'user-1'): User {
   return { id } as User;
