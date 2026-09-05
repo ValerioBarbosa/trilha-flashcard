@@ -13,13 +13,20 @@ function stableHash(value: string): string { let hash = 2166136261; for (let i =
 function slugify(value: string): string { const normalized = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 100); return normalized || `item-${stableHash(value)}`; }
 function subjectName(deck: LegacyDeck): string { const title = deck.title?.trim() || deck.id; return title.split('·')[0]?.trim() || title; }
 function isOnboardingDeck(deck: LegacyDeck): boolean { return deck.id === 'trt4-overview' || slugify(subjectName(deck)) === 'comece-aqui'; }
+function isEmptyDeck(deck: LegacyDeck): boolean { return !(deck.topics || []).length && !(deck.cards || []).length; }
+function subjectWeight(deck: LegacyDeck): number | null {
+  const match = deck.title?.match(/·\s*([\d.,]+)\s*%\s*$/);
+  if (!match) return null;
+  const value = Number(match[1].replace(',', '.'));
+  return Number.isFinite(value) ? value : null;
+}
 function contentKey(front: string, back: string): string { return `${front.trim().toLowerCase()}|${back.trim().toLowerCase()}`; }
 function normalizedPriority(value: unknown): 'A'|'B'|'C'|null { const v = typeof value === 'string' ? value.trim().toUpperCase() : ''; return v === 'A' || v === 'B' || v === 'C' ? v : null; }
 function normalizedDifficulty(value: unknown): 'easy'|'medium'|'hard'|null { const v = typeof value === 'string' ? value.trim().toLowerCase() : ''; if (['easy','facil','fácil'].includes(v)) return 'easy'; if (['medium','medio','médio'].includes(v)) return 'medium'; if (['hard','dificil','difícil'].includes(v)) return 'hard'; return null; }
 function tagsFor(card: LegacyCard): string[] { const values = new Set<string>(); if (Array.isArray(card.tags)) card.tags.forEach((tag) => tag && values.add(String(tag).trim())); if (card.tag?.trim()) values.add(card.tag.trim()); if (card.subtopic?.trim()) values.add(card.subtopic.trim()); return [...values].filter(Boolean); }
 
-async function upsertSubject(client: SupabaseClient, user: User, profileId: string, name: string, order: number) {
-  const { data, error } = await client.from('subjects').upsert({ user_id:user.id, profile_id:profileId, name, slug:slugify(name), sort_order:order }, { onConflict:'profile_id,slug' }).select('id').single();
+async function upsertSubject(client: SupabaseClient, user: User, profileId: string, name: string, order: number, weight: number | null) {
+  const { data, error } = await client.from('subjects').upsert({ user_id:user.id, profile_id:profileId, name, slug:slugify(name), sort_order:order, weight }, { onConflict:'profile_id,slug' }).select('id').single();
   if (error) throw error; return data.id as string;
 }
 async function upsertDeck(client: SupabaseClient, user: User, profileId: string, subjectId: string | null, deck: LegacyDeck) {
@@ -50,13 +57,15 @@ export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User
   const decks = legacyDecks as LegacyDeck[];
   const { data: existing, error: existingError } = await client.from('cards').select('front,back').eq('profile_id', profileId).is('deleted_at', null); if (existingError) throw existingError;
   const seen = new Set<string>((existing || []).map((row:any) => contentKey(row.front,row.back)));
-  let cards=0, topics=0, duplicatesSkipped=0;
-  for (let index=0; index<decks.length; index+=1) {
-    const deck=decks[index];
-    const subjectId=isOnboardingDeck(deck) ? null : await upsertSubject(client,user,profileId,subjectName(deck),index);
+  let seededDecks=0, cards=0, topics=0, duplicatesSkipped=0, order=0;
+  for (const deck of decks) {
+    if (!isOnboardingDeck(deck) && isEmptyDeck(deck)) continue;
+    let subjectId: string | null = null;
+    if (!isOnboardingDeck(deck)) { subjectId = await upsertSubject(client,user,profileId,subjectName(deck),order,subjectWeight(deck)); order += 1; }
     const deckId=await upsertDeck(client,user,profileId,subjectId,deck);
+    seededDecks += 1;
     const topicMap=await ensureTopics(client,user,profileId,subjectId,deck); topics += topicMap.size;
     const result=await upsertCards(client,user,profileId,subjectId,deckId,deck,topicMap,seen); cards += result.inserted; duplicatesSkipped += result.skipped;
   }
-  return { decks:decks.length, cards, topics, duplicatesSkipped };
+  return { decks:seededDecks, cards, topics, duplicatesSkipped };
 }
