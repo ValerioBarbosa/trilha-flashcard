@@ -24,7 +24,6 @@ src/
 ├── features/
 │   ├── auth/
 │   ├── cards/
-│   ├── questions/
 │   ├── study/
 │   ├── errors/
 │   ├── edital/

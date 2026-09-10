@@ -7,13 +7,12 @@ import { JurisprudencePage } from '../jurisprudence/JurisprudencePage';
 import { PerformancePage } from '../performance/PerformancePage';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { LegacyMigrationPanel } from '../migration/LegacyMigrationPanel';
-import { ProductionQuestionsPage } from '../questions/ProductionQuestionsPage';
 import { MetricTile } from '../shared/MetricTile';
 import { PageHeader } from '../shared/PageHeader';
 import { SyncPanel } from '../sync/SyncPanel';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
 
-type PageId = 'home' | 'study' | 'edital' | 'questions' | 'jurisprudence' | 'performance' | 'data';
+type PageId = 'home' | 'study' | 'edital' | 'jurisprudence' | 'performance' | 'data';
 
 type Props = {
   user: User;
@@ -24,7 +23,6 @@ const NAV: Array<{ id: PageId; label: string; icon: string }> = [
   { id: 'home', label: 'Início', icon: '⌂' },
   { id: 'study', label: 'Estudar', icon: '▣' },
   { id: 'edital', label: 'Edital', icon: '☑' },
-  { id: 'questions', label: 'Questões', icon: '?' },
   { id: 'jurisprudence', label: 'Jurisprudência', icon: '§' },
   { id: 'performance', label: 'Desempenho', icon: '↗' },
   { id: 'data', label: 'Dados', icon: '↻' },
@@ -68,7 +66,6 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
             {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} /> : null}
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} /> : null}
             {page === 'edital' ? <EditalPage subjects={workspace.subjects} topics={workspace.topics} /> : null}
-            {page === 'questions' ? <ProductionQuestionsPage user={user} profileId={workspace.profile.id} defaultBoard={workspace.profile.board} subjects={workspace.subjects.map((subject) => subject.name)} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
             {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} /> : null}
             {page === 'data' ? <DataPage user={user} onMigrated={workspace.refresh} /> : null}
@@ -107,7 +104,7 @@ function HomePage({ user, workspace, onNavigate }: { user: User; workspace: Retu
       <div className="dashboard-grid four"><MetricTile label="Cartões ativos" value={cardCount} helper="No perfil atual" /><MetricTile label="Precisão" value={`${performance?.accuracy ?? 0}%`} helper={`${performance?.totalReviews ?? 0} revisões`} /><MetricTile label="Disciplinas" value={workspace.subjects.length} helper="Organizadas pelo edital" /><MetricTile label="Erros abertos" value={performance?.openErrors ?? 0} helper="Para atacar na revisão" /></div>
       <div className="content-grid two-one">
         <section className="panel-card"><div className="panel-heading"><div><span>BARALHOS</span><h2>Continuar por disciplina</h2></div><button className="link-button" onClick={() => onNavigate('study')}>Ver todos</button></div><div className="deck-list-clean">{topDecks.map((deck, index) => <button key={deck.id} onClick={() => onNavigate('study')}><span className="deck-number">{String(index + 1).padStart(2, '0')}</span><span className="deck-copy"><strong>{deck.name}</strong><small>{deck.is_builtin ? 'Baralho oficial' : 'Baralho personalizado'}</small></span><span className="chevron">›</span></button>)}</div></section>
-        <section className="panel-card accent-panel"><span className="panel-label">FOCO DA SEMANA</span><h2>Lei seca + questões + revisão.</h2><p>Use o Edital para escolher o tópico e volte ao cartão depois da resolução de questões.</p><button onClick={() => onNavigate('edital')}>Abrir edital</button></section>
+        <section className="panel-card accent-panel"><span className="panel-label">FOCO DA SEMANA</span><h2>Lei seca + revisão espaçada.</h2><p>Use o Edital para escolher o tópico e volte ao cartão para reforçar a memorização.</p><button onClick={() => onNavigate('edital')}>Abrir edital</button></section>
       </div>
     </div>
   );

@@ -20,16 +20,15 @@ export function PerformancePage({ user, profileId }: { user: User; profileId: st
 
   return (
     <div className="page-wrap">
-      <PageHeader eyebrow="ANÁLISE" title="Desempenho" subtitle="Métricas reais das revisões e questões gravadas no Supabase." />
+      <PageHeader eyebrow="ANÁLISE" title="Desempenho" subtitle="Métricas reais das revisões de cartões gravadas no Supabase." />
       <div className="dashboard-grid four">
         <MetricTile label="Revisões" value={summary?.totalReviews ?? 0} helper={`${summary?.reviewedToday ?? 0} hoje`} />
         <MetricTile label="Acerto nos cartões" value={`${summary?.accuracy ?? 0}%`} helper={`${summary?.correctReviews ?? 0} respostas boas/fáceis`} />
-        <MetricTile label="Questões" value={summary?.attemptedQuestions ?? 0} helper={`${summary?.questionAccuracy ?? 0}% de acerto`} />
         <MetricTile label="Caderno de erros" value={summary?.openErrors ?? 0} helper="pendências abertas" />
       </div>
       <div className="content-grid two-one">
-        <section className="panel-card"><span className="panel-label">LEITURA DO MOMENTO</span><h2>{(summary?.accuracy ?? 0) >= 80 ? 'Consistência forte.' : (summary?.totalReviews ?? 0) === 0 ? 'Comece a registrar revisões.' : 'Há espaço claro para ganho.'}</h2><p>{(summary?.totalReviews ?? 0) === 0 ? 'Faça uma sessão de cartões para iniciar sua série histórica.' : `Sua taxa atual nos cartões é ${summary?.accuracy ?? 0}%. O próximo ganho vem de revisar os itens difíceis e cruzá-los com questões.`}</p></section>
-        <section className="panel-card accent-panel"><span className="panel-label">PRÓXIMO FOCO</span><h2>Erros primeiro.</h2><p>O caderno de erros será o ponto de encontro entre cartões, questões e jurisprudência.</p></section>
+        <section className="panel-card"><span className="panel-label">LEITURA DO MOMENTO</span><h2>{(summary?.accuracy ?? 0) >= 80 ? 'Consistência forte.' : (summary?.totalReviews ?? 0) === 0 ? 'Comece a registrar revisões.' : 'Há espaço claro para ganho.'}</h2><p>{(summary?.totalReviews ?? 0) === 0 ? 'Faça uma sessão de cartões para iniciar sua série histórica.' : `Sua taxa atual nos cartões é ${summary?.accuracy ?? 0}%. O próximo ganho vem de revisar os itens difíceis com mais frequência.`}</p></section>
+        <section className="panel-card accent-panel"><span className="panel-label">PRÓXIMO FOCO</span><h2>Erros primeiro.</h2><p>O caderno de erros é o ponto de encontro entre cartões e jurisprudência.</p></section>
       </div>
     </div>
   );
