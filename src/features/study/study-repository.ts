@@ -7,19 +7,14 @@ export type StudyProfile = {
   role: string | null;
   board: string | null;
   edital_year: string | null;
+  is_builtin: boolean;
 };
 
-export type StudyMetrics = {
-  profiles: number;
-  subjects: number;
-  topics: number;
-  decks: number;
-  cards: number;
-  reviews: number;
-  questions: number;
-  attempts: number;
-  jurisprudence: number;
-  openErrors: number;
+export type NewProfileInput = {
+  name: string;
+  role?: string;
+  board?: string;
+  editalYear?: string;
 };
 
 const DEFAULT_PROFILE = {
@@ -31,18 +26,23 @@ const DEFAULT_PROFILE = {
   is_builtin: true,
 };
 
-async function exactCount(client: SupabaseClient, table: string, filters?: (query: any) => any) {
-  let query = client.from(table).select('*', { count: 'exact', head: true });
-  if (filters) query = filters(query);
-  const { count, error } = await query;
-  if (error) throw error;
-  return count ?? 0;
+const PROFILE_COLUMNS = 'id,slug,name,role,board,edital_year,is_builtin';
+
+function slugify(value: string): string {
+  const normalized = value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 100);
+  return normalized || `perfil-${Date.now().toString(36)}`;
 }
 
 export async function ensureDefaultProfile(client: SupabaseClient, user: User): Promise<StudyProfile> {
   const { data: existing, error: readError } = await client
     .from('study_profiles')
-    .select('id,slug,name,role,board,edital_year')
+    .select(PROFILE_COLUMNS)
     .eq('user_id', user.id)
     .eq('slug', DEFAULT_PROFILE.slug)
     .maybeSingle();
@@ -53,40 +53,44 @@ export async function ensureDefaultProfile(client: SupabaseClient, user: User): 
   const { data, error } = await client
     .from('study_profiles')
     .insert({ ...DEFAULT_PROFILE, user_id: user.id })
-    .select('id,slug,name,role,board,edital_year')
+    .select(PROFILE_COLUMNS)
     .single();
 
   if (error) throw error;
   return data as StudyProfile;
 }
 
-export async function loadStudyMetrics(client: SupabaseClient, user: User): Promise<StudyMetrics> {
-  const own = (query: any) => query.eq('user_id', user.id);
-  const openErrors = (query: any) => query.eq('user_id', user.id).eq('resolved', false);
+export async function createStudyProfile(client: SupabaseClient, user: User, input: NewProfileInput): Promise<StudyProfile> {
+  const name = input.name.trim();
+  if (!name) throw new Error('Informe um nome para o perfil.');
+  const baseSlug = slugify(name);
+  let slug = baseSlug;
+  for (let attempt = 1; attempt < 50; attempt += 1) {
+    const { data: taken, error: readError } = await client
+      .from('study_profiles')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('slug', slug)
+      .maybeSingle();
+    if (readError) throw readError;
+    if (!taken) break;
+    slug = `${baseSlug}-${attempt + 1}`;
+  }
 
-  const [profiles, subjects, topics, decks, cards, reviews, questions, attempts, jurisprudence, errors] = await Promise.all([
-    exactCount(client, 'study_profiles', own),
-    exactCount(client, 'subjects', own),
-    exactCount(client, 'topics', own),
-    exactCount(client, 'decks', own),
-    exactCount(client, 'cards', (query) => own(query).is('deleted_at', null)),
-    exactCount(client, 'reviews', own),
-    exactCount(client, 'questions', own),
-    exactCount(client, 'question_attempts', own),
-    exactCount(client, 'jurisprudence', own),
-    exactCount(client, 'error_notebook', openErrors),
-  ]);
+  const { data, error } = await client
+    .from('study_profiles')
+    .insert({
+      user_id: user.id,
+      slug,
+      name,
+      role: input.role?.trim() || null,
+      board: input.board?.trim() || null,
+      edital_year: input.editalYear?.trim() || null,
+      is_builtin: false,
+    })
+    .select(PROFILE_COLUMNS)
+    .single();
 
-  return {
-    profiles,
-    subjects,
-    topics,
-    decks,
-    cards,
-    reviews,
-    questions,
-    attempts,
-    jurisprudence,
-    openErrors: errors,
-  };
+  if (error) throw error;
+  return data as StudyProfile;
 }

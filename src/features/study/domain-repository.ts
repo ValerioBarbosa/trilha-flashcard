@@ -7,6 +7,7 @@ export type ProfileRow = {
   role: string | null;
   board: string | null;
   edital_year: string | null;
+  is_builtin: boolean;
 };
 
 export type SubjectRow = {
@@ -86,7 +87,7 @@ async function requireData<T>(promise: PromiseLike<{ data: T | null; error: any 
 
 export async function listProfiles(client: SupabaseClient, user: User): Promise<ProfileRow[]> {
   return requireData(client.from('study_profiles')
-    .select('id,name,slug,role,board,edital_year')
+    .select('id,name,slug,role,board,edital_year,is_builtin')
     .eq('user_id', user.id)
     .eq('is_archived', false)
     .order('created_at'));

@@ -193,6 +193,12 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 
 .study-dashboard, .migration-panel, .sync-panel { margin-top: 20px; padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: white; }
 .section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }.section-heading h2 { margin: 0; }.section-heading p { margin: 6px 0 0; color: var(--muted); line-height: 1.55; }.section-heading button.secondary { border: 0; border-radius: 12px; padding: 10px 14px; background: #edf3ef; color: #263c2e; font-weight: 800; }
+.profile-list { display: grid; gap: 10px; margin-top: 16px; }
+.profile-row { display: grid; gap: 3px; text-align: left; position: relative; border: 1px solid var(--line); border-radius: 13px; padding: 12px 14px; background: white; }
+.profile-row.active { border-color: var(--green); background: var(--surface-soft); }
+.profile-row:disabled { cursor: default; }
+.profile-row small { color: var(--muted); }
+.profile-active-tag { position: absolute; top: 12px; right: 14px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--green); }
 .status-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin: 16px 0; }.status-grid > div { border: 1px solid var(--line); border-radius: 13px; padding: 12px; background: var(--surface-soft); }.status-wide { grid-column: 1/-1; } dt { color: #7c8780; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .07em; } dd { margin: 5px 0 0; font-weight: 800; overflow-wrap: anywhere; }
 .migration-summary { display: flex; justify-content: space-between; gap: 14px; align-items: center; margin-top: 14px; border: 1px solid var(--line); background: var(--surface-soft); border-radius: 13px; padding: 12px 14px; }.migration-summary span { color: var(--muted); font-weight: 700; }.migration-summary strong { font-size: 24px; }.migration-report { grid-template-columns: repeat(3,minmax(0,1fr)); }.pilot-note { color: #87918a; line-height: 1.55; font-size: 12px; }.pilot-error { border-radius: 12px; padding: 10px 12px; color: var(--danger); background: #fff3f3; font-weight: 700; }
 

@@ -9,6 +9,7 @@ import { LegacyMigrationPanel } from '../migration/LegacyMigrationPanel';
 import { MetricTile } from '../shared/MetricTile';
 import { PageHeader } from '../shared/PageHeader';
 import { SyncPanel } from '../sync/SyncPanel';
+import { ProfileSwitcher } from '../study/ProfileSwitcher';
 import { StudyPage } from '../study/StudyPage';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
 
@@ -68,7 +69,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
             {page === 'edital' ? <EditalPage subjects={workspace.subjects} topics={workspace.topics} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
             {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} /> : null}
-            {page === 'data' ? <DataPage user={user} onMigrated={workspace.refresh} /> : null}
+            {page === 'data' ? <DataPage user={user} workspace={workspace} onMigrated={workspace.refresh} /> : null}
           </>
         )}
       </main>
@@ -111,6 +112,6 @@ function HomePage({ user, workspace, onNavigate }: { user: User; workspace: Retu
 }
 
 
-function DataPage({ user, onMigrated }: { user: User; onMigrated: () => Promise<void> }) {
-  return <div className="page-wrap"><PageHeader eyebrow="CONTA E DADOS" title="Sincronização" subtitle="Migre o legado, confira a nuvem e mantenha uma cópia local durante a transição." /><LegacyMigrationPanel user={user} onMigrated={onMigrated} /><SyncPanel user={user} /></div>;
+function DataPage({ user, workspace, onMigrated }: { user: User; workspace: ReturnType<typeof useStudyWorkspace>; onMigrated: () => Promise<void> }) {
+  return <div className="page-wrap"><PageHeader eyebrow="CONTA E DADOS" title="Sincronização" subtitle="Migre o legado, confira a nuvem e mantenha uma cópia local durante a transição." /><ProfileSwitcher profiles={workspace.profiles} activeProfileId={workspace.profile?.id ?? null} onSwitch={workspace.switchProfile} onCreate={workspace.createProfile} /><LegacyMigrationPanel user={user} onMigrated={onMigrated} /><SyncPanel user={user} /></div>;
 }
