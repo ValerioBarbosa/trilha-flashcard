@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { loadPerformance, type PerformanceSummary } from '@core/features/performance/performance-repository';
-import { listCards, saveReview, type CardRow } from '../study/domain-repository';
 import { EditalPage } from '../edital/EditalPage';
 import { JurisprudencePage } from '../jurisprudence/JurisprudencePage';
 import { PerformancePage } from '../performance/PerformancePage';
@@ -10,6 +9,7 @@ import { LegacyMigrationPanel } from '../migration/LegacyMigrationPanel';
 import { MetricTile } from '../shared/MetricTile';
 import { PageHeader } from '../shared/PageHeader';
 import { SyncPanel } from '../sync/SyncPanel';
+import { StudyPage } from '../study/StudyPage';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
 
 type PageId = 'home' | 'study' | 'edital' | 'jurisprudence' | 'performance' | 'data';
@@ -110,95 +110,6 @@ function HomePage({ user, workspace, onNavigate }: { user: User; workspace: Retu
   );
 }
 
-type StudyTopic = { id:string; subject_id:string; parent_id:string|null; name:string };
-type StudyDeck = { id:string; name:string; subject_id:string|null };
-
-function StudyPage({ user, profileId, subjects, topics, decks }: { user: User; profileId: string; subjects: Array<{id:string;name:string}>; topics: StudyTopic[]; decks: StudyDeck[] }) {
-  const firstSubjectWithDeck = subjects.find((subject) => decks.some((deck) => deck.subject_id === subject.id));
-  const [subjectId, setSubjectId] = useState(firstSubjectWithDeck?.id || 'all');
-  const [topicId, setTopicId] = useState('all');
-  const [subtopicId, setSubtopicId] = useState('all');
-  const [loadedCards, setLoadedCards] = useState<CardRow[]>([]);
-  const [index, setIndex] = useState(0);
-  const [revealed, setRevealed] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [startedAt, setStartedAt] = useState(Date.now());
-
-  const subjectDecks = useMemo(() => decks.filter((deck) => deck.subject_id && (subjectId === 'all' || deck.subject_id === subjectId)), [decks, subjectId]);
-  const availableTopics = useMemo(() => topics.filter((topic) => topic.subject_id === subjectId && !topic.parent_id), [topics, subjectId]);
-  const availableSubtopics = useMemo(() => topics.filter((topic) => topic.parent_id === topicId), [topics, topicId]);
-  const childTopicIds = useMemo(() => new Set(topics.filter((topic) => topic.parent_id === topicId).map((topic) => topic.id)), [topics, topicId]);
-
-  const cards = useMemo(() => loadedCards.filter((card) => {
-    if (subtopicId !== 'all') return card.topic_id === subtopicId;
-    if (topicId !== 'all') return card.topic_id === topicId || Boolean(card.topic_id && childTopicIds.has(card.topic_id));
-    return true;
-  }), [loadedCards, topicId, subtopicId, childTopicIds]);
-
-  useEffect(() => {
-    setTopicId('all');
-    setSubtopicId('all');
-  }, [subjectId]);
-
-  useEffect(() => {
-    setSubtopicId('all');
-  }, [topicId]);
-
-  useEffect(() => {
-    if (!subjectDecks.length) { setLoadedCards([]); return; }
-    setLoading(true);
-    setMessage(null);
-    void Promise.all(subjectDecks.map((deck) => listCards(getSupabaseClient(), deck.id)))
-      .then((groups) => {
-        const unique = new Map<string, CardRow>();
-        groups.flat().forEach((card) => unique.set(card.id, card));
-        setLoadedCards([...unique.values()]);
-        setIndex(0);
-        setRevealed(false);
-        setStartedAt(Date.now());
-      })
-      .catch((error) => setMessage(error instanceof Error ? error.message : String(error)))
-      .finally(() => setLoading(false));
-  }, [subjectDecks]);
-
-  useEffect(() => {
-    setIndex(0);
-    setRevealed(false);
-    setStartedAt(Date.now());
-  }, [topicId, subtopicId]);
-
-  const card = cards[index];
-
-  async function rate(rating: 1 | 2 | 3 | 4) {
-    if (!card) return;
-    setMessage(null);
-    try {
-      await saveReview(getSupabaseClient(), user, profileId, card.id, rating, Date.now() - startedAt);
-      setMessage('Revisão registrada.');
-      const next = cards.length ? (index + 1) % cards.length : 0;
-      setIndex(next);
-      setRevealed(false);
-      setStartedAt(Date.now());
-    } catch (cause) {
-      setMessage(cause instanceof Error ? cause.message : String(cause));
-    }
-  }
-
-  return (
-    <div className="page-wrap study-page">
-      <PageHeader eyebrow="SESSÃO DE ESTUDO" title="Estudar" subtitle="Recupere a resposta antes de revelar. Depois, registre o nível de lembrança." />
-      <div className="study-toolbar study-filter-toolbar">
-        <label><span>Disciplina</span><select value={subjectId} onChange={(event) => setSubjectId(event.target.value)}><option value="all">Todas</option>{subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}</select></label>
-        <label><span>Assunto</span><select value={topicId} onChange={(event) => setTopicId(event.target.value)} disabled={subjectId === 'all'}><option value="all">Todos os assuntos</option>{availableTopics.map((topic) => <option key={topic.id} value={topic.id}>{topic.name}</option>)}</select></label>
-        <label><span>Subassunto</span><select value={subtopicId} onChange={(event) => setSubtopicId(event.target.value)} disabled={topicId === 'all' || availableSubtopics.length === 0}><option value="all">Todos os subassuntos</option>{availableSubtopics.map((topic) => <option key={topic.id} value={topic.id}>{topic.name}</option>)}</select></label>
-        <div className="session-counter"><span>Progresso</span><strong>{cards.length ? `${index + 1}/${cards.length}` : '0/0'}</strong></div>
-      </div>
-      {loading ? <div className="study-empty">Carregando cartões…</div> : !card ? <div className="study-empty"><strong>Nenhum cartão neste filtro.</strong><span>Escolha outra disciplina, assunto ou subassunto.</span></div> : <><button className={`flashcard-modern ${revealed ? 'revealed' : ''}`} onClick={() => setRevealed(true)}><div className="card-meta"><span>{card.priority ? `Prioridade ${card.priority}` : 'Flashcard'}</span>{card.tags?.[0] ? <span>{card.tags[0]}</span> : null}</div><div className="card-question"><small>PERGUNTA</small><h2>{card.front}</h2></div>{revealed ? <div className="card-answer"><small>RESPOSTA</small><p>{card.back}</p>{card.legal_basis ? <div className="legal-basis"><strong>Base legal</strong><span>{card.legal_basis}</span></div> : null}{card.pitfall ? <div className="pitfall"><strong>Pegadinha</strong><span>{card.pitfall}</span></div> : null}{card.mnemonic ? <div className="mnemonic"><strong>Mnemônico</strong><span>{card.mnemonic}</span></div> : null}</div> : <div className="reveal-hint">Toque no cartão para revelar</div>}</button>{revealed ? <div className="rating-row"><button className="rating again" onClick={() => void rate(1)}><strong>Errei</strong><span>rever logo</span></button><button className="rating hard" onClick={() => void rate(2)}><strong>Difícil</strong><span>1 dia</span></button><button className="rating good" onClick={() => void rate(3)}><strong>Bom</strong><span>7 dias</span></button><button className="rating easy" onClick={() => void rate(4)}><strong>Fácil</strong><span>30 dias</span></button></div> : null}<div className="study-navigation"><button className="secondary-action" onClick={() => { setIndex((index - 1 + cards.length) % cards.length); setRevealed(false); setStartedAt(Date.now()); }}>← Anterior</button><button className="secondary-action" onClick={() => { setIndex((index + 1) % cards.length); setRevealed(false); setStartedAt(Date.now()); }}>Próximo →</button></div></>}
-      {message ? <p className="toast-note">{message}</p> : null}
-    </div>
-  );
-}
 
 function DataPage({ user, onMigrated }: { user: User; onMigrated: () => Promise<void> }) {
   return <div className="page-wrap"><PageHeader eyebrow="CONTA E DADOS" title="Sincronização" subtitle="Migre o legado, confira a nuvem e mantenha uma cópia local durante a transição." /><LegacyMigrationPanel user={user} onMigrated={onMigrated} /><SyncPanel user={user} /></div>;

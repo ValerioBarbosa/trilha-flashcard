@@ -60,25 +60,6 @@ export type CardRow = {
   tags: string[];
 };
 
-export type QuestionRow = {
-  id: string;
-  subject_id: string | null;
-  topic_id: string | null;
-  board: string | null;
-  exam: string | null;
-  exam_year: number | null;
-  statement: string;
-  alternatives: unknown;
-  correct_answer: string | null;
-  explanation: string | null;
-  legal_basis: string | null;
-  source: string | null;
-  source_provider: string | null;
-  external_id: string | null;
-  source_url: string | null;
-  tags: string[];
-};
-
 export type JurisprudenceRow = {
   id: string;
   subject_id: string | null;
@@ -95,17 +76,6 @@ export type JurisprudenceRow = {
   judgment_date: string | null;
   bulletin: string | null;
   status: string;
-};
-
-export type PerformanceSummary = {
-  totalReviews: number;
-  correctReviews: number;
-  accuracy: number;
-  reviewedToday: number;
-  attemptedQuestions: number;
-  correctQuestions: number;
-  questionAccuracy: number;
-  openErrors: number;
 };
 
 async function requireData<T>(promise: PromiseLike<{ data: T | null; error: any }>): Promise<T> {
@@ -180,35 +150,6 @@ export async function saveReview(
   if (error) throw error;
 }
 
-export async function listQuestions(client: SupabaseClient, profileId: string): Promise<QuestionRow[]> {
-  return requireData(client.from('questions')
-    .select('id,subject_id,topic_id,board,exam,exam_year,statement,alternatives,correct_answer,explanation,legal_basis,source,source_provider,external_id,source_url,tags')
-    .eq('profile_id', profileId)
-    .is('deleted_at', null)
-    .order('created_at', { ascending: false })
-    .limit(200));
-}
-
-export async function saveQuestionAttempt(
-  client: SupabaseClient,
-  user: User,
-  profileId: string,
-  questionId: string,
-  answer: string,
-  isCorrect: boolean,
-  responseMs?: number,
-): Promise<void> {
-  const { error } = await client.from('question_attempts').insert({
-    user_id: user.id,
-    profile_id: profileId,
-    question_id: questionId,
-    answer,
-    is_correct: isCorrect,
-    response_ms: responseMs ?? null,
-  });
-  if (error) throw error;
-}
-
 export async function listJurisprudence(client: SupabaseClient, profileId: string): Promise<JurisprudenceRow[]> {
   return requireData(client.from('jurisprudence')
     .select('id,subject_id,topic_id,court,body,theme,process_number,thesis,summary,legal_basis,exam_angle,pitfall,judgment_date,bulletin,status')
@@ -217,33 +158,26 @@ export async function listJurisprudence(client: SupabaseClient, profileId: strin
     .limit(100));
 }
 
-export async function loadPerformance(client: SupabaseClient, user: User, profileId: string): Promise<PerformanceSummary> {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+export type LatestReview = { rating: number; due_at: string };
 
-  const [{ data: reviews, error: reviewError }, { data: attempts, error: attemptError }, { count: openErrors, error: errorCountError }] = await Promise.all([
-    client.from('reviews').select('rating,reviewed_at').eq('user_id', user.id).eq('profile_id', profileId),
-    client.from('question_attempts').select('is_correct').eq('user_id', user.id).eq('profile_id', profileId),
-    client.from('error_notebook').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('profile_id', profileId).eq('resolved', false),
-  ]);
-  if (reviewError) throw reviewError;
-  if (attemptError) throw attemptError;
-  if (errorCountError) throw errorCountError;
+export async function listLatestReviewsByCard(client: SupabaseClient, profileId: string): Promise<Map<string, LatestReview>> {
+  const rows = await requireData<Array<{ card_id: string; rating: number; due_at: string }>>(client.from('reviews')
+    .select('card_id,rating,due_at')
+    .eq('profile_id', profileId)
+    .order('reviewed_at', { ascending: false })
+    .limit(5000));
+  const latest = new Map<string, LatestReview>();
+  for (const row of rows) {
+    if (!latest.has(row.card_id)) latest.set(row.card_id, { rating: row.rating, due_at: row.due_at });
+  }
+  return latest;
+}
 
-  const reviewRows = reviews ?? [];
-  const attemptRows = attempts ?? [];
-  const correctReviews = reviewRows.filter((row: any) => Number(row.rating) >= 3).length;
-  const correctQuestions = attemptRows.filter((row: any) => row.is_correct === true).length;
-  const reviewedToday = reviewRows.filter((row: any) => new Date(row.reviewed_at) >= today).length;
-
-  return {
-    totalReviews: reviewRows.length,
-    correctReviews,
-    accuracy: reviewRows.length ? Math.round((correctReviews / reviewRows.length) * 100) : 0,
-    reviewedToday,
-    attemptedQuestions: attemptRows.length,
-    correctQuestions,
-    questionAccuracy: attemptRows.length ? Math.round((correctQuestions / attemptRows.length) * 100) : 0,
-    openErrors: openErrors ?? 0,
-  };
+export async function listOpenErrorCardIds(client: SupabaseClient, profileId: string): Promise<Set<string>> {
+  const rows = await requireData<Array<{ card_id: string | null }>>(client.from('error_notebook')
+    .select('card_id')
+    .eq('profile_id', profileId)
+    .eq('kind', 'card')
+    .eq('resolved', false));
+  return new Set(rows.map((row) => row.card_id).filter((id): id is string => Boolean(id)));
 }
