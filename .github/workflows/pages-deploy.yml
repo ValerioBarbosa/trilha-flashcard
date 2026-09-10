@@ -1,0 +1,54 @@
+name: Deploy React app to GitHub Pages
+
+# Ativação em duas etapas, de propósito (ver docs/PRODUCTION_CUTOVER.md):
+# 1) Este workflow entra em main só com `workflow_dispatch` — não publica nada sozinho.
+# 2) O corte de fato acontece quando alguém: (a) mudar Settings > Pages > Build and
+#    deployment > Source para "GitHub Actions" neste repositório, e (b) adicionar o
+#    gatilho `push: branches: [main]` (ou disparar manualmente) depois de validar
+#    com workflow_dispatch que o deploy funciona.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install legacy dependencies
+        run: npm ci
+      - name: Install React app dependencies
+        working-directory: modern
+        run: npm install --no-audit --no-fund
+      - name: Build React app
+        working-directory: modern
+        run: npm run build
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: modern/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

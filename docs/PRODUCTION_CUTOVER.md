@@ -17,10 +17,22 @@ O app React já gera um candidato de produção em `modern/dist`, com manifesto 
 7. CI legado e React verdes.
 8. Candidato `modern/dist` inspecionado antes de substituir o root público.
 
+## Mecanismo de corte
+
+`.github/workflows/pages-deploy.yml` builda `modern/dist` e publica via `actions/deploy-pages`, sem mover nenhum arquivo legado do lugar. Isso evita reescrever caminhos relativos usados pelos testes, pelo `sw.js` do legado e pelo `vendor/`. A ativação é em duas etapas propositalmente separadas, para que mesclar o workflow em `main` não troque nada sozinho:
+
+1. **Preparação (feita)**: workflow criado com gatilho só `workflow_dispatch` (manual). Mesclar essa mudança em `main` não publica nada — o job só roda se alguém disparar manualmente pela aba Actions.
+2. **Corte de fato** (ação humana, feita com aprovação explícita): em Settings → Pages → Build and deployment → Source, trocar de "Deploy from a branch" para "GitHub Actions". Isso precisa ser feito na UI do GitHub; não há chamada de API disponível neste ambiente para isso. Depois disso, disparar o workflow manualmente uma vez para validar, e só então adicionar o gatilho `push: branches: [main]` ao arquivo (ou continuar disparando manualmente a cada release, se preferir mais controle).
+
+Enquanto o Source do Pages continuar em "Deploy from a branch", o site publicado continua sendo servido a partir da raiz de `main` (legado) exatamente como hoje, independente de este workflow existir ou ser mesclado.
+
 ## Estratégia de rollback
 
-O corte deve ser feito em PR própria. Os arquivos legados não serão removidos no mesmo commit que troca o entrypoint público. A remoção só acontece depois de uma janela de validação. Em caso de regressão, basta reverter a PR de corte para restaurar o entrypoint anterior.
+Reverter o corte é trocar o Source do Pages de volta para "Deploy from a branch" nas configurações do repositório — não depende de reverter nenhum commit, já que nenhum arquivo legado é movido ou removido pelo corte. Os arquivos legados só são removidos numa PR de limpeza separada, depois de uma janela de validação em produção.
 
 ## Próxima etapa
 
-Depois da validação real em navegador e em pelo menos dois dispositivos, promover `modern/dist` para o root publicado e iniciar a retirada progressiva de Firebase e dos arquivos legados que deixarem de ser referenciados.
+Depois da validação real em navegador e em pelo menos dois dispositivos (critérios 1, 2, 4, 5, 8 acima):
+1. Trocar o Source do Pages para "GitHub Actions" e disparar `pages-deploy.yml` manualmente para confirmar que o deploy funciona no domínio final.
+2. Adicionar o gatilho automático (`push: branches: [main]`) ao workflow.
+3. Após a janela de validação em produção, abrir a PR de limpeza: remover os arquivos legados da raiz, `firebase-config.js`/`firebase.json`/`firestore.rules` e o workflow `react-preview.yml`, que deixam de ser necessários.
