@@ -5,6 +5,7 @@ import { EditalPage } from '../edital/EditalPage';
 import { JurisprudencePage } from '../jurisprudence/JurisprudencePage';
 import { PerformancePage } from '../performance/PerformancePage';
 import { getSupabaseClient } from '../lib/supabase-client';
+import { BackupPanel } from '../data/BackupPanel';
 import { LegacyMigrationPanel } from '../migration/LegacyMigrationPanel';
 import { MetricTile } from '../shared/MetricTile';
 import { PageHeader } from '../shared/PageHeader';
@@ -113,5 +114,5 @@ function HomePage({ user, workspace, onNavigate }: { user: User; workspace: Retu
 
 
 function DataPage({ user, workspace, onMigrated }: { user: User; workspace: ReturnType<typeof useStudyWorkspace>; onMigrated: () => Promise<void> }) {
-  return <div className="page-wrap"><PageHeader eyebrow="CONTA E DADOS" title="Sincronização" subtitle="Migre o legado, confira a nuvem e mantenha uma cópia local durante a transição." /><ProfileSwitcher profiles={workspace.profiles} activeProfileId={workspace.profile?.id ?? null} onSwitch={workspace.switchProfile} onCreate={workspace.createProfile} /><LegacyMigrationPanel user={user} onMigrated={onMigrated} /><SyncPanel user={user} /></div>;
+  return <div className="page-wrap"><PageHeader eyebrow="CONTA E DADOS" title="Sincronização" subtitle="Migre o legado, confira a nuvem e mantenha uma cópia local durante a transição." /><ProfileSwitcher profiles={workspace.profiles} activeProfileId={workspace.profile?.id ?? null} onSwitch={workspace.switchProfile} onCreate={workspace.createProfile} /><BackupPanel user={user} profile={workspace.profile ? { id: workspace.profile.id, name: workspace.profile.name, slug: workspace.profile.slug } : null} onRestored={onMigrated} /><LegacyMigrationPanel user={user} onMigrated={onMigrated} /><SyncPanel user={user} /></div>;
 }
