@@ -2953,10 +2953,10 @@ kbd {
 .danger-button { color: #c94747; }
 
 .card-list-row.is-selected { border-color: var(--blue); background: rgba(65, 120, 232, 0.08); }
-.card-list-row.is-duplicate { box-shadow: inset 3px 0 0 #d68a18; }
+.card-list-row.is-duplicate { box-shadow: inset 3px 0 0 var(--coral-dark); background: color-mix(in srgb, var(--coral) 10%, var(--surface)); }
 .card-select-control { display: grid; place-items: center; flex: 0 0 28px; }
 .card-select-control input { width: 18px; height: 18px; }
-.duplicate-badge { display: inline-flex; margin-left: 6px; border-radius: 999px; padding: 2px 7px; background: rgba(214, 138, 24, 0.14); color: #b56d00; font-size: 0.68rem; font-weight: 700; }
+.duplicate-badge { display: inline-flex; margin-left: 6px; border-radius: 999px; padding: 2px 7px; background: var(--coral); color: white; font-size: 0.68rem; font-weight: 800; }
 .card-subtopic-group + .card-subtopic-group { border-top: 1px solid var(--line-soft); }
 .card-subtopic-title { margin: 0; padding: 10px 14px 6px; color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
 

@@ -242,8 +242,8 @@ function sourcePage(value: LegacyCard['sourcePage']): number | null {
   return Number.isInteger(parsed) && Number(parsed) > 0 ? Number(parsed) : null;
 }
 
-function contentKey(front: string, back: string): string {
-  return `${front.trim().toLowerCase()}|${back.trim().toLowerCase()}`;
+function contentKey(subjectId: string | null, front: string, back: string): string {
+  return `${subjectId || ''}|${front.trim().toLowerCase()}|${back.trim().toLowerCase()}`;
 }
 
 function isDuplicateContentError(error: unknown): boolean {
@@ -275,7 +275,7 @@ export async function migrateLegacyLocalData(
 
     const { data: existingCards, error: existingError } = await client
       .from('cards')
-      .select('deck_id,legacy_id,front,back')
+      .select('deck_id,legacy_id,subject_id,front,back')
       .eq('profile_id', profileId)
       .is('deleted_at', null);
     if (existingError) throw existingError;
@@ -283,7 +283,7 @@ export async function migrateLegacyLocalData(
     const contentOwner = new Map<string, string>();
     (existingCards || []).forEach((row: any) => {
       if (!row.legacy_id) return;
-      contentOwner.set(contentKey(row.front, row.back), `${row.deck_id}|${row.legacy_id}`);
+      contentOwner.set(contentKey(row.subject_id, row.front, row.back), `${row.deck_id}|${row.legacy_id}`);
     });
 
     const decks = [...readCustomDecks(storage, legacyProfile.id), ...readDeckOverrides(storage, legacyProfile.id)];
@@ -336,7 +336,7 @@ export async function migrateLegacyLocalData(
 
         const legacyId = legacyCardId(deckIdentity, card);
         const identityKey = `${deckId}|${legacyId}`;
-        const key = contentKey(front, back);
+        const key = contentKey(subjectId, front, back);
         const owner = contentOwner.get(key);
         if (owner && owner !== identityKey) {
           report.skippedCards += 1;

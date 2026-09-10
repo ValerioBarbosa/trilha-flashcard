@@ -118,7 +118,7 @@ class FakeQueryBuilder {
       row !== self
       && !row.deleted_at
       && row.user_id === payload.user_id
-      && row.profile_id === payload.profile_id
+      && row.subject_id === payload.subject_id
       && fingerprint(row.front, row.back) === fingerprint(payload.front, payload.back));
     if (!clash) return null;
     return { code: '23505', message: 'duplicate key value violates unique constraint "idx_cards_unique_content_active"' };
@@ -167,10 +167,10 @@ class FakeSupabase {
 const USER = { id: 'user-1' } as User;
 
 describe('migração de cartões legados para o modelo relacional', () => {
-  it('não trava a migração quando dois baralhos diferentes têm um cartão com o mesmo conteúdo', async () => {
+  it('não trava a migração quando dois baralhos da mesma disciplina têm um cartão com o mesmo conteúdo', async () => {
     const storage = new FakeStorage();
-    storage.setItem('trilha-flashcard-deck:deckA', JSON.stringify([{ id: 'c1', front: 'Pergunta X', back: 'Resposta X' }]));
-    storage.setItem('trilha-flashcard-deck:deckB', JSON.stringify([{ id: 'c2', front: 'Pergunta X', back: 'Resposta X' }]));
+    storage.setItem('trilha-flashcard-deck:deckA', JSON.stringify([{ id: 'c1', front: 'Pergunta X', back: 'Resposta X', discipline: 'Direito X' }]));
+    storage.setItem('trilha-flashcard-deck:deckB', JSON.stringify([{ id: 'c2', front: 'Pergunta X', back: 'Resposta X', discipline: 'Direito X' }]));
 
     const db = new FakeSupabase();
     const report = await migrateLegacyLocalData(db as unknown as SupabaseClient, USER, storage);
@@ -182,8 +182,8 @@ describe('migração de cartões legados para o modelo relacional', () => {
 
   it('reexecutar a migração atualiza os cartões existentes em vez de duplicar ou travar', async () => {
     const storage = new FakeStorage();
-    storage.setItem('trilha-flashcard-deck:deckA', JSON.stringify([{ id: 'c1', front: 'Pergunta X', back: 'Resposta X' }]));
-    storage.setItem('trilha-flashcard-deck:deckB', JSON.stringify([{ id: 'c2', front: 'Pergunta X', back: 'Resposta X' }]));
+    storage.setItem('trilha-flashcard-deck:deckA', JSON.stringify([{ id: 'c1', front: 'Pergunta X', back: 'Resposta X', discipline: 'Direito X' }]));
+    storage.setItem('trilha-flashcard-deck:deckB', JSON.stringify([{ id: 'c2', front: 'Pergunta X', back: 'Resposta X', discipline: 'Direito X' }]));
 
     const db = new FakeSupabase();
     await migrateLegacyLocalData(db as unknown as SupabaseClient, USER, storage);
@@ -192,6 +192,19 @@ describe('migração de cartões legados para o modelo relacional', () => {
     expect(secondReport.cards).toBe(1);
     expect(secondReport.skippedCards).toBe(1);
     expect(db.tables.cards).toHaveLength(1);
+  });
+
+  it('permite o mesmo conteúdo em disciplinas diferentes, sem marcar como duplicado', async () => {
+    const storage = new FakeStorage();
+    storage.setItem('trilha-flashcard-deck:deckA', JSON.stringify([{ id: 'c1', front: 'Pergunta X', back: 'Resposta X', discipline: 'Direito X' }]));
+    storage.setItem('trilha-flashcard-deck:deckB', JSON.stringify([{ id: 'c2', front: 'Pergunta X', back: 'Resposta X', discipline: 'Direito Y' }]));
+
+    const db = new FakeSupabase();
+    const report = await migrateLegacyLocalData(db as unknown as SupabaseClient, USER, storage);
+
+    expect(report.cards).toBe(2);
+    expect(report.skippedCards).toBe(0);
+    expect(db.tables.cards).toHaveLength(2);
   });
 
   it('migra normalmente cartões com conteúdo distinto entre baralhos', async () => {
