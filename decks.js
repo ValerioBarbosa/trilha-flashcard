@@ -264,13 +264,6 @@ const trt4Decks = [
     ],
     cards: [],
   },
-  {
-    id: "labor-justice-organs",
-    title: "Justiça do Trabalho · CF/88 e CLT",
-    sourceNote: "Fonte oficial: Constituição Federal e CLT — Planalto. Texto vigente consultado em 17/08/2026.",
-    topics: [],
-    cards: [],
-  },
 ];
 
 if (typeof module === "object" && module.exports) module.exports = { trt4Decks };

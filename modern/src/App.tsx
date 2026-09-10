@@ -4,8 +4,6 @@ import { useAuth } from './auth/AuthContext';
 import { CardManagerLauncher } from './cards/CardManagerLauncher';
 import { PdfImportLauncher } from './cards/PdfImportLauncher';
 import { ErrorNotebookLauncher } from './errors/ErrorNotebookLauncher';
-import { QuestionBankPreview } from './questions/QuestionBankPreview';
-import { QuestionManagerLauncher } from './questions/QuestionManagerLauncher';
 import { QuickActions } from './shared/QuickActions';
 import './styles.css';
 import './shared/quick-actions.css';
@@ -13,7 +11,6 @@ import './shared/quick-actions.css';
 export function App() {
   const { user, loading, initialized, error, signIn, signOut } = useAuth();
   const [actionError, setActionError] = useState<string | null>(null);
-  const questionPreview = new URLSearchParams(window.location.search).get('questoes') === 'preview';
 
   async function handleSignIn() {
     setActionError(null);
@@ -24,25 +21,11 @@ export function App() {
     }
   }
 
-  if (questionPreview) {
-    return (
-      <QuestionBankPreview
-        user={user}
-        onClose={() => {
-          const url = new URL(window.location.href);
-          url.searchParams.delete('questoes');
-          window.location.assign(url.toString());
-        }}
-      />
-    );
-  }
-
   if (user) {
     return (
       <>
         <ModernWorkspace user={user} onSignOut={signOut} />
         <QuickActions onSignOut={signOut} />
-        <QuestionManagerLauncher user={user} />
         <ErrorNotebookLauncher user={user} />
         <PdfImportLauncher user={user} />
         <CardManagerLauncher user={user} />
@@ -57,8 +40,7 @@ export function App() {
         <div className="auth-copy">
           <span className="page-eyebrow">ESTUDE O QUE MAIS IMPORTA</span>
           <h1>Seu edital vira uma trilha de aprovação.</h1>
-          <p>Flashcards, questões, jurisprudência, revisão e desempenho no mesmo lugar — com seus dados sincronizados.</p>
-          <a className="preview-link" href="?questoes=preview">Ver demonstração do banco de questões →</a>
+          <p>Flashcards, jurisprudência, revisão espaçada e desempenho no mesmo lugar — com seus dados sincronizados.</p>
         </div>
         <div className="auth-proof"><strong>Local-first</strong><span>Você continua estudando mesmo quando a conexão falha.</span></div>
       </section>

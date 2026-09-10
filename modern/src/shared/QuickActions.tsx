@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 const ACTIONS = [
-  { selector: '.question-manager-launcher', icon: '?', title: 'Gerenciar questões', detail: 'Cadastre e organize questões' },
   { selector: '.error-launcher', icon: '!', title: 'Caderno de erros', detail: 'Revise suas pendências' },
   { selector: '.pdf-import-launcher', icon: 'PDF', title: 'Importar PDF', detail: 'Importe cartões de PDF' },
   { selector: '.card-manager-launcher', icon: '▤', title: 'Gerenciar cartões', detail: 'Gerencie seus cartões' },
