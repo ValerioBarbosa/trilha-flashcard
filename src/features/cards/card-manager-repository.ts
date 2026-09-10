@@ -101,12 +101,12 @@ export async function setCardSuspended(client: SupabaseClient, cardId: string, s
   if (error) throw error;
 }
 
-export async function findDuplicateContent(client: SupabaseClient, profileId: string, front: string, back: string): Promise<boolean> {
+export async function findDuplicateContent(client: SupabaseClient, profileId: string, subjectId: string | null, front: string, back: string): Promise<boolean> {
   const normalizedFront = front.trim().toLowerCase();
   const normalizedBack = back.trim().toLowerCase();
-  const { data, error } = await client.from('cards').select('front,back').eq('profile_id', profileId).is('deleted_at', null);
+  const { data, error } = await client.from('cards').select('subject_id,front,back').eq('profile_id', profileId).is('deleted_at', null);
   if (error) throw error;
-  return (data || []).some((row: any) => row.front.trim().toLowerCase() === normalizedFront && row.back.trim().toLowerCase() === normalizedBack);
+  return (data || []).some((row: any) => (row.subject_id || null) === (subjectId || null) && row.front.trim().toLowerCase() === normalizedFront && row.back.trim().toLowerCase() === normalizedBack);
 }
 
 export async function importCards(client: SupabaseClient, user: User, profileId: string, candidates: ImportCandidate[]) {
@@ -151,21 +151,23 @@ export function parseJsonImport(text: string, defaults: { deckId: string; subjec
 }
 
 export async function markImportDuplicates(client: SupabaseClient, profileId: string, candidates: ImportCandidate[]): Promise<ImportCandidate[]> {
-  const { data, error } = await client.from('cards').select('front,back').eq('profile_id', profileId).is('deleted_at', null);
+  const { data, error } = await client.from('cards').select('subject_id,front,back').eq('profile_id', profileId).is('deleted_at', null);
   if (error) throw error;
-  const existing = new Set((data || []).map((row: any) => contentKey(row.front, row.back)));
+  const existing = new Set((data || []).map((row: any) => contentKey(row.subject_id, row.front, row.back)));
   const withinImport = new Set<string>();
   return candidates.map((candidate) => {
-    const key = contentKey(candidate.front, candidate.back);
+    const key = contentKey(candidate.subjectId, candidate.front, candidate.back);
     if (!candidate.front || !candidate.back) return { ...candidate, duplicate: false };
-    if (existing.has(key)) return { ...candidate, duplicate: true, duplicateReason: 'Já existe no seu banco.' };
+    if (existing.has(key)) return { ...candidate, duplicate: true, duplicateReason: 'Já existe nesta disciplina.' };
     if (withinImport.has(key)) return { ...candidate, duplicate: true, duplicateReason: 'Duplicado neste arquivo.' };
     withinImport.add(key);
     return { ...candidate, duplicate: false };
   });
 }
 
-function contentKey(front: string, back: string) { return `${front.trim().toLowerCase()}|${back.trim().toLowerCase()}`; }
+function contentKey(subjectId: string | null | undefined, front: string, back: string) {
+  return `${subjectId || ''}|${front.trim().toLowerCase()}|${back.trim().toLowerCase()}`;
+}
 function normalizeCardError(error: any): Error {
   if (String(error?.code) === '23505' || /duplicate|unique/i.test(String(error?.message || ''))) return new Error('card-duplicate');
   return error instanceof Error ? error : new Error(String(error?.message || error));

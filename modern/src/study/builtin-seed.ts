@@ -20,7 +20,7 @@ function subjectWeight(deck: LegacyDeck): number | null {
   const value = Number(match[1].replace(',', '.'));
   return Number.isFinite(value) ? value : null;
 }
-function contentKey(front: string, back: string): string { return `${front.trim().toLowerCase()}|${back.trim().toLowerCase()}`; }
+function contentKey(subjectId: string | null, front: string, back: string): string { return `${subjectId || ''}|${front.trim().toLowerCase()}|${back.trim().toLowerCase()}`; }
 function normalizedPriority(value: unknown): 'A'|'B'|'C'|null { const v = typeof value === 'string' ? value.trim().toUpperCase() : ''; return v === 'A' || v === 'B' || v === 'C' ? v : null; }
 function normalizedDifficulty(value: unknown): 'easy'|'medium'|'hard'|null { const v = typeof value === 'string' ? value.trim().toLowerCase() : ''; if (['easy','facil','fácil'].includes(v)) return 'easy'; if (['medium','medio','médio'].includes(v)) return 'medium'; if (['hard','dificil','difícil'].includes(v)) return 'hard'; return null; }
 function tagsFor(card: LegacyCard): string[] { const values = new Set<string>(); if (Array.isArray(card.tags)) card.tags.forEach((tag) => tag && values.add(String(tag).trim())); if (card.tag?.trim()) values.add(card.tag.trim()); if (card.subtopic?.trim()) values.add(card.subtopic.trim()); return [...values].filter(Boolean); }
@@ -46,7 +46,7 @@ async function upsertCards(client: SupabaseClient, user: User, profileId: string
   const rows:any[] = []; let skipped = 0;
   for (const card of deck.cards || []) {
     const front = card.front?.trim(); const back = card.back?.trim(); if (!front || !back) continue;
-    const key = contentKey(front, back); if (seen.has(key)) { skipped += 1; continue; } seen.add(key);
+    const key = contentKey(subjectId, front, back); if (seen.has(key)) { skipped += 1; continue; } seen.add(key);
     rows.push({ user_id:user.id, profile_id:profileId, deck_id:deckId, subject_id:subjectId, topic_id:subjectId && card.topic ? topics.get(card.topic.trim()) || null : null, legacy_id:card.id?.trim() || `card-${stableHash(`${deck.id}|${front}|${back}`)}`, front, back, card_type:typeof card.cardType === 'string' ? card.cardType : typeof card.type === 'string' ? card.type : null, legal_basis:typeof card.legalBasis === 'string' ? card.legalBasis : null, example:typeof card.example === 'string' ? card.example : null, complement:typeof card.complement === 'string' ? card.complement : null, pitfall:typeof card.pitfall === 'string' ? card.pitfall : null, mnemonic:typeof card.mnemonic === 'string' ? card.mnemonic : null, priority:normalizedPriority(card.priority), difficulty:normalizedDifficulty(card.difficulty), tags:tagsFor(card), source:deck.sourceNote || 'Catálogo nativo Trilha Flashcard', deleted_at:null, suspended:false });
   }
   for (let start=0; start<rows.length; start+=100) { const { error } = await client.from('cards').upsert(rows.slice(start,start+100), { onConflict:'user_id,deck_id,legacy_id' }); if (error) throw error; }
@@ -55,8 +55,8 @@ async function upsertCards(client: SupabaseClient, user: User, profileId: string
 
 export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User, profileId: string): Promise<BuiltinSeedReport> {
   const decks = legacyDecks as LegacyDeck[];
-  const { data: existing, error: existingError } = await client.from('cards').select('front,back').eq('profile_id', profileId).is('deleted_at', null); if (existingError) throw existingError;
-  const seen = new Set<string>((existing || []).map((row:any) => contentKey(row.front,row.back)));
+  const { data: existing, error: existingError } = await client.from('cards').select('subject_id,front,back').eq('profile_id', profileId).is('deleted_at', null); if (existingError) throw existingError;
+  const seen = new Set<string>((existing || []).map((row:any) => contentKey(row.subject_id, row.front, row.back)));
   let seededDecks=0, cards=0, topics=0, duplicatesSkipped=0, order=0;
   for (const deck of decks) {
     if (!isOnboardingDeck(deck) && isEmptyDeck(deck)) continue;
