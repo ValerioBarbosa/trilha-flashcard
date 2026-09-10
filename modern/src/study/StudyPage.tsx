@@ -132,6 +132,44 @@ export function StudyPage({ user, profileId, subjects, topics, decks }: { user: 
     setStartedAt(Date.now());
   }
 
+  function goPrevious() {
+    if (!cards.length) return;
+    setIndex((current) => (current - 1 + cards.length) % cards.length);
+    setRevealed(false);
+    setStartedAt(Date.now());
+  }
+
+  function goNext() {
+    if (!cards.length) return;
+    setIndex((current) => (current + 1) % cards.length);
+    setRevealed(false);
+    setStartedAt(Date.now());
+  }
+
+  useEffect(() => {
+    function isTypingTarget(target: EventTarget | null): boolean {
+      const tag = (target as HTMLElement | null)?.tagName;
+      return tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA';
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (builderOpen || isTypingTarget(event.target)) return;
+      if (event.key === ' ' || event.code === 'Space') {
+        event.preventDefault();
+        setRevealed((current) => !current);
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        goPrevious();
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        goNext();
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [builderOpen, cards.length]);
+
   return (
     <div className="page-wrap study-page">
       <PageHeader eyebrow="SESSÃO DE ESTUDO" title="Estudar" subtitle="Recupere a resposta antes de revelar. Depois, registre o nível de lembrança." />
@@ -147,8 +185,9 @@ export function StudyPage({ user, profileId, subjects, topics, decks }: { user: 
         ) : (
           <button className="secondary-outline" onClick={() => setBuilderOpen(true)}>Montar sessão</button>
         )}
+        <small className="keyboard-hint">Espaço vira o cartão · ← → navega</small>
       </div>
-      {loading ? <div className="study-empty">Carregando cartões…</div> : !card ? <div className="study-empty"><strong>Nenhum cartão neste filtro.</strong><span>Escolha outra disciplina, assunto ou subassunto.</span></div> : <><button className={`flashcard-modern ${revealed ? 'revealed' : ''}`} onClick={() => setRevealed(true)}><div className="card-meta"><span>{card.priority ? `Prioridade ${card.priority}` : 'Flashcard'}</span>{card.tags?.[0] ? <span>{card.tags[0]}</span> : null}</div><div className="card-question"><small>PERGUNTA</small><h2>{card.front}</h2></div>{revealed ? <div className="card-answer"><small>RESPOSTA</small><p>{card.back}</p>{card.legal_basis ? <div className="legal-basis"><strong>Base legal</strong><span>{card.legal_basis}</span></div> : null}{card.pitfall ? <div className="pitfall"><strong>Pegadinha</strong><span>{card.pitfall}</span></div> : null}{card.mnemonic ? <div className="mnemonic"><strong>Mnemônico</strong><span>{card.mnemonic}</span></div> : null}</div> : <div className="reveal-hint">Toque no cartão para revelar</div>}</button>{revealed ? <div className="rating-row"><button className="rating again" onClick={() => void rate(1)}><strong>Errei</strong><span>rever logo</span></button><button className="rating hard" onClick={() => void rate(2)}><strong>Difícil</strong><span>1 dia</span></button><button className="rating good" onClick={() => void rate(3)}><strong>Bom</strong><span>7 dias</span></button><button className="rating easy" onClick={() => void rate(4)}><strong>Fácil</strong><span>30 dias</span></button></div> : null}<div className="study-navigation"><button className="secondary-action" onClick={() => { setIndex((index - 1 + cards.length) % cards.length); setRevealed(false); setStartedAt(Date.now()); }}>← Anterior</button><button className="secondary-action" onClick={() => { setIndex((index + 1) % cards.length); setRevealed(false); setStartedAt(Date.now()); }}>Próximo →</button></div></>}
+      {loading ? <div className="study-empty">Carregando cartões…</div> : !card ? <div className="study-empty"><strong>Nenhum cartão neste filtro.</strong><span>Escolha outra disciplina, assunto ou subassunto.</span></div> : <><button className={`flashcard-modern ${revealed ? 'revealed' : ''}`} onClick={() => setRevealed(true)}><div className="card-meta"><span>{card.priority ? `Prioridade ${card.priority}` : 'Flashcard'}</span>{card.tags?.[0] ? <span>{card.tags[0]}</span> : null}</div><div className="card-question"><small>PERGUNTA</small><h2>{card.front}</h2></div>{revealed ? <div className="card-answer"><small>RESPOSTA</small><p>{card.back}</p>{card.legal_basis ? <div className="legal-basis"><strong>Base legal</strong><span>{card.legal_basis}</span></div> : null}{card.pitfall ? <div className="pitfall"><strong>Pegadinha</strong><span>{card.pitfall}</span></div> : null}{card.mnemonic ? <div className="mnemonic"><strong>Mnemônico</strong><span>{card.mnemonic}</span></div> : null}</div> : <div className="reveal-hint">Toque no cartão para revelar</div>}</button>{revealed ? <div className="rating-row"><button className="rating again" onClick={() => void rate(1)}><strong>Errei</strong><span>rever logo</span></button><button className="rating hard" onClick={() => void rate(2)}><strong>Difícil</strong><span>1 dia</span></button><button className="rating good" onClick={() => void rate(3)}><strong>Bom</strong><span>7 dias</span></button><button className="rating easy" onClick={() => void rate(4)}><strong>Fácil</strong><span>30 dias</span></button></div> : null}<div className="study-navigation"><button className="secondary-action" onClick={goPrevious}>← Anterior</button><button className="secondary-action" onClick={goNext}>Próximo →</button></div></>}
       {message ? <p className="toast-note">{message}</p> : null}
 
       {builderOpen ? <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setBuilderOpen(false)}><div className="modal-card" role="dialog" aria-modal="true"><div className="modal-heading"><div><span className="page-eyebrow">SESSÃO PERSONALIZADA</span><h2>Montar sessão</h2><p>Filtra, embaralha e limita os cartões da disciplina/assunto já selecionados acima.</p></div><button className="modal-close" onClick={() => setBuilderOpen(false)}>×</button></div>
