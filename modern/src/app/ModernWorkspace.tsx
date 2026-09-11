@@ -3,6 +3,7 @@ import type { User } from '@supabase/supabase-js';
 import { loadPerformance, type PerformanceSummary } from '@core/features/performance/performance-repository';
 import { EditalPage } from '../edital/EditalPage';
 import { JurisprudencePage } from '../jurisprudence/JurisprudencePage';
+import { LeiSecaPage } from '../legal-provisions/LeiSecaPage';
 import { PerformancePage } from '../performance/PerformancePage';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { BackupPanel } from '../data/BackupPanel';
@@ -15,7 +16,7 @@ import { StudyPage } from '../study/StudyPage';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
 import { ThemeToggle } from '../shared/ThemeToggle';
 
-type PageId = 'home' | 'study' | 'edital' | 'jurisprudence' | 'performance' | 'data';
+type PageId = 'home' | 'study' | 'edital' | 'jurisprudence' | 'lei-seca' | 'performance' | 'data';
 
 type Props = {
   user: User;
@@ -27,6 +28,7 @@ const NAV: Array<{ id: PageId; label: string; icon: string }> = [
   { id: 'study', label: 'Estudar', icon: '▣' },
   { id: 'edital', label: 'Edital', icon: '☑' },
   { id: 'jurisprudence', label: 'Jurisprudência', icon: '§' },
+  { id: 'lei-seca', label: 'Lei Seca', icon: '⚖' },
   { id: 'performance', label: 'Desempenho', icon: '↗' },
   { id: 'data', label: 'Dados', icon: '↻' },
 ];
@@ -71,6 +73,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} /> : null}
             {page === 'edital' ? <EditalPage subjects={workspace.subjects} topics={workspace.topics} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
+            {page === 'lei-seca' ? <LeiSecaPage profileId={workspace.profile.id} /> : null}
             {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} /> : null}
             {page === 'data' ? <DataPage user={user} workspace={workspace} onMigrated={workspace.refresh} /> : null}
           </>
