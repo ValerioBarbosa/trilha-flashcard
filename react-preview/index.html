@@ -12,8 +12,16 @@
     <link rel="icon" type="image/png" href="./icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="./icons/icon-192.png" />
     <title>Trilha Concursos</title>
-    <script type="module" crossorigin src="./assets/index-DzWRJxOD.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-_ImAqIfD.css">
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('trilha-theme');
+          if (stored === 'light' || stored === 'dark') document.documentElement.setAttribute('data-theme', stored);
+        } catch (e) {}
+      })();
+    </script>
+    <script type="module" crossorigin src="./assets/index-D0jB_zCI.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BsBpVfH0.css">
   </head>
   <body>
     <div id="root"></div>
