@@ -4,7 +4,7 @@ Este documento define o gate para substituir a interface legada pelo app React s
 
 ## Estado atual
 
-O app React já gera um candidato de produção em `modern/dist`, com manifesto PWA, service worker e ícones. O CI publica esse diretório como artefato temporário em cada validação relevante.
+**Corte concluído.** `valeriobarbosa.github.io/trilha-flashcard` publica o app React via `pages-deploy.yml` (Source do Pages em "GitHub Actions"). Todo push em `main` publica automaticamente. Os critérios abaixo foram validados manualmente em produção antes do corte. Os arquivos legados continuam no repositório (não removidos ainda) para permitir rollback e referência durante a janela de validação — ver "Próxima etapa".
 
 ## Critérios obrigatórios antes do corte
 
@@ -19,20 +19,17 @@ O app React já gera um candidato de produção em `modern/dist`, com manifesto 
 
 ## Mecanismo de corte
 
-`.github/workflows/pages-deploy.yml` builda `modern/dist` e publica via `actions/deploy-pages`, sem mover nenhum arquivo legado do lugar. Isso evita reescrever caminhos relativos usados pelos testes, pelo `sw.js` do legado e pelo `vendor/`. A ativação é em duas etapas propositalmente separadas, para que mesclar o workflow em `main` não troque nada sozinho:
+`.github/workflows/pages-deploy.yml` builda `modern/dist` e publica via `actions/deploy-pages`, sem mover nenhum arquivo legado do lugar. Isso evita reescrever caminhos relativos usados pelos testes, pelo `sw.js` do legado e pelo `vendor/`.
 
-1. **Preparação (feita)**: workflow criado com gatilho só `workflow_dispatch` (manual). Mesclar essa mudança em `main` não publica nada — o job só roda se alguém disparar manualmente pela aba Actions.
-2. **Corte de fato** (ação humana, feita com aprovação explícita): em Settings → Pages → Build and deployment → Source, trocar de "Deploy from a branch" para "GitHub Actions". Isso precisa ser feito na UI do GitHub; não há chamada de API disponível neste ambiente para isso. Depois disso, disparar o workflow manualmente uma vez para validar, e só então adicionar o gatilho `push: branches: [main]` ao arquivo (ou continuar disparando manualmente a cada release, se preferir mais controle).
-
-Enquanto o Source do Pages continuar em "Deploy from a branch", o site publicado continua sendo servido a partir da raiz de `main` (legado) exatamente como hoje, independente de este workflow existir ou ser mesclado.
+Histórico da ativação:
+1. Workflow criado com gatilho só `workflow_dispatch` (manual) — mesclar em `main` não publicou nada sozinho.
+2. Source do Pages trocado para "GitHub Actions" nas configurações do repositório, deploy manual disparado e validado em produção.
+3. Gatilho `push: branches: [main]` adicionado — a partir daqui, todo merge em `main` publica automaticamente.
 
 ## Estratégia de rollback
 
-Reverter o corte é trocar o Source do Pages de volta para "Deploy from a branch" nas configurações do repositório — não depende de reverter nenhum commit, já que nenhum arquivo legado é movido ou removido pelo corte. Os arquivos legados só são removidos numa PR de limpeza separada, depois de uma janela de validação em produção.
+Reverter o corte é trocar o Source do Pages de volta para "Deploy from a branch" nas configurações do repositório — não depende de reverter nenhum commit, já que nenhum arquivo legado foi movido ou removido pelo corte.
 
 ## Próxima etapa
 
-Depois da validação real em navegador e em pelo menos dois dispositivos (critérios 1, 2, 4, 5, 8 acima):
-1. Trocar o Source do Pages para "GitHub Actions" e disparar `pages-deploy.yml` manualmente para confirmar que o deploy funciona no domínio final.
-2. Adicionar o gatilho automático (`push: branches: [main]`) ao workflow.
-3. Após a janela de validação em produção, abrir a PR de limpeza: remover os arquivos legados da raiz, `firebase-config.js`/`firebase.json`/`firestore.rules` e o workflow `react-preview.yml`, que deixam de ser necessários.
+Janela de validação em produção (monitorar login, revisões salvando, console sem erros, PWA). Depois dela, abrir a PR de limpeza: remover os arquivos legados da raiz, `firebase-config.js`/`firebase.json`/`firestore.rules` e o workflow `react-preview.yml`, que deixam de ser necessários.

@@ -1,12 +1,11 @@
 name: Deploy React app to GitHub Pages
 
-# Ativação em duas etapas, de propósito (ver docs/PRODUCTION_CUTOVER.md):
-# 1) Este workflow entra em main só com `workflow_dispatch` — não publica nada sozinho.
-# 2) O corte de fato acontece quando alguém: (a) mudar Settings > Pages > Build and
-#    deployment > Source para "GitHub Actions" neste repositório, e (b) adicionar o
-#    gatilho `push: branches: [main]` (ou disparar manualmente) depois de validar
-#    com workflow_dispatch que o deploy funciona.
+# Corte de produção concluído (ver docs/PRODUCTION_CUTOVER.md): o Source do Pages
+# já está em "GitHub Actions" e o primeiro deploy manual (workflow_dispatch) foi
+# validado em produção. A partir daqui, todo push em main publica automaticamente.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
