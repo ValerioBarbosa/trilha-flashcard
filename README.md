@@ -27,8 +27,7 @@ O app inclui:
 - conferência dos cartões antes de confirmar uma importação;
 - lixeira com restauração e desfazer exclusão;
 - backup completo de cartões, desempenho e lixeira;
-- sincronização opcional com Google e Firebase, com backup dividido em partes para crescer além do limite de um único documento, modo offline e escolha segura em caso de conflito;
-- sincronização incremental opcional com Supabase, mantendo o Firebase como compatibilidade durante a migração;
+- sincronização incremental opcional com Google e Supabase, modo offline e escolha segura em caso de conflito;
 - sessões personalizadas por quantidade, escopo e prioridade.
 
 ## Banco de Matérias
@@ -80,25 +79,7 @@ Edições em baralhos por disciplina ficam salvas no navegador (via `localStorag
 4. Copie a URL e a **publishable key** do projeto para `supabase-config.js`.
 5. Nunca use `service_role`, secret key ou senha do banco no navegador.
 
-O Supabase armazena cada chave de estudo separadamente em `flashcard_sync_entries`. Somente chaves alteradas são enviadas, e exclusões usam tombstones para que dados antigos não reapareçam em outro dispositivo. As políticas RLS restringem leitura e escrita ao proprietário autenticado.
-
-Durante a transição, deixe `firebase-config.js` intacto. Com `supabase-config.js` vazio, o aplicativo continua usando Firebase; ao preencher a configuração Supabase, passa a usar o novo banco. Faça a primeira conexão no aparelho que contém a cópia local mais completa e confirme um backup JSON antes da troca.
-
-### Firebase (compatibilidade)
-
-1. Crie um projeto no Firebase e um aplicativo Web.
-2. Ative **Authentication > Google**.
-3. Crie o banco **Cloud Firestore** e publique `firestore.rules` (o `firebase.json` já aponta para esse arquivo).
-4. Adicione `valeriobarbosa.github.io` aos domínios autorizados do Authentication.
-5. Copie a configuração Web para `firebase-config.js`, substituindo `null` pelo objeto `firebaseConfig`.
-
-Os metadados ficam em `flashcardUsers/{uid}` e o conteúdo é dividido em `flashcardUsers/{uid}/chunks/{chunkId}`. Isso evita concentrar todo o banco no limite de um único documento do Firestore. O leitor continua compatível com backups antigos que ainda tenham o campo `snapshot`. As regras permitem que cada usuário leia e altere somente os próprios documentos. Na primeira conexão, os dados locais são enviados automaticamente se a nuvem estiver vazia. Se existirem duas versões, o aplicativo exige uma escolha antes de substituir qualquer dado.
-
-Para publicar as regras pelo Firebase CLI:
-
-```bash
-firebase deploy --only firestore:rules --project trilha-flashcard
-```
+O Supabase armazena cada chave de estudo separadamente em `flashcard_sync_entries`. Somente chaves alteradas são enviadas, e exclusões usam tombstones para que dados antigos não reapareçam em outro dispositivo. As políticas RLS restringem leitura e escrita ao proprietário autenticado. Na primeira conexão, os dados locais são enviados automaticamente se a nuvem estiver vazia. Se existirem duas versões, o aplicativo exige uma escolha antes de substituir qualquer dado.
 
 ## Importar seu próprio baralho
 

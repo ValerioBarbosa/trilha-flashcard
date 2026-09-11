@@ -32,4 +32,6 @@ Reverter o corte é trocar o Source do Pages de volta para "Deploy from a branch
 
 ## Próxima etapa
 
-Janela de validação em produção (monitorar login, revisões salvando, console sem erros, PWA). Depois dela, abrir a PR de limpeza: remover os arquivos legados da raiz, `firebase-config.js`/`firebase.json`/`firestore.rules` e o workflow `react-preview.yml`, que deixam de ser necessários.
+**Limpeza concluída (parcial):** `firebase-config.js`/`firebase.json`/`firestore.rules` (e o teste `firestore-rules.test.js`) e o workflow `react-preview.yml`/pasta `react-preview/` foram removidos — não tinham mais nenhuma dependência viva.
+
+O restante do app legado (`index.html`, `app.js`, `card-*.js`, `spaced-repetition.js`, `cloud-sync.js`, `styles.css`, `sw.js` etc.) **continua no repositório de propósito**: cada um tem um teste dedicado (`tests/*.test.js`) e `decks.js` ainda alimenta o seed do catálogo oficial no React via `modern/scripts/generate-legacy-decks.mjs`. Remover o app legado por completo exige antes decidir o destino de `decks.js` (realocar a fonte do catálogo) e dos ~8 testes legados — decisão em aberto, não faz parte desta limpeza.
