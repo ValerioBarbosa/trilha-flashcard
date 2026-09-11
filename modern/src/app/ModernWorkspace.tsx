@@ -13,6 +13,7 @@ import { SyncPanel } from '../sync/SyncPanel';
 import { ProfileSwitcher } from '../study/ProfileSwitcher';
 import { StudyPage } from '../study/StudyPage';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
+import { ThemeToggle } from '../shared/ThemeToggle';
 
 type PageId = 'home' | 'study' | 'edital' | 'jurisprudence' | 'performance' | 'data';
 
@@ -48,6 +49,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
           {NAV.map((item) => <button type="button" key={item.id} className={page === item.id ? 'active' : ''} onClick={() => selectPage(item.id)}><span aria-hidden="true">{item.icon}</span>{item.label}</button>)}
         </nav>
         <div className="sidebar-footer">
+          <ThemeToggle />
           <div className="account-chip"><span className="account-avatar">{(user.email || 'U').slice(0, 1).toUpperCase()}</span><div><strong>{user.user_metadata?.full_name || 'Estudante'}</strong><small>{user.email}</small></div></div>
           <button type="button" className="text-button" onClick={() => void onSignOut()}>Sair</button>
         </div>
