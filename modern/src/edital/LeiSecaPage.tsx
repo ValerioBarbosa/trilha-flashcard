@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import type { DeckRow, SubjectRow, TopicRow } from '@core/features/study/domain-repository';
-import { listCardsByType, listStudyCardTopicIds, type CardRow } from '../study/domain-repository';
+import { listCardsByType, listStudyCardTopicIds, setCardReadAt, type CardRow } from '../study/domain-repository';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { PageHeader } from '../shared/PageHeader';
 import { MetricTile } from '../shared/MetricTile';
@@ -58,15 +58,20 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
     let totalTopics = 0;
     let coveredTopics = 0;
     let totalCards = 0;
+    let readCards = 0;
     let subjectsCovered = 0;
     for (const subject of allSubjects) {
       totalTopics += subject.rootTopics.length;
       const covered = subject.rootTopics.filter((topic) => (cardsByTopic.get(topic.id)?.length ?? 0) > 0);
       coveredTopics += covered.length;
-      totalCards += covered.reduce((sum, topic) => sum + (cardsByTopic.get(topic.id)?.length ?? 0), 0);
+      for (const topic of covered) {
+        const cards = cardsByTopic.get(topic.id) ?? [];
+        totalCards += cards.length;
+        readCards += cards.filter((card) => card.read_at).length;
+      }
       if (covered.length > 0) subjectsCovered += 1;
     }
-    return { totalTopics, coveredTopics, totalCards, subjectsCovered, totalSubjects: allSubjects.length };
+    return { totalTopics, coveredTopics, totalCards, readCards, subjectsCovered, totalSubjects: allSubjects.length };
   }, [allSubjects, cardsByTopic]);
 
   function reloadCards() {
@@ -150,6 +155,19 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
     });
   }
 
+  function toggleRead(card: CardRow) {
+    const nextRead = !card.read_at;
+    setCardsByTopic((current) => {
+      const next = new Map(current);
+      const topicId = card.topic_id;
+      if (!topicId) return current;
+      const bucket = (next.get(topicId) ?? []).map((entry) => entry.id === card.id ? { ...entry, read_at: nextRead ? new Date().toISOString() : null } : entry);
+      next.set(topicId, bucket);
+      return next;
+    });
+    void setCardReadAt(getSupabaseClient(), card.id, nextRead).catch(() => void reloadCards());
+  }
+
   return (
     <div className="page-wrap">
       <PageHeader
@@ -162,6 +180,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         <MetricTile label="Assuntos com Lei Seca" value={`${coverage.coveredTopics}/${coverage.totalTopics}`} helper="do total de assuntos com base legal" />
         <MetricTile label="Disciplinas iniciadas" value={`${coverage.subjectsCovered}/${coverage.totalSubjects}`} helper="com ao menos 1 assunto cadastrado" />
         <MetricTile label="Cartões de Lei Seca" value={coverage.totalCards} helper="trechos importados no total" />
+        <MetricTile label="Trechos lidos" value={`${coverage.readCards}/${coverage.totalCards}`} helper="marcados como lidos" />
         <MetricTile label="Cobertura geral" value={coverage.totalTopics ? `${Math.round((coverage.coveredTopics / coverage.totalTopics) * 100)}%` : '0%'} helper="dos assuntos já com texto de lei" />
       </div>
       {!rows.length ? (
@@ -185,6 +204,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                 {open ? <div className="topic-list">{subject.rootTopics.map((topic) => {
                   const topicCards = cardsByTopic.get(topic.id) ?? [];
                   const cardsOpen = openTopics.has(topic.id);
+                  const readCount = topicCards.filter((card) => card.read_at).length;
                   return (
                     <div key={topic.id} className="topic-row-wrap">
                       <div className="topic-row">
@@ -194,7 +214,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                       </div>
                       <div className="topic-actions">
                         {topicCards.length ? (
-                          <button className="link-button" onClick={() => toggleTopicCards(topic.id)}>{cardsOpen ? 'Ocultar leitura' : 'Ler'} {topicCards.length} trecho{topicCards.length === 1 ? '' : 's'}</button>
+                          <button className="link-button" onClick={() => toggleTopicCards(topic.id)}>{cardsOpen ? 'Ocultar leitura' : 'Ler'} {topicCards.length} trecho{topicCards.length === 1 ? '' : 's'}{readCount ? ` (${readCount} lido${readCount === 1 ? '' : 's'})` : ''}</button>
                         ) : null}
                         {studyTopicIds.has(topic.id) ? (
                           <button className="link-button" onClick={() => onStudyTopic(subject.id, topic.id)}>Estudar este assunto →</button>
@@ -202,8 +222,11 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                         <button className="link-button" onClick={() => openImport(topic.id)}>Importar cartões (PDF) →</button>
                       </div>
                       {cardsOpen ? <div className="topic-cards topic-reading">{topicCards.map((card) => (
-                        <article key={card.id} className="topic-reading-item">
-                          <h3>{card.front}</h3>
+                        <article key={card.id} className={`topic-reading-item ${card.read_at ? 'is-read' : ''}`}>
+                          <div className="topic-reading-head">
+                            <h3>{card.front}</h3>
+                            <button className={`read-toggle ${card.read_at ? 'is-read' : ''}`} onClick={() => toggleRead(card)}>{card.read_at ? '✓ Lido' : 'Marcar como lido'}</button>
+                          </div>
                           <p>{card.back}</p>
                         </article>
                       ))}</div> : null}
