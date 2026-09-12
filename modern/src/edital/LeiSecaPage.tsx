@@ -11,9 +11,12 @@ import '../cards/pdf-import.css';
 
 type LeiSecaSubject = SubjectRow & { rootTopics: TopicRow[] };
 
+const LEI_SECA_EXCLUDED_SUBJECTS = new Set(['português']);
+
 function buildLeiSecaSubjects(subjects: SubjectRow[], topics: TopicRow[], query: string): LeiSecaSubject[] {
   const normalized = query.trim().toLowerCase();
   return subjects
+    .filter((subject) => !LEI_SECA_EXCLUDED_SUBJECTS.has(subject.name.trim().toLowerCase()))
     .map((subject) => ({
       ...subject,
       rootTopics: topics.filter((topic) => topic.subject_id === subject.id && !topic.parent_id && topic.legal_basis),

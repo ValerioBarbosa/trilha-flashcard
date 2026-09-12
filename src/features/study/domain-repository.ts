@@ -124,6 +124,7 @@ export async function listCards(client: SupabaseClient, deckId: string): Promise
     .eq('deck_id', deckId)
     .is('deleted_at', null)
     .eq('suspended', false)
+    .or('card_type.is.null,card_type.neq.Lei seca')
     .order('created_at'));
 }
 
