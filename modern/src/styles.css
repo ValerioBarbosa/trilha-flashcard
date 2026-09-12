@@ -308,6 +308,9 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .question-actions { display: flex; justify-content: flex-end; margin-top: 18px; }
 .empty-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: var(--green-soft); color: var(--green); font-size: 22px; }.empty-feature h2 { margin: 4px 0; color: var(--ink); }.empty-feature p { max-width: 620px; line-height: 1.6; }
 
+.juris-groups { display: grid; gap: 28px; }
+.juris-group-title { display: flex; align-items: baseline; gap: 10px; margin: 0 0 14px; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; color: var(--ink); }
+.juris-group-title span { color: var(--muted-2); font-size: 11px; font-weight: 700; text-transform: none; letter-spacing: 0; }
 .juris-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
 .juris-card { border: 1px solid var(--line); border-radius: 18px; background: var(--surface); padding: 20px; }
 .juris-meta { display: flex; justify-content: space-between; gap: 10px; align-items: center; }.juris-meta > span:first-child { color: var(--green); font-size: 11px; font-weight: 900; }.status { border-radius: 999px; padding: 5px 8px; background: var(--surface-soft); font-size: 9px; font-weight: 900; text-transform: uppercase; }.status-vigente { background: var(--green-soft); color: var(--green-deep); }.status-superado, .status-cancelado { background: var(--danger-soft); color: var(--danger); }
