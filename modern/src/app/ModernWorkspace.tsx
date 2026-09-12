@@ -77,7 +77,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
           <>
             {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} /> : null}
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} focus={studyFocus} /> : null}
-            {page === 'edital' ? <EditalPage subjects={workspace.subjects} topics={workspace.topics} /> : null}
+            {page === 'edital' ? <EditalPage profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} onStudyTopic={focusStudyTopic} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
             {page === 'lei-seca' ? <LeiSecaPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} onStudyTopic={focusStudyTopic} /> : null}
             {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} /> : null}

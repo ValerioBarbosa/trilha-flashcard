@@ -144,7 +144,7 @@ export async function setCardReadAt(client: SupabaseClient, cardId: string, read
   if (error) throw error;
 }
 
-export async function listStudyCardTopicIds(client: SupabaseClient, profileId: string): Promise<Set<string>> {
+export async function listStudyCardCountsByTopic(client: SupabaseClient, profileId: string): Promise<Map<string, number>> {
   const { data, error } = await client.from('cards')
     .select('topic_id')
     .eq('profile_id', profileId)
@@ -153,7 +153,12 @@ export async function listStudyCardTopicIds(client: SupabaseClient, profileId: s
     .or('card_type.is.null,card_type.neq.Lei seca')
     .not('topic_id', 'is', null);
   if (error) throw error;
-  return new Set((data || []).map((row: { topic_id: string | null }) => row.topic_id).filter((id): id is string => Boolean(id)));
+  const counts = new Map<string, number>();
+  for (const row of (data || []) as Array<{ topic_id: string | null }>) {
+    if (!row.topic_id) continue;
+    counts.set(row.topic_id, (counts.get(row.topic_id) ?? 0) + 1);
+  }
+  return counts;
 }
 
 export async function saveReview(

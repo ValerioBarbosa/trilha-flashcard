@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import type { DeckRow, SubjectRow, TopicRow } from '@core/features/study/domain-repository';
-import { listCardsByType, listStudyCardTopicIds, setCardReadAt, type CardRow } from '../study/domain-repository';
+import { listCardsByType, listStudyCardCountsByTopic, setCardReadAt, type CardRow } from '../study/domain-repository';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { PageHeader } from '../shared/PageHeader';
 import { MetricTile } from '../shared/MetricTile';
@@ -84,8 +84,8 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   function reloadCards() {
     return Promise.all([
       listCardsByType(getSupabaseClient(), profileId, 'Lei seca'),
-      listStudyCardTopicIds(getSupabaseClient(), profileId),
-    ]).then(([cards, topicIds]) => {
+      listStudyCardCountsByTopic(getSupabaseClient(), profileId),
+    ]).then(([cards, counts]) => {
       const grouped = new Map<string, CardRow[]>();
       for (const card of cards) {
         if (!card.topic_id) continue;
@@ -94,7 +94,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         grouped.set(card.topic_id, bucket);
       }
       setCardsByTopic(grouped);
-      setStudyTopicIds(topicIds);
+      setStudyTopicIds(new Set(counts.keys()));
     });
   }
 
