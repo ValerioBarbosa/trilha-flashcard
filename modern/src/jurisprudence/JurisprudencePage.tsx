@@ -19,14 +19,29 @@ export function JurisprudencePage({ profileId }: { profileId: string }) {
 
   const filtered = rows.filter((row) => `${row.court} ${row.theme || ''} ${row.thesis} ${row.summary || ''}`.toLowerCase().includes(query.toLowerCase()));
 
+  const groups = Object.values(
+    filtered.reduce<Record<string, { court: string; rows: JurisprudenceRow[] }>>((acc, row) => {
+      const key = row.court || 'Outros';
+      (acc[key] ??= { court: key, rows: [] }).rows.push(row);
+      return acc;
+    }, {}),
+  ).sort((a, b) => b.rows.length - a.rows.length || a.court.localeCompare(b.court));
+
   return (
     <div className="page-wrap">
       <PageHeader eyebrow="JURISPRUDÊNCIA VIVA" title="Jurisprudência" subtitle="Teses ligadas ao edital, com foco de cobrança e status de atualização." action={<div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar tese ou tribunal" /></div>} />
       {loading ? <div className="study-empty">Carregando jurisprudência…</div> : !filtered.length ? (
         <EmptyFeature title="Área de jurisprudência pronta." text="Quando teses forem cadastradas, elas aparecerão aqui vinculadas à disciplina, tema, base legal e forma provável de cobrança." />
       ) : (
-        <div className="juris-grid">
-          {filtered.map((row) => <article key={row.id} className="juris-card"><div className="juris-meta"><span>{row.court}</span><span className={`status status-${row.status}`}>{row.status}</span></div><h2>{row.theme || 'Tese jurisprudencial'}</h2><p>{row.summary || row.thesis}</p><details><summary>Ver tese completa</summary><blockquote>{row.thesis}</blockquote>{row.exam_angle ? <p><strong>Como pode cair:</strong> {row.exam_angle}</p> : null}{row.pitfall ? <p><strong>Pegadinha:</strong> {row.pitfall}</p> : null}{row.legal_basis ? <small>Base legal: {row.legal_basis}</small> : null}</details></article>)}
+        <div className="juris-groups">
+          {groups.map((group) => (
+            <section key={group.court} className="juris-group">
+              <h2 className="juris-group-title">{group.court}<span>{group.rows.length} tese{group.rows.length === 1 ? '' : 's'}</span></h2>
+              <div className="juris-grid">
+                {group.rows.map((row) => <article key={row.id} className="juris-card"><div className="juris-meta"><span>{row.court}</span><span className={`status status-${row.status}`}>{row.status}</span></div><h2>{row.theme || 'Tese jurisprudencial'}</h2><p>{row.summary || row.thesis}</p><details><summary>Ver tese completa</summary><blockquote>{row.thesis}</blockquote>{row.exam_angle ? <p><strong>Como pode cair:</strong> {row.exam_angle}</p> : null}{row.pitfall ? <p><strong>Pegadinha:</strong> {row.pitfall}</p> : null}{row.legal_basis ? <small>Base legal: {row.legal_basis}</small> : null}</details></article>)}
+              </div>
+            </section>
+          ))}
         </div>
       )}
     </div>
