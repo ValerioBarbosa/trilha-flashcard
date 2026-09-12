@@ -98,6 +98,61 @@ function findByName<T extends { id: string; name: string }>(items: T[], value?: 
   return items.find((item) => canonical(item.name) === needle || canonical(item.name).includes(needle) || needle.includes(canonical(item.name)));
 }
 
+const WATERMARK_PATTERN = /uid:\S*\|email:\S*\|name:.*?\|cpfCnpj:\S*\|phone:\S*/gi;
+
+function stripWatermark(text: string): string {
+  return text.replace(WATERMARK_PATTERN, '').split('\n').map((line) => line.trim()).filter(Boolean).join('\n').trim();
+}
+
+function detectLeiSecaCitation(lawLabel: string, text: string): string {
+  const articleMatches = Array.from(text.matchAll(/Art\.?\s*(\d+)[ºo]?/gi)).map((match) => match[1]);
+  const uniqueArticles = Array.from(new Set(articleMatches));
+  const incisoMatches = Array.from(text.matchAll(/(?:^|\n)\s*(?:Art\.?\s*\d+[ºo]?,?\s*)?([IVXLCDM]{1,7})\s*[-–—]/g)).map((match) => match[1]);
+
+  let articlePart = '';
+  if (uniqueArticles.length === 1) articlePart = `art. ${uniqueArticles[0]}º`;
+  else if (uniqueArticles.length === 2) articlePart = `arts. ${uniqueArticles[0]}º e ${uniqueArticles[1]}º`;
+  else if (uniqueArticles.length > 2) articlePart = `arts. ${uniqueArticles[0]}º a ${uniqueArticles[uniqueArticles.length - 1]}º`;
+
+  let incisoPart = '';
+  if (uniqueArticles.length <= 1 && incisoMatches.length >= 2) {
+    incisoPart = `, ${incisoMatches[0]} a ${incisoMatches[incisoMatches.length - 1]}`;
+  }
+
+  const citation = `${articlePart}${incisoPart}`.trim();
+  return citation ? `${lawLabel}, ${citation}` : '';
+}
+
+export async function parseLeiSecaPdfImport(file: File, options: { lawLabel: string; subjectId: string; topicId: string | null; deckId: string }): Promise<ImportCandidate[]> {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const document = await pdfjsLib.getDocument({ data: bytes }).promise;
+  const candidates: ImportCandidate[] = [];
+
+  for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
+    const page = await document.getPage(pageNumber);
+    const text = stripWatermark(await pageText(page));
+    if (!text) continue;
+
+    const citation = detectLeiSecaCitation(options.lawLabel, text) || `${options.lawLabel} — pág. ${pageNumber}`;
+    candidates.push({
+      row: pageNumber,
+      subjectId: options.subjectId,
+      deckId: options.deckId,
+      topicId: options.topicId,
+      front: citation,
+      back: text,
+      legalBasis: citation,
+      cardType: 'Lei seca',
+      tags: ['Lei seca'],
+      priority: '',
+      difficulty: '',
+      source: `${file.name} · pág. ${pageNumber}`,
+    });
+  }
+
+  return candidates;
+}
+
 export async function parsePdfImport(file: File, lookups: { subjects: SubjectRow[]; topics: TopicRow[]; decks: DeckRow[]; defaultSubjectId: string; defaultDeckId: string }): Promise<ImportCandidate[]> {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const document = await pdfjsLib.getDocument({ data: bytes }).promise;

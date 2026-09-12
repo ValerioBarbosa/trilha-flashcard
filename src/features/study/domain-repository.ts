@@ -59,6 +59,7 @@ export type CardRow = {
   priority: string | null;
   difficulty: string | null;
   tags: string[];
+  read_at: string | null;
 };
 
 export type JurisprudenceRow = {
@@ -120,21 +121,44 @@ export async function listDecks(client: SupabaseClient, profileId: string): Prom
 
 export async function listCards(client: SupabaseClient, deckId: string): Promise<CardRow[]> {
   return requireData(client.from('cards')
-    .select('id,deck_id,subject_id,topic_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags')
+    .select('id,deck_id,subject_id,topic_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags,read_at')
     .eq('deck_id', deckId)
     .is('deleted_at', null)
     .eq('suspended', false)
+    .or('card_type.is.null,card_type.neq.Lei seca')
     .order('created_at'));
 }
 
 export async function listCardsByType(client: SupabaseClient, profileId: string, cardType: string): Promise<CardRow[]> {
   return requireData(client.from('cards')
-    .select('id,deck_id,subject_id,topic_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags')
+    .select('id,deck_id,subject_id,topic_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags,read_at')
     .eq('profile_id', profileId)
     .eq('card_type', cardType)
     .is('deleted_at', null)
     .eq('suspended', false)
     .order('created_at'));
+}
+
+export async function setCardReadAt(client: SupabaseClient, cardId: string, read: boolean): Promise<void> {
+  const { error } = await client.from('cards').update({ read_at: read ? new Date().toISOString() : null }).eq('id', cardId);
+  if (error) throw error;
+}
+
+export async function listStudyCardCountsByTopic(client: SupabaseClient, profileId: string): Promise<Map<string, number>> {
+  const { data, error } = await client.from('cards')
+    .select('topic_id')
+    .eq('profile_id', profileId)
+    .is('deleted_at', null)
+    .eq('suspended', false)
+    .or('card_type.is.null,card_type.neq.Lei seca')
+    .not('topic_id', 'is', null);
+  if (error) throw error;
+  const counts = new Map<string, number>();
+  for (const row of (data || []) as Array<{ topic_id: string | null }>) {
+    if (!row.topic_id) continue;
+    counts.set(row.topic_id, (counts.get(row.topic_id) ?? 0) + 1);
+  }
+  return counts;
 }
 
 export async function saveReview(
