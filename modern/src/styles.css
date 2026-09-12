@@ -176,6 +176,15 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .chevron { color: var(--muted-2); font-size: 24px; }
 .accent-panel { color: white; border-color: transparent; background: #1d3427; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
 .accent-panel .panel-label { color: #88baa0; }
+.review-actions-row { display: flex; gap: 12px; flex-wrap: wrap; margin: 4px 0 22px; }
+.subject-performance-list { display: grid; gap: 12px; margin-top: 16px; }
+.subject-performance-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(120px,240px) 44px; gap: 14px; align-items: center; }
+.subject-performance-row strong { display: block; font-size: 14px; }
+.subject-performance-row small { color: var(--muted-2); }
+.subject-performance-track { height: 8px; border-radius: 999px; background: var(--surface-soft); overflow: hidden; }
+.subject-performance-track span { display: block; height: 100%; background: var(--green); border-radius: 999px; }
+.subject-performance-row > strong:last-child { text-align: right; }
+.panel-card > p { margin: 12px 0 0; color: var(--muted); }
 .accent-panel h2 { margin: 10px 0 10px; font-size: 26px; letter-spacing: -.035em; }
 .accent-panel p { color: rgba(255,255,255,.65); line-height: 1.6; }
 .accent-panel button { margin-top: auto; background: white; color: #1d3427; }

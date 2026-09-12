@@ -14,7 +14,7 @@ import { PageHeader } from '../shared/PageHeader';
 
 type StudyTopic = { id: string; subject_id: string; parent_id: string | null; name: string };
 type StudyDeck = { id: string; name: string; subject_id: string | null };
-export type StudyFocus = { subjectId: string; topicId: string; token: number };
+export type StudyFocus = { subjectId: string; topicId: string; token: number; scope?: Scope };
 
 export function StudyPage({ user, profileId, subjects, topics, decks, focus }: { user: User; profileId: string; subjects: Array<{ id: string; name: string }>; topics: StudyTopic[]; decks: StudyDeck[]; focus?: StudyFocus | null }) {
   const firstSubjectWithDeck = subjects.find((subject) => decks.some((deck) => deck.subject_id === subject.id));
@@ -81,6 +81,12 @@ export function StudyPage({ user, profileId, subjects, topics, decks, focus }: {
     } else {
       pendingFocusTopic.current = focus.topicId;
       setSubjectId(focus.subjectId);
+    }
+    if (focus.scope) {
+      setScope(focus.scope);
+      setPriority('');
+      setCount(200);
+      setBuilderOpen(true);
     }
   }, [focus?.token]);
 

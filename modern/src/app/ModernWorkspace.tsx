@@ -49,6 +49,16 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
     selectPage('study');
   };
 
+  const startWrongReview = () => {
+    setStudyFocus({ subjectId: 'all', topicId: 'all', token: Date.now(), scope: 'wrong' });
+    selectPage('study');
+  };
+
+  const startDueReview = () => {
+    setStudyFocus({ subjectId: 'all', topicId: 'all', token: Date.now(), scope: 'due' });
+    selectPage('study');
+  };
+
   return (
     <div className="modern-app">
       <aside className={`app-sidebar ${menuOpen ? 'open' : ''}`}>
@@ -80,7 +90,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
             {page === 'edital' ? <EditalPage profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} onStudyTopic={focusStudyTopic} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
             {page === 'lei-seca' ? <LeiSecaPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} onStudyTopic={focusStudyTopic} /> : null}
-            {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} /> : null}
+            {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} onReviewWrong={startWrongReview} onReviewDue={startDueReview} /> : null}
             {page === 'data' ? <DataPage user={user} workspace={workspace} onMigrated={workspace.refresh} /> : null}
           </>
         )}
