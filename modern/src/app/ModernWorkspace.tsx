@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { loadPerformance, type PerformanceSummary } from '@core/features/performance/performance-repository';
 import { EditalPage } from '../edital/EditalPage';
+import { LeiSecaPage } from '../edital/LeiSecaPage';
 import { JurisprudencePage } from '../jurisprudence/JurisprudencePage';
-import { LeiSecaPage } from '../legal-provisions/LeiSecaPage';
 import { PerformancePage } from '../performance/PerformancePage';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { BackupPanel } from '../data/BackupPanel';
@@ -73,7 +73,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} /> : null}
             {page === 'edital' ? <EditalPage subjects={workspace.subjects} topics={workspace.topics} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
-            {page === 'lei-seca' ? <LeiSecaPage profileId={workspace.profile.id} /> : null}
+            {page === 'lei-seca' ? <LeiSecaPage subjects={workspace.subjects} topics={workspace.topics} /> : null}
             {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} /> : null}
             {page === 'data' ? <DataPage user={user} workspace={workspace} onMigrated={workspace.refresh} /> : null}
           </>
