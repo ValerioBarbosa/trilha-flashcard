@@ -152,6 +152,7 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .hero-stat span { color: rgba(255,255,255,.68); font-size: 12px; }
 .dashboard-grid { display: grid; gap: 14px; margin: 22px 0; }
 .dashboard-grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.dashboard-grid.lei-seca-metrics { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
 .metric-tile { border: 1px solid var(--line); background: var(--surface); border-radius: 18px; padding: 18px; box-shadow: 0 8px 26px rgba(20,40,28,.035); }
 .metric-tile > span { color: var(--muted); font-size: 12px; font-weight: 700; }
 .metric-tile strong { display: block; margin: 10px 0 4px; font-size: 30px; letter-spacing: -.04em; }

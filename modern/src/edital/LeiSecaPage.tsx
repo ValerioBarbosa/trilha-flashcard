@@ -190,7 +190,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
           </div>
         }
       />
-      <div className="dashboard-grid four">
+      <div className="dashboard-grid lei-seca-metrics">
         <MetricTile label="Assuntos com Lei Seca" value={`${coverage.coveredTopics}/${coverage.totalTopics}`} helper="do total de assuntos com base legal" />
         <MetricTile label="Disciplinas iniciadas" value={`${coverage.subjectsCovered}/${coverage.totalSubjects}`} helper="com ao menos 1 assunto cadastrado" />
         <MetricTile label="Cartões de Lei Seca" value={coverage.totalCards} helper="trechos importados no total" />
