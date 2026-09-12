@@ -12,7 +12,7 @@ import { MetricTile } from '../shared/MetricTile';
 import { PageHeader } from '../shared/PageHeader';
 import { SyncPanel } from '../sync/SyncPanel';
 import { ProfileSwitcher } from '../study/ProfileSwitcher';
-import { StudyPage } from '../study/StudyPage';
+import { StudyPage, type StudyFocus } from '../study/StudyPage';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
 import { ThemeToggle } from '../shared/ThemeToggle';
 
@@ -37,10 +37,16 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
   const workspace = useStudyWorkspace(user);
   const [page, setPage] = useState<PageId>('home');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [studyFocus, setStudyFocus] = useState<StudyFocus | null>(null);
 
   const selectPage = (next: PageId) => {
     setPage(next);
     setMenuOpen(false);
+  };
+
+  const focusStudyTopic = (subjectId: string, topicId: string) => {
+    setStudyFocus({ subjectId, topicId, token: Date.now() });
+    selectPage('study');
   };
 
   return (
@@ -70,10 +76,10 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
         ) : (
           <>
             {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} /> : null}
-            {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} /> : null}
+            {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} focus={studyFocus} /> : null}
             {page === 'edital' ? <EditalPage subjects={workspace.subjects} topics={workspace.topics} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
-            {page === 'lei-seca' ? <LeiSecaPage subjects={workspace.subjects} topics={workspace.topics} /> : null}
+            {page === 'lei-seca' ? <LeiSecaPage profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} onStudyTopic={focusStudyTopic} /> : null}
             {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} /> : null}
             {page === 'data' ? <DataPage user={user} workspace={workspace} onMigrated={workspace.refresh} /> : null}
           </>

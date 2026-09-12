@@ -127,6 +127,16 @@ export async function listCards(client: SupabaseClient, deckId: string): Promise
     .order('created_at'));
 }
 
+export async function listCardsByType(client: SupabaseClient, profileId: string, cardType: string): Promise<CardRow[]> {
+  return requireData(client.from('cards')
+    .select('id,deck_id,subject_id,topic_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags')
+    .eq('profile_id', profileId)
+    .eq('card_type', cardType)
+    .is('deleted_at', null)
+    .eq('suspended', false)
+    .order('created_at'));
+}
+
 export async function saveReview(
   client: SupabaseClient,
   user: User,

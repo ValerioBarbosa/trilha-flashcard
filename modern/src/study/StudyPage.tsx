@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabase-client';
 import {
@@ -14,12 +14,14 @@ import { PageHeader } from '../shared/PageHeader';
 
 type StudyTopic = { id: string; subject_id: string; parent_id: string | null; name: string };
 type StudyDeck = { id: string; name: string; subject_id: string | null };
+export type StudyFocus = { subjectId: string; topicId: string; token: number };
 
-export function StudyPage({ user, profileId, subjects, topics, decks }: { user: User; profileId: string; subjects: Array<{ id: string; name: string }>; topics: StudyTopic[]; decks: StudyDeck[] }) {
+export function StudyPage({ user, profileId, subjects, topics, decks, focus }: { user: User; profileId: string; subjects: Array<{ id: string; name: string }>; topics: StudyTopic[]; decks: StudyDeck[]; focus?: StudyFocus | null }) {
   const firstSubjectWithDeck = subjects.find((subject) => decks.some((deck) => deck.subject_id === subject.id));
-  const [subjectId, setSubjectId] = useState(firstSubjectWithDeck?.id || 'all');
-  const [topicId, setTopicId] = useState('all');
+  const [subjectId, setSubjectId] = useState(focus?.subjectId || firstSubjectWithDeck?.id || 'all');
+  const [topicId, setTopicId] = useState(focus?.topicId || 'all');
   const [subtopicId, setSubtopicId] = useState('all');
+  const pendingFocusTopic = useRef<string | null>(null);
   const [loadedCards, setLoadedCards] = useState<CardRow[]>([]);
   const [reviewMap, setReviewMap] = useState<Map<string, LatestReview>>(new Map());
   const [errorCardIds, setErrorCardIds] = useState<Set<string>>(new Set());
@@ -58,13 +60,29 @@ export function StudyPage({ user, profileId, subjects, topics, decks }: { user: 
   }
 
   useEffect(() => {
-    setTopicId('all');
+    if (pendingFocusTopic.current) {
+      setTopicId(pendingFocusTopic.current);
+      pendingFocusTopic.current = null;
+    } else {
+      setTopicId('all');
+    }
     setSubtopicId('all');
   }, [subjectId]);
 
   useEffect(() => {
     setSubtopicId('all');
   }, [topicId]);
+
+  useEffect(() => {
+    if (!focus) return;
+    if (subjectId === focus.subjectId) {
+      setTopicId(focus.topicId);
+      setSubtopicId('all');
+    } else {
+      pendingFocusTopic.current = focus.topicId;
+      setSubjectId(focus.subjectId);
+    }
+  }, [focus?.token]);
 
   useEffect(() => {
     setSession(null);
