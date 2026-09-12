@@ -41,6 +41,7 @@ type Props = {
 
 export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyTopic }: Props) {
   const [query, setQuery] = useState('');
+  const [onlyMissing, setOnlyMissing] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [openTopics, setOpenTopics] = useState<Set<string>>(new Set());
   const [cardsByTopic, setCardsByTopic] = useState<Map<string, CardRow[]>>(new Map());
@@ -51,8 +52,14 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const [importRows, setImportRows] = useState<ImportCandidate[]>([]);
   const [importStatus, setImportStatus] = useState<string | null>(null);
   const [importBusy, setImportBusy] = useState(false);
-  const rows = useMemo(() => buildLeiSecaSubjects(subjects, topics, query), [subjects, topics, query]);
+  const baseRows = useMemo(() => buildLeiSecaSubjects(subjects, topics, query), [subjects, topics, query]);
   const allSubjects = useMemo(() => buildLeiSecaSubjects(subjects, topics, ''), [subjects, topics]);
+  const rows = useMemo(() => {
+    if (!onlyMissing) return baseRows;
+    return baseRows
+      .map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter((topic) => (cardsByTopic.get(topic.id)?.length ?? 0) === 0) }))
+      .filter((subject) => subject.rootTopics.length > 0);
+  }, [baseRows, onlyMissing, cardsByTopic]);
 
   const coverage = useMemo(() => {
     let totalTopics = 0;
@@ -174,7 +181,14 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         eyebrow="LEI SECA"
         title="Artigos por matéria e assunto"
         subtitle="Cada assunto do edital com a base legal indicada e, quando disponível, cartões para revisar o texto do artigo."
-        action={<div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar norma ou assunto" /></div>}
+        action={
+          <div className="lei-seca-header-actions">
+            <div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar norma ou assunto" /></div>
+            <button type="button" className={`missing-toggle ${onlyMissing ? 'active' : ''}`} onClick={() => setOnlyMissing((current) => !current)}>
+              {onlyMissing ? '✓ ' : ''}Só o que falta
+            </button>
+          </div>
+        }
       />
       <div className="dashboard-grid four">
         <MetricTile label="Assuntos com Lei Seca" value={`${coverage.coveredTopics}/${coverage.totalTopics}`} helper="do total de assuntos com base legal" />
@@ -184,7 +198,10 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         <MetricTile label="Cobertura geral" value={coverage.totalTopics ? `${Math.round((coverage.coveredTopics / coverage.totalTopics) * 100)}%` : '0%'} helper="dos assuntos já com texto de lei" />
       </div>
       {!rows.length ? (
-        <div className="study-empty"><strong>Nenhum artigo cadastrado ainda.</strong><span>Quando os assuntos tiverem base legal registrada, eles aparecerão aqui por matéria.</span></div>
+        <div className="study-empty">
+          <strong>{onlyMissing ? 'Tudo coberto por aqui! 🎉' : 'Nenhum artigo cadastrado ainda.'}</strong>
+          <span>{onlyMissing ? 'Todos os assuntos com base legal já têm ao menos um trecho de Lei Seca.' : 'Quando os assuntos tiverem base legal registrada, eles aparecerão aqui por matéria.'}</span>
+        </div>
       ) : (
         <div className="edital-tree">
           {rows.map((subject, index) => {
@@ -198,7 +215,12 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                   return next;
                 })}>
                   <span className="subject-index">{String(index + 1).padStart(2, '0')}</span>
-                  <span className="subject-title"><strong>{subject.name}</strong><small>{subject.rootTopics.length} assunto{subject.rootTopics.length === 1 ? '' : 's'} · {subjectCovered} com Lei Seca</small></span>
+                  <span className="subject-title">
+                    <strong>{subject.name}</strong>
+                    <small>{onlyMissing
+                      ? `${subject.rootTopics.length} assunto${subject.rootTopics.length === 1 ? '' : 's'} sem Lei Seca`
+                      : `${subject.rootTopics.length} assunto${subject.rootTopics.length === 1 ? '' : 's'} · ${subjectCovered} com Lei Seca`}</small>
+                  </span>
                   <span className="expand-icon">{open ? '−' : '+'}</span>
                 </button>
                 {open ? <div className="topic-list">{subject.rootTopics.map((topic) => {
