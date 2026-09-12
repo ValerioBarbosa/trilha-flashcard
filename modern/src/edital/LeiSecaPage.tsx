@@ -4,6 +4,7 @@ import type { DeckRow, SubjectRow, TopicRow } from '@core/features/study/domain-
 import { listCardsByType, listStudyCardTopicIds, type CardRow } from '../study/domain-repository';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { PageHeader } from '../shared/PageHeader';
+import { MetricTile } from '../shared/MetricTile';
 import { importCards, markImportDuplicates, type ImportCandidate } from '../cards/card-manager-repository';
 import { parseLeiSecaPdfImport } from '../cards/pdf-import';
 import '../cards/card-manager.css';
@@ -51,6 +52,22 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const [importStatus, setImportStatus] = useState<string | null>(null);
   const [importBusy, setImportBusy] = useState(false);
   const rows = useMemo(() => buildLeiSecaSubjects(subjects, topics, query), [subjects, topics, query]);
+  const allSubjects = useMemo(() => buildLeiSecaSubjects(subjects, topics, ''), [subjects, topics]);
+
+  const coverage = useMemo(() => {
+    let totalTopics = 0;
+    let coveredTopics = 0;
+    let totalCards = 0;
+    let subjectsCovered = 0;
+    for (const subject of allSubjects) {
+      totalTopics += subject.rootTopics.length;
+      const covered = subject.rootTopics.filter((topic) => (cardsByTopic.get(topic.id)?.length ?? 0) > 0);
+      coveredTopics += covered.length;
+      totalCards += covered.reduce((sum, topic) => sum + (cardsByTopic.get(topic.id)?.length ?? 0), 0);
+      if (covered.length > 0) subjectsCovered += 1;
+    }
+    return { totalTopics, coveredTopics, totalCards, subjectsCovered, totalSubjects: allSubjects.length };
+  }, [allSubjects, cardsByTopic]);
 
   function reloadCards() {
     return Promise.all([
@@ -141,12 +158,19 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         subtitle="Cada assunto do edital com a base legal indicada e, quando disponível, cartões para revisar o texto do artigo."
         action={<div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar norma ou assunto" /></div>}
       />
+      <div className="dashboard-grid four">
+        <MetricTile label="Assuntos com Lei Seca" value={`${coverage.coveredTopics}/${coverage.totalTopics}`} helper="do total de assuntos com base legal" />
+        <MetricTile label="Disciplinas iniciadas" value={`${coverage.subjectsCovered}/${coverage.totalSubjects}`} helper="com ao menos 1 assunto cadastrado" />
+        <MetricTile label="Cartões de Lei Seca" value={coverage.totalCards} helper="trechos importados no total" />
+        <MetricTile label="Cobertura geral" value={coverage.totalTopics ? `${Math.round((coverage.coveredTopics / coverage.totalTopics) * 100)}%` : '0%'} helper="dos assuntos já com texto de lei" />
+      </div>
       {!rows.length ? (
         <div className="study-empty"><strong>Nenhum artigo cadastrado ainda.</strong><span>Quando os assuntos tiverem base legal registrada, eles aparecerão aqui por matéria.</span></div>
       ) : (
         <div className="edital-tree">
           {rows.map((subject, index) => {
             const open = expanded.has(subject.id);
+            const subjectCovered = subject.rootTopics.filter((topic) => (cardsByTopic.get(topic.id)?.length ?? 0) > 0).length;
             return (
               <section key={subject.id} className="edital-subject">
                 <button className="edital-subject-head" onClick={() => setExpanded((current) => {
@@ -155,7 +179,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                   return next;
                 })}>
                   <span className="subject-index">{String(index + 1).padStart(2, '0')}</span>
-                  <span className="subject-title"><strong>{subject.name}</strong><small>{subject.rootTopics.length} artigo{subject.rootTopics.length === 1 ? '' : 's'}</small></span>
+                  <span className="subject-title"><strong>{subject.name}</strong><small>{subject.rootTopics.length} assunto{subject.rootTopics.length === 1 ? '' : 's'} · {subjectCovered} com Lei Seca</small></span>
                   <span className="expand-icon">{open ? '−' : '+'}</span>
                 </button>
                 {open ? <div className="topic-list">{subject.rootTopics.map((topic) => {
