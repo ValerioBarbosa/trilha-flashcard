@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { loadPerformance, type PerformanceSummary } from '@core/features/performance/performance-repository';
+import { listCardsByType, listStudyCardCountsByTopic } from '../study/domain-repository';
 import { EditalPage } from '../edital/EditalPage';
 import { LeiSecaPage } from '../edital/LeiSecaPage';
 import { JurisprudencePage } from '../jurisprudence/JurisprudencePage';
@@ -85,7 +86,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
           <div className="page-wrap"><div className="notice">Nenhum perfil de estudos disponível.</div></div>
         ) : (
           <>
-            {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} /> : null}
+            {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} onStudySubject={(subjectId) => focusStudyTopic(subjectId, 'all')} onReviewDue={startDueReview} /> : null}
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} focus={studyFocus} /> : null}
             {page === 'edital' ? <EditalPage profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} onStudyTopic={focusStudyTopic} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
@@ -103,31 +104,70 @@ function LoadingView({ seeding }: { seeding: boolean }) {
   return <div className="page-wrap loading-page"><div className="loading-orb" /><h2>{seeding ? 'Preparando seus baralhos…' : 'Carregando sua trilha…'}</h2><p>{seeding ? 'O catálogo oficial está sendo organizado no novo banco. Isso acontece apenas na primeira vez.' : 'Sincronizando estrutura e progresso.'}</p></div>;
 }
 
-function HomePage({ user, workspace, onNavigate }: { user: User; workspace: ReturnType<typeof useStudyWorkspace>; onNavigate: (page: PageId) => void }) {
+function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: {
+  user: User;
+  workspace: ReturnType<typeof useStudyWorkspace>;
+  onNavigate: (page: PageId) => void;
+  onStudySubject: (subjectId: string) => void;
+  onReviewDue: () => void;
+}) {
   const [performance, setPerformance] = useState<PerformanceSummary | null>(null);
   const [cardCount, setCardCount] = useState(0);
+  const [leiSecaCount, setLeiSecaCount] = useState(0);
+  const [editalCoveredTopics, setEditalCoveredTopics] = useState(0);
+  const [leiSecaCoveredTopics, setLeiSecaCoveredTopics] = useState(0);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     const client = getSupabaseClient();
+    const profileId = workspace.profile!.id;
+    setLoadError(null);
     void Promise.all([
-      loadPerformance(client, user, workspace.profile!.id),
-      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', workspace.profile!.id).is('deleted_at', null),
-    ]).then(([summary, cards]) => {
+      loadPerformance(client, user, profileId),
+      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).or('card_type.is.null,card_type.neq.Lei seca'),
+      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).eq('card_type', 'Lei seca'),
+      listStudyCardCountsByTopic(client, profileId),
+      listCardsByType(client, profileId, 'Lei seca'),
+    ]).then(([summary, cards, leiSeca, studyCounts, leiSecaCards]) => {
       setPerformance(summary);
       if (!cards.error) setCardCount(cards.count ?? 0);
-    }).catch(() => undefined);
+      if (!leiSeca.error) setLeiSecaCount(leiSeca.count ?? 0);
+      setEditalCoveredTopics(studyCounts.size);
+      setLeiSecaCoveredTopics(new Set(leiSecaCards.map((card) => card.topic_id).filter(Boolean)).size);
+    }).catch((cause) => setLoadError(cause instanceof Error ? cause.message : 'Não foi possível carregar os dados do painel.'));
   }, [user.id, workspace.profile?.id]);
+
+  const rootTopics = workspace.topics.filter((topic) => !topic.parent_id);
+  const leiSecaEligibleTopics = rootTopics.filter((topic) => topic.legal_basis && workspace.subjects.find((subject) => subject.id === topic.subject_id)?.name.trim().toLowerCase() !== 'português');
+  const editalPct = rootTopics.length ? Math.round((editalCoveredTopics / rootTopics.length) * 100) : 0;
+  const leiSecaPct = leiSecaEligibleTopics.length ? Math.round((leiSecaCoveredTopics / leiSecaEligibleTopics.length) * 100) : 0;
 
   const topDecks = workspace.decks.filter((deck) => deck.subject_id).slice(0, 4);
 
+  const heroAction = () => (performance?.dueNow ? onReviewDue() : onNavigate('study'));
+  const heroLabel = performance?.dueNow ? `Revisar ${performance.dueNow} vencido${performance.dueNow === 1 ? '' : 's'} →` : 'Continuar estudando →';
+
+  const focusMessage = performance?.dueNow
+    ? { title: `${performance.dueNow} cartão${performance.dueNow === 1 ? '' : 's'} vencido${performance.dueNow === 1 ? '' : 's'}.`, body: 'A revisão espaçada funciona melhor sem atraso — vale zerar a fila agora.', action: 'Revisar agora', onClick: onReviewDue }
+    : leiSecaPct < editalPct
+      ? { title: 'Lei Seca está para trás.', body: `Cobertura de Lei Seca em ${leiSecaPct}%, contra ${editalPct}% de flashcards. Bom momento pra importar mais PDFs.`, action: 'Abrir Lei Seca', onClick: () => onNavigate('lei-seca') }
+      : { title: 'Continue no Edital.', body: `${editalPct}% dos assuntos já têm flashcard. Use o Edital pra achar o que falta cadastrar.`, action: 'Abrir edital', onClick: () => onNavigate('edital') };
+
   return (
     <div className="page-wrap">
-      <PageHeader eyebrow="SEU PAINEL" title={`Bom estudo${user.user_metadata?.given_name ? `, ${user.user_metadata.given_name}` : ''}.`} subtitle={`${workspace.profile?.name} · ${workspace.profile?.board || 'Banca em acompanhamento'} · Edital ${workspace.profile?.edital_year || 'atual'}`} action={<button className="primary-action" onClick={() => onNavigate('study')}>Continuar estudando →</button>} />
-      <section className="hero-study-card"><div><span className="hero-kicker">PRÓXIMA AÇÃO</span><h2>Transforme pendências em pontos.</h2><p>Estude um baralho, responda sem revelar e registre a dificuldade. O desempenho passa a alimentar sua trilha.</p><button onClick={() => onNavigate('study')}>Iniciar sessão</button></div><div className="hero-stat"><strong>{performance?.reviewedToday ?? 0}</strong><span>revisões hoje</span></div></section>
-      <div className="dashboard-grid four"><MetricTile label="Cartões ativos" value={cardCount} helper="No perfil atual" /><MetricTile label="Precisão" value={`${performance?.accuracy ?? 0}%`} helper={`${performance?.totalReviews ?? 0} revisões`} /><MetricTile label="Disciplinas" value={workspace.subjects.length} helper="Organizadas pelo edital" /><MetricTile label="Erros abertos" value={performance?.openErrors ?? 0} helper="Para atacar na revisão" /></div>
+      <PageHeader eyebrow="SEU PAINEL" title={`Bom estudo${user.user_metadata?.given_name ? `, ${user.user_metadata.given_name}` : ''}.`} subtitle={`${workspace.profile?.name} · ${workspace.profile?.board || 'Banca em acompanhamento'} · Edital ${workspace.profile?.edital_year || 'atual'}`} action={<button className="primary-action" onClick={heroAction}>{heroLabel}</button>} />
+      {loadError ? <div className="notice error"><strong>Alguns dados não carregaram.</strong><span>{loadError}</span></div> : null}
+      <section className="hero-study-card"><div><span className="hero-kicker">PRÓXIMA AÇÃO</span><h2>Transforme pendências em pontos.</h2><p>Estude um baralho, responda sem revelar e registre a dificuldade. O desempenho passa a alimentar sua trilha.</p><button onClick={heroAction}>{performance?.dueNow ? 'Revisar vencidos' : 'Iniciar sessão'}</button></div><div className="hero-stat"><strong>{performance?.streakDays ?? 0}</strong><span>dia{performance?.streakDays === 1 ? '' : 's'} seguidos</span></div></section>
+      <div className="dashboard-grid lei-seca-metrics">
+        <MetricTile label="Flashcards" value={cardCount} helper={`${editalPct}% do edital coberto`} />
+        <MetricTile label="Trechos de Lei Seca" value={leiSecaCount} helper={`${leiSecaPct}% dos assuntos cobertos`} />
+        <MetricTile label="Precisão" value={`${performance?.accuracy ?? 0}%`} helper={`${performance?.totalReviews ?? 0} revisões`} />
+        <MetricTile label="Revisar hoje" value={performance?.dueNow ?? 0} helper="cartões vencidos" />
+        <MetricTile label="Erros abertos" value={performance?.openErrors ?? 0} helper="para atacar na revisão" />
+      </div>
       <div className="content-grid two-one">
-        <section className="panel-card"><div className="panel-heading"><div><span>BARALHOS</span><h2>Continuar por disciplina</h2></div><button className="link-button" onClick={() => onNavigate('study')}>Ver todos</button></div><div className="deck-list-clean">{topDecks.map((deck, index) => <button key={deck.id} onClick={() => onNavigate('study')}><span className="deck-number">{String(index + 1).padStart(2, '0')}</span><span className="deck-copy"><strong>{deck.name}</strong><small>{deck.is_builtin ? 'Baralho oficial' : 'Baralho personalizado'}</small></span><span className="chevron">›</span></button>)}</div></section>
-        <section className="panel-card accent-panel"><span className="panel-label">FOCO DA SEMANA</span><h2>Lei seca + revisão espaçada.</h2><p>Use o Edital para escolher o tópico e volte ao cartão para reforçar a memorização.</p><button onClick={() => onNavigate('edital')}>Abrir edital</button></section>
+        <section className="panel-card"><div className="panel-heading"><div><span>BARALHOS</span><h2>Continuar por disciplina</h2></div><button className="link-button" onClick={() => onNavigate('study')}>Ver todos</button></div><div className="deck-list-clean">{topDecks.map((deck, index) => <button key={deck.id} onClick={() => onStudySubject(deck.subject_id!)}><span className="deck-number">{String(index + 1).padStart(2, '0')}</span><span className="deck-copy"><strong>{deck.name}</strong><small>{deck.is_builtin ? 'Baralho oficial' : 'Baralho personalizado'}</small></span><span className="chevron">›</span></button>)}</div></section>
+        <section className="panel-card accent-panel"><span className="panel-label">PRÓXIMO FOCO</span><h2>{focusMessage.title}</h2><p>{focusMessage.body}</p><button onClick={focusMessage.onClick}>{focusMessage.action}</button></section>
       </div>
     </div>
   );
