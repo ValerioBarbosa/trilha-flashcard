@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import type { DeckRow, SubjectRow, TopicRow } from '@core/features/study/domain-repository';
-import { listCardsByType, type CardRow } from '../study/domain-repository';
+import { listCardsByType, listStudyCardTopicIds, type CardRow } from '../study/domain-repository';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { PageHeader } from '../shared/PageHeader';
 import { importCards, markImportDuplicates, type ImportCandidate } from '../cards/card-manager-repository';
@@ -42,8 +42,8 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [openTopics, setOpenTopics] = useState<Set<string>>(new Set());
-  const [revealedCards, setRevealedCards] = useState<Set<string>>(new Set());
   const [cardsByTopic, setCardsByTopic] = useState<Map<string, CardRow[]>>(new Map());
+  const [studyTopicIds, setStudyTopicIds] = useState<Set<string>>(new Set());
   const [importOpen, setImportOpen] = useState(false);
   const [importTopicId, setImportTopicId] = useState('');
   const [importLawLabel, setImportLawLabel] = useState('');
@@ -53,7 +53,10 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const rows = useMemo(() => buildLeiSecaSubjects(subjects, topics, query), [subjects, topics, query]);
 
   function reloadCards() {
-    return listCardsByType(getSupabaseClient(), profileId, 'Lei seca').then((cards) => {
+    return Promise.all([
+      listCardsByType(getSupabaseClient(), profileId, 'Lei seca'),
+      listStudyCardTopicIds(getSupabaseClient(), profileId),
+    ]).then(([cards, topicIds]) => {
       const grouped = new Map<string, CardRow[]>();
       for (const card of cards) {
         if (!card.topic_id) continue;
@@ -62,6 +65,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         grouped.set(card.topic_id, bucket);
       }
       setCardsByTopic(grouped);
+      setStudyTopicIds(topicIds);
     });
   }
 
@@ -129,14 +133,6 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
     });
   }
 
-  function toggleReveal(cardId: string) {
-    setRevealedCards((current) => {
-      const next = new Set(current);
-      next.has(cardId) ? next.delete(cardId) : next.add(cardId);
-      return next;
-    });
-  }
-
   return (
     <div className="page-wrap">
       <PageHeader
@@ -174,18 +170,18 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                       </div>
                       <div className="topic-actions">
                         {topicCards.length ? (
-                          <button className="link-button" onClick={() => toggleTopicCards(topic.id)}>{cardsOpen ? 'Ocultar' : 'Ver'} {topicCards.length} cartão{topicCards.length === 1 ? '' : 'es'}</button>
+                          <button className="link-button" onClick={() => toggleTopicCards(topic.id)}>{cardsOpen ? 'Ocultar leitura' : 'Ler'} {topicCards.length} trecho{topicCards.length === 1 ? '' : 's'}</button>
                         ) : null}
-                        {topicCards.length ? (
+                        {studyTopicIds.has(topic.id) ? (
                           <button className="link-button" onClick={() => onStudyTopic(subject.id, topic.id)}>Estudar este assunto →</button>
                         ) : null}
                         <button className="link-button" onClick={() => openImport(topic.id)}>Importar cartões (PDF) →</button>
                       </div>
-                      {cardsOpen ? <div className="topic-cards">{topicCards.map((card) => (
-                        <div key={card.id} className="topic-card-item">
-                          <button onClick={() => toggleReveal(card.id)}>{card.front}</button>
-                          {revealedCards.has(card.id) ? <div className="card-answer-inline"><p>{card.back}</p>{card.legal_basis ? <small>Base legal: {card.legal_basis}</small> : null}</div> : null}
-                        </div>
+                      {cardsOpen ? <div className="topic-cards topic-reading">{topicCards.map((card) => (
+                        <article key={card.id} className="topic-reading-item">
+                          <h3>{card.front}</h3>
+                          <p>{card.back}</p>
+                        </article>
                       ))}</div> : null}
                     </div>
                   );

@@ -138,6 +138,18 @@ export async function listCardsByType(client: SupabaseClient, profileId: string,
     .order('created_at'));
 }
 
+export async function listStudyCardTopicIds(client: SupabaseClient, profileId: string): Promise<Set<string>> {
+  const { data, error } = await client.from('cards')
+    .select('topic_id')
+    .eq('profile_id', profileId)
+    .is('deleted_at', null)
+    .eq('suspended', false)
+    .or('card_type.is.null,card_type.neq.Lei seca')
+    .not('topic_id', 'is', null);
+  if (error) throw error;
+  return new Set((data || []).map((row: { topic_id: string | null }) => row.topic_id).filter((id): id is string => Boolean(id)));
+}
+
 export async function saveReview(
   client: SupabaseClient,
   user: User,
