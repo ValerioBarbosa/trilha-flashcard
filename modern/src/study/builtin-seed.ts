@@ -34,6 +34,7 @@ const COMPLETE_DECK_TITLES: Record<string, string> = {
 };
 
 async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return [];
   const chunks = await Promise.all(COMPLETE_CATALOG_PARTS.map(async (path) => {
     const response = await fetch(new URL(path, document.baseURI));
     if (!response.ok) throw new Error(`builtin-catalog-fetch-failed:${path}:${response.status}`);
