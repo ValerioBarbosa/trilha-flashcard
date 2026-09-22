@@ -14,8 +14,22 @@ import {
   type TopicRow,
 } from './domain-repository';
 
+const BUILTIN_CATALOG_VERSION = 'trt4-ajaj-v3-1077-2026-09-22';
+
 function activeProfileKey(userId: string): string {
   return `trilha-active-profile:${userId}`;
+}
+
+function builtinCatalogVersionKey(userId: string, profileId: string): string {
+  return `trilha-builtin-catalog-version:${userId}:${profileId}`;
+}
+
+function readBuiltinCatalogVersion(userId: string, profileId: string): string | null {
+  try { return window.localStorage.getItem(builtinCatalogVersionKey(userId, profileId)); } catch { return null; }
+}
+
+function storeBuiltinCatalogVersion(userId: string, profileId: string): void {
+  try { window.localStorage.setItem(builtinCatalogVersionKey(userId, profileId), BUILTIN_CATALOG_VERSION); } catch { /* localStorage indisponível */ }
 }
 
 function readStoredProfileId(userId: string): string | null {
@@ -66,9 +80,11 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
         .eq('is_builtin', true);
       if (countError) throw countError;
 
-      if (resolvedProfile.is_builtin && (count ?? 0) === 0) {
+      const catalogOutdated = readBuiltinCatalogVersion(user.id, resolvedProfile.id) !== BUILTIN_CATALOG_VERSION;
+      if (resolvedProfile.is_builtin && ((count ?? 0) === 0 || catalogOutdated)) {
         setSeeding(true);
         await seedBuiltinStudyCatalog(client, user, resolvedProfile.id);
+        storeBuiltinCatalogVersion(user.id, resolvedProfile.id);
         setSeeding(false);
       }
 

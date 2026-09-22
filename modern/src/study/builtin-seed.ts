@@ -9,6 +9,83 @@ type LegacyCard = Record<string, unknown> & {
 type LegacyDeck = { id: string; title: string; sourceNote?: string; topics?: string[]; cards?: LegacyCard[] };
 export type BuiltinSeedReport = { decks: number; cards: number; topics: number; duplicatesSkipped: number };
 
+type CompleteCatalogCard = {
+  id: string; discipline: string; disciplineName?: string; topic?: string; subtopic?: string;
+  legalBasis?: string; type?: string; priority?: string; difficulty?: string;
+  front: string; back: string; complement?: string; trap?: string; mnemonic?: string;
+  tags?: string[]; level?: string; sourceLayer?: string;
+};
+type CompleteCatalogFile = { cards: CompleteCatalogCard[] };
+
+const COMPLETE_CATALOG_PARTS = Array.from({ length: 6 }, (_, index) =>
+  `data/trt4-ajaj-v3-1077/part-${String(index + 1).padStart(2, '0')}.txt`
+);
+
+const COMPLETE_DECK_TITLES: Record<string, string> = {
+  'labor-procedure': 'Direito Processual do Trabalho · 17,8%',
+  portuguese: 'Português · 16,7%',
+  administrative: 'Direito Administrativo · 16,7%',
+  'labor-law': 'Direito do Trabalho · 15,6%',
+  constitutional: 'Direito Constitucional · 11,1%',
+  'civil-procedure': 'Direito Processual Civil · 11,1%',
+  'math-logic': 'Matemática + RLM · 5,6%',
+  'trt-legislation': 'Regimento/Legislação TRT · 3,3%',
+  'lgpd-digital': 'LGPD e Direito Digital · 2,2%',
+};
+
+async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return [];
+  const chunks = await Promise.all(COMPLETE_CATALOG_PARTS.map(async (path) => {
+    const response = await fetch(new URL(path, document.baseURI));
+    if (!response.ok) throw new Error(`builtin-catalog-fetch-failed:${path}:${response.status}`);
+    return response.text();
+  }));
+  const parsed = JSON.parse(chunks.join('\n')) as CompleteCatalogFile;
+  const groups = new Map<string, LegacyDeck>();
+
+  for (const card of parsed.cards || []) {
+    const deckId = card.discipline;
+    if (!deckId) continue;
+    let deck = groups.get(deckId);
+    if (!deck) {
+      deck = {
+        id: deckId,
+        title: COMPLETE_DECK_TITLES[deckId] || card.disciplineName || deckId,
+        sourceNote: 'Edital Verticalizado TRT-4 AJAJ 2026 V3 · catálogo completo 1.077 cartões',
+        topics: [],
+        cards: [],
+      };
+      groups.set(deckId, deck);
+    }
+    if (card.topic && !deck.topics!.includes(card.topic)) deck.topics!.push(card.topic);
+    deck.cards!.push({
+      id: card.id,
+      front: card.front,
+      back: card.back,
+      topic: card.topic,
+      subtopic: card.subtopic,
+      legalBasis: card.legalBasis,
+      type: card.type,
+      priority: card.priority,
+      difficulty: card.difficulty,
+      tags: card.tags,
+      complement: card.complement,
+      pitfall: card.trap,
+      mnemonic: card.mnemonic,
+      example: [card.level, card.sourceLayer].filter(Boolean).join(' · '),
+    });
+  }
+  return [...groups.values()];
+}
+
+function mergeLegacyDecks(baseDecks: LegacyDeck[], completeDecks: LegacyDeck[]): LegacyDeck[] {
+  const completeById = new Map(completeDecks.map((deck) => [deck.id, deck]));
+  const merged = baseDecks.map((deck) => completeById.get(deck.id) || deck);
+  const existing = new Set(merged.map((deck) => deck.id));
+  for (const deck of completeDecks) if (!existing.has(deck.id)) merged.push(deck);
+  return merged;
+}
+
 function stableHash(value: string): string { let hash = 2166136261; for (let i = 0; i < value.length; i += 1) { hash ^= value.charCodeAt(i); hash = Math.imul(hash, 16777619); } return (hash >>> 0).toString(36); }
 function slugify(value: string): string { const normalized = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 100); return normalized || `item-${stableHash(value)}`; }
 function subjectName(deck: LegacyDeck): string { const title = deck.title?.trim() || deck.id; return title.split('·')[0]?.trim() || title; }
@@ -54,7 +131,8 @@ async function upsertCards(client: SupabaseClient, user: User, profileId: string
 }
 
 export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User, profileId: string): Promise<BuiltinSeedReport> {
-  const decks = legacyDecks as LegacyDeck[];
+  const completeDecks = await loadCompleteCatalogDecks();
+  const decks = mergeLegacyDecks(legacyDecks as LegacyDeck[], completeDecks);
   const { data: existing, error: existingError } = await client.from('cards').select('subject_id,front,back').eq('profile_id', profileId).is('deleted_at', null); if (existingError) throw existingError;
   const seen = new Set<string>((existing || []).map((row:any) => contentKey(row.subject_id, row.front, row.back)));
   let seededDecks=0, cards=0, topics=0, duplicatesSkipped=0, order=0;
