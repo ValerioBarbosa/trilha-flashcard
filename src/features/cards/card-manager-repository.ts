@@ -73,14 +73,14 @@ export async function createCard(client: SupabaseClient, user: User, profileId: 
   return data as ManagedCard;
 }
 
-export async function updateCard(client: SupabaseClient, cardId: string, draft: CardDraft): Promise<void> {
+export async function updateCard(client: SupabaseClient, profileId: string, cardId: string, draft: CardDraft): Promise<void> {
   const front = draft.front.trim();
   const back = draft.back.trim();
   if (!draft.subjectId?.trim()) throw new Error('card-subject-required');
   if (!draft.deckId?.trim()) throw new Error('card-deck-required');
   if (!front) throw new Error('card-front-required');
   if (!back) throw new Error('card-back-required');
-  if (await findDuplicateContent(client, '', draft.subjectId, front, back, cardId)) throw new Error('card-duplicate');
+  if (await findDuplicateContent(client, profileId, draft.subjectId, front, back, cardId)) throw new Error('card-duplicate');
 
   const { error } = await client.from('cards').update({
     deck_id: draft.deckId,
