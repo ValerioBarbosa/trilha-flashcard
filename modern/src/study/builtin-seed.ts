@@ -301,6 +301,7 @@ async function upsertCards(
 ) {
   const rows:any[] = [];
   const reconcileRows:any[] = [];
+  const releaseLegacyIds = new Set<string>();
   let skipped = 0;
 
   for (const card of deck.cards || []) {
@@ -334,9 +335,12 @@ async function upsertCards(
       suspended:false,
     };
 
-    const existingBuiltin = canonical
-      ? existingBuiltinByContent.get(key) || existingBuiltinByLegacyId.get(legacyId)
-      : existingBuiltinByContent.get(key);
+    const contentMatch = existingBuiltinByContent.get(key);
+    const legacyMatch = canonical ? existingBuiltinByLegacyId.get(legacyId) : undefined;
+    const existingBuiltin = canonical ? contentMatch || legacyMatch : contentMatch;
+    if (canonical && contentMatch && legacyMatch && contentMatch.id !== legacyMatch.id) {
+      releaseLegacyIds.add(legacyMatch.id);
+    }
     if (canonical && existingBuiltin) {
       reconcileRows.push({ id: existingBuiltin.id, ...row });
       seen.add(key);
@@ -349,6 +353,14 @@ async function upsertCards(
     }
     seen.add(key);
     rows.push(row);
+  }
+
+  const releaseIds = [...releaseLegacyIds];
+  for (let start=0; start<releaseIds.length; start+=100) {
+    const { error } = await client.from('cards')
+      .update({ legacy_id: null })
+      .in('id', releaseIds.slice(start,start+100));
+    if (error) throw error;
   }
 
   for (let start=0; start<reconcileRows.length; start+=100) {
