@@ -422,3 +422,104 @@ button:disabled { cursor: not-allowed; opacity: .5; }
   .home-bottom-grid .panel-card { padding: 17px; }
   .home-focus-panel { min-height: 190px; }
 }
+
+
+/* Edital command center */
+.edital-command-page { padding-top: 34px; }
+.edital-command-actions { display: flex; gap: 10px; align-items: center; }
+.edital-overview {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 18px;
+  align-items: end;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  margin-bottom: 16px;
+}
+.edital-overview-copy h2 { margin: 6px 0 5px; font-size: 24px; letter-spacing: -.03em; }
+.edital-overview-copy p { margin: 0; color: var(--muted); line-height: 1.5; max-width: 760px; }
+.edital-overview > strong { font-size: 34px; color: var(--green); letter-spacing: -.04em; }
+.edital-progress-track { grid-column: 1/-1; height: 10px; border-radius: 999px; overflow: hidden; background: var(--surface-soft); }
+.edital-progress-track span { display: block; height: 100%; border-radius: inherit; background: var(--green); }
+.edital-command-metrics { grid-template-columns: repeat(4,minmax(0,1fr)); margin-bottom: 16px; }
+
+.edital-filter-bar {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  align-items: center;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  margin-bottom: 14px;
+}
+.edital-filter-bar > div { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.edital-filter-bar > div > span { color: var(--muted); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
+.filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-pills button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.filter-pills button.active { border-color: var(--green); background: var(--green); color: #fff; }
+
+.edital-command-subject-head { align-items: center; }
+.subject-progress-track { display: block; width: min(280px,100%); height: 5px; border-radius: 999px; overflow: hidden; background: var(--surface-soft); margin-top: 7px; }
+.subject-progress-track i { display: block; height: 100%; border-radius: inherit; background: var(--green); }
+.edital-command-topics { padding: 14px 18px 18px 74px; display: grid; gap: 10px; }
+.edital-topic-card {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface-soft);
+}
+.edital-topic-title-row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+.edital-topic-card h3 { margin: 8px 0 6px; font-size: 16px; }
+.edital-topic-card p { margin: 0 0 8px; color: var(--muted); line-height: 1.5; }
+.edital-topic-card small { color: var(--muted-2); line-height: 1.5; }
+.edital-topic-meta { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 11px; color: var(--muted); font-size: 11px; }
+.edital-topic-meta strong { color: var(--ink); }
+.edital-topic-meta .available { color: var(--green); font-weight: 800; }
+.edital-topic-actions { display: flex; flex-direction: column; min-width: 118px; gap: 8px; justify-content: center; }
+.edital-topic-actions button { width: 100%; }
+.edital-status-pill { border-radius: 999px; padding: 5px 8px; font-size: 10px; font-weight: 900; }
+.status-not-started { background: var(--surface); color: var(--muted); border: 1px solid var(--line); }
+.status-studying { background: var(--info-soft); color: var(--info); }
+.status-reviewed { background: var(--warning-soft); color: var(--warning); }
+.status-mastered { background: var(--green-soft); color: var(--green); }
+
+@media (max-width: 900px) {
+  .edital-command-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .edital-filter-bar { grid-template-columns: 1fr; }
+  .edital-topic-card { grid-template-columns: 1fr; }
+  .edital-topic-actions { flex-direction: row; min-width: 0; }
+  .edital-topic-actions button { width: auto; flex: 1; }
+}
+
+@media (max-width: 560px) {
+  .edital-command-page { width: min(100% - 24px,1240px); padding-top: 18px; }
+  .edital-overview { padding: 16px; grid-template-columns: 1fr auto; border-radius: 17px; }
+  .edital-overview-copy h2 { font-size: 19px; }
+  .edital-overview-copy p { font-size: 12px; }
+  .edital-overview > strong { font-size: 26px; }
+  .edital-command-metrics { gap: 10px; }
+  .edital-filter-bar { padding: 12px; gap: 12px; }
+  .status-filter-pills { gap: 5px; }
+  .filter-pills button { font-size: 10px; padding: 6px 8px; }
+  .edital-command-topics { padding: 10px 12px 14px; }
+  .edital-topic-card { padding: 13px; gap: 12px; }
+  .edital-topic-card h3 { font-size: 15px; }
+  .edital-topic-card p, .edital-topic-card small { font-size: 11px; }
+  .edital-topic-actions { flex-direction: row; }
+  .edital-topic-actions button { padding: 9px 8px; font-size: 11px; }
+}
