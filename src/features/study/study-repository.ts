@@ -21,7 +21,7 @@ const DEFAULT_PROFILE = {
   slug: 'trt4-ajaj',
   name: 'TRT-4 · AJAJ',
   role: 'Analista Judiciário · Área Judiciária',
-  board: 'FCC',
+  board: 'FCC (base histórica)',
   edital_year: '2026',
   is_builtin: true,
 };
@@ -48,7 +48,20 @@ export async function ensureDefaultProfile(client: SupabaseClient, user: User): 
     .maybeSingle();
 
   if (readError) throw readError;
-  if (existing) return existing as StudyProfile;
+  if (existing) {
+    const current = existing as StudyProfile;
+    if (current.is_builtin && current.board !== DEFAULT_PROFILE.board) {
+      const { data: updated, error: updateError } = await client
+        .from('study_profiles')
+        .update({ board: DEFAULT_PROFILE.board, role: DEFAULT_PROFILE.role, edital_year: DEFAULT_PROFILE.edital_year })
+        .eq('id', current.id)
+        .select(PROFILE_COLUMNS)
+        .single();
+      if (updateError) throw updateError;
+      return updated as StudyProfile;
+    }
+    return current;
+  }
 
   const { data, error } = await client
     .from('study_profiles')
