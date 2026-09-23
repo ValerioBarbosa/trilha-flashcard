@@ -170,7 +170,7 @@ export function parseJsonImport(
   };
 
   return rows.map((row: any, index: number) => {
-    const subject = lookup(row.subjectId || row.disciplineId || row.discipline || row.disciplineName, defaults.subjects || []);
+    const subject = lookup(row.subjectId || row.disciplineId || row.disciplineName || row.discipline, defaults.subjects || []);
     const subjectId = subject?.id || String(row.subjectId || row.disciplineId || defaults.subjectId);
     const availableDecks = (defaults.decks || []).filter((deck) => !subjectId || deck.subject_id === subjectId);
     const deck = lookup(row.deckId || row.deck || row.baralho, availableDecks);
@@ -179,7 +179,7 @@ export function parseJsonImport(
 
     return {
     row: index + 1,
-    deckId: deck?.id || String(row.deckId || defaults.deckId),
+    deckId: deck?.id || availableDecks[0]?.id || String(row.deckId || defaults.deckId),
     subjectId,
     topicId: topic?.id || row.topicId || null,
     front: String(row.front || row.pergunta || row.question || '').trim(),
