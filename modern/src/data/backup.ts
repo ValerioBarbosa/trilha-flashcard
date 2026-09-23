@@ -17,19 +17,28 @@ export type RestoreReport = {
   topics: number;
   decks: number;
   cards: number;
+  reviews: number;
+  errors: number;
 };
 
 const SUBJECT_COLUMNS = 'id,name,slug,weight,priority,sort_order';
 const TOPIC_COLUMNS = 'id,subject_id,parent_id,name,slug,edital_text,legal_basis,priority,sort_order';
 const DECK_COLUMNS = 'id,subject_id,name,slug,description,source,is_builtin,is_archived';
-const CARD_COLUMNS = 'id,deck_id,subject_id,topic_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags,suspended';
-const REVIEW_COLUMNS = 'card_id,rating,response_ms,interval_days,due_at,reviewed_at,algorithm';
-const ERROR_COLUMNS = 'subject_id,topic_id,card_id,kind,title,note,correction,legal_basis,resolved,resolved_at';
+const CARD_COLUMNS = 'id,deck_id,subject_id,topic_id,legacy_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags,source,source_page,read_at,suspended,deleted_at';
+const REVIEW_COLUMNS = 'id,card_id,rating,response_ms,interval_days,due_at,reviewed_at,algorithm';
+const ERROR_COLUMNS = 'id,subject_id,topic_id,card_id,kind,title,note,correction,legal_basis,resolved,resolved_at';
+const PAGE_SIZE = 1000;
 
 async function fetchAll(client: SupabaseClient, table: string, columns: string, profileId: string): Promise<Array<Record<string, unknown>>> {
-  const { data, error } = await client.from(table).select(columns).eq('profile_id', profileId);
-  if (error) throw error;
-  return (data ?? []) as unknown as Array<Record<string, unknown>>;
+  const rows: Array<Record<string, unknown>> = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await client.from(table).select(columns).eq('profile_id', profileId).range(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    const page = (data ?? []) as unknown as Array<Record<string, unknown>>;
+    rows.push(...page);
+    if (page.length < PAGE_SIZE) break;
+  }
+  return rows;
 }
 
 export async function exportBackup(
@@ -37,9 +46,7 @@ export async function exportBackup(
   profile: { id: string; name: string; slug: string },
 ): Promise<BackupPayload> {
   async function fetchCards() {
-    const { data, error } = await client.from('cards').select(CARD_COLUMNS).eq('profile_id', profile.id).is('deleted_at', null);
-    if (error) throw error;
-    return (data ?? []) as unknown as Array<Record<string, unknown>>;
+    return fetchAll(client, 'cards', CARD_COLUMNS, profile.id);
   }
 
   const [subjects, topics, decks, cardsRaw, reviews, errors] = await Promise.all([
@@ -105,10 +112,30 @@ export async function restoreBackup(
     return rows.length;
   }
 
+  async function restoreHistory(table: 'reviews' | 'error_notebook', rows: Array<Record<string, unknown>>) {
+    if (!rows.length) return 0;
+    const prepared = rows.map((row) => ({ ...row, user_id: user.id, profile_id: profileId }));
+    const hasStableIds = prepared.every((row) => typeof row.id === 'string' && row.id);
+    if (!hasStableIds) {
+      const { error: deleteError } = await client.from(table).delete().eq('profile_id', profileId);
+      if (deleteError) throw deleteError;
+    }
+    for (let start = 0; start < prepared.length; start += 200) {
+      const batch = prepared.slice(start, start + 200);
+      const response = hasStableIds
+        ? await client.from(table).upsert(batch, { onConflict: 'id' })
+        : await client.from(table).insert(batch.map(({ id: _id, ...row }) => row));
+      if (response.error) throw response.error;
+    }
+    return rows.length;
+  }
+
   const subjects = await upsertAll('subjects', payload.subjects);
   const topics = await upsertAll('topics', payload.topics);
   const decks = await upsertAll('decks', payload.decks);
   const cards = await upsertAll('cards', payload.cards);
+  const reviews = await restoreHistory('reviews', payload.reviews || []);
+  const errors = await restoreHistory('error_notebook', payload.errors || []);
 
-  return { subjects, topics, decks, cards };
+  return { subjects, topics, decks, cards, reviews, errors };
 }
