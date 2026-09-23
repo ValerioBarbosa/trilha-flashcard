@@ -227,7 +227,20 @@ function subjectWeight(deck: LegacyDeck): number | null {
   const value = Number(match[1].replace(',', '.'));
   return Number.isFinite(value) ? value : null;
 }
-function contentKey(subjectId: string | null, front: string, back: string): string { return `${subjectId || ''}|${front.trim().toLowerCase()}|${back.trim().toLowerCase()}`; }
+const PAGE_SIZE = 1000;
+async function requirePaged<T>(queryPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: any }>): Promise<T[]> {
+  const rows: T[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await queryPage(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    const page = data || [];
+    rows.push(...page);
+    if (page.length < PAGE_SIZE) break;
+  }
+  return rows;
+}
+function normalizeContent(value: string): string { return value.normalize('NFKC').replace(/\s+/g, ' ').trim().toLocaleLowerCase('pt-BR'); }
+function contentKey(subjectId: string | null, front: string, back: string): string { return `${subjectId || ''}|${normalizeContent(front)}|${normalizeContent(back)}`; }
 function normalizedPriority(value: unknown): 'A'|'B'|'C'|null { const v = typeof value === 'string' ? value.trim().toUpperCase() : ''; return v === 'A' || v === 'B' || v === 'C' ? v : null; }
 function normalizedDifficulty(value: unknown): 'easy'|'medium'|'hard'|null { const v = typeof value === 'string' ? value.trim().toLowerCase() : ''; if (['easy','facil','fácil'].includes(v)) return 'easy'; if (['medium','medio','médio'].includes(v)) return 'medium'; if (['hard','dificil','difícil'].includes(v)) return 'hard'; return null; }
 function tagsFor(card: LegacyCard): string[] { const values = new Set<string>(); if (Array.isArray(card.tags)) card.tags.forEach((tag) => tag && values.add(String(tag).trim())); if (card.tag?.trim()) values.add(card.tag.trim()); if (card.subtopic?.trim()) values.add(card.subtopic.trim()); return [...values].filter(Boolean); }
@@ -249,7 +262,8 @@ async function ensureTopics(client: SupabaseClient, user: User, profileId: strin
 
   const rows = [...names].map((name,index) => {
     const topicCards = (deck.cards || []).filter((card) => card.topic?.trim() === name);
-    const baseCard = topicCards.find((card) => card.subtopic?.trim() === 'Base legal e referência')
+    const baseCard = topicCards.find((card) => card.example?.includes('Camada 3 - Fechamento do edital'))
+      || topicCards.find((card) => card.subtopic?.trim() === 'Base legal e referência')
       || topicCards.find((card) => Array.isArray(card.tags) && card.tags.includes('Nível 1 - Matriz verticalizada'))
       || topicCards[0];
     const focusCard = topicCards.find((card) => card.subtopic?.trim() === 'Núcleo de cobrança');
@@ -354,17 +368,20 @@ export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User
   const currentBuiltinLegacyIds = new Set(
     decks.flatMap((deck) => (deck.cards || []).map((card) => card.id?.trim()).filter((id): id is string => Boolean(id)))
   );
-  const [{ data: existingDecks, error: deckReadError }, { data: existing, error: existingError }] = await Promise.all([
+  const [{ data: existingDecks, error: deckReadError }, existing] = await Promise.all([
     client.from('decks').select('id,is_builtin').eq('profile_id', profileId),
-    client.from('cards').select('id,deck_id,legacy_id,subject_id,front,back').eq('profile_id', profileId).is('deleted_at', null),
+    requirePaged<ExistingBuiltinCard>((from, to) => client.from('cards')
+      .select('id,deck_id,legacy_id,subject_id,front,back')
+      .eq('profile_id', profileId)
+      .is('deleted_at', null)
+      .range(from, to)),
   ]);
   if (deckReadError) throw deckReadError;
-  if (existingError) throw existingError;
   const builtinDeckIds = new Set((existingDecks || []).filter((row:any) => row.is_builtin).map((row:any) => row.id));
-  const seen = new Set<string>((existing || []).map((row:any) => contentKey(row.subject_id, row.front, row.back)));
+  const seen = new Set<string>(existing.map((row:any) => contentKey(row.subject_id, row.front, row.back)));
   const existingBuiltinByContent = new Map<string, ExistingBuiltinCard>();
   const existingBuiltinByLegacyId = new Map<string, ExistingBuiltinCard>();
-  for (const row of (existing || []) as ExistingBuiltinCard[]) {
+  for (const row of existing) {
     if (!builtinDeckIds.has(row.deck_id)) continue;
     existingBuiltinByContent.set(contentKey(row.subject_id, row.front, row.back), row);
     if (row.legacy_id) existingBuiltinByLegacyId.set(row.legacy_id, row);
@@ -382,7 +399,7 @@ export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User
     reconciled += result.reconciled;
     duplicatesSkipped += result.skipped;
   }
-  const staleBuiltinIds = ((existing || []) as ExistingBuiltinCard[])
+  const staleBuiltinIds = existing
     .filter((row) => builtinDeckIds.has(row.deck_id))
     .filter((row) => Boolean(row.legacy_id?.startsWith('card-trt4-')))
     .filter((row) => !currentBuiltinLegacyIds.has(row.legacy_id!))
