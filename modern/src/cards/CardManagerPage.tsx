@@ -113,7 +113,7 @@ export function CardManagerPage({ user, profileId, subjects, topics, decks, onCh
     if (!form.front.trim() || !form.back.trim()) return setMessage('Pergunta e resposta são obrigatórias.');
     const draft: CardDraft = { ...form, tags: form.tagsText.split(',').map((tag) => tag.trim()).filter(Boolean) };
     try {
-      if (form.id) await updateCard(getSupabaseClient(), form.id, draft);
+      if (form.id) await updateCard(getSupabaseClient(), profileId, form.id, draft);
       else await createCard(getSupabaseClient(), user, profileId, draft);
       setEditorOpen(false);
       await refresh();
