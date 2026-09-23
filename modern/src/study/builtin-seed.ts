@@ -31,7 +31,128 @@ const COMPLETE_DECK_TITLES: Record<string, string> = {
   'math-logic': 'Matemática + RLM · 5,6%',
   'trt-legislation': 'Regimento/Legislação TRT · 3,3%',
   'lgpd-digital': 'LGPD e Direito Digital · 2,2%',
+  'study-case': 'Estudo de Caso Jurídico',
 };
+
+
+const LAYER4_JURISPRUDENCE: Array<[string,string,string,string]> = [
+  ['TST Súmulas 6, 51 e 85','Equiparação salarial; regulamento empresarial; compensação de jornada','labor-law','Direito do Trabalho'],
+  ['TST Súmulas 100, 128 e 245','Ação rescisória; depósito recursal; prazo do depósito','labor-procedure','Direito Processual do Trabalho'],
+  ['TST Súmulas 214 e 414','Decisões interlocutórias; mandado de segurança; tutela','labor-procedure','Direito Processual do Trabalho'],
+  ['TST Súmulas 331 e 338','Terceirização e responsabilidade; controles de jornada','labor-law','Direito do Trabalho'],
+  ['TST Súmulas 422, 425 e 463','Dialeticidade; jus postulandi; justiça gratuita','labor-procedure','Direito Processual do Trabalho'],
+  ['STF Súmula Vinculante 10','Reserva de plenário','constitutional','Direito Constitucional'],
+  ['STF ADPF 324 + RE 958.252','Terceirização e divisão do trabalho','labor-law','Direito do Trabalho'],
+  ['STF ADI 5.766','Justiça gratuita, honorários e acesso à Justiça','labor-procedure','Direito Processual do Trabalho'],
+  ['STF ADC 58/59','Atualização dos créditos trabalhistas','labor-procedure','Direito Processual do Trabalho'],
+  ['STF Tema 1.046','Validade da negociação coletiva limitadora de direitos','labor-law','Direito do Trabalho'],
+];
+
+const LAYER4_STUDY_CASE: Array<[string,string,string]> = [
+  ['Leitura do caso','Na primeira leitura do Estudo de Caso, quais elementos devem ser identificados?','Sujeitos, fatos, pedido, controvérsia e limite da resposta; destaque verbos de comando e dados juridicamente relevantes.'],
+  ['Problema jurídico','Como formular o problema jurídico central?','Em uma frase objetiva, delimitando exatamente a controvérsia apresentada, sem responder problema diferente do enunciado.'],
+  ['Regra aplicável','O que deve aparecer na etapa de fundamentação do Estudo de Caso?','Constituição, CLT, CPC, lei especial e jurisprudência aplicáveis, com fundamento específico e sem inventar artigo.'],
+  ['Aplicação','O que diferencia aplicação de mera citação de norma?','Confrontar cada fato juridicamente relevante com a regra e explicar por que essa regra conduz à solução.'],
+  ['Conclusão','Como deve ser a conclusão do Estudo de Caso?','Direta, completa e coerente, respondendo cada comando do enunciado e retomando os pontos solicitados.'],
+  ['Revisão final','O que conferir nos minutos finais do Estudo de Caso?','Competência, cabimento, prazo, legitimidade, efeitos, conclusão e correção formal.'],
+  ['Processo do Trabalho','Quais eixos devem ser priorizados em Estudos de Caso de Processo do Trabalho?','Competência, recursos, execução, tutela provisória, provas e precedentes.'],
+  ['Direito do Trabalho','Quais eixos devem ser priorizados em Estudos de Caso de Direito do Trabalho?','Vínculo, jornada, remuneração, estabilidade, rescisão e responsabilidade.'],
+  ['Direito Constitucional','Quais eixos devem ser priorizados em Estudos de Caso de Direito Constitucional?','Direitos fundamentais, Administração Pública e organização da Justiça do Trabalho.'],
+  ['Direito Administrativo','Quais eixos devem ser priorizados em Estudos de Caso de Direito Administrativo?','Servidor público, processo administrativo, responsabilidade, improbidade e licitações.'],
+  ['Direito Processual Civil','Quais eixos devem ser priorizados em Estudos de Caso de Processo Civil?','Competência, sujeitos, atos, provas, recursos, execução e aplicação subsidiária.'],
+  ['Comando da questão','Por que os verbos de comando devem ser marcados antes de escrever?','Porque eles delimitam exatamente o que deve ser respondido e evitam desenvolvimento correto, mas fora do pedido.'],
+  ['Fatos relevantes','Todo fato narrado precisa aparecer na resposta?','Não. Devem ser selecionados os fatos juridicamente relevantes para a controvérsia e para os comandos da questão.'],
+  ['Fundamento específico','É suficiente escrever “conforme a legislação vigente”?','Não. O protocolo exige fundamento específico e localizado; evite referência vaga e não invente artigo.'],
+  ['Regra e exceção','Ao identificar uma regra jurídica, qual verificação vem logo depois?','Verificar requisitos, exceções e consequências aplicáveis aos fatos do caso.'],
+  ['Competência','Por que competência deve entrar no checklist final?','Porque uma solução materialmente correta pode estar incompleta se o órgão competente ou a via adequada forem ignorados.'],
+  ['Cabimento','O que verificar sobre cabimento antes de concluir?','Se o instrumento, ação, recurso ou medida escolhida é juridicamente adequada à hipótese apresentada.'],
+  ['Prazo','Como tratar prazo no Estudo de Caso?','Identifique o prazo aplicável, seu marco inicial e eventual regra especial relevante ao caso.'],
+  ['Legitimidade','O que deve ser conferido sobre legitimidade?','Quem pode propor, recorrer, requerer ou figurar no polo pertinente segundo o instituto cobrado.'],
+  ['Efeitos','Por que os efeitos jurídicos devem ser explicitados?','Porque a conclusão deve indicar não apenas se a medida é cabível, mas também a consequência jurídica da solução.'],
+  ['Estrutura enxuta','Qual é o modelo enxuto recomendado para organizar a resposta?','Questão jurídica → fundamento → aplicação aos fatos → conclusão objetiva para cada comando.'],
+  ['Tempo','Qual regra de gestão da prova consta no material-base?','Resolver primeiro as questões seguras, marcar as demoradas e preservar cerca de 55 a 65 minutos para a parte escrita/transcrição.'],
+  ['Reescrita','O que fazer com um Estudo de Caso que fique abaixo da meta?','Identificar falhas de fundamento, estrutura e aplicação e reescrever a resposta.'],
+  ['Meta base','Qual é a meta escrita da fase Base?','Produzir estrutura completa e localizar corretamente o fundamento.'],
+  ['Meta consolidação','Qual é a meta escrita da fase de Consolidação?','Entregar resposta completa dentro do tempo.'],
+  ['Meta reta final','Qual é a meta escrita na reta final?','Alcançar 70+ com fundamentação, aplicação e conclusão.'],
+];
+
+function buildLayer4Cards(cards: CompleteCatalogCard[]): CompleteCatalogCard[] {
+  const counts = new Map<string, number>();
+  for (const card of cards) {
+    const key = `${card.discipline}|${card.topic || ''}`;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+
+  const layer4: CompleteCatalogCard[] = [];
+  const officialTopics = cards.filter((card) => card.sourceLayer === 'Camada 3 - Fechamento do edital');
+  for (const card of officialTopics) {
+    const key = `${card.discipline}|${card.topic || ''}`;
+    if ((counts.get(key) || 0) !== 3 || !card.topic) continue;
+    const tags = ['AJAJ','Edital V3','Nível 4 - Aprofundamento real','TRT4','camada-4','aprofundamento'];
+    layer4.push({
+      id: `card-trt4-layer4-${stableHash(`${key}|caso`)}`,
+      discipline: card.discipline, disciplineName: card.disciplineName, topic: card.topic,
+      subtopic: 'Aplicação prática do tópico', legalBasis: card.legalBasis, type: 'Caso prático',
+      priority: card.priority, difficulty: 'Difícil',
+      front: `Em uma questão prática sobre “${card.topic}”, quais pontos mínimos você deve identificar antes de concluir?`,
+      back: card.back,
+      complement: 'Camada 4: aprofundamento aplicado ao tópico do edital verticalizado V3.',
+      trap: 'A FCC pode apresentar fatos corretos, mas omitir um requisito, exceção, prazo, sujeito ou efeito decisivo. Faça o checklist completo antes de marcar.',
+      mnemonic: '', tags: [...tags,'caso-pratico'], level: 'Nível 4 - Aprofundamento real', sourceLayer: 'Camada 4 - Aprofundamento real',
+    });
+    layer4.push({
+      id: `card-trt4-layer4-${stableHash(`${key}|fcc`)}`,
+      discipline: card.discipline, disciplineName: card.disciplineName, topic: card.topic,
+      subtopic: 'Controle de pegadinha FCC', legalBasis: card.legalBasis, type: 'Pegadinha FCC',
+      priority: card.priority, difficulty: 'Difícil',
+      front: `Qual é o núcleo que não pode ser perdido numa alternativa da FCC sobre “${card.topic}”?`,
+      back: card.back,
+      complement: 'Camada 4: recuperação ativa do núcleo de cobrança antes de resolver alternativas.',
+      trap: `Desconfie de alternativa que simplifique “${card.topic}” a uma regra absoluta. Procure requisito, exceção e consequência.`,
+      mnemonic: '', tags: [...tags,'fcc','pegadinha'], level: 'Nível 4 - Aprofundamento real', sourceLayer: 'Camada 4 - Aprofundamento real',
+    });
+  }
+
+  for (const [reference, theme, discipline, disciplineName] of LAYER4_JURISPRUDENCE) {
+    const tags = ['AJAJ','Edital V3','Nível 4 - Aprofundamento real','TRT4','jurisprudencia-prioritaria'];
+    layer4.push({
+      id: `card-trt4-layer4-${stableHash(`${reference}|mapa`)}`, discipline, disciplineName,
+      topic: 'Jurisprudência prioritária STF/TST', subtopic: reference, legalBasis: reference,
+      type: 'Jurisprudência', priority: 'A', difficulty: 'Difícil',
+      front: `Qual é o núcleo de cobrança associado a ${reference} no mapa jurisprudencial do TRT-4?`,
+      back: `${theme}.`,
+      complement: 'Precedente listado expressamente no bloco de jurisprudência prioritária do edital verticalizado V3. Confira vigência, modulação e alterações antes da prova.',
+      trap: 'Não memorize apenas o número do precedente: recupere também a hipótese de incidência e sua conexão com o tópico do edital.',
+      mnemonic: '', tags, level: 'Nível 4 - Aprofundamento real', sourceLayer: 'Camada 4 - Aprofundamento real',
+    });
+    layer4.push({
+      id: `card-trt4-layer4-${stableHash(`${reference}|controle`)}`, discipline, disciplineName,
+      topic: 'Jurisprudência prioritária STF/TST', subtopic: `${reference} - controle de vigência`, legalBasis: reference,
+      type: 'Revisão jurisprudencial', priority: 'A', difficulty: 'Difícil',
+      front: `Antes de usar ${reference} numa questão, o que deve ser conferido além do número do precedente?`,
+      back: `A tese aplicável a ${theme.toLowerCase()}, a hipótese de incidência, a vigência, eventual cancelamento/alteração e eventual modulação.`,
+      complement: 'Use o precedente somente depois de confirmar sua situação atual.',
+      trap: 'Número correto com tese superada ou aplicada fora da hipótese também leva ao erro.',
+      mnemonic: '', tags: [...tags,'vigencia'], level: 'Nível 4 - Aprofundamento real', sourceLayer: 'Camada 4 - Aprofundamento real',
+    });
+  }
+
+  for (const [subtopic, front, back] of LAYER4_STUDY_CASE) {
+    layer4.push({
+      id: `card-trt4-layer4-${stableHash(`study-case|${subtopic}`)}`,
+      discipline: 'study-case', disciplineName: 'Estudo de Caso Jurídico',
+      topic: 'Estudo de Caso Jurídico - protocolo de treino', subtopic,
+      legalBasis: 'Edital Verticalizado TRT-4 AJAJ V3, seção 19',
+      type: 'Estudo de Caso', priority: 'A', difficulty: 'Difícil', front, back,
+      complement: 'Treino transversal para a prova discursiva AJAJ.',
+      trap: 'Não confunda conhecer o conteúdo com responder exatamente o que o comando e os fatos exigem.',
+      mnemonic: '', tags: ['AJAJ','Edital V3','Nível 4 - Aprofundamento real','TRT4','estudo-de-caso'],
+      level: 'Nível 4 - Aprofundamento real', sourceLayer: 'Camada 4 - Aprofundamento real',
+    });
+  }
+  return layer4;
+}
 
 async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
   if (typeof window === 'undefined' || typeof document === 'undefined') return [];
@@ -41,9 +162,10 @@ async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
     return response.text();
   }));
   const parsed = JSON.parse(chunks.join('\n')) as CompleteCatalogFile;
+  const catalogCards = [...(parsed.cards || []), ...buildLayer4Cards(parsed.cards || [])];
   const groups = new Map<string, LegacyDeck>();
 
-  for (const card of parsed.cards || []) {
+  for (const card of catalogCards) {
     const deckId = card.discipline;
     if (!deckId) continue;
     let deck = groups.get(deckId);
@@ -51,7 +173,7 @@ async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
       deck = {
         id: deckId,
         title: COMPLETE_DECK_TITLES[deckId] || card.disciplineName || deckId,
-        sourceNote: 'Edital Verticalizado TRT-4 AJAJ 2026 V3 · catálogo completo 1.077 cartões',
+        sourceNote: 'Edital Verticalizado TRT-4 AJAJ 2026 V3 · catálogo completo 1.437 cartões · 4 camadas',
         topics: [],
         cards: [],
       };
