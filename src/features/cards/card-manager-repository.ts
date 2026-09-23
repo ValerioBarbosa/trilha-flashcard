@@ -136,7 +136,7 @@ export async function findDuplicateContent(client: SupabaseClient, profileId: st
     let query = client.from('cards').select('id,subject_id,front,back').is('deleted_at', null);
     if (profileId) query = query.eq('profile_id', profileId);
     if (subjectId) query = query.eq('subject_id', subjectId);
-    return query.range(from, to);
+    return query.order('id').range(from, to);
   });
   return data.some((row: any) =>
     row.id !== excludeCardId
@@ -217,6 +217,7 @@ export async function markImportDuplicates(client: SupabaseClient, profileId: st
     .select('subject_id,front,back')
     .eq('profile_id', profileId)
     .is('deleted_at', null)
+    .order('id')
     .range(from, to));
   const existing = new Set(data.map((row: any) => contentKey(row.subject_id, row.front, row.back)));
   const withinImport = new Set<string>();
