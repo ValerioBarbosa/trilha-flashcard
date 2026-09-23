@@ -32,7 +32,7 @@ const PAGE_SIZE = 1000;
 async function fetchAll(client: SupabaseClient, table: string, columns: string, profileId: string): Promise<Array<Record<string, unknown>>> {
   const rows: Array<Record<string, unknown>> = [];
   for (let from = 0; ; from += PAGE_SIZE) {
-    const { data, error } = await client.from(table).select(columns).eq('profile_id', profileId).range(from, from + PAGE_SIZE - 1);
+    const { data, error } = await client.from(table).select(columns).eq('profile_id', profileId).order('id').range(from, from + PAGE_SIZE - 1);
     if (error) throw error;
     const page = (data ?? []) as unknown as Array<Record<string, unknown>>;
     rows.push(...page);
