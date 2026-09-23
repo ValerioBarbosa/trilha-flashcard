@@ -293,6 +293,7 @@ export async function migrateLegacyLocalData(
       .select('deck_id,legacy_id,subject_id,front,back')
       .eq('profile_id', profileId)
       .is('deleted_at', null)
+      .order('id')
       .range(from, to));
 
     const contentOwner = new Map<string, string>();
