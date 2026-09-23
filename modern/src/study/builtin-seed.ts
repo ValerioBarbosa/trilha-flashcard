@@ -283,6 +283,7 @@ async function upsertCards(
   topics: Map<string,string>,
   seen: Set<string>,
   existingBuiltinByContent: Map<string, ExistingBuiltinCard>,
+  existingBuiltinByLegacyId: Map<string, ExistingBuiltinCard>,
 ) {
   const rows:any[] = [];
   const reconcileRows:any[] = [];
@@ -319,7 +320,9 @@ async function upsertCards(
       suspended:false,
     };
 
-    const existingBuiltin = existingBuiltinByContent.get(key);
+    const existingBuiltin = canonical
+      ? existingBuiltinByLegacyId.get(legacyId) || existingBuiltinByContent.get(key)
+      : existingBuiltinByContent.get(key);
     if (canonical && existingBuiltin) {
       reconcileRows.push({ id: existingBuiltin.id, ...row });
       seen.add(key);
@@ -360,9 +363,11 @@ export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User
   const builtinDeckIds = new Set((existingDecks || []).filter((row:any) => row.is_builtin).map((row:any) => row.id));
   const seen = new Set<string>((existing || []).map((row:any) => contentKey(row.subject_id, row.front, row.back)));
   const existingBuiltinByContent = new Map<string, ExistingBuiltinCard>();
+  const existingBuiltinByLegacyId = new Map<string, ExistingBuiltinCard>();
   for (const row of (existing || []) as ExistingBuiltinCard[]) {
     if (!builtinDeckIds.has(row.deck_id)) continue;
     existingBuiltinByContent.set(contentKey(row.subject_id, row.front, row.back), row);
+    if (row.legacy_id) existingBuiltinByLegacyId.set(row.legacy_id, row);
   }
   let seededDecks=0, cards=0, reconciled=0, topics=0, duplicatesSkipped=0, order=0;
   for (const deck of decks) {
@@ -372,7 +377,7 @@ export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User
     const deckId=await upsertDeck(client,user,profileId,subjectId,deck);
     seededDecks += 1;
     const topicMap=await ensureTopics(client,user,profileId,subjectId,deck); topics += topicMap.size;
-    const result=await upsertCards(client,user,profileId,subjectId,deckId,deck,topicMap,seen,existingBuiltinByContent);
+    const result=await upsertCards(client,user,profileId,subjectId,deckId,deck,topicMap,seen,existingBuiltinByContent,existingBuiltinByLegacyId);
     cards += result.inserted;
     reconciled += result.reconciled;
     duplicatesSkipped += result.skipped;
