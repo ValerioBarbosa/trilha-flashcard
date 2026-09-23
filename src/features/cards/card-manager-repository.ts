@@ -74,6 +74,14 @@ export async function createCard(client: SupabaseClient, user: User, profileId: 
 }
 
 export async function updateCard(client: SupabaseClient, cardId: string, draft: CardDraft): Promise<void> {
+  const front = draft.front.trim();
+  const back = draft.back.trim();
+  if (!draft.subjectId?.trim()) throw new Error('card-subject-required');
+  if (!draft.deckId?.trim()) throw new Error('card-deck-required');
+  if (!front) throw new Error('card-front-required');
+  if (!back) throw new Error('card-back-required');
+  if (await findDuplicateContent(client, '', draft.subjectId, front, back, cardId)) throw new Error('card-duplicate');
+
   const { error } = await client.from('cards').update({
     deck_id: draft.deckId,
     subject_id: draft.subjectId,
@@ -109,12 +117,19 @@ export async function setCardSuspended(client: SupabaseClient, cardId: string, s
   if (error) throw error;
 }
 
-export async function findDuplicateContent(client: SupabaseClient, profileId: string, subjectId: string | null, front: string, back: string): Promise<boolean> {
+export async function findDuplicateContent(client: SupabaseClient, profileId: string, subjectId: string | null, front: string, back: string, excludeCardId?: string): Promise<boolean> {
   const normalizedFront = normalizeContent(front);
   const normalizedBack = normalizeContent(back);
-  const { data, error } = await client.from('cards').select('subject_id,front,back').eq('profile_id', profileId).is('deleted_at', null);
+  let query = client.from('cards').select('id,subject_id,front,back').is('deleted_at', null);
+  if (profileId) query = query.eq('profile_id', profileId);
+  const { data, error } = await query;
   if (error) throw error;
-  return (data || []).some((row: any) => (row.subject_id || null) === (subjectId || null) && normalizeContent(row.front) === normalizedFront && normalizeContent(row.back) === normalizedBack);
+  return (data || []).some((row: any) =>
+    row.id !== excludeCardId
+    && (row.subject_id || null) === (subjectId || null)
+    && normalizeContent(row.front) === normalizedFront
+    && normalizeContent(row.back) === normalizedBack
+  );
 }
 
 export async function importCards(client: SupabaseClient, user: User, profileId: string, candidates: ImportCandidate[]) {
@@ -135,14 +150,38 @@ export async function importCards(client: SupabaseClient, user: User, profileId:
   return { inserted, duplicates: candidates.filter((row) => row.duplicate).length + (accepted.length - inserted - failed), failed };
 }
 
-export function parseJsonImport(text: string, defaults: { deckId: string; subjectId: string }): ImportCandidate[] {
+export function parseJsonImport(
+  text: string,
+  defaults: {
+    deckId: string;
+    subjectId: string;
+    subjects?: SubjectRow[];
+    topics?: TopicRow[];
+    decks?: DeckRow[];
+  },
+): ImportCandidate[] {
   const parsed = JSON.parse(text);
   const rows = Array.isArray(parsed) ? parsed : Array.isArray(parsed?.cards) ? parsed.cards : [];
-  return rows.map((row: any, index: number) => ({
+  const lookup = (value: unknown, items: Array<{ id: string; name: string; slug?: string }> = []) => {
+    const raw = String(value || '').trim();
+    if (!raw) return undefined;
+    const normalized = normalizeContent(raw);
+    return items.find((item) => item.id === raw || normalizeContent(item.name) === normalized || normalizeContent(item.slug || '') === normalized);
+  };
+
+  return rows.map((row: any, index: number) => {
+    const subject = lookup(row.subjectId || row.disciplineId || row.discipline || row.disciplineName, defaults.subjects || []);
+    const subjectId = subject?.id || String(row.subjectId || row.disciplineId || defaults.subjectId);
+    const availableDecks = (defaults.decks || []).filter((deck) => !subjectId || deck.subject_id === subjectId);
+    const deck = lookup(row.deckId || row.deck || row.baralho, availableDecks);
+    const availableTopics = (defaults.topics || []).filter((topic) => topic.subject_id === subjectId);
+    const topic = lookup(row.topicId || row.topic || row.assunto, availableTopics);
+
+    return {
     row: index + 1,
-    deckId: String(row.deckId || defaults.deckId),
-    subjectId: String(row.subjectId || row.disciplineId || defaults.subjectId),
-    topicId: row.topicId || null,
+    deckId: deck?.id || String(row.deckId || defaults.deckId),
+    subjectId,
+    topicId: topic?.id || row.topicId || null,
     front: String(row.front || row.pergunta || row.question || '').trim(),
     back: String(row.back || row.resposta || row.answer || '').trim(),
     legalBasis: String(row.legalBasis || row.baseLegal || '').trim(),
@@ -155,7 +194,8 @@ export function parseJsonImport(text: string, defaults: { deckId: string; subjec
     tags: Array.isArray(row.tags) ? row.tags.map(String) : row.tag ? [String(row.tag)] : [],
     cardType: String(row.cardType || row.tipo || '').trim(),
     source: String(row.source || row.fonte || '').trim(),
-  }));
+  };
+  });
 }
 
 export async function markImportDuplicates(client: SupabaseClient, profileId: string, candidates: ImportCandidate[]): Promise<ImportCandidate[]> {
