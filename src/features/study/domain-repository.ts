@@ -168,6 +168,7 @@ export async function listOfficialEditalTopicIds(client: SupabaseClient, profile
     .is('deleted_at', null)
     .eq('suspended', false)
     .not('topic_id', 'is', null)
+    .order('id')
     .range(from, to));
   const topicIds = new Set<string>();
   for (const row of data) {
@@ -193,6 +194,7 @@ export async function listEditalTopicProgress(client: SupabaseClient, profileId:
       .is('deleted_at', null)
       .eq('suspended', false)
       .not('topic_id', 'is', null)
+      .order('id')
       .range(from, to)),
     requirePaged<{ card_id: string; rating: number }>((from, to) => client.from('reviews')
       .select('card_id,rating')
@@ -298,6 +300,7 @@ export async function listOpenErrorCardIds(client: SupabaseClient, profileId: st
     .eq('profile_id', profileId)
     .eq('kind', 'card')
     .eq('resolved', false)
+    .order('id')
     .range(from, to));
   return new Set(rows.map((row) => row.card_id).filter((id): id is string => Boolean(id)));
 }
