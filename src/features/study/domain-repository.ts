@@ -144,6 +144,26 @@ export async function setCardReadAt(client: SupabaseClient, cardId: string, read
   if (error) throw error;
 }
 
+
+export async function listOfficialEditalTopicIds(client: SupabaseClient, profileId: string): Promise<Set<string>> {
+  const { data, error } = await client.from('cards')
+    .select('topic_id,tags')
+    .eq('profile_id', profileId)
+    .is('deleted_at', null)
+    .eq('suspended', false)
+    .not('topic_id', 'is', null);
+  if (error) throw error;
+  const topicIds = new Set<string>();
+  for (const row of (data || []) as Array<{ topic_id: string | null; tags: string[] | null }>) {
+    if (!row.topic_id) continue;
+    const tags = Array.isArray(row.tags) ? row.tags : [];
+    if (tags.some((tag) => tag === 'Nível 1 - Matriz verticalizada' || tag.includes('EDITAL V3'))) {
+      topicIds.add(row.topic_id);
+    }
+  }
+  return topicIds;
+}
+
 export async function listStudyCardCountsByTopic(client: SupabaseClient, profileId: string): Promise<Map<string, number>> {
   const { data, error } = await client.from('cards')
     .select('topic_id')
