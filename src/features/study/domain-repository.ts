@@ -164,6 +164,58 @@ export async function listOfficialEditalTopicIds(client: SupabaseClient, profile
   return topicIds;
 }
 
+export type EditalTopicProgress = {
+  cardCount: number;
+  leiSecaCount: number;
+  reviewedCount: number;
+  masteredCount: number;
+  status: 'Não iniciado' | 'Em estudo' | 'Revisado' | 'Dominado';
+};
+
+export async function listEditalTopicProgress(client: SupabaseClient, profileId: string): Promise<Map<string, EditalTopicProgress>> {
+  const [cards, reviews] = await Promise.all([
+    requireData<Array<{ id: string; topic_id: string | null; card_type: string | null }>>(client.from('cards')
+      .select('id,topic_id,card_type')
+      .eq('profile_id', profileId)
+      .is('deleted_at', null)
+      .eq('suspended', false)
+      .not('topic_id', 'is', null)),
+    requireData<Array<{ card_id: string; rating: number }>>(client.from('reviews')
+      .select('card_id,rating')
+      .eq('profile_id', profileId)
+      .order('reviewed_at', { ascending: false })
+      .limit(10000)),
+  ]);
+
+  const latestRating = new Map<string, number>();
+  for (const review of reviews) if (!latestRating.has(review.card_id)) latestRating.set(review.card_id, review.rating);
+
+  const grouped = new Map<string, { cards: string[]; leiSecaCount: number }>();
+  for (const card of cards) {
+    if (!card.topic_id) continue;
+    const bucket = grouped.get(card.topic_id) ?? { cards: [], leiSecaCount: 0 };
+    bucket.cards.push(card.id);
+    if (card.card_type === 'Lei seca') bucket.leiSecaCount += 1;
+    grouped.set(card.topic_id, bucket);
+  }
+
+  const result = new Map<string, EditalTopicProgress>();
+  for (const [topicId, group] of grouped) {
+    const ratings = group.cards.map((id) => latestRating.get(id)).filter((value): value is number => typeof value === 'number');
+    const reviewedCount = ratings.length;
+    const masteredCount = ratings.filter((rating) => rating >= 3).length;
+    const studyCardCount = Math.max(0, group.cards.length - group.leiSecaCount);
+    let status: EditalTopicProgress['status'] = 'Não iniciado';
+    if (studyCardCount > 0) {
+      if (reviewedCount === 0) status = 'Em estudo';
+      else if (masteredCount >= studyCardCount) status = 'Dominado';
+      else status = 'Revisado';
+    }
+    result.set(topicId, { cardCount: studyCardCount, leiSecaCount: group.leiSecaCount, reviewedCount, masteredCount, status });
+  }
+  return result;
+}
+
 export async function listStudyCardCountsByTopic(client: SupabaseClient, profileId: string): Promise<Map<string, number>> {
   const { data, error } = await client.from('cards')
     .select('topic_id')
