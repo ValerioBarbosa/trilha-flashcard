@@ -335,7 +335,7 @@ async function upsertCards(
     };
 
     const existingBuiltin = canonical
-      ? existingBuiltinByLegacyId.get(legacyId) || existingBuiltinByContent.get(key)
+      ? existingBuiltinByContent.get(key) || existingBuiltinByLegacyId.get(legacyId)
       : existingBuiltinByContent.get(key);
     if (canonical && existingBuiltin) {
       reconcileRows.push({ id: existingBuiltin.id, ...row });
