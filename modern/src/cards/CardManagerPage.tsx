@@ -56,8 +56,13 @@ export function CardManagerPage({ user, profileId, subjects, topics, decks, onCh
 
   async function refresh() {
     setLoading(true);
-    try { setCards(await listManagedCards(getSupabaseClient(), profileId)); }
-    finally { setLoading(false); }
+    try {
+      setCards(await listManagedCards(getSupabaseClient(), profileId));
+    } catch (cause) {
+      setMessage(cause instanceof Error ? cause.message : 'Não foi possível carregar os cartões.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => { void refresh(); }, [profileId]);
@@ -113,7 +118,7 @@ export function CardManagerPage({ user, profileId, subjects, topics, decks, onCh
     if (!form.front.trim() || !form.back.trim()) return setMessage('Pergunta e resposta são obrigatórias.');
     const draft: CardDraft = { ...form, tags: form.tagsText.split(',').map((tag) => tag.trim()).filter(Boolean) };
     try {
-      if (form.id) await updateCard(getSupabaseClient(), form.id, draft);
+      if (form.id) await updateCard(getSupabaseClient(), profileId, form.id, draft);
       else await createCard(getSupabaseClient(), user, profileId, draft);
       setEditorOpen(false);
       await refresh();
@@ -134,7 +139,7 @@ export function CardManagerPage({ user, profileId, subjects, topics, decks, onCh
       const text = await file.text();
       const subjectId = subjects[0]?.id || '';
       const deckId = decks.find((deck) => deck.subject_id === subjectId)?.id || decks[0]?.id || '';
-      const parsed = parseJsonImport(text, { subjectId, deckId });
+      const parsed = parseJsonImport(text, { subjectId, deckId, subjects, topics, decks });
       const marked = await markImportDuplicates(getSupabaseClient(), profileId, parsed);
       const duplicateCount = marked.filter((row) => row.duplicate).length;
       const invalidCount = marked.filter((row) => !row.duplicate && !isImportableCandidate(row)).length;
@@ -146,16 +151,20 @@ export function CardManagerPage({ user, profileId, subjects, topics, decks, onCh
   }
 
   async function confirmImport() {
-    const result = await importCards(getSupabaseClient(), user, profileId, importCandidates);
-    setImportStatus(`${result.inserted} incluídos · ${result.duplicates} duplicados ignorados · ${result.failed} falhas.`);
-    await refresh();
-    await onChanged?.();
-    if (!result.failed) {
-      setImportCandidates((current) => current.map((row) => (
-        isImportableCandidate(row)
-          ? { ...row, duplicate: true, duplicateReason: 'Importado com sucesso.' }
-          : row
-      )));
+    try {
+      const result = await importCards(getSupabaseClient(), user, profileId, importCandidates);
+      setImportStatus(`${result.inserted} incluídos · ${result.duplicates} duplicados ignorados · ${result.failed} falhas.`);
+      await refresh();
+      await onChanged?.();
+      if (!result.failed) {
+        setImportCandidates((current) => current.map((row) => (
+          isImportableCandidate(row)
+            ? { ...row, duplicate: true, duplicateReason: 'Importado com sucesso.' }
+            : row
+        )));
+      }
+    } catch (cause) {
+      setImportStatus(`Falha ao importar: ${cause instanceof Error ? cause.message : String(cause)}`);
     }
   }
 

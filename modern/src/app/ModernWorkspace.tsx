@@ -16,8 +16,9 @@ import { ProfileSwitcher } from '../study/ProfileSwitcher';
 import { StudyPage, type StudyFocus } from '../study/StudyPage';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
 import { ThemeToggle } from '../shared/ThemeToggle';
+import { CardManagerPage } from '../cards/CardManagerPage';
 
-type PageId = 'home' | 'study' | 'edital' | 'jurisprudence' | 'lei-seca' | 'performance' | 'data';
+type PageId = 'home' | 'study' | 'edital' | 'jurisprudence' | 'lei-seca' | 'cards' | 'performance' | 'data';
 
 type Props = {
   user: User;
@@ -30,6 +31,7 @@ const NAV: Array<{ id: PageId; label: string; icon: string }> = [
   { id: 'edital', label: 'Edital', icon: '☑' },
   { id: 'jurisprudence', label: 'Jurisprudência', icon: '§' },
   { id: 'lei-seca', label: 'Lei Seca', icon: '⚖' },
+  { id: 'cards', label: 'Cartões', icon: '▤' },
   { id: 'performance', label: 'Desempenho', icon: '↗' },
   { id: 'data', label: 'Dados', icon: '↻' },
 ];
@@ -91,6 +93,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
             {page === 'edital' ? <EditalPage profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} onStudyTopic={focusStudyTopic} onOpenLeiSeca={() => selectPage('lei-seca')} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
             {page === 'lei-seca' ? <LeiSecaPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} onStudyTopic={focusStudyTopic} /> : null}
+            {page === 'cards' ? <CardManagerPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} onChanged={workspace.refresh} /> : null}
             {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} onReviewWrong={startWrongReview} onReviewDue={startDueReview} /> : null}
             {page === 'data' ? <DataPage user={user} workspace={workspace} onMigrated={workspace.refresh} /> : null}
           </>
@@ -101,7 +104,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
 }
 
 function LoadingView({ seeding }: { seeding: boolean }) {
-  return <div className="page-wrap loading-page"><div className="loading-orb" /><h2>{seeding ? 'Preparando seus baralhos…' : 'Carregando sua trilha…'}</h2><p>{seeding ? 'O catálogo oficial está sendo organizado no novo banco. Isso acontece apenas na primeira vez.' : 'Sincronizando estrutura e progresso.'}</p></div>;
+  return <div className="page-wrap loading-page"><div className="loading-orb" /><h2>{seeding ? 'Preparando seus baralhos…' : 'Carregando sua trilha…'}</h2><p>{seeding ? 'Atualizando e conferindo o catálogo oficial sem apagar seu histórico.' : 'Sincronizando estrutura e progresso.'}</p></div>;
 }
 
 function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: {
@@ -114,7 +117,8 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
   const [performance, setPerformance] = useState<PerformanceSummary | null>(null);
   const [totalCardCount, setTotalCardCount] = useState(0);
   const [leiSecaCount, setLeiSecaCount] = useState(0);
-  const [editalCoveredTopics, setEditalCoveredTopics] = useState(0);
+  const [editalCoveredTopicIds, setEditalCoveredTopicIds] = useState<Set<string>>(new Set());
+  const [catalogCardCount, setCatalogCardCount] = useState(0);
   const [leiSecaCoveredTopics, setLeiSecaCoveredTopics] = useState(0);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -126,20 +130,25 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
       loadPerformance(client, user, profileId),
       client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false),
       client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).eq('card_type', 'Lei seca'),
+      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).like('source', 'Edital Verticalizado TRT-4 AJAJ 2026 V3%'),
       listOfficialEditalTopicIds(client, profileId),
       listCardsByType(client, profileId, 'Lei seca'),
-    ]).then(([summary, cards, leiSeca, officialTopicIds, leiSecaCards]) => {
+    ]).then(([summary, cards, leiSeca, catalogCards, officialTopicIds, leiSecaCards]) => {
       setPerformance(summary);
       if (!cards.error) setTotalCardCount(cards.count ?? 0);
       if (!leiSeca.error) setLeiSecaCount(leiSeca.count ?? 0);
-      setEditalCoveredTopics(officialTopicIds.size);
+      if (!catalogCards.error) setCatalogCardCount(catalogCards.count ?? 0);
+      setEditalCoveredTopicIds(officialTopicIds);
       setLeiSecaCoveredTopics(new Set(leiSecaCards.map((card) => card.topic_id).filter(Boolean)).size);
     }).catch((cause) => setLoadError(cause instanceof Error ? cause.message : 'Não foi possível carregar os dados do painel.'));
   }, [user.id, workspace.profile?.id]);
 
   const rootTopics = workspace.topics.filter((topic) => !topic.parent_id);
-  const leiSecaEligibleTopics = rootTopics.filter((topic) => topic.legal_basis && workspace.subjects.find((subject) => subject.id === topic.subject_id)?.name.trim().toLowerCase() !== 'português');
-  const officialTopicTotal = workspace.profile?.is_builtin ? 171 : rootTopics.length;
+  const complementaryTopicNames = new Set(['Jurisprudência prioritária STF/TST', 'Estudo de Caso Jurídico - protocolo de treino']);
+  const officialRootTopics = rootTopics.filter((topic) => !complementaryTopicNames.has(topic.name));
+  const leiSecaEligibleTopics = officialRootTopics.filter((topic) => topic.legal_basis && workspace.subjects.find((subject) => subject.id === topic.subject_id)?.name.trim().toLowerCase() !== 'português');
+  const officialTopicTotal = workspace.profile?.is_builtin ? 171 : officialRootTopics.length;
+  const editalCoveredTopics = officialRootTopics.filter((topic) => editalCoveredTopicIds.has(topic.id)).length;
   const editalPct = officialTopicTotal ? Math.round((Math.min(editalCoveredTopics, officialTopicTotal) / officialTopicTotal) * 100) : 0;
   const leiSecaPct = leiSecaEligibleTopics.length ? Math.round((leiSecaCoveredTopics / leiSecaEligibleTopics.length) * 100) : 0;
 
@@ -177,13 +186,14 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
           <div>
             <span className="panel-label">COBERTURA DO EDITAL</span>
             <h2>{Math.min(editalCoveredTopics, officialTopicTotal)}/{officialTopicTotal} tópicos cobertos</h2>
-            <p>{workspace.profile?.is_builtin ? 'Catálogo TRT-4 AJAJ com 1.437 cartões em quatro camadas, mantendo 171 tópicos oficiais da matriz.' : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
+            <p>{workspace.profile?.is_builtin ? `Catálogo TRT-4 AJAJ: ${catalogCardCount}/1.437 cartões oficiais carregados · 171 tópicos da matriz.` : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
           </div>
           <strong className="home-progress-percent">{editalPct}%</strong>
         </div>
         <div className="home-progress-track" aria-label={`Cobertura do edital: ${editalPct}%`}><span style={{ width: `${editalPct}%` }} /></div>
         <div className="home-progress-meta">
           <span><strong>{totalCardCount}</strong> cartões totais</span>
+          {workspace.profile?.is_builtin ? <span><strong>{catalogCardCount}</strong> catálogo oficial</span> : null}
           <span><strong>{leiSecaCount}</strong> Lei Seca</span>
           <span><strong>{performance?.accuracy ?? 0}%</strong> precisão</span>
         </div>

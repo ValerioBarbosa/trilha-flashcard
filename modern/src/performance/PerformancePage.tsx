@@ -17,15 +17,23 @@ type Props = {
 export function PerformancePage({ user, profileId, subjects, onReviewWrong, onReviewDue }: Props) {
   const [summary, setSummary] = useState<PerformanceSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  function load() {
+    setLoading(true);
+    setError(null);
+    return loadPerformance(getSupabaseClient(), user, profileId)
+      .then(setSummary)
+      .catch((cause) => setError(cause instanceof Error ? cause.message : 'Não foi possível calcular o desempenho.'))
+      .finally(() => setLoading(false));
+  }
 
   useEffect(() => {
-    setLoading(true);
-    void loadPerformance(getSupabaseClient(), user, profileId)
-      .then(setSummary)
-      .finally(() => setLoading(false));
+    void load();
   }, [user.id, profileId]);
 
   if (loading) return <div className="page-wrap"><PageHeader eyebrow="ANÁLISE" title="Desempenho" /><div className="study-empty">Calculando desempenho…</div></div>;
+  if (error) return <div className="page-wrap"><PageHeader eyebrow="ANÁLISE" title="Desempenho" /><div className="notice error"><strong>Falha ao calcular desempenho.</strong><span>{error}</span><button onClick={() => void load()}>Tentar novamente</button></div></div>;
 
   const subjectName = (subjectId: string) => subjects.find((subject) => subject.id === subjectId)?.name || 'Sem disciplina';
   const bySubject = [...(summary?.bySubject ?? [])].sort((a, b) => a.accuracy - b.accuracy || b.reviews - a.reviews);
