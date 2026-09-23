@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'trilha-modern';
-const CACHE_VERSION = 'v5-global-reconcile-20260923';
+const CACHE_VERSION = 'v6-content-reconcile-20260923';
 const CACHE_NAME = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest'];
 
