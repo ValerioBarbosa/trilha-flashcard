@@ -56,8 +56,13 @@ export function CardManagerPage({ user, profileId, subjects, topics, decks, onCh
 
   async function refresh() {
     setLoading(true);
-    try { setCards(await listManagedCards(getSupabaseClient(), profileId)); }
-    finally { setLoading(false); }
+    try {
+      setCards(await listManagedCards(getSupabaseClient(), profileId));
+    } catch (cause) {
+      setMessage(cause instanceof Error ? cause.message : 'Não foi possível carregar os cartões.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => { void refresh(); }, [profileId]);
@@ -146,16 +151,20 @@ export function CardManagerPage({ user, profileId, subjects, topics, decks, onCh
   }
 
   async function confirmImport() {
-    const result = await importCards(getSupabaseClient(), user, profileId, importCandidates);
-    setImportStatus(`${result.inserted} incluídos · ${result.duplicates} duplicados ignorados · ${result.failed} falhas.`);
-    await refresh();
-    await onChanged?.();
-    if (!result.failed) {
-      setImportCandidates((current) => current.map((row) => (
-        isImportableCandidate(row)
-          ? { ...row, duplicate: true, duplicateReason: 'Importado com sucesso.' }
-          : row
-      )));
+    try {
+      const result = await importCards(getSupabaseClient(), user, profileId, importCandidates);
+      setImportStatus(`${result.inserted} incluídos · ${result.duplicates} duplicados ignorados · ${result.failed} falhas.`);
+      await refresh();
+      await onChanged?.();
+      if (!result.failed) {
+        setImportCandidates((current) => current.map((row) => (
+          isImportableCandidate(row)
+            ? { ...row, duplicate: true, duplicateReason: 'Importado com sucesso.' }
+            : row
+        )));
+      }
+    } catch (cause) {
+      setImportStatus(`Falha ao importar: ${cause instanceof Error ? cause.message : String(cause)}`);
     }
   }
 
