@@ -14,7 +14,7 @@ import {
   type TopicRow,
 } from './domain-repository';
 
-const BUILTIN_CATALOG_VERSION = 'trt4-ajaj-v3-1437-self-heal-v4-2026-09-23';
+const BUILTIN_CATALOG_VERSION = 'trt4-ajaj-v3-1437-db-fingerprint-v5-2026-09-23';
 const EXPECTED_BUILTIN_CATALOG_CARDS = 1437;
 
 function activeProfileKey(userId: string): string {
