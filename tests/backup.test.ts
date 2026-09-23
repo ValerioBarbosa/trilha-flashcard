@@ -9,12 +9,17 @@ class FakeQueryBuilder {
   private mode: 'select' | 'upsert' = 'select';
   private payloads: Row[] = [];
   private conflictCols: string[] | null = null;
+  private rangeStart = 0;
+  private rangeEnd: number | null = null;
+  private orderField: string | null = null;
 
   constructor(private rows: Row[]) {}
 
   select(_cols?: string) { return this; }
   eq(field: string, value: any) { this.filters.push([field, value]); return this; }
   is(field: string, value: any) { this.filters.push([field, value]); return this; }
+  order(field: string) { this.orderField = field; return this; }
+  range(from: number, to: number) { this.rangeStart = from; this.rangeEnd = to; return this; }
 
   upsert(rows: Row | Row[], opts?: { onConflict?: string }) {
     this.mode = 'upsert';
@@ -25,7 +30,10 @@ class FakeQueryBuilder {
 
   then(resolve: (value: { data: Row[] | null; error: any }) => void) {
     if (this.mode === 'select') {
-      resolve({ data: this.rows.filter((row) => this.filters.every(([f, v]) => row[f] === v)), error: null });
+      let rows = this.rows.filter((row) => this.filters.every(([f, v]) => row[f] === v));
+      if (this.orderField) rows = [...rows].sort((a, b) => String(a[this.orderField!]).localeCompare(String(b[this.orderField!])));
+      if (this.rangeEnd !== null) rows = rows.slice(this.rangeStart, this.rangeEnd + 1);
+      resolve({ data: rows, error: null });
       return;
     }
     for (const payload of this.payloads) {

@@ -56,7 +56,7 @@ const DEFAULT_PROFILE: LegacyProfile = {
   name: 'TRT-4 · AJAJ',
   builtin: true,
   role: 'Analista Judiciário · Área Judiciária',
-  board: 'FCC',
+  board: 'FCC (base histórica)',
   editalYear: '2026',
 };
 
@@ -242,8 +242,23 @@ function sourcePage(value: LegacyCard['sourcePage']): number | null {
   return Number.isInteger(parsed) && Number(parsed) > 0 ? Number(parsed) : null;
 }
 
+const PAGE_SIZE = 1000;
+async function requirePaged<T>(queryPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: any }>): Promise<T[]> {
+  const rows: T[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await queryPage(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    const page = data || [];
+    rows.push(...page);
+    if (page.length < PAGE_SIZE) break;
+  }
+  return rows;
+}
+function normalizeContent(value: string): string {
+  return value.normalize('NFKC').replace(/\s+/g, ' ').trim().toLocaleLowerCase('pt-BR');
+}
 function contentKey(subjectId: string | null, front: string, back: string): string {
-  return `${subjectId || ''}|${front.trim().toLowerCase()}|${back.trim().toLowerCase()}`;
+  return `${subjectId || ''}|${normalizeContent(front)}|${normalizeContent(back)}`;
 }
 
 function isDuplicateContentError(error: unknown): boolean {
@@ -273,15 +288,16 @@ export async function migrateLegacyLocalData(
     const profileId = await upsertProfile(client, user, legacyProfile);
     report.profiles += 1;
 
-    const { data: existingCards, error: existingError } = await client
+    const existingCards = await requirePaged<any>((from, to) => client
       .from('cards')
       .select('deck_id,legacy_id,subject_id,front,back')
       .eq('profile_id', profileId)
-      .is('deleted_at', null);
-    if (existingError) throw existingError;
+      .is('deleted_at', null)
+      .order('id')
+      .range(from, to));
 
     const contentOwner = new Map<string, string>();
-    (existingCards || []).forEach((row: any) => {
+    existingCards.forEach((row: any) => {
       if (!row.legacy_id) return;
       contentOwner.set(contentKey(row.subject_id, row.front, row.back), `${row.deck_id}|${row.legacy_id}`);
     });

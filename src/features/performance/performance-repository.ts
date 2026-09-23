@@ -26,6 +26,19 @@ function dateKey(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+const PAGE_SIZE = 1000;
+async function requirePaged<T>(queryPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: any }>): Promise<T[]> {
+  const rows: T[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await queryPage(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    const page = data || [];
+    rows.push(...page);
+    if (page.length < PAGE_SIZE) break;
+  }
+  return rows;
+}
+
 function computeStreak(activeDays: Set<string>, referenceDate: Date): number {
   const cursor = new Date(referenceDate);
   cursor.setHours(12, 0, 0, 0);
@@ -46,17 +59,25 @@ export async function loadPerformance(client: SupabaseClient, user: User, profil
   today.setHours(0, 0, 0, 0);
   const now = Date.now();
 
-  const [{ data: reviews, error: reviewError }, { count: openErrors, error: errorCountError }, latestByCard, { data: activeCards, error: activeCardsError }] = await Promise.all([
-    client.from('reviews').select('rating,reviewed_at,cards(subject_id)').eq('user_id', user.id).eq('profile_id', profileId),
+  type ReviewRow = { rating: number; reviewed_at: string; cards: { subject_id: string | null }[] | { subject_id: string | null } | null };
+  const [reviewRows, { count: openErrors, error: errorCountError }, latestByCard, activeCards] = await Promise.all([
+    requirePaged<ReviewRow>((from, to) => client.from('reviews')
+      .select('rating,reviewed_at,cards(subject_id)')
+      .eq('user_id', user.id)
+      .eq('profile_id', profileId)
+      .order('reviewed_at')
+      .range(from, to)),
     client.from('error_notebook').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('profile_id', profileId).eq('resolved', false),
     listLatestReviewsByCard(client, profileId),
-    client.from('cards').select('id').eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false),
+    requirePaged<{ id: string }>((from, to) => client.from('cards')
+      .select('id')
+      .eq('profile_id', profileId)
+      .is('deleted_at', null)
+      .eq('suspended', false)
+      .order('id')
+      .range(from, to)),
   ]);
-  if (reviewError) throw reviewError;
   if (errorCountError) throw errorCountError;
-  if (activeCardsError) throw activeCardsError;
-
-  const reviewRows = (reviews ?? []) as Array<{ rating: number; reviewed_at: string; cards: { subject_id: string | null }[] | { subject_id: string | null } | null }>;
   const subjectIdOf = (row: (typeof reviewRows)[number]) => Array.isArray(row.cards) ? row.cards[0]?.subject_id ?? null : row.cards?.subject_id ?? null;
   const correctReviews = reviewRows.filter((row) => Number(row.rating) >= 3).length;
   const reviewedToday = reviewRows.filter((row) => new Date(row.reviewed_at) >= today).length;
@@ -64,7 +85,7 @@ export async function loadPerformance(client: SupabaseClient, user: User, profil
   const activeDays = new Set(reviewRows.map((row) => dateKey(new Date(row.reviewed_at))));
   const streakDays = computeStreak(activeDays, new Date());
 
-  const activeCardIds = new Set((activeCards || []).map((row: { id: string }) => row.id));
+  const activeCardIds = new Set(activeCards.map((row) => row.id));
   const dueNow = Array.from(latestByCard.entries()).filter(([cardId, row]) => activeCardIds.has(cardId) && new Date(row.due_at).getTime() <= now).length;
 
   const bySubjectMap = new Map<string, { reviews: number; correct: number }>();

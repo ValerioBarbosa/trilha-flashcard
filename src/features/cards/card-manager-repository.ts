@@ -30,13 +30,25 @@ export type CardDraft = {
 
 export type ImportCandidate = CardDraft & { row: number; duplicate?: boolean; duplicateReason?: string };
 
+const PAGE_SIZE = 1000;
+async function requirePaged<T>(queryPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: any }>): Promise<T[]> {
+  const rows: T[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await queryPage(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    const page = data || [];
+    rows.push(...page);
+    if (page.length < PAGE_SIZE) break;
+  }
+  return rows;
+}
+
 export async function listManagedCards(client: SupabaseClient, profileId: string): Promise<ManagedCard[]> {
-  const { data, error } = await client.from('cards')
-    .select('id,deck_id,subject_id,topic_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags,source,source_page,suspended,deleted_at,created_at,updated_at')
+  return requirePaged<ManagedCard>((from, to) => client.from('cards')
+    .select('id,deck_id,subject_id,topic_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags,read_at,source,source_page,suspended,deleted_at,created_at,updated_at')
     .eq('profile_id', profileId)
-    .order('updated_at', { ascending: false });
-  if (error) throw error;
-  return (data || []) as ManagedCard[];
+    .order('updated_at', { ascending: false })
+    .range(from, to));
 }
 
 export async function createCard(client: SupabaseClient, user: User, profileId: string, draft: CardDraft): Promise<ManagedCard> {
@@ -120,11 +132,13 @@ export async function setCardSuspended(client: SupabaseClient, cardId: string, s
 export async function findDuplicateContent(client: SupabaseClient, profileId: string, subjectId: string | null, front: string, back: string, excludeCardId?: string): Promise<boolean> {
   const normalizedFront = normalizeContent(front);
   const normalizedBack = normalizeContent(back);
-  let query = client.from('cards').select('id,subject_id,front,back').is('deleted_at', null);
-  if (profileId) query = query.eq('profile_id', profileId);
-  const { data, error } = await query;
-  if (error) throw error;
-  return (data || []).some((row: any) =>
+  const data = await requirePaged<any>((from, to) => {
+    let query = client.from('cards').select('id,subject_id,front,back').is('deleted_at', null);
+    if (profileId) query = query.eq('profile_id', profileId);
+    if (subjectId) query = query.eq('subject_id', subjectId);
+    return query.order('id').range(from, to);
+  });
+  return data.some((row: any) =>
     row.id !== excludeCardId
     && (row.subject_id || null) === (subjectId || null)
     && normalizeContent(row.front) === normalizedFront
@@ -199,9 +213,13 @@ export function parseJsonImport(
 }
 
 export async function markImportDuplicates(client: SupabaseClient, profileId: string, candidates: ImportCandidate[]): Promise<ImportCandidate[]> {
-  const { data, error } = await client.from('cards').select('subject_id,front,back').eq('profile_id', profileId).is('deleted_at', null);
-  if (error) throw error;
-  const existing = new Set((data || []).map((row: any) => contentKey(row.subject_id, row.front, row.back)));
+  const data = await requirePaged<any>((from, to) => client.from('cards')
+    .select('subject_id,front,back')
+    .eq('profile_id', profileId)
+    .is('deleted_at', null)
+    .order('id')
+    .range(from, to));
+  const existing = new Set(data.map((row: any) => contentKey(row.subject_id, row.front, row.back)));
   const withinImport = new Set<string>();
   return candidates.map((candidate) => {
     const key = contentKey(candidate.subjectId, candidate.front, candidate.back);

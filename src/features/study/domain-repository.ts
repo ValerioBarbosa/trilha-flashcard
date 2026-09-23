@@ -86,6 +86,20 @@ async function requireData<T>(promise: PromiseLike<{ data: T | null; error: any 
   return data as T;
 }
 
+const PAGE_SIZE = 1000;
+
+async function requirePaged<T>(queryPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: any }>): Promise<T[]> {
+  const rows: T[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await queryPage(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    const page = data || [];
+    rows.push(...page);
+    if (page.length < PAGE_SIZE) break;
+  }
+  return rows;
+}
+
 export async function listProfiles(client: SupabaseClient, user: User): Promise<ProfileRow[]> {
   return requireData(client.from('study_profiles')
     .select('id,name,slug,role,board,edital_year,is_builtin')
@@ -120,23 +134,25 @@ export async function listDecks(client: SupabaseClient, profileId: string): Prom
 }
 
 export async function listCards(client: SupabaseClient, deckId: string): Promise<CardRow[]> {
-  return requireData(client.from('cards')
+  return requirePaged<CardRow>((from, to) => client.from('cards')
     .select('id,deck_id,subject_id,topic_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags,read_at')
     .eq('deck_id', deckId)
     .is('deleted_at', null)
     .eq('suspended', false)
     .or('card_type.is.null,card_type.neq.Lei seca')
-    .order('created_at'));
+    .order('created_at')
+    .range(from, to));
 }
 
 export async function listCardsByType(client: SupabaseClient, profileId: string, cardType: string): Promise<CardRow[]> {
-  return requireData(client.from('cards')
+  return requirePaged<CardRow>((from, to) => client.from('cards')
     .select('id,deck_id,subject_id,topic_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags,read_at')
     .eq('profile_id', profileId)
     .eq('card_type', cardType)
     .is('deleted_at', null)
     .eq('suspended', false)
-    .order('created_at'));
+    .order('created_at')
+    .range(from, to));
 }
 
 export async function setCardReadAt(client: SupabaseClient, cardId: string, read: boolean): Promise<void> {
@@ -146,15 +162,16 @@ export async function setCardReadAt(client: SupabaseClient, cardId: string, read
 
 
 export async function listOfficialEditalTopicIds(client: SupabaseClient, profileId: string): Promise<Set<string>> {
-  const { data, error } = await client.from('cards')
+  const data = await requirePaged<{ topic_id: string | null; card_type: string | null }>((from, to) => client.from('cards')
     .select('topic_id,card_type')
     .eq('profile_id', profileId)
     .is('deleted_at', null)
     .eq('suspended', false)
-    .not('topic_id', 'is', null);
-  if (error) throw error;
+    .not('topic_id', 'is', null)
+    .order('id')
+    .range(from, to));
   const topicIds = new Set<string>();
-  for (const row of (data || []) as Array<{ topic_id: string | null; card_type: string | null }>) {
+  for (const row of data) {
     if (!row.topic_id || row.card_type === 'Lei seca') continue;
     topicIds.add(row.topic_id);
   }
@@ -171,17 +188,19 @@ export type EditalTopicProgress = {
 
 export async function listEditalTopicProgress(client: SupabaseClient, profileId: string): Promise<Map<string, EditalTopicProgress>> {
   const [cards, reviews] = await Promise.all([
-    requireData<Array<{ id: string; topic_id: string | null; card_type: string | null }>>(client.from('cards')
+    requirePaged<{ id: string; topic_id: string | null; card_type: string | null }>((from, to) => client.from('cards')
       .select('id,topic_id,card_type')
       .eq('profile_id', profileId)
       .is('deleted_at', null)
       .eq('suspended', false)
-      .not('topic_id', 'is', null)),
-    requireData<Array<{ card_id: string; rating: number }>>(client.from('reviews')
+      .not('topic_id', 'is', null)
+      .order('id')
+      .range(from, to)),
+    requirePaged<{ card_id: string; rating: number }>((from, to) => client.from('reviews')
       .select('card_id,rating')
       .eq('profile_id', profileId)
       .order('reviewed_at', { ascending: false })
-      .limit(10000)),
+      .range(from, to)),
   ]);
 
   const latestRating = new Map<string, number>();
@@ -212,16 +231,16 @@ export async function listEditalTopicProgress(client: SupabaseClient, profileId:
 }
 
 export async function listStudyCardCountsByTopic(client: SupabaseClient, profileId: string): Promise<Map<string, number>> {
-  const { data, error } = await client.from('cards')
+  const data = await requirePaged<{ topic_id: string | null }>((from, to) => client.from('cards')
     .select('topic_id')
     .eq('profile_id', profileId)
     .is('deleted_at', null)
     .eq('suspended', false)
     .or('card_type.is.null,card_type.neq.Lei seca')
-    .not('topic_id', 'is', null);
-  if (error) throw error;
+    .not('topic_id', 'is', null)
+    .range(from, to));
   const counts = new Map<string, number>();
-  for (const row of (data || []) as Array<{ topic_id: string | null }>) {
+  for (const row of data) {
     if (!row.topic_id) continue;
     counts.set(row.topic_id, (counts.get(row.topic_id) ?? 0) + 1);
   }
@@ -263,11 +282,11 @@ export async function listJurisprudence(client: SupabaseClient, profileId: strin
 export type LatestReview = { rating: number; due_at: string };
 
 export async function listLatestReviewsByCard(client: SupabaseClient, profileId: string): Promise<Map<string, LatestReview>> {
-  const rows = await requireData<Array<{ card_id: string; rating: number; due_at: string }>>(client.from('reviews')
+  const rows = await requirePaged<{ card_id: string; rating: number; due_at: string }>((from, to) => client.from('reviews')
     .select('card_id,rating,due_at')
     .eq('profile_id', profileId)
     .order('reviewed_at', { ascending: false })
-    .limit(5000));
+    .range(from, to));
   const latest = new Map<string, LatestReview>();
   for (const row of rows) {
     if (!latest.has(row.card_id)) latest.set(row.card_id, { rating: row.rating, due_at: row.due_at });
@@ -276,10 +295,12 @@ export async function listLatestReviewsByCard(client: SupabaseClient, profileId:
 }
 
 export async function listOpenErrorCardIds(client: SupabaseClient, profileId: string): Promise<Set<string>> {
-  const rows = await requireData<Array<{ card_id: string | null }>>(client.from('error_notebook')
+  const rows = await requirePaged<{ card_id: string | null }>((from, to) => client.from('error_notebook')
     .select('card_id')
     .eq('profile_id', profileId)
     .eq('kind', 'card')
-    .eq('resolved', false));
+    .eq('resolved', false)
+    .order('id')
+    .range(from, to));
   return new Set(rows.map((row) => row.card_id).filter((id): id is string => Boolean(id)));
 }

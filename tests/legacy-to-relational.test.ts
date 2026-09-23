@@ -41,6 +41,9 @@ class FakeQueryBuilder {
   private mode: 'select' | 'insert' | 'upsert' = 'select';
   private payloads: Row[] = [];
   private conflictCols: string[] | null = null;
+  private rangeStart = 0;
+  private rangeEnd: number | null = null;
+  private orderField: string | null = null;
 
   constructor(private tables: Record<string, Row[]>, private counters: Record<string, number>, private table: string) {}
 
@@ -55,6 +58,17 @@ class FakeQueryBuilder {
 
   is(field: string, value: any) {
     this.filters.push([field, value]);
+    return this;
+  }
+
+  order(field: string) {
+    this.orderField = field;
+    return this;
+  }
+
+  range(from: number, to: number) {
+    this.rangeStart = from;
+    this.rangeEnd = to;
     return this;
   }
 
@@ -90,7 +104,10 @@ class FakeQueryBuilder {
   then(resolve: (value: { data: Row[] | null; error: any }) => void, reject: (reason: unknown) => void) {
     try {
       if (this.mode === 'select') {
-        resolve({ data: this.rows().filter((row) => this.matches(row)), error: null });
+        let rows = this.rows().filter((row) => this.matches(row));
+        if (this.orderField) rows = [...rows].sort((a, b) => String(a[this.orderField!]).localeCompare(String(b[this.orderField!])));
+        if (this.rangeEnd !== null) rows = rows.slice(this.rangeStart, this.rangeEnd + 1);
+        resolve({ data: rows, error: null });
       } else {
         resolve(this.runWrite());
       }

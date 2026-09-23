@@ -22,7 +22,7 @@ export function BackupPanel({ user, profile, onRestored }: Props) {
     try {
       const payload = await exportBackup(getSupabaseClient(), profile);
       downloadBackupFile(payload);
-      setMessage(`Backup baixado: ${payload.cards.length} cartões, ${payload.subjects.length} disciplinas.`);
+      setMessage(`Backup baixado: ${payload.cards.length} cartões, ${payload.reviews.length} revisões, ${payload.errors.length} erros e ${payload.subjects.length} disciplinas.`);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause));
     } finally {
@@ -39,7 +39,7 @@ export function BackupPanel({ user, profile, onRestored }: Props) {
       const text = await file.text();
       const payload = parseBackupFile(text);
       const report = await restoreBackup(getSupabaseClient(), user, profile.id, payload);
-      setMessage(`Backup restaurado: ${report.cards} cartões, ${report.subjects} disciplinas, ${report.decks} baralhos.`);
+      setMessage(`Backup restaurado: ${report.cards} cartões, ${report.reviews} revisões, ${report.errors} erros, ${report.subjects} disciplinas e ${report.decks} baralhos.`);
       await onRestored?.();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause));
