@@ -46,13 +46,15 @@ export async function loadPerformance(client: SupabaseClient, user: User, profil
   today.setHours(0, 0, 0, 0);
   const now = Date.now();
 
-  const [{ data: reviews, error: reviewError }, { count: openErrors, error: errorCountError }, latestByCard] = await Promise.all([
+  const [{ data: reviews, error: reviewError }, { count: openErrors, error: errorCountError }, latestByCard, { data: activeCards, error: activeCardsError }] = await Promise.all([
     client.from('reviews').select('rating,reviewed_at,cards(subject_id)').eq('user_id', user.id).eq('profile_id', profileId),
     client.from('error_notebook').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('profile_id', profileId).eq('resolved', false),
     listLatestReviewsByCard(client, profileId),
+    client.from('cards').select('id').eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false),
   ]);
   if (reviewError) throw reviewError;
   if (errorCountError) throw errorCountError;
+  if (activeCardsError) throw activeCardsError;
 
   const reviewRows = (reviews ?? []) as Array<{ rating: number; reviewed_at: string; cards: { subject_id: string | null }[] | { subject_id: string | null } | null }>;
   const subjectIdOf = (row: (typeof reviewRows)[number]) => Array.isArray(row.cards) ? row.cards[0]?.subject_id ?? null : row.cards?.subject_id ?? null;
@@ -62,7 +64,8 @@ export async function loadPerformance(client: SupabaseClient, user: User, profil
   const activeDays = new Set(reviewRows.map((row) => dateKey(new Date(row.reviewed_at))));
   const streakDays = computeStreak(activeDays, new Date());
 
-  const dueNow = Array.from(latestByCard.values()).filter((row) => new Date(row.due_at).getTime() <= now).length;
+  const activeCardIds = new Set((activeCards || []).map((row: { id: string }) => row.id));
+  const dueNow = Array.from(latestByCard.entries()).filter(([cardId, row]) => activeCardIds.has(cardId) && new Date(row.due_at).getTime() <= now).length;
 
   const bySubjectMap = new Map<string, { reviews: number; correct: number }>();
   for (const row of reviewRows) {
