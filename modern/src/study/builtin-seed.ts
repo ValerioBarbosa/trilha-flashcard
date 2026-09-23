@@ -240,7 +240,7 @@ async function requirePaged<T>(queryPage: (from: number, to: number) => PromiseL
   return rows;
 }
 function normalizeContent(value: string): string { return value.normalize('NFKC').replace(/\s+/g, ' ').trim().toLocaleLowerCase('pt-BR'); }
-function contentKey(subjectId: string | null, front: string, back: string): string { return `${subjectId || ''}|${normalizeContent(front)}|${normalizeContent(back)}`; }
+function contentKey(front: string, back: string): string { return `${normalizeContent(front)}|${normalizeContent(back)}`; }
 function normalizedPriority(value: unknown): 'A'|'B'|'C'|null { const v = typeof value === 'string' ? value.trim().toUpperCase() : ''; return v === 'A' || v === 'B' || v === 'C' ? v : null; }
 function normalizedDifficulty(value: unknown): 'easy'|'medium'|'hard'|null { const v = typeof value === 'string' ? value.trim().toLowerCase() : ''; if (['easy','facil','fácil'].includes(v)) return 'easy'; if (['medium','medio','médio'].includes(v)) return 'medium'; if (['hard','dificil','difícil'].includes(v)) return 'hard'; return null; }
 function tagsFor(card: LegacyCard): string[] { const values = new Set<string>(); if (Array.isArray(card.tags)) card.tags.forEach((tag) => tag && values.add(String(tag).trim())); if (card.tag?.trim()) values.add(card.tag.trim()); if (card.subtopic?.trim()) values.add(card.subtopic.trim()); return [...values].filter(Boolean); }
@@ -308,7 +308,7 @@ async function upsertCards(
     const back = card.back?.trim();
     if (!front || !back) continue;
 
-    const key = contentKey(subjectId, front, back);
+    const key = contentKey(front, back);
     const legacyId = card.id?.trim() || `card-${stableHash(`${deck.id}|${front}|${back}`)}`;
     const canonical = legacyId.startsWith('card-trt4-');
     const row = {
@@ -379,12 +379,12 @@ export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User
   ]);
   if (deckReadError) throw deckReadError;
   const builtinDeckIds = new Set((existingDecks || []).filter((row:any) => row.is_builtin).map((row:any) => row.id));
-  const seen = new Set<string>(existing.map((row:any) => contentKey(row.subject_id, row.front, row.back)));
+  const seen = new Set<string>(existing.map((row:any) => contentKey(row.front, row.back)));
   const existingBuiltinByContent = new Map<string, ExistingBuiltinCard>();
   const existingBuiltinByLegacyId = new Map<string, ExistingBuiltinCard>();
   for (const row of existing) {
     if (!builtinDeckIds.has(row.deck_id)) continue;
-    existingBuiltinByContent.set(contentKey(row.subject_id, row.front, row.back), row);
+    existingBuiltinByContent.set(contentKey(row.front, row.back), row);
     if (row.legacy_id) existingBuiltinByLegacyId.set(row.legacy_id, row);
   }
   let seededDecks=0, cards=0, reconciled=0, topics=0, duplicatesSkipped=0, order=0;
