@@ -65,6 +65,7 @@ export async function loadPerformance(client: SupabaseClient, user: User, profil
       .select('rating,reviewed_at,cards(subject_id)')
       .eq('user_id', user.id)
       .eq('profile_id', profileId)
+      .order('reviewed_at')
       .range(from, to)),
     client.from('error_notebook').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('profile_id', profileId).eq('resolved', false),
     listLatestReviewsByCard(client, profileId),
@@ -73,6 +74,7 @@ export async function loadPerformance(client: SupabaseClient, user: User, profil
       .eq('profile_id', profileId)
       .is('deleted_at', null)
       .eq('suspended', false)
+      .order('id')
       .range(from, to)),
   ]);
   if (errorCountError) throw errorCountError;
