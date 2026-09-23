@@ -14,7 +14,8 @@ import {
   type TopicRow,
 } from './domain-repository';
 
-const BUILTIN_CATALOG_VERSION = 'trt4-ajaj-v3-1437-global-reconcile-v2-2026-09-23';
+const BUILTIN_CATALOG_VERSION = 'trt4-ajaj-v3-1437-self-heal-v3-2026-09-23';
+const EXPECTED_BUILTIN_CATALOG_CARDS = 1437;
 
 function activeProfileKey(userId: string): string {
   return `trilha-active-profile:${userId}`;
@@ -87,21 +88,40 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
       const nextProfiles = await listProfiles(client, user);
       const resolvedProfile = (activeProfileId && nextProfiles.find((item) => item.id === activeProfileId)) || defaultProfile;
 
-      const { count, error: countError } = await client.from('decks')
-        .select('*', { count: 'exact', head: true })
-        .eq('profile_id', resolvedProfile.id)
-        .eq('is_builtin', true);
+      const [{ count, error: countError }, { count: officialCount, error: officialCountError }] = await Promise.all([
+        client.from('decks')
+          .select('*', { count: 'exact', head: true })
+          .eq('profile_id', resolvedProfile.id)
+          .eq('is_builtin', true),
+        client.from('cards')
+          .select('*', { count: 'exact', head: true })
+          .eq('profile_id', resolvedProfile.id)
+          .is('deleted_at', null)
+          .eq('suspended', false)
+          .like('source', 'Edital Verticalizado TRT-4 AJAJ 2026 V3%'),
+      ]);
       if (countError) throw countError;
+      if (officialCountError) throw officialCountError;
 
       const catalogOutdated = readBuiltinCatalogVersion(user.id, resolvedProfile.id) !== BUILTIN_CATALOG_VERSION;
-      if (resolvedProfile.is_builtin && ((count ?? 0) === 0 || catalogOutdated)) {
+      const catalogIncomplete = (officialCount ?? 0) < EXPECTED_BUILTIN_CATALOG_CARDS;
+      if (resolvedProfile.is_builtin && ((count ?? 0) === 0 || catalogOutdated || catalogIncomplete)) {
         setSeeding(true);
         try {
           await seedBuiltinStudyCatalog(client, user, resolvedProfile.id);
+          const { count: verifiedCount, error: verifyError } = await client.from('cards')
+            .select('*', { count: 'exact', head: true })
+            .eq('profile_id', resolvedProfile.id)
+            .is('deleted_at', null)
+            .eq('suspended', false)
+            .like('source', 'Edital Verticalizado TRT-4 AJAJ 2026 V3%');
+          if (verifyError) throw verifyError;
+          if ((verifiedCount ?? 0) < EXPECTED_BUILTIN_CATALOG_CARDS) {
+            throw new Error(`Catálogo oficial incompleto: ${verifiedCount ?? 0}/${EXPECTED_BUILTIN_CATALOG_CARDS}. Tente novamente.`);
+          }
           storeBuiltinCatalogVersion(user.id, resolvedProfile.id);
         } catch (seedError) {
-          if ((count ?? 0) === 0) throw seedError;
-          console.warn('Falha não bloqueante ao atualizar catálogo nativo:', errorMessage(seedError));
+          throw new Error(`Falha ao atualizar catálogo oficial: ${errorMessage(seedError)}`);
         } finally {
           setSeeding(false);
         }

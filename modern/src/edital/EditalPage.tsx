@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { buildEditalSubjects } from '@core/features/edital/edital-model';
 import type { SubjectRow, TopicRow } from '@core/features/study/domain-repository';
-import { listEditalTopicProgress, type EditalTopicProgress } from '../study/domain-repository';
+import { listEditalTopicProgress, listOfficialEditalTopicIds, type EditalTopicProgress } from '../study/domain-repository';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { PageHeader } from '../shared/PageHeader';
 import { MetricTile } from '../shared/MetricTile';
 
 type Props = {
   profileId: string;
+  isBuiltin?: boolean;
   subjects: SubjectRow[];
   topics: TopicRow[];
   onStudyTopic: (subjectId: string, topicId: string) => void;
@@ -31,22 +32,33 @@ function statusClass(status: EditalTopicProgress['status']): string {
   return 'status-not-started';
 }
 
-export function EditalPage({ profileId, subjects, topics, onStudyTopic, onOpenLeiSeca }: Props) {
+export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onStudyTopic, onOpenLeiSeca }: Props) {
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [priority, setPriority] = useState<PriorityFilter>('all');
   const [status, setStatus] = useState<StatusFilter>('all');
   const [progress, setProgress] = useState<Map<string, EditalTopicProgress>>(new Map());
+  const [officialTopicIds, setOfficialTopicIds] = useState<Set<string>>(new Set());
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const allSubjects = useMemo(() => buildEditalSubjects(subjects, topics, '').map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter((topic) => !COMPLEMENTARY_TOPICS.has(topic.name)) })).filter((subject) => subject.rootTopics.length > 0), [subjects, topics]);
-  const searchedSubjects = useMemo(() => buildEditalSubjects(subjects, topics, query).map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter((topic) => !COMPLEMENTARY_TOPICS.has(topic.name)) })).filter((subject) => subject.rootTopics.length > 0), [subjects, topics, query]);
+  const officialFilter = (topic: TopicRow) => !COMPLEMENTARY_TOPICS.has(topic.name) && (!isBuiltin || officialTopicIds.has(topic.id));
+  const allSubjects = useMemo(() => buildEditalSubjects(subjects, topics, '').map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter(officialFilter) })).filter((subject) => subject.rootTopics.length > 0), [subjects, topics, isBuiltin, officialTopicIds]);
+  const searchedSubjects = useMemo(() => buildEditalSubjects(subjects, topics, query).map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter(officialFilter) })).filter((subject) => subject.rootTopics.length > 0), [subjects, topics, query, isBuiltin, officialTopicIds]);
 
   useEffect(() => {
     let cancelled = false;
     setLoadError(null);
-    void listEditalTopicProgress(getSupabaseClient(), profileId)
-      .then((rows) => { if (!cancelled) setProgress(rows); })
+    const client = getSupabaseClient();
+    void Promise.all([
+      listEditalTopicProgress(client, profileId),
+      isBuiltin ? listOfficialEditalTopicIds(client, profileId) : Promise.resolve(new Set<string>()),
+    ])
+      .then(([rows, ids]) => {
+        if (!cancelled) {
+          setProgress(rows);
+          setOfficialTopicIds(ids);
+        }
+      })
       .catch((cause) => { if (!cancelled) setLoadError(cause instanceof Error ? cause.message : 'Não foi possível carregar o progresso do edital.'); });
     return () => { cancelled = true; };
   }, [profileId]);
