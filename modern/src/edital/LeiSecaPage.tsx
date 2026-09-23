@@ -52,6 +52,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const [importRows, setImportRows] = useState<ImportCandidate[]>([]);
   const [importStatus, setImportStatus] = useState<string | null>(null);
   const [importBusy, setImportBusy] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const baseRows = useMemo(() => buildLeiSecaSubjects(subjects, topics, query), [subjects, topics, query]);
   const allSubjects = useMemo(() => buildLeiSecaSubjects(subjects, topics, ''), [subjects, topics]);
   const rows = useMemo(() => {
@@ -82,6 +83,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   }, [allSubjects, cardsByTopic]);
 
   function reloadCards() {
+    setLoadError(null);
     return Promise.all([
       listCardsByType(getSupabaseClient(), profileId, 'Lei seca'),
       listStudyCardCountsByTopic(getSupabaseClient(), profileId),
@@ -100,7 +102,9 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
 
   useEffect(() => {
     let cancelled = false;
-    void reloadCards().catch(() => { if (!cancelled) undefined; });
+    void reloadCards().catch((cause) => {
+      if (!cancelled) setLoadError(cause instanceof Error ? cause.message : 'Não foi possível carregar a Lei Seca.');
+    });
     return () => { cancelled = true; };
   }, [profileId]);
 
@@ -149,6 +153,8 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
       setImportStatus(`${result.inserted} cartões importados · ${result.duplicates} duplicados ignorados · ${result.failed} falhas.`);
       await reloadCards();
       setImportRows(await markImportDuplicates(getSupabaseClient(), profileId, importRows));
+    } catch (cause) {
+      setImportStatus(`Falha ao importar: ${cause instanceof Error ? cause.message : String(cause)}`);
     } finally {
       setImportBusy(false);
     }
@@ -201,6 +207,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
           </div>
         }
       />
+      {loadError ? <div className="notice error"><strong>Não foi possível carregar a Lei Seca.</strong><span>{loadError}</span><button onClick={() => void reloadCards()}>Tentar novamente</button></div> : null}
       <div className="dashboard-grid lei-seca-metrics">
         <MetricTile label="Assuntos com Lei Seca" value={`${coverage.coveredTopics}/${coverage.totalTopics}`} helper="do total de assuntos com base legal" />
         <MetricTile label="Disciplinas iniciadas" value={`${coverage.subjectsCovered}/${coverage.totalSubjects}`} helper="com ao menos 1 assunto cadastrado" />
@@ -256,7 +263,10 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                       </div>
                       <div className="topic-actions lei-seca-topic-actions">
                         {topicCards.length ? (
-                          <button className="primary-action" onClick={() => openReader(topic.id, Math.min(readCount, topicCards.length - 1))}>Ler agora</button>
+                          <button className="primary-action" onClick={() => {
+                            const firstUnread = topicCards.findIndex((card) => !card.read_at);
+                            openReader(topic.id, firstUnread >= 0 ? firstUnread : 0);
+                          }}>Ler agora</button>
                         ) : null}
                         {studyTopicIds.has(topic.id) ? (
                           <button className="secondary-outline" onClick={() => onStudyTopic(subject.id, topic.id)}>Estudar assunto</button>
