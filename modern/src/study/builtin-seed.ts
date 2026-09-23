@@ -348,6 +348,9 @@ async function upsertCards(
 export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User, profileId: string): Promise<BuiltinSeedReport> {
   const completeDecks = await loadCompleteCatalogDecks();
   const decks = mergeLegacyDecks(legacyDecks as LegacyDeck[], completeDecks);
+  const currentBuiltinLegacyIds = new Set(
+    decks.flatMap((deck) => (deck.cards || []).map((card) => card.id?.trim()).filter((id): id is string => Boolean(id)))
+  );
   const [{ data: existingDecks, error: deckReadError }, { data: existing, error: existingError }] = await Promise.all([
     client.from('decks').select('id,is_builtin').eq('profile_id', profileId),
     client.from('cards').select('id,deck_id,legacy_id,subject_id,front,back').eq('profile_id', profileId).is('deleted_at', null),
@@ -374,5 +377,17 @@ export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User
     reconciled += result.reconciled;
     duplicatesSkipped += result.skipped;
   }
+  const staleBuiltinIds = ((existing || []) as ExistingBuiltinCard[])
+    .filter((row) => builtinDeckIds.has(row.deck_id))
+    .filter((row) => Boolean(row.legacy_id?.startsWith('card-trt4-')))
+    .filter((row) => !currentBuiltinLegacyIds.has(row.legacy_id!))
+    .map((row) => row.id);
+  for (let start=0; start<staleBuiltinIds.length; start+=100) {
+    const { error } = await client.from('cards')
+      .update({ deleted_at: new Date().toISOString(), suspended: true })
+      .in('id', staleBuiltinIds.slice(start,start+100));
+    if (error) throw error;
+  }
+
   return { decks:seededDecks, cards: cards + reconciled, topics, duplicatesSkipped };
 }
