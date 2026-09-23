@@ -45,7 +45,7 @@ async function requirePaged<T>(queryPage: (from: number, to: number) => PromiseL
 
 export async function listManagedCards(client: SupabaseClient, profileId: string): Promise<ManagedCard[]> {
   return requirePaged<ManagedCard>((from, to) => client.from('cards')
-    .select('id,deck_id,subject_id,topic_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags,source,source_page,suspended,deleted_at,created_at,updated_at')
+    .select('id,deck_id,subject_id,topic_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags,read_at,source,source_page,suspended,deleted_at,created_at,updated_at')
     .eq('profile_id', profileId)
     .order('updated_at', { ascending: false })
     .range(from, to));
