@@ -114,8 +114,8 @@ export async function restoreBackup(
 
   async function restoreHistory(table: 'reviews' | 'error_notebook', rows: Array<Record<string, unknown>>) {
     if (!rows.length) return 0;
-    const prepared = rows.map((row) => ({ ...row, user_id: user.id, profile_id: profileId }));
-    const hasStableIds = prepared.every((row) => typeof row.id === 'string' && row.id);
+    const prepared: Array<Record<string, unknown>> = rows.map((row) => ({ ...row, user_id: user.id, profile_id: profileId }));
+    const hasStableIds = prepared.every((row) => typeof row['id'] === 'string' && Boolean(row['id']));
     if (!hasStableIds) {
       const { error: deleteError } = await client.from(table).delete().eq('profile_id', profileId);
       if (deleteError) throw deleteError;
@@ -124,7 +124,11 @@ export async function restoreBackup(
       const batch = prepared.slice(start, start + 200);
       const response = hasStableIds
         ? await client.from(table).upsert(batch, { onConflict: 'id' })
-        : await client.from(table).insert(batch.map(({ id: _id, ...row }) => row));
+        : await client.from(table).insert(batch.map((row) => {
+            const copy = { ...row };
+            delete copy['id'];
+            return copy;
+          }));
       if (response.error) throw response.error;
     }
     return rows.length;
