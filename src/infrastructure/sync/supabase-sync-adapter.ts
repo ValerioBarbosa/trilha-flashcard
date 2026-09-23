@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { RemoteSnapshot, SyncAdapter, SyncSnapshot, SyncWriteOptions } from '../../types/sync';
 
 const TABLE = 'flashcard_sync_entries';
+const PAGE_SIZE = 1000;
 
 type SyncRow = {
   storage_key: string;
@@ -77,13 +78,19 @@ function buildChangedRows(userId: string, snapshot: SyncSnapshot, remoteRows: Sy
 
 export function createSupabaseSyncAdapter(client: SupabaseClient): SyncAdapter {
   async function fetchRows(userId: string): Promise<SyncRow[]> {
-    const { data, error } = await client
-      .from(TABLE)
-      .select('storage_key,storage_value,content_hash,deleted,updated_at')
-      .eq('user_id', userId);
-
-    if (error) throw error;
-    return (data ?? []) as SyncRow[];
+    const rows: SyncRow[] = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data, error } = await client
+        .from(TABLE)
+        .select('storage_key,storage_value,content_hash,deleted,updated_at')
+        .eq('user_id', userId)
+        .range(from, from + PAGE_SIZE - 1);
+      if (error) throw error;
+      const page = (data ?? []) as SyncRow[];
+      rows.push(...page);
+      if (page.length < PAGE_SIZE) break;
+    }
+    return rows;
   }
 
   return {
@@ -106,17 +113,17 @@ export function createSupabaseSyncAdapter(client: SupabaseClient): SyncAdapter {
       const changedRows = buildChangedRows(userId, snapshot, remoteRows);
       if (changedRows.length === 0) return remoteToken ?? new Date().toISOString();
 
-      const { data, error } = await client
-        .from(TABLE)
-        .upsert(changedRows, { onConflict: 'user_id,storage_key' })
-        .select('updated_at');
-
-      if (error) throw error;
-
       let serverToken = '';
-      for (const row of data ?? []) {
-        const value = String(row.updated_at ?? '');
-        if (value > serverToken) serverToken = value;
+      for (let start = 0; start < changedRows.length; start += 500) {
+        const { data, error } = await client
+          .from(TABLE)
+          .upsert(changedRows.slice(start, start + 500), { onConflict: 'user_id,storage_key' })
+          .select('updated_at');
+        if (error) throw error;
+        for (const row of data ?? []) {
+          const value = String(row.updated_at ?? '');
+          if (value > serverToken) serverToken = value;
+        }
       }
 
       return serverToken || remoteToken || new Date().toISOString();
