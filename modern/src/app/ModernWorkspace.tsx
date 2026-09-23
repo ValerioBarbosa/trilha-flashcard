@@ -155,21 +155,57 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
       : { title: 'Continue no Edital.', body: `${editalPct}% dos assuntos já têm flashcard. Use o Edital pra achar o que falta cadastrar.`, action: 'Abrir edital', onClick: () => onNavigate('edital') };
 
   return (
-    <div className="page-wrap">
-      <PageHeader eyebrow="SEU PAINEL" title={`Bom estudo${user.user_metadata?.given_name ? `, ${user.user_metadata.given_name}` : ''}.`} subtitle={`${workspace.profile?.name} · ${workspace.profile?.board || 'Banca em acompanhamento'} · Edital ${workspace.profile?.edital_year || 'atual'}`} action={<button className="primary-action" onClick={heroAction}>{heroLabel}</button>} />
+    <div className="page-wrap home-page">
+      <PageHeader eyebrow="SEU PAINEL" title={`Bom estudo${user.user_metadata?.given_name ? `, ${user.user_metadata.given_name}` : ''}.`} subtitle={`${workspace.profile?.name} · ${workspace.profile?.board || 'Banca em acompanhamento'} · Edital ${workspace.profile?.edital_year || 'atual'}`} />
       {loadError ? <div className="notice error"><strong>Alguns dados não carregaram.</strong><span>{loadError}</span></div> : null}
-      <section className="hero-study-card"><div><span className="hero-kicker">PRÓXIMA AÇÃO</span><h2>Transforme pendências em pontos.</h2><p>Estude um baralho, responda sem revelar e registre a dificuldade. O desempenho passa a alimentar sua trilha.</p><button onClick={heroAction}>{performance?.dueNow ? 'Revisar vencidos' : 'Iniciar sessão'}</button></div><div className="hero-stat"><strong>{performance?.streakDays ?? 0}</strong><span>dia{performance?.streakDays === 1 ? '' : 's'} seguidos</span></div></section>
-      <div className="dashboard-grid lei-seca-metrics">
-        <MetricTile label="Cartões totais" value={totalCardCount} helper="inclui flashcards e Lei Seca" />
-        <MetricTile label="Catálogo TRT-4" value={workspace.profile?.is_builtin ? 1077 : editalCoveredTopics} helper={workspace.profile?.is_builtin ? `${Math.min(editalCoveredTopics, 171)}/171 tópicos · ${editalPct}% coberto` : `${editalPct}% do edital coberto`} />
-        <MetricTile label="Trechos de Lei Seca" value={leiSecaCount} helper={`${leiSecaPct}% dos assuntos com base legal`} />
+
+      <section className="home-action-card">
+        <div className="home-action-copy">
+          <span className="home-kicker">PRÓXIMA AÇÃO</span>
+          <h2>{performance?.dueNow ? `Você tem ${performance.dueNow} revisão${performance.dueNow === 1 ? '' : 'ões'} esperando.` : 'Continue do ponto certo.'}</h2>
+          <p>{performance?.dueNow ? 'Zere primeiro os cartões vencidos para manter a repetição espaçada em dia.' : 'Abra uma sessão curta e avance no edital sem perder o ritmo.'}</p>
+          <button className="primary-action" onClick={heroAction}>{heroLabel}</button>
+        </div>
+        <div className="home-action-side">
+          <div className="home-streak"><strong>{performance?.streakDays ?? 0}</strong><span>dias de sequência</span></div>
+          <div className="home-due"><strong>{performance?.dueNow ?? 0}</strong><span>para revisar hoje</span></div>
+        </div>
+      </section>
+
+      <section className="home-progress-card">
+        <div className="home-progress-head">
+          <div>
+            <span className="panel-label">COBERTURA DO EDITAL</span>
+            <h2>{Math.min(editalCoveredTopics, officialTopicTotal)}/{officialTopicTotal} tópicos cobertos</h2>
+            <p>{workspace.profile?.is_builtin ? 'Catálogo oficial TRT-4 AJAJ com 1.077 cartões organizados pelo edital verticalizado.' : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
+          </div>
+          <strong className="home-progress-percent">{editalPct}%</strong>
+        </div>
+        <div className="home-progress-track" aria-label={`Cobertura do edital: ${editalPct}%`}><span style={{ width: `${editalPct}%` }} /></div>
+        <div className="home-progress-meta">
+          <span><strong>{totalCardCount}</strong> cartões totais</span>
+          <span><strong>{leiSecaCount}</strong> Lei Seca</span>
+          <span><strong>{performance?.accuracy ?? 0}%</strong> precisão</span>
+        </div>
+      </section>
+
+      <div className="home-metric-grid">
+        <MetricTile label="Cartões totais" value={totalCardCount} helper="flashcards + Lei Seca" />
+        <MetricTile label="Lei Seca" value={leiSecaCount} helper={`${leiSecaPct}% dos assuntos com base legal`} />
         <MetricTile label="Precisão" value={`${performance?.accuracy ?? 0}%`} helper={`${performance?.totalReviews ?? 0} revisões`} />
-        <MetricTile label="Revisar hoje" value={performance?.dueNow ?? 0} helper="cartões vencidos" />
-        <MetricTile label="Erros abertos" value={performance?.openErrors ?? 0} helper="para atacar na revisão" />
+        <MetricTile label="Erros abertos" value={performance?.openErrors ?? 0} helper="para revisar depois" />
       </div>
-      <div className="content-grid two-one">
+
+      <section className="home-quick-actions" aria-label="Atalhos de estudo">
+        <button onClick={() => onNavigate('study')}><span>▣</span><strong>Estudar</strong><small>Abrir sessão</small></button>
+        <button onClick={() => onNavigate('edital')}><span>☑</span><strong>Edital</strong><small>Ver cobertura</small></button>
+        <button onClick={() => onNavigate('lei-seca')}><span>⚖</span><strong>Lei Seca</strong><small>Leitura dirigida</small></button>
+        <button onClick={() => onNavigate('performance')}><span>↗</span><strong>Desempenho</strong><small>Revisões e erros</small></button>
+      </section>
+
+      <div className="content-grid two-one home-bottom-grid">
         <section className="panel-card"><div className="panel-heading"><div><span>BARALHOS</span><h2>Continuar por disciplina</h2></div><button className="link-button" onClick={() => onNavigate('study')}>Ver todos</button></div><div className="deck-list-clean">{topDecks.map((deck, index) => <button key={deck.id} onClick={() => onStudySubject(deck.subject_id!)}><span className="deck-number">{String(index + 1).padStart(2, '0')}</span><span className="deck-copy"><strong>{deck.name}</strong><small>{deck.is_builtin ? 'Baralho oficial' : 'Baralho personalizado'}</small></span><span className="chevron">›</span></button>)}</div></section>
-        <section className="panel-card accent-panel"><span className="panel-label">PRÓXIMO FOCO</span><h2>{focusMessage.title}</h2><p>{focusMessage.body}</p><button onClick={focusMessage.onClick}>{focusMessage.action}</button></section>
+        <section className="panel-card accent-panel home-focus-panel"><span className="panel-label">PRÓXIMO FOCO</span><h2>{focusMessage.title}</h2><p>{focusMessage.body}</p><button onClick={focusMessage.onClick}>{focusMessage.action}</button></section>
       </div>
     </div>
   );
