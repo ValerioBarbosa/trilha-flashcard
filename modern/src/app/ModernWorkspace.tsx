@@ -16,8 +16,9 @@ import { ProfileSwitcher } from '../study/ProfileSwitcher';
 import { StudyPage, type StudyFocus } from '../study/StudyPage';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
 import { ThemeToggle } from '../shared/ThemeToggle';
+import { CardManagerPage } from '../cards/CardManagerPage';
 
-type PageId = 'home' | 'study' | 'edital' | 'jurisprudence' | 'lei-seca' | 'performance' | 'data';
+type PageId = 'home' | 'study' | 'edital' | 'jurisprudence' | 'lei-seca' | 'cards' | 'performance' | 'data';
 
 type Props = {
   user: User;
@@ -30,6 +31,7 @@ const NAV: Array<{ id: PageId; label: string; icon: string }> = [
   { id: 'edital', label: 'Edital', icon: '☑' },
   { id: 'jurisprudence', label: 'Jurisprudência', icon: '§' },
   { id: 'lei-seca', label: 'Lei Seca', icon: '⚖' },
+  { id: 'cards', label: 'Cartões', icon: '▤' },
   { id: 'performance', label: 'Desempenho', icon: '↗' },
   { id: 'data', label: 'Dados', icon: '↻' },
 ];
@@ -91,6 +93,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
             {page === 'edital' ? <EditalPage profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} onStudyTopic={focusStudyTopic} onOpenLeiSeca={() => selectPage('lei-seca')} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
             {page === 'lei-seca' ? <LeiSecaPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} onStudyTopic={focusStudyTopic} /> : null}
+            {page === 'cards' ? <CardManagerPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} onChanged={workspace.refresh} /> : null}
             {page === 'performance' ? <PerformancePage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} onReviewWrong={startWrongReview} onReviewDue={startDueReview} /> : null}
             {page === 'data' ? <DataPage user={user} workspace={workspace} onMigrated={workspace.refresh} /> : null}
           </>
@@ -101,7 +104,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
 }
 
 function LoadingView({ seeding }: { seeding: boolean }) {
-  return <div className="page-wrap loading-page"><div className="loading-orb" /><h2>{seeding ? 'Preparando seus baralhos…' : 'Carregando sua trilha…'}</h2><p>{seeding ? 'O catálogo oficial está sendo organizado no novo banco. Isso acontece apenas na primeira vez.' : 'Sincronizando estrutura e progresso.'}</p></div>;
+  return <div className="page-wrap loading-page"><div className="loading-orb" /><h2>{seeding ? 'Preparando seus baralhos…' : 'Carregando sua trilha…'}</h2><p>{seeding ? 'Atualizando e conferindo o catálogo oficial sem apagar seu histórico.' : 'Sincronizando estrutura e progresso.'}</p></div>;
 }
 
 function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: {
