@@ -85,10 +85,18 @@ function buildLayer4Cards(cards: CompleteCatalogCard[]): CompleteCatalogCard[] {
   }
 
   const layer4: CompleteCatalogCard[] = [];
-  const officialTopics = cards.filter((card) => card.sourceLayer === 'Camada 3 - Fechamento do edital');
-  for (const card of officialTopics) {
+  const officialTopicsByKey = new Map<string, CompleteCatalogCard>();
+  for (const card of cards.filter((entry) => entry.sourceLayer === 'Camada 3 - Fechamento do edital')) {
+    if (!card.topic) continue;
+    officialTopicsByKey.set(`${card.discipline}|${card.topic}`, card);
+  }
+  const deepestGaps = [...officialTopicsByKey.entries()]
+    .sort(([keyA], [keyB]) => (counts.get(keyA) || 0) - (counts.get(keyB) || 0) || keyA.localeCompare(keyB, 'pt-BR'))
+    .slice(0, 157)
+    .map(([, card]) => card);
+
+  for (const card of deepestGaps) {
     const key = `${card.discipline}|${card.topic || ''}`;
-    if ((counts.get(key) || 0) !== 3 || !card.topic) continue;
     const tags = ['AJAJ','Edital V3','Nível 4 - Aprofundamento real','TRT4','camada-4','aprofundamento'];
     layer4.push({
       id: `card-trt4-layer4-${stableHash(`${key}|caso`)}`,
@@ -234,30 +242,126 @@ async function upsertDeck(client: SupabaseClient, user: User, profileId: string,
 }
 async function ensureTopics(client: SupabaseClient, user: User, profileId: string, subjectId: string | null, deck: LegacyDeck): Promise<Map<string,string>> {
   if (!subjectId) return new Map();
-  const names = new Set<string>(); (deck.topics || []).forEach((name) => name?.trim() && names.add(name.trim())); (deck.cards || []).forEach((card) => card.topic?.trim() && names.add(card.topic.trim()));
+  const names = new Set<string>();
+  (deck.topics || []).forEach((name) => name?.trim() && names.add(name.trim()));
+  (deck.cards || []).forEach((card) => card.topic?.trim() && names.add(card.topic.trim()));
   if (!names.size) return new Map();
-  const rows = [...names].map((name,index) => ({ user_id:user.id, profile_id:profileId, subject_id:subjectId, parent_id:null, name, slug:slugify(name), sort_order:index }));
-  const { data, error } = await client.from('topics').upsert(rows, { onConflict:'subject_id,parent_id,slug' }).select('id,name'); if (error) throw error;
+
+  const rows = [...names].map((name,index) => {
+    const topicCards = (deck.cards || []).filter((card) => card.topic?.trim() === name);
+    const baseCard = topicCards.find((card) => card.subtopic?.trim() === 'Base legal e referência')
+      || topicCards.find((card) => Array.isArray(card.tags) && card.tags.includes('Nível 1 - Matriz verticalizada'))
+      || topicCards[0];
+    const focusCard = topicCards.find((card) => card.subtopic?.trim() === 'Núcleo de cobrança');
+    return {
+      user_id:user.id,
+      profile_id:profileId,
+      subject_id:subjectId,
+      parent_id:null,
+      name,
+      slug:slugify(name),
+      sort_order:index,
+      legal_basis: typeof baseCard?.legalBasis === 'string' ? baseCard.legalBasis : null,
+      priority: normalizedPriority(baseCard?.priority || focusCard?.priority),
+      edital_text: typeof focusCard?.back === 'string' ? focusCard.back : null,
+    };
+  });
+  const { data, error } = await client.from('topics').upsert(rows, { onConflict:'subject_id,parent_id,slug' }).select('id,name');
+  if (error) throw error;
   return new Map((data || []).map((row:any) => [row.name,row.id]));
 }
 
-async function upsertCards(client: SupabaseClient, user: User, profileId: string, subjectId: string | null, deckId: string, deck: LegacyDeck, topics: Map<string,string>, seen: Set<string>) {
-  const rows:any[] = []; let skipped = 0;
+type ExistingBuiltinCard = { id: string; deck_id: string; legacy_id: string | null; subject_id: string | null; front: string; back: string };
+
+async function upsertCards(
+  client: SupabaseClient,
+  user: User,
+  profileId: string,
+  subjectId: string | null,
+  deckId: string,
+  deck: LegacyDeck,
+  topics: Map<string,string>,
+  seen: Set<string>,
+  existingBuiltinByContent: Map<string, ExistingBuiltinCard>,
+) {
+  const rows:any[] = [];
+  const reconcileRows:any[] = [];
+  let skipped = 0;
+
   for (const card of deck.cards || []) {
-    const front = card.front?.trim(); const back = card.back?.trim(); if (!front || !back) continue;
-    const key = contentKey(subjectId, front, back); if (seen.has(key)) { skipped += 1; continue; } seen.add(key);
-    rows.push({ user_id:user.id, profile_id:profileId, deck_id:deckId, subject_id:subjectId, topic_id:subjectId && card.topic ? topics.get(card.topic.trim()) || null : null, legacy_id:card.id?.trim() || `card-${stableHash(`${deck.id}|${front}|${back}`)}`, front, back, card_type:typeof card.cardType === 'string' ? card.cardType : typeof card.type === 'string' ? card.type : null, legal_basis:typeof card.legalBasis === 'string' ? card.legalBasis : null, example:typeof card.example === 'string' ? card.example : null, complement:typeof card.complement === 'string' ? card.complement : null, pitfall:typeof card.pitfall === 'string' ? card.pitfall : null, mnemonic:typeof card.mnemonic === 'string' ? card.mnemonic : null, priority:normalizedPriority(card.priority), difficulty:normalizedDifficulty(card.difficulty), tags:tagsFor(card), source:deck.sourceNote || 'Catálogo nativo Trilha Flashcard', deleted_at:null, suspended:false });
+    const front = card.front?.trim();
+    const back = card.back?.trim();
+    if (!front || !back) continue;
+
+    const key = contentKey(subjectId, front, back);
+    const legacyId = card.id?.trim() || `card-${stableHash(`${deck.id}|${front}|${back}`)}`;
+    const canonical = legacyId.startsWith('card-trt4-');
+    const row = {
+      user_id:user.id,
+      profile_id:profileId,
+      deck_id:deckId,
+      subject_id:subjectId,
+      topic_id:subjectId && card.topic ? topics.get(card.topic.trim()) || null : null,
+      legacy_id:legacyId,
+      front,
+      back,
+      card_type:typeof card.cardType === 'string' ? card.cardType : typeof card.type === 'string' ? card.type : null,
+      legal_basis:typeof card.legalBasis === 'string' ? card.legalBasis : null,
+      example:typeof card.example === 'string' ? card.example : null,
+      complement:typeof card.complement === 'string' ? card.complement : null,
+      pitfall:typeof card.pitfall === 'string' ? card.pitfall : null,
+      mnemonic:typeof card.mnemonic === 'string' ? card.mnemonic : null,
+      priority:normalizedPriority(card.priority),
+      difficulty:normalizedDifficulty(card.difficulty),
+      tags:tagsFor(card),
+      source:deck.sourceNote || 'Catálogo nativo Trilha Flashcard',
+      deleted_at:null,
+      suspended:false,
+    };
+
+    const existingBuiltin = existingBuiltinByContent.get(key);
+    if (canonical && existingBuiltin) {
+      reconcileRows.push({ id: existingBuiltin.id, ...row });
+      seen.add(key);
+      continue;
+    }
+
+    if (seen.has(key)) {
+      skipped += 1;
+      continue;
+    }
+    seen.add(key);
+    rows.push(row);
   }
-  for (let start=0; start<rows.length; start+=100) { const { error } = await client.from('cards').upsert(rows.slice(start,start+100), { onConflict:'user_id,deck_id,legacy_id' }); if (error) throw error; }
-  return { inserted: rows.length, skipped };
+
+  for (let start=0; start<reconcileRows.length; start+=100) {
+    const { error } = await client.from('cards').upsert(reconcileRows.slice(start,start+100), { onConflict:'id' });
+    if (error) throw error;
+  }
+  for (let start=0; start<rows.length; start+=100) {
+    const { error } = await client.from('cards').upsert(rows.slice(start,start+100), { onConflict:'user_id,deck_id,legacy_id' });
+    if (error) throw error;
+  }
+  return { inserted: rows.length, reconciled: reconcileRows.length, skipped };
 }
 
 export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User, profileId: string): Promise<BuiltinSeedReport> {
   const completeDecks = await loadCompleteCatalogDecks();
   const decks = mergeLegacyDecks(legacyDecks as LegacyDeck[], completeDecks);
-  const { data: existing, error: existingError } = await client.from('cards').select('subject_id,front,back').eq('profile_id', profileId).is('deleted_at', null); if (existingError) throw existingError;
+  const [{ data: existingDecks, error: deckReadError }, { data: existing, error: existingError }] = await Promise.all([
+    client.from('decks').select('id,is_builtin').eq('profile_id', profileId),
+    client.from('cards').select('id,deck_id,legacy_id,subject_id,front,back').eq('profile_id', profileId).is('deleted_at', null),
+  ]);
+  if (deckReadError) throw deckReadError;
+  if (existingError) throw existingError;
+  const builtinDeckIds = new Set((existingDecks || []).filter((row:any) => row.is_builtin).map((row:any) => row.id));
   const seen = new Set<string>((existing || []).map((row:any) => contentKey(row.subject_id, row.front, row.back)));
-  let seededDecks=0, cards=0, topics=0, duplicatesSkipped=0, order=0;
+  const existingBuiltinByContent = new Map<string, ExistingBuiltinCard>();
+  for (const row of (existing || []) as ExistingBuiltinCard[]) {
+    if (!builtinDeckIds.has(row.deck_id)) continue;
+    existingBuiltinByContent.set(contentKey(row.subject_id, row.front, row.back), row);
+  }
+  let seededDecks=0, cards=0, reconciled=0, topics=0, duplicatesSkipped=0, order=0;
   for (const deck of decks) {
     if (!isOnboardingDeck(deck) && isEmptyDeck(deck)) continue;
     let subjectId: string | null = null;
@@ -265,7 +369,10 @@ export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User
     const deckId=await upsertDeck(client,user,profileId,subjectId,deck);
     seededDecks += 1;
     const topicMap=await ensureTopics(client,user,profileId,subjectId,deck); topics += topicMap.size;
-    const result=await upsertCards(client,user,profileId,subjectId,deckId,deck,topicMap,seen); cards += result.inserted; duplicatesSkipped += result.skipped;
+    const result=await upsertCards(client,user,profileId,subjectId,deckId,deck,topicMap,seen,existingBuiltinByContent);
+    cards += result.inserted;
+    reconciled += result.reconciled;
+    duplicatesSkipped += result.skipped;
   }
-  return { decks:seededDecks, cards, topics, duplicatesSkipped };
+  return { decks:seededDecks, cards: cards + reconciled, topics, duplicatesSkipped };
 }
