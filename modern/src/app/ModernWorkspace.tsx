@@ -145,14 +145,14 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
 
   const topDecks = workspace.decks.filter((deck) => deck.subject_id).slice(0, 4);
 
-  const heroAction = () => (performance?.dueNow ? onReviewDue() : onNavigate('study'));
-  const heroLabel = performance?.dueNow ? `Revisar ${performance.dueNow} vencido${performance.dueNow === 1 ? '' : 's'} →` : 'Continuar estudando →';
+  const heroAction = () => onNavigate('study');
+  const heroLabel = 'Continuar estudando →';
 
-  const focusMessage = performance?.dueNow
-    ? { title: `${performance.dueNow} cartão${performance.dueNow === 1 ? '' : 's'} vencido${performance.dueNow === 1 ? '' : 's'}.`, body: 'A revisão espaçada funciona melhor sem atraso — vale zerar a fila agora.', action: 'Revisar agora', onClick: onReviewDue }
-    : leiSecaPct < editalPct
-      ? { title: 'Lei Seca está para trás.', body: `Cobertura de Lei Seca em ${leiSecaPct}%, contra ${editalPct}% de flashcards. Bom momento pra importar mais PDFs.`, action: 'Abrir Lei Seca', onClick: () => onNavigate('lei-seca') }
-      : { title: 'Continue no Edital.', body: `${editalPct}% dos assuntos já têm flashcard. Use o Edital pra achar o que falta cadastrar.`, action: 'Abrir edital', onClick: () => onNavigate('edital') };
+  const focusMessage = leiSecaPct < editalPct
+    ? { title: 'Avance na Lei Seca.', body: `A cobertura de Lei Seca está em ${leiSecaPct}%. Continue pelos assuntos do edital que ainda têm espaço para leitura dirigida.`, action: 'Abrir Lei Seca', onClick: () => onNavigate('lei-seca') }
+    : editalPct < 100
+      ? { title: 'Continue avançando no edital.', body: `Você já cobriu ${editalPct}% dos tópicos. Priorize agora os assuntos ainda sem cobertura completa.`, action: 'Abrir edital', onClick: () => onNavigate('edital') }
+      : { title: 'Mantenha o ritmo.', body: 'O edital já está coberto por cartões. Agora o foco é estudar, praticar e consolidar os pontos mais difíceis.', action: 'Estudar agora', onClick: () => onNavigate('study') };
 
   return (
     <div className="page-wrap home-page">
@@ -162,13 +162,13 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
       <section className="home-action-card">
         <div className="home-action-copy">
           <span className="home-kicker">PRÓXIMA AÇÃO</span>
-          <h2>{performance?.dueNow ? `Você tem ${performance.dueNow} revisão${performance.dueNow === 1 ? '' : 'ões'} esperando.` : 'Continue do ponto certo.'}</h2>
-          <p>{performance?.dueNow ? 'Zere primeiro os cartões vencidos para manter a repetição espaçada em dia.' : 'Abra uma sessão curta e avance no edital sem perder o ritmo.'}</p>
+          <h2>Continue do ponto certo.</h2>
+          <p>Abra uma sessão curta, avance no conteúdo do edital e mantenha o ritmo de estudo.</p>
           <button className="primary-action" onClick={heroAction}>{heroLabel}</button>
         </div>
         <div className="home-action-side">
           <div className="home-streak"><strong>{performance?.streakDays ?? 0}</strong><span>dias de sequência</span></div>
-          <div className="home-due"><strong>{performance?.dueNow ?? 0}</strong><span>para revisar hoje</span></div>
+          <div className="home-due"><strong>{performance?.dueNow ?? 0}</strong><span>pendentes hoje</span></div>
         </div>
       </section>
 
@@ -192,15 +192,15 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
       <div className="home-metric-grid">
         <MetricTile label="Cartões totais" value={totalCardCount} helper="flashcards + Lei Seca" />
         <MetricTile label="Lei Seca" value={leiSecaCount} helper={`${leiSecaPct}% dos assuntos com base legal`} />
-        <MetricTile label="Precisão" value={`${performance?.accuracy ?? 0}%`} helper={`${performance?.totalReviews ?? 0} revisões`} />
-        <MetricTile label="Erros abertos" value={performance?.openErrors ?? 0} helper="para revisar depois" />
+        <MetricTile label="Precisão" value={`${performance?.accuracy ?? 0}%`} helper={`${performance?.totalReviews ?? 0} respostas registradas`} />
+        <MetricTile label="Erros abertos" value={performance?.openErrors ?? 0} helper="pontos para reforçar" />
       </div>
 
       <section className="home-quick-actions" aria-label="Atalhos de estudo">
         <button onClick={() => onNavigate('study')}><span>▣</span><strong>Estudar</strong><small>Abrir sessão</small></button>
         <button onClick={() => onNavigate('edital')}><span>☑</span><strong>Edital</strong><small>Ver cobertura</small></button>
         <button onClick={() => onNavigate('lei-seca')}><span>⚖</span><strong>Lei Seca</strong><small>Leitura dirigida</small></button>
-        <button onClick={() => onNavigate('performance')}><span>↗</span><strong>Desempenho</strong><small>Revisões e erros</small></button>
+        <button onClick={() => onNavigate('performance')}><span>↗</span><strong>Desempenho</strong><small>Precisão e progresso</small></button>
       </section>
 
       <div className="content-grid two-one home-bottom-grid">
