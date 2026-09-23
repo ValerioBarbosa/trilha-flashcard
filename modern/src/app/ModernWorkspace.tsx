@@ -130,7 +130,7 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
       loadPerformance(client, user, profileId),
       client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false),
       client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).eq('card_type', 'Lei seca'),
-      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).like('legacy_id', 'card-trt4-%'),
+      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).like('source', 'Edital Verticalizado TRT-4 AJAJ 2026 V3%'),
       listOfficialEditalTopicIds(client, profileId),
       listCardsByType(client, profileId, 'Lei seca'),
     ]).then(([summary, cards, leiSeca, catalogCards, officialTopicIds, leiSecaCards]) => {
