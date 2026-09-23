@@ -84,6 +84,7 @@ export function createSupabaseSyncAdapter(client: SupabaseClient): SyncAdapter {
         .from(TABLE)
         .select('storage_key,storage_value,content_hash,deleted,updated_at')
         .eq('user_id', userId)
+        .order('storage_key')
         .range(from, from + PAGE_SIZE - 1);
       if (error) throw error;
       const page = (data ?? []) as SyncRow[];
