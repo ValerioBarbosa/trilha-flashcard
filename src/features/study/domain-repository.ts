@@ -167,6 +167,7 @@ export async function listOfficialEditalTopicIds(client: SupabaseClient, profile
     .eq('profile_id', profileId)
     .is('deleted_at', null)
     .eq('suspended', false)
+    .like('source', 'Edital Verticalizado TRT-4 AJAJ 2026 V3%')
     .not('topic_id', 'is', null)
     .order('id')
     .range(from, to));
