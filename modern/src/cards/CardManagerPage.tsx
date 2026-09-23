@@ -134,7 +134,7 @@ export function CardManagerPage({ user, profileId, subjects, topics, decks, onCh
       const text = await file.text();
       const subjectId = subjects[0]?.id || '';
       const deckId = decks.find((deck) => deck.subject_id === subjectId)?.id || decks[0]?.id || '';
-      const parsed = parseJsonImport(text, { subjectId, deckId });
+      const parsed = parseJsonImport(text, { subjectId, deckId, subjects, topics, decks });
       const marked = await markImportDuplicates(getSupabaseClient(), profileId, parsed);
       const duplicateCount = marked.filter((row) => row.duplicate).length;
       const invalidCount = marked.filter((row) => !row.duplicate && !isImportableCandidate(row)).length;
