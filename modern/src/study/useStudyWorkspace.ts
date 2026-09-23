@@ -40,6 +40,19 @@ function storeProfileId(userId: string, profileId: string): void {
   try { window.localStorage.setItem(activeProfileKey(userId), profileId); } catch { /* localStorage indisponível */ }
 }
 
+function errorMessage(cause: unknown): string {
+  if (cause instanceof Error) return cause.message;
+  if (cause && typeof cause === 'object') {
+    const value = cause as Record<string, unknown>;
+    const message = typeof value.message === 'string' ? value.message : null;
+    const details = typeof value.details === 'string' ? value.details : null;
+    const hint = typeof value.hint === 'string' ? value.hint : null;
+    const code = typeof value.code === 'string' ? value.code : null;
+    return [message, details, hint, code ? `Código: ${code}` : null].filter(Boolean).join(' · ') || 'Erro inesperado ao carregar os estudos.';
+  }
+  return String(cause);
+}
+
 export type StudyWorkspace = {
   profile: ProfileRow | null;
   profiles: ProfileRow[];
@@ -83,9 +96,15 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
       const catalogOutdated = readBuiltinCatalogVersion(user.id, resolvedProfile.id) !== BUILTIN_CATALOG_VERSION;
       if (resolvedProfile.is_builtin && ((count ?? 0) === 0 || catalogOutdated)) {
         setSeeding(true);
-        await seedBuiltinStudyCatalog(client, user, resolvedProfile.id);
-        storeBuiltinCatalogVersion(user.id, resolvedProfile.id);
-        setSeeding(false);
+        try {
+          await seedBuiltinStudyCatalog(client, user, resolvedProfile.id);
+          storeBuiltinCatalogVersion(user.id, resolvedProfile.id);
+        } catch (seedError) {
+          if ((count ?? 0) === 0) throw seedError;
+          console.warn('Falha não bloqueante ao atualizar catálogo nativo:', errorMessage(seedError));
+        } finally {
+          setSeeding(false);
+        }
       }
 
       const [nextSubjects, nextTopics, nextDecks] = await Promise.all([
@@ -100,7 +119,7 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
       setDecks(nextDecks);
     } catch (cause) {
       setSeeding(false);
-      setError(cause instanceof Error ? cause.message : String(cause));
+      setError(errorMessage(cause));
     } finally {
       setLoading(false);
     }
