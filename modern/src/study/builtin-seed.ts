@@ -239,7 +239,7 @@ async function requirePaged<T>(queryPage: (from: number, to: number) => PromiseL
   }
   return rows;
 }
-function normalizeContent(value: string): string { return value.normalize('NFKC').replace(/\s+/g, ' ').trim().toLocaleLowerCase('pt-BR'); }
+function normalizeContent(value: string): string { return value.trim().toLowerCase(); }
 function contentKey(front: string, back: string): string { return `${normalizeContent(front)}|${normalizeContent(back)}`; }
 function normalizedPriority(value: unknown): 'A'|'B'|'C'|null { const v = typeof value === 'string' ? value.trim().toUpperCase() : ''; return v === 'A' || v === 'B' || v === 'C' ? v : null; }
 function normalizedDifficulty(value: unknown): 'easy'|'medium'|'hard'|null { const v = typeof value === 'string' ? value.trim().toLowerCase() : ''; if (['easy','facil','fácil'].includes(v)) return 'easy'; if (['medium','medio','médio'].includes(v)) return 'medium'; if (['hard','dificil','difícil'].includes(v)) return 'hard'; return null; }
