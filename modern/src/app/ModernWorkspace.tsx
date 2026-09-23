@@ -114,7 +114,8 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
   const [performance, setPerformance] = useState<PerformanceSummary | null>(null);
   const [totalCardCount, setTotalCardCount] = useState(0);
   const [leiSecaCount, setLeiSecaCount] = useState(0);
-  const [editalCoveredTopics, setEditalCoveredTopics] = useState(0);
+  const [editalCoveredTopicIds, setEditalCoveredTopicIds] = useState<Set<string>>(new Set());
+  const [catalogCardCount, setCatalogCardCount] = useState(0);
   const [leiSecaCoveredTopics, setLeiSecaCoveredTopics] = useState(0);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -126,20 +127,25 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
       loadPerformance(client, user, profileId),
       client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false),
       client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).eq('card_type', 'Lei seca'),
+      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).like('legacy_id', 'card-trt4-%'),
       listOfficialEditalTopicIds(client, profileId),
       listCardsByType(client, profileId, 'Lei seca'),
-    ]).then(([summary, cards, leiSeca, officialTopicIds, leiSecaCards]) => {
+    ]).then(([summary, cards, leiSeca, catalogCards, officialTopicIds, leiSecaCards]) => {
       setPerformance(summary);
       if (!cards.error) setTotalCardCount(cards.count ?? 0);
       if (!leiSeca.error) setLeiSecaCount(leiSeca.count ?? 0);
-      setEditalCoveredTopics(officialTopicIds.size);
+      if (!catalogCards.error) setCatalogCardCount(catalogCards.count ?? 0);
+      setEditalCoveredTopicIds(officialTopicIds);
       setLeiSecaCoveredTopics(new Set(leiSecaCards.map((card) => card.topic_id).filter(Boolean)).size);
     }).catch((cause) => setLoadError(cause instanceof Error ? cause.message : 'Não foi possível carregar os dados do painel.'));
   }, [user.id, workspace.profile?.id]);
 
   const rootTopics = workspace.topics.filter((topic) => !topic.parent_id);
-  const leiSecaEligibleTopics = rootTopics.filter((topic) => topic.legal_basis && workspace.subjects.find((subject) => subject.id === topic.subject_id)?.name.trim().toLowerCase() !== 'português');
-  const officialTopicTotal = workspace.profile?.is_builtin ? 171 : rootTopics.length;
+  const complementaryTopicNames = new Set(['Jurisprudência prioritária STF/TST', 'Estudo de Caso Jurídico - protocolo de treino']);
+  const officialRootTopics = rootTopics.filter((topic) => !complementaryTopicNames.has(topic.name));
+  const leiSecaEligibleTopics = officialRootTopics.filter((topic) => topic.legal_basis && workspace.subjects.find((subject) => subject.id === topic.subject_id)?.name.trim().toLowerCase() !== 'português');
+  const officialTopicTotal = workspace.profile?.is_builtin ? 171 : officialRootTopics.length;
+  const editalCoveredTopics = officialRootTopics.filter((topic) => editalCoveredTopicIds.has(topic.id)).length;
   const editalPct = officialTopicTotal ? Math.round((Math.min(editalCoveredTopics, officialTopicTotal) / officialTopicTotal) * 100) : 0;
   const leiSecaPct = leiSecaEligibleTopics.length ? Math.round((leiSecaCoveredTopics / leiSecaEligibleTopics.length) * 100) : 0;
 
@@ -177,13 +183,14 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
           <div>
             <span className="panel-label">COBERTURA DO EDITAL</span>
             <h2>{Math.min(editalCoveredTopics, officialTopicTotal)}/{officialTopicTotal} tópicos cobertos</h2>
-            <p>{workspace.profile?.is_builtin ? 'Catálogo TRT-4 AJAJ com 1.437 cartões em quatro camadas, mantendo 171 tópicos oficiais da matriz.' : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
+            <p>{workspace.profile?.is_builtin ? `Catálogo TRT-4 AJAJ: ${catalogCardCount}/1.437 cartões oficiais carregados · 171 tópicos da matriz.` : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
           </div>
           <strong className="home-progress-percent">{editalPct}%</strong>
         </div>
         <div className="home-progress-track" aria-label={`Cobertura do edital: ${editalPct}%`}><span style={{ width: `${editalPct}%` }} /></div>
         <div className="home-progress-meta">
           <span><strong>{totalCardCount}</strong> cartões totais</span>
+          {workspace.profile?.is_builtin ? <span><strong>{catalogCardCount}</strong> catálogo oficial</span> : null}
           <span><strong>{leiSecaCount}</strong> Lei Seca</span>
           <span><strong>{performance?.accuracy ?? 0}%</strong> precisão</span>
         </div>
