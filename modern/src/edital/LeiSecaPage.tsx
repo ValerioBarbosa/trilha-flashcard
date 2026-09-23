@@ -43,7 +43,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const [query, setQuery] = useState('');
   const [onlyMissing, setOnlyMissing] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const [openTopics, setOpenTopics] = useState<Set<string>>(new Set());
+  const [reader, setReader] = useState<{ topicId: string; index: number } | null>(null);
   const [cardsByTopic, setCardsByTopic] = useState<Map<string, CardRow[]>>(new Map());
   const [studyTopicIds, setStudyTopicIds] = useState<Set<string>>(new Set());
   const [importOpen, setImportOpen] = useState(false);
@@ -154,11 +154,22 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
     }
   }
 
-  function toggleTopicCards(topicId: string) {
-    setOpenTopics((current) => {
-      const next = new Set(current);
-      next.has(topicId) ? next.delete(topicId) : next.add(topicId);
-      return next;
+  function openReader(topicId: string, startIndex = 0) {
+    const cards = cardsByTopic.get(topicId) ?? [];
+    if (!cards.length) return;
+    setReader({ topicId, index: Math.min(Math.max(startIndex, 0), cards.length - 1) });
+  }
+
+  function closeReader() {
+    setReader(null);
+  }
+
+  function moveReader(delta: number) {
+    setReader((current) => {
+      if (!current) return current;
+      const cards = cardsByTopic.get(current.topicId) ?? [];
+      if (!cards.length) return null;
+      return { ...current, index: (current.index + delta + cards.length) % cards.length };
     });
   }
 
@@ -176,11 +187,11 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   }
 
   return (
-    <div className="page-wrap">
+    <div className="page-wrap lei-seca-page">
       <PageHeader
         eyebrow="LEI SECA"
-        title="Artigos por matéria e assunto"
-        subtitle="Cada assunto do edital com a base legal indicada e, quando disponível, cartões para revisar o texto do artigo."
+        title="Leitura de Lei Seca"
+        subtitle="Leia um trecho por vez, marque o que já passou e avance pela legislação do edital sem poluição visual."
         action={
           <div className="lei-seca-header-actions">
             <div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar norma ou assunto" /></div>
@@ -225,33 +236,33 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                 </button>
                 {open ? <div className="topic-list">{subject.rootTopics.map((topic) => {
                   const topicCards = cardsByTopic.get(topic.id) ?? [];
-                  const cardsOpen = openTopics.has(topic.id);
                   const readCount = topicCards.filter((card) => card.read_at).length;
+                  const readPct = topicCards.length ? Math.round((readCount / topicCards.length) * 100) : 0;
                   return (
                     <div key={topic.id} className="topic-row-wrap">
-                      <div className="topic-row">
+                      <div className="topic-row lei-seca-topic-row">
                         <span className="topic-check">§</span>
-                        <div><strong>{topic.name}</strong><p>{topic.legal_basis}</p></div>
-                        {topic.priority ? <span className={`priority-pill priority-${topic.priority.toLowerCase()}`}>{topic.priority}</span> : null}
+                        <div className="lei-seca-topic-copy">
+                          <strong>{topic.name}</strong>
+                          <p>{topic.legal_basis}</p>
+                          {topicCards.length ? (
+                            <div className="lei-seca-topic-progress">
+                              <div><span style={{ width: `${readPct}%` }} /></div>
+                              <small>{readCount}/{topicCards.length} lidos · {readPct}%</small>
+                            </div>
+                          ) : null}
+                        </div>
+                        {topic.priority ? <span className={`priority-pill priority-${topic.priority.toLowerCase()}`}>Prioridade {topic.priority}</span> : null}
                       </div>
-                      <div className="topic-actions">
+                      <div className="topic-actions lei-seca-topic-actions">
                         {topicCards.length ? (
-                          <button className="link-button" onClick={() => toggleTopicCards(topic.id)}>{cardsOpen ? 'Ocultar leitura' : 'Ler'} {topicCards.length} trecho{topicCards.length === 1 ? '' : 's'}{readCount ? ` (${readCount} lido${readCount === 1 ? '' : 's'})` : ''}</button>
+                          <button className="primary-action" onClick={() => openReader(topic.id, Math.min(readCount, topicCards.length - 1))}>Ler agora</button>
                         ) : null}
                         {studyTopicIds.has(topic.id) ? (
-                          <button className="link-button" onClick={() => onStudyTopic(subject.id, topic.id)}>Estudar este assunto →</button>
+                          <button className="secondary-outline" onClick={() => onStudyTopic(subject.id, topic.id)}>Estudar assunto</button>
                         ) : null}
-                        <button className="link-button" onClick={() => openImport(topic.id)}>Importar cartões (PDF) →</button>
+                        <button className="secondary-outline" onClick={() => openImport(topic.id)}>Importar PDF</button>
                       </div>
-                      {cardsOpen ? <div className="topic-cards topic-reading">{topicCards.map((card) => (
-                        <article key={card.id} className={`topic-reading-item ${card.read_at ? 'is-read' : ''}`}>
-                          <div className="topic-reading-head">
-                            <h3>{card.front}</h3>
-                            <button className={`read-toggle ${card.read_at ? 'is-read' : ''}`} onClick={() => toggleRead(card)}>{card.read_at ? '✓ Lido' : 'Marcar como lido'}</button>
-                          </div>
-                          <p>{card.back}</p>
-                        </article>
-                      ))}</div> : null}
                     </div>
                   );
                 })}</div> : null}
@@ -260,6 +271,47 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
           })}
         </div>
       )}
+
+      {reader ? (() => {
+        const topic = topics.find((entry) => entry.id === reader.topicId);
+        const subject = topic ? subjects.find((entry) => entry.id === topic.subject_id) : null;
+        const cards = cardsByTopic.get(reader.topicId) ?? [];
+        const card = cards[reader.index];
+        if (!topic || !card) return null;
+        const readCount = cards.filter((entry) => entry.read_at).length;
+        const pct = cards.length ? Math.round(((reader.index + 1) / cards.length) * 100) : 0;
+        return (
+          <div className="law-reader-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeReader()}>
+            <section className="law-reader" role="dialog" aria-modal="true" aria-label={`Leitura de ${topic.name}`}>
+              <header className="law-reader-header">
+                <div>
+                  <span className="page-eyebrow">{subject?.name || 'LEI SECA'}</span>
+                  <h2>{topic.name}</h2>
+                  <p>{topic.legal_basis}</p>
+                </div>
+                <button className="law-reader-close" onClick={closeReader} aria-label="Fechar leitura">×</button>
+              </header>
+
+              <div className="law-reader-progress">
+                <div><span style={{ width: `${pct}%` }} /></div>
+                <small>Trecho {reader.index + 1} de {cards.length} · {readCount} lidos</small>
+              </div>
+
+              <article className={`law-reader-paper ${card.read_at ? 'is-read' : ''}`}>
+                <div className="law-reader-citation">{card.front}</div>
+                <div className="law-reader-text">{card.back}</div>
+                {card.complement ? <aside className="law-reader-note"><strong>Observação</strong><p>{card.complement}</p></aside> : null}
+              </article>
+
+              <footer className="law-reader-footer">
+                <button className="secondary-outline" onClick={() => moveReader(-1)} disabled={cards.length < 2}>← Anterior</button>
+                <button className={`read-toggle law-reader-read ${card.read_at ? 'is-read' : ''}`} onClick={() => toggleRead(card)}>{card.read_at ? '✓ Lido' : 'Marcar como lido'}</button>
+                <button className="primary-action" onClick={() => moveReader(1)} disabled={cards.length < 2}>Próximo →</button>
+              </footer>
+            </section>
+          </div>
+        );
+      })() : null}
       {importOpen ? (
         <div className="modal-backdrop">
           <div className="modal-card import-modal">
