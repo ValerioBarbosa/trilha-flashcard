@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { loadPerformance, type PerformanceSummary } from '@core/features/performance/performance-repository';
-import { listCardsByType, listStudyCardCountsByTopic } from '../study/domain-repository';
+import { listCardsByType, listOfficialEditalTopicIds } from '../study/domain-repository';
 import { EditalPage } from '../edital/EditalPage';
 import { LeiSecaPage } from '../edital/LeiSecaPage';
 import { JurisprudencePage } from '../jurisprudence/JurisprudencePage';
@@ -112,7 +112,7 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
   onReviewDue: () => void;
 }) {
   const [performance, setPerformance] = useState<PerformanceSummary | null>(null);
-  const [cardCount, setCardCount] = useState(0);
+  const [totalCardCount, setTotalCardCount] = useState(0);
   const [leiSecaCount, setLeiSecaCount] = useState(0);
   const [editalCoveredTopics, setEditalCoveredTopics] = useState(0);
   const [leiSecaCoveredTopics, setLeiSecaCoveredTopics] = useState(0);
@@ -124,22 +124,23 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
     setLoadError(null);
     void Promise.all([
       loadPerformance(client, user, profileId),
-      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).or('card_type.is.null,card_type.neq.Lei seca'),
+      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false),
       client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).eq('card_type', 'Lei seca'),
-      listStudyCardCountsByTopic(client, profileId),
+      listOfficialEditalTopicIds(client, profileId),
       listCardsByType(client, profileId, 'Lei seca'),
-    ]).then(([summary, cards, leiSeca, studyCounts, leiSecaCards]) => {
+    ]).then(([summary, cards, leiSeca, officialTopicIds, leiSecaCards]) => {
       setPerformance(summary);
-      if (!cards.error) setCardCount(cards.count ?? 0);
+      if (!cards.error) setTotalCardCount(cards.count ?? 0);
       if (!leiSeca.error) setLeiSecaCount(leiSeca.count ?? 0);
-      setEditalCoveredTopics(studyCounts.size);
+      setEditalCoveredTopics(officialTopicIds.size);
       setLeiSecaCoveredTopics(new Set(leiSecaCards.map((card) => card.topic_id).filter(Boolean)).size);
     }).catch((cause) => setLoadError(cause instanceof Error ? cause.message : 'Não foi possível carregar os dados do painel.'));
   }, [user.id, workspace.profile?.id]);
 
   const rootTopics = workspace.topics.filter((topic) => !topic.parent_id);
   const leiSecaEligibleTopics = rootTopics.filter((topic) => topic.legal_basis && workspace.subjects.find((subject) => subject.id === topic.subject_id)?.name.trim().toLowerCase() !== 'português');
-  const editalPct = rootTopics.length ? Math.round((editalCoveredTopics / rootTopics.length) * 100) : 0;
+  const officialTopicTotal = workspace.profile?.is_builtin ? 171 : rootTopics.length;
+  const editalPct = officialTopicTotal ? Math.round((Math.min(editalCoveredTopics, officialTopicTotal) / officialTopicTotal) * 100) : 0;
   const leiSecaPct = leiSecaEligibleTopics.length ? Math.round((leiSecaCoveredTopics / leiSecaEligibleTopics.length) * 100) : 0;
 
   const topDecks = workspace.decks.filter((deck) => deck.subject_id).slice(0, 4);
@@ -159,8 +160,9 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
       {loadError ? <div className="notice error"><strong>Alguns dados não carregaram.</strong><span>{loadError}</span></div> : null}
       <section className="hero-study-card"><div><span className="hero-kicker">PRÓXIMA AÇÃO</span><h2>Transforme pendências em pontos.</h2><p>Estude um baralho, responda sem revelar e registre a dificuldade. O desempenho passa a alimentar sua trilha.</p><button onClick={heroAction}>{performance?.dueNow ? 'Revisar vencidos' : 'Iniciar sessão'}</button></div><div className="hero-stat"><strong>{performance?.streakDays ?? 0}</strong><span>dia{performance?.streakDays === 1 ? '' : 's'} seguidos</span></div></section>
       <div className="dashboard-grid lei-seca-metrics">
-        <MetricTile label="Flashcards" value={cardCount} helper={`${editalPct}% do edital coberto`} />
-        <MetricTile label="Trechos de Lei Seca" value={leiSecaCount} helper={`${leiSecaPct}% dos assuntos cobertos`} />
+        <MetricTile label="Cartões totais" value={totalCardCount} helper="inclui flashcards e Lei Seca" />
+        <MetricTile label="Catálogo TRT-4" value={workspace.profile?.is_builtin ? 1077 : editalCoveredTopics} helper={workspace.profile?.is_builtin ? `${Math.min(editalCoveredTopics, 171)}/171 tópicos · ${editalPct}% coberto` : `${editalPct}% do edital coberto`} />
+        <MetricTile label="Trechos de Lei Seca" value={leiSecaCount} helper={`${leiSecaPct}% dos assuntos com base legal`} />
         <MetricTile label="Precisão" value={`${performance?.accuracy ?? 0}%`} helper={`${performance?.totalReviews ?? 0} revisões`} />
         <MetricTile label="Revisar hoje" value={performance?.dueNow ?? 0} helper="cartões vencidos" />
         <MetricTile label="Erros abertos" value={performance?.openErrors ?? 0} helper="para atacar na revisão" />
