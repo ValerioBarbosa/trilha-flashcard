@@ -14,7 +14,7 @@ import {
   type TopicRow,
 } from './domain-repository';
 
-const BUILTIN_CATALOG_VERSION = 'trt4-ajaj-v3-1437-layer4-2026-09-23';
+const BUILTIN_CATALOG_VERSION = 'trt4-ajaj-v3-1437-audit-reconcile-2026-09-23';
 
 function activeProfileKey(userId: string): string {
   return `trilha-active-profile:${userId}`;
