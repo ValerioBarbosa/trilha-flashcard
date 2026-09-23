@@ -293,10 +293,11 @@ export async function listLatestReviewsByCard(client: SupabaseClient, profileId:
 }
 
 export async function listOpenErrorCardIds(client: SupabaseClient, profileId: string): Promise<Set<string>> {
-  const rows = await requireData<Array<{ card_id: string | null }>>(client.from('error_notebook')
+  const rows = await requirePaged<{ card_id: string | null }>((from, to) => client.from('error_notebook')
     .select('card_id')
     .eq('profile_id', profileId)
     .eq('kind', 'card')
-    .eq('resolved', false));
+    .eq('resolved', false)
+    .range(from, to));
   return new Set(rows.map((row) => row.card_id).filter((id): id is string => Boolean(id)));
 }
