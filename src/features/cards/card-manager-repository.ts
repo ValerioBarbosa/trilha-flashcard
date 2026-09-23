@@ -40,14 +40,22 @@ export async function listManagedCards(client: SupabaseClient, profileId: string
 }
 
 export async function createCard(client: SupabaseClient, user: User, profileId: string, draft: CardDraft): Promise<ManagedCard> {
+  const front = draft.front.trim();
+  const back = draft.back.trim();
+  if (!draft.subjectId?.trim()) throw new Error('card-subject-required');
+  if (!draft.deckId?.trim()) throw new Error('card-deck-required');
+  if (!front) throw new Error('card-front-required');
+  if (!back) throw new Error('card-back-required');
+  if (await findDuplicateContent(client, profileId, draft.subjectId, front, back)) throw new Error('card-duplicate');
+
   const { data, error } = await client.from('cards').insert({
     user_id: user.id,
     profile_id: profileId,
     deck_id: draft.deckId,
     subject_id: draft.subjectId,
     topic_id: draft.topicId || null,
-    front: draft.front.trim(),
-    back: draft.back.trim(),
+    front,
+    back,
     legal_basis: draft.legalBasis?.trim() || null,
     example: draft.example?.trim() || null,
     complement: draft.complement?.trim() || null,
@@ -102,11 +110,11 @@ export async function setCardSuspended(client: SupabaseClient, cardId: string, s
 }
 
 export async function findDuplicateContent(client: SupabaseClient, profileId: string, subjectId: string | null, front: string, back: string): Promise<boolean> {
-  const normalizedFront = front.trim().toLowerCase();
-  const normalizedBack = back.trim().toLowerCase();
+  const normalizedFront = normalizeContent(front);
+  const normalizedBack = normalizeContent(back);
   const { data, error } = await client.from('cards').select('subject_id,front,back').eq('profile_id', profileId).is('deleted_at', null);
   if (error) throw error;
-  return (data || []).some((row: any) => (row.subject_id || null) === (subjectId || null) && row.front.trim().toLowerCase() === normalizedFront && row.back.trim().toLowerCase() === normalizedBack);
+  return (data || []).some((row: any) => (row.subject_id || null) === (subjectId || null) && normalizeContent(row.front) === normalizedFront && normalizeContent(row.back) === normalizedBack);
 }
 
 export async function importCards(client: SupabaseClient, user: User, profileId: string, candidates: ImportCandidate[]) {
@@ -165,8 +173,11 @@ export async function markImportDuplicates(client: SupabaseClient, profileId: st
   });
 }
 
+function normalizeContent(value: string) {
+  return value.normalize('NFKC').replace(/\s+/g, ' ').trim().toLocaleLowerCase('pt-BR');
+}
 function contentKey(subjectId: string | null | undefined, front: string, back: string) {
-  return `${subjectId || ''}|${front.trim().toLowerCase()}|${back.trim().toLowerCase()}`;
+  return `${subjectId || ''}|${normalizeContent(front)}|${normalizeContent(back)}`;
 }
 function normalizeCardError(error: any): Error {
   if (String(error?.code) === '23505' || /duplicate|unique/i.test(String(error?.message || ''))) return new Error('card-duplicate');
