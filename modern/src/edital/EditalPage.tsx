@@ -18,6 +18,7 @@ type StatusFilter = 'all' | EditalTopicProgress['status'];
 type PriorityFilter = 'all' | 'A' | 'B' | 'C';
 
 const STATUS_ORDER: EditalTopicProgress['status'][] = ['Não iniciado', 'Em estudo', 'Revisado', 'Dominado'];
+const COMPLEMENTARY_TOPICS = new Set(['Jurisprudência prioritária STF/TST', 'Estudo de Caso Jurídico - protocolo de treino']);
 
 function emptyProgress(): EditalTopicProgress {
   return { cardCount: 0, leiSecaCount: 0, reviewedCount: 0, masteredCount: 0, status: 'Não iniciado' };
@@ -38,8 +39,8 @@ export function EditalPage({ profileId, subjects, topics, onStudyTopic, onOpenLe
   const [progress, setProgress] = useState<Map<string, EditalTopicProgress>>(new Map());
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const allSubjects = useMemo(() => buildEditalSubjects(subjects, topics, ''), [subjects, topics]);
-  const searchedSubjects = useMemo(() => buildEditalSubjects(subjects, topics, query), [subjects, topics, query]);
+  const allSubjects = useMemo(() => buildEditalSubjects(subjects, topics, '').map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter((topic) => !COMPLEMENTARY_TOPICS.has(topic.name)) })).filter((subject) => subject.rootTopics.length > 0), [subjects, topics]);
+  const searchedSubjects = useMemo(() => buildEditalSubjects(subjects, topics, query).map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter((topic) => !COMPLEMENTARY_TOPICS.has(topic.name)) })).filter((subject) => subject.rootTopics.length > 0), [subjects, topics, query]);
 
   useEffect(() => {
     let cancelled = false;
@@ -124,6 +125,7 @@ export function EditalPage({ profileId, subjects, topics, onStudyTopic, onOpenLe
         <MetricTile label="Dominados" value={coverage.masteredTopics} helper={`${masteredPct}% do edital`} />
         <MetricTile label="Cartões de estudo" value={coverage.totalCards} helper="sem contar Lei Seca" />
         <MetricTile label="Com base legal" value={coverage.leiSecaTopics} helper="aptos para leitura de Lei Seca" />
+        <MetricTile label="Camada 4" value="+360" helper="aprofundamento, jurisprudência e Estudo de Caso" />
       </div>
 
       <section className="edital-filter-bar">

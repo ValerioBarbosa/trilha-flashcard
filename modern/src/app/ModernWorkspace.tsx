@@ -177,7 +177,7 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
           <div>
             <span className="panel-label">COBERTURA DO EDITAL</span>
             <h2>{Math.min(editalCoveredTopics, officialTopicTotal)}/{officialTopicTotal} tópicos cobertos</h2>
-            <p>{workspace.profile?.is_builtin ? 'Catálogo oficial TRT-4 AJAJ com 1.077 cartões organizados pelo edital verticalizado.' : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
+            <p>{workspace.profile?.is_builtin ? 'Catálogo TRT-4 AJAJ com 1.437 cartões em quatro camadas, mantendo 171 tópicos oficiais da matriz.' : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
           </div>
           <strong className="home-progress-percent">{editalPct}%</strong>
         </div>
