@@ -147,19 +147,16 @@ export async function setCardReadAt(client: SupabaseClient, cardId: string, read
 
 export async function listOfficialEditalTopicIds(client: SupabaseClient, profileId: string): Promise<Set<string>> {
   const { data, error } = await client.from('cards')
-    .select('topic_id,tags')
+    .select('topic_id,card_type')
     .eq('profile_id', profileId)
     .is('deleted_at', null)
     .eq('suspended', false)
     .not('topic_id', 'is', null);
   if (error) throw error;
   const topicIds = new Set<string>();
-  for (const row of (data || []) as Array<{ topic_id: string | null; tags: string[] | null }>) {
-    if (!row.topic_id) continue;
-    const tags = Array.isArray(row.tags) ? row.tags : [];
-    if (tags.some((tag) => tag === 'Nível 1 - Matriz verticalizada' || tag.includes('EDITAL V3'))) {
-      topicIds.add(row.topic_id);
-    }
+  for (const row of (data || []) as Array<{ topic_id: string | null; card_type: string | null }>) {
+    if (!row.topic_id || row.card_type === 'Lei seca') continue;
+    topicIds.add(row.topic_id);
   }
   return topicIds;
 }
@@ -190,27 +187,25 @@ export async function listEditalTopicProgress(client: SupabaseClient, profileId:
   const latestRating = new Map<string, number>();
   for (const review of reviews) if (!latestRating.has(review.card_id)) latestRating.set(review.card_id, review.rating);
 
-  const grouped = new Map<string, { cards: string[]; leiSecaCount: number }>();
+  const grouped = new Map<string, { studyCards: string[]; leiSecaCount: number }>();
   for (const card of cards) {
     if (!card.topic_id) continue;
-    const bucket = grouped.get(card.topic_id) ?? { cards: [], leiSecaCount: 0 };
-    bucket.cards.push(card.id);
+    const bucket = grouped.get(card.topic_id) ?? { studyCards: [], leiSecaCount: 0 };
     if (card.card_type === 'Lei seca') bucket.leiSecaCount += 1;
+    else bucket.studyCards.push(card.id);
     grouped.set(card.topic_id, bucket);
   }
 
   const result = new Map<string, EditalTopicProgress>();
   for (const [topicId, group] of grouped) {
-    const ratings = group.cards.map((id) => latestRating.get(id)).filter((value): value is number => typeof value === 'number');
+    const ratings = group.studyCards.map((id) => latestRating.get(id)).filter((value): value is number => typeof value === 'number');
     const reviewedCount = ratings.length;
     const masteredCount = ratings.filter((rating) => rating >= 3).length;
-    const studyCardCount = Math.max(0, group.cards.length - group.leiSecaCount);
+    const studyCardCount = group.studyCards.length;
     let status: EditalTopicProgress['status'] = 'Não iniciado';
-    if (studyCardCount > 0) {
-      if (reviewedCount === 0) status = 'Em estudo';
-      else if (masteredCount >= studyCardCount) status = 'Dominado';
-      else status = 'Revisado';
-    }
+    if (reviewedCount > 0 && reviewedCount < studyCardCount) status = 'Em estudo';
+    else if (studyCardCount > 0 && reviewedCount >= studyCardCount && masteredCount < studyCardCount) status = 'Revisado';
+    else if (studyCardCount > 0 && masteredCount >= studyCardCount) status = 'Dominado';
     result.set(topicId, { cardCount: studyCardCount, leiSecaCount: group.leiSecaCount, reviewedCount, masteredCount, status });
   }
   return result;
