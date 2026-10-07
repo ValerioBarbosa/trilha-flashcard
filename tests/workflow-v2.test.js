@@ -81,7 +81,7 @@ describe("persistência da sessão ativa", () => {
     expect(app).toContain('setActiveSurface(resumedActiveSession ? "study" : "home")');
     expect(app).toContain('showToast("Sessão retomada")');
     expect(html).toContain("app.js?v=20260829-dup1");
-    expect(serviceWorker).toContain("trilha-flashcard-v39");
+    expect(serviceWorker).toContain("trilha-flashcard-v40");
     expect(serviceWorker).toContain("motion-animations.js?v=20260824-1");
     expect(spacedRepetition).toContain("motion-animations.js?v=20260824-1");
   });

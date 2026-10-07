@@ -21,7 +21,7 @@ const DEFAULT_PROFILE = {
   slug: 'trt4-ajaj',
   name: 'TRT-4 · AJAJ',
   role: 'Analista Judiciário · Área Judiciária',
-  board: 'FCC (base histórica)',
+  board: 'FCC',
   edital_year: '2026',
   is_builtin: true,
 };

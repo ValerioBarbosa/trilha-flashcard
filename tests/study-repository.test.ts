@@ -55,6 +55,7 @@ describe('ensureDefaultProfile', () => {
     const first = await ensureDefaultProfile(db as unknown as SupabaseClient, USER);
     expect(first.slug).toBe('trt4-ajaj');
     expect(first.is_builtin).toBe(true);
+    expect(first.board).toBe('FCC');
 
     const second = await ensureDefaultProfile(db as unknown as SupabaseClient, USER);
     expect(second.id).toBe(first.id);

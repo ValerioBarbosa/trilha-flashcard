@@ -2,7 +2,7 @@ const trt4Decks = [
   {
     id: "trt4-overview",
     title: "Comece aqui · TRT4 AJAJ · Edital V3",
-    sourceNote: "Pré-edital TRT-4 AJAJ — versão 3.0, atualizado em 29/08/2026. Estudo de Caso confirmado pelo TRT-4 em 14/08/2026; banca e conteúdo do novo edital ainda pendentes.",
+    sourceNote: "Pré-edital TRT-4 AJAJ — versão 3.0, base atualizada em 29/08/2026. Estudo de Caso confirmado pelo TRT-4 em 14/08/2026. FCC homologada para organizar o concurso em registro publicado no PNCP em 06/10/2026 (https://pncp.gov.br/app/editais/00509968000148/2026/3411). Conteúdo, pesos e mínimos do novo edital ainda pendentes.",
     topics: [
       "Situação oficial do concurso em 2026",
       "Dashboard de preparação por disciplina",

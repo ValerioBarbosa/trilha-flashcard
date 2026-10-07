@@ -1,4 +1,4 @@
-const CACHE_NAME = "trilha-flashcard-v39";
+const CACHE_NAME = "trilha-flashcard-v40";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -14,7 +14,7 @@ const CORE_ASSETS = [
   "./vendor/supabase-js.mjs",
   "./firebase-config.js?v=20260821-2",
   "./cloud-sync.js?v=20260826-1",
-  "./decks.js?v=20260829-1",
+  "./decks.js?v=20261007-fcc1",
   "./spaced-repetition.js?v=20260823-1",
   "./motion-animations.js?v=20260824-1",
   "./manifest.webmanifest",
