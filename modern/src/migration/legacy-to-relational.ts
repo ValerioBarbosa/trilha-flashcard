@@ -56,7 +56,7 @@ const DEFAULT_PROFILE: LegacyProfile = {
   name: 'TRT-4 · AJAJ',
   builtin: true,
   role: 'Analista Judiciário · Área Judiciária',
-  board: 'FCC (base histórica)',
+  board: 'FCC',
   editalYear: '2026',
 };
 

@@ -9,6 +9,8 @@ describe("edital TRT-4 AJAJ versão 3", () => {
 
     expect(overview.title).toContain("Edital V3");
     expect(overview.sourceNote).toContain("29/08/2026");
+    expect(overview.sourceNote).toContain("06/10/2026");
+    expect(overview.sourceNote).toContain("https://pncp.gov.br/app/editais/00509968000148/2026/3411");
     expect(overview.topics).toContain("Situação oficial do concurso em 2026");
   });
 
