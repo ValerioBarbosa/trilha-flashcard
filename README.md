@@ -115,3 +115,16 @@ O banco TRT-4 AJAJ acompanha a versão 3.0 do material **pré-edital 2026**, atu
 A FCC consta como fornecedora homologada para organizar o novo concurso em registro publicado no PNCP em 06/10/2026. A publicação é um ato de contratação direta; a assinatura do contrato ainda precisa de confirmação. Os pesos, os mínimos e o conteúdo programático do novo edital ainda dependem de publicação oficial. Os percentuais exibidos no aplicativo continuam sendo a fotografia histórica da prova FCC de 2022. Quando o novo edital for publicado, ele prevalecerá e o banco será revisado.
 
 Fontes oficiais: [TRT-RS avança no planejamento do novo concurso público](https://www.trt4.jus.br/portais/trt4/modulos/noticias/51064882) e [registro da contratação no PNCP](https://pncp.gov.br/app/editais/00509968000148/2026/3411).
+
+
+### Estudo guiado — 09/10/2026
+
+A versão moderna tem **Aprender**, **Questões** e **Estudo de Caso**, além da revisão de cartões. Os 171 assuntos são a matriz de preparação, não confirmação do conteúdo de novo edital. Os percentuais das disciplinas permanecem como referência histórica de 2022.
+
+- Roteiros de leitura não entram na fila de recuperação nem no indicador de autoavaliação. A leitura de Lei Seca distingue roteiro de transcrição.
+- O banco autoral tem 31 questões de cinco alternativas em nove disciplinas e 11 minicasos para escrita com espelho e checklist. Não são questões da FCC nem simulados oficiais; não cobrem todos os assuntos.
+- Tentativas objetivas na conta usam `questions`/`question_attempts`, respeitando RLS e os gatilhos existentes do caderno de erros. Autoavaliações de casos não entram no percentual objetivo. Visitantes podem explorar sem registro; rascunhos de casos são apenas da sessão.
+- Atualizações preservam IDs relacionais e históricos de cartões, inclusive leitura, suspensão e exclusão. Nenhuma migração de banco é necessária.
+- A jurisprudência inclui alertas sobre os itens cancelados pela Resolução TST 225/2025. Atualização monetária é roteiro de consulta, sem fórmula automática apresentada como vigente.
+
+Validação: testes Vitest, build TypeScript/Vite e teste visual do fluxo público. O funcionamento com uma conta real depende da sessão autenticada e das políticas já existentes no Supabase.

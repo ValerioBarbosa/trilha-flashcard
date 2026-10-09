@@ -1,4 +1,5 @@
 import type { SupabaseClient, User } from '@supabase/supabase-js';
+import { qualifyCatalog, JURISPRUDENCE_NOTES } from '../learning/catalog-quality';
 import legacyDecks from '../generated/legacy-decks.json';
 
 type LegacyCard = Record<string, unknown> & {
@@ -9,7 +10,7 @@ type LegacyCard = Record<string, unknown> & {
 type LegacyDeck = { id: string; title: string; sourceNote?: string; topics?: string[]; cards?: LegacyCard[] };
 export type BuiltinSeedReport = { decks: number; cards: number; topics: number; duplicatesSkipped: number };
 
-type CompleteCatalogCard = {
+export type CompleteCatalogCard = {
   id: string; discipline: string; disciplineName?: string; topic?: string; subtopic?: string;
   legalBasis?: string; type?: string; priority?: string; difficulty?: string;
   front: string; back: string; complement?: string; trap?: string; mnemonic?: string;
@@ -97,52 +98,52 @@ function buildLayer4Cards(cards: CompleteCatalogCard[]): CompleteCatalogCard[] {
 
   for (const card of deepestGaps) {
     const key = `${card.discipline}|${card.topic || ''}`;
-    const tags = ['AJAJ','Edital V3','Nível 4 - Aprofundamento real','TRT4','camada-4','aprofundamento'];
+    const tags = ['AJAJ','Edital V3','Nível 4 - Roteiros e jurisprudência','TRT4','camada-4','roteiro-de-estudo'];
     layer4.push({
       id: `card-trt4-layer4-${stableHash(`${key}|caso`)}`,
       discipline: card.discipline, disciplineName: card.disciplineName, topic: card.topic,
-      subtopic: 'Aplicação prática do tópico', legalBasis: card.legalBasis, type: 'Caso prático',
+      subtopic: 'Aplicação prática do tópico', legalBasis: card.legalBasis, type: 'Roteiro de estudo',
       priority: card.priority, difficulty: 'Difícil',
       front: `Em uma questão prática sobre “${card.topic}”, quais pontos mínimos você deve identificar antes de concluir?`,
       back: card.back,
-      complement: 'Camada 4: aprofundamento aplicado ao tópico do edital verticalizado V3.',
+      complement: 'Roteiro para orientar a aplicação do tópico; não é exercício com fatos.',
       trap: 'A FCC pode apresentar fatos corretos, mas omitir um requisito, exceção, prazo, sujeito ou efeito decisivo. Faça o checklist completo antes de marcar.',
-      mnemonic: '', tags: [...tags,'caso-pratico'], level: 'Nível 4 - Aprofundamento real', sourceLayer: 'Camada 4 - Aprofundamento real',
+      mnemonic: '', tags: [...tags,'caso-pratico'], level: 'Nível 4 - Roteiros e jurisprudência', sourceLayer: 'Camada 4 - Roteiros e jurisprudência',
     });
     layer4.push({
       id: `card-trt4-layer4-${stableHash(`${key}|fcc`)}`,
       discipline: card.discipline, disciplineName: card.disciplineName, topic: card.topic,
-      subtopic: 'Controle de pegadinha FCC', legalBasis: card.legalBasis, type: 'Pegadinha FCC',
+      subtopic: 'Controle de pegadinha FCC', legalBasis: card.legalBasis, type: 'Roteiro de estudo',
       priority: card.priority, difficulty: 'Difícil',
       front: `Qual é o núcleo que não pode ser perdido numa alternativa da FCC sobre “${card.topic}”?`,
       back: card.back,
-      complement: 'Camada 4: recuperação ativa do núcleo de cobrança antes de resolver alternativas.',
+      complement: 'Roteiro para orientar a leitura de alternativas; não conta como recuperação de conteúdo.',
       trap: `Desconfie de alternativa que simplifique “${card.topic}” a uma regra absoluta. Procure requisito, exceção e consequência.`,
-      mnemonic: '', tags: [...tags,'fcc','pegadinha'], level: 'Nível 4 - Aprofundamento real', sourceLayer: 'Camada 4 - Aprofundamento real',
+      mnemonic: '', tags: [...tags,'fcc','pegadinha'], level: 'Nível 4 - Roteiros e jurisprudência', sourceLayer: 'Camada 4 - Roteiros e jurisprudência',
     });
   }
 
   for (const [reference, theme, discipline, disciplineName] of LAYER4_JURISPRUDENCE) {
-    const tags = ['AJAJ','Edital V3','Nível 4 - Aprofundamento real','TRT4','jurisprudencia-prioritaria'];
+    const tags = ['AJAJ','Edital V3','Nível 4 - Roteiros e jurisprudência','TRT4','jurisprudencia-prioritaria'];
     layer4.push({
       id: `card-trt4-layer4-${stableHash(`${reference}|mapa`)}`, discipline, disciplineName,
       topic: 'Jurisprudência prioritária STF/TST', subtopic: reference, legalBasis: reference,
-      type: 'Jurisprudência', priority: 'A', difficulty: 'Difícil',
+      type: reference === 'STF ADC 58/59' ? 'Roteiro de estudo' : 'Jurisprudência', priority: 'A', difficulty: 'Difícil',
       front: `Qual é o núcleo de cobrança associado a ${reference} no mapa jurisprudencial do TRT-4?`,
-      back: `${theme}.`,
-      complement: 'Precedente listado expressamente no bloco de jurisprudência prioritária do edital verticalizado V3. Confira vigência, modulação e alterações antes da prova.',
-      trap: 'Não memorize apenas o número do precedente: recupere também a hipótese de incidência e sua conexão com o tópico do edital.',
-      mnemonic: '', tags, level: 'Nível 4 - Aprofundamento real', sourceLayer: 'Camada 4 - Aprofundamento real',
+      back: JURISPRUDENCE_NOTES[reference]?.text || `${theme}.`,
+      complement: `Referência: ${JURISPRUDENCE_NOTES[reference]?.source || ''} · Revisão editorial: 09/10/2026.`,
+      trap: JURISPRUDENCE_NOTES[reference]?.alert || '',
+      mnemonic: '', tags, level: 'Nível 4 - Roteiros e jurisprudência', sourceLayer: 'Camada 4 - Roteiros e jurisprudência',
     });
     layer4.push({
       id: `card-trt4-layer4-${stableHash(`${reference}|controle`)}`, discipline, disciplineName,
       topic: 'Jurisprudência prioritária STF/TST', subtopic: `${reference} - controle de vigência`, legalBasis: reference,
-      type: 'Revisão jurisprudencial', priority: 'A', difficulty: 'Difícil',
+      type: 'Roteiro de estudo', priority: 'A', difficulty: 'Difícil',
       front: `Antes de usar ${reference} numa questão, o que deve ser conferido além do número do precedente?`,
-      back: `A tese aplicável a ${theme.toLowerCase()}, a hipótese de incidência, a vigência, eventual cancelamento/alteração e eventual modulação.`,
+      back: JURISPRUDENCE_NOTES[reference]?.alert || `Confira a tese sobre ${theme.toLowerCase()}.`,
       complement: 'Use o precedente somente depois de confirmar sua situação atual.',
       trap: 'Número correto com tese superada ou aplicada fora da hipótese também leva ao erro.',
-      mnemonic: '', tags: [...tags,'vigencia'], level: 'Nível 4 - Aprofundamento real', sourceLayer: 'Camada 4 - Aprofundamento real',
+      mnemonic: '', tags: [...tags,'vigencia'], level: 'Nível 4 - Roteiros e jurisprudência', sourceLayer: 'Camada 4 - Roteiros e jurisprudência',
     });
   }
 
@@ -155,22 +156,27 @@ function buildLayer4Cards(cards: CompleteCatalogCard[]): CompleteCatalogCard[] {
       type: 'Estudo de Caso', priority: 'A', difficulty: 'Difícil', front, back,
       complement: 'Treino transversal para a prova discursiva AJAJ.',
       trap: 'Não confunda conhecer o conteúdo com responder exatamente o que o comando e os fatos exigem.',
-      mnemonic: '', tags: ['AJAJ','Edital V3','Nível 4 - Aprofundamento real','TRT4','estudo-de-caso'],
-      level: 'Nível 4 - Aprofundamento real', sourceLayer: 'Camada 4 - Aprofundamento real',
+      mnemonic: '', tags: ['AJAJ','Edital V3','Nível 4 - Roteiros e jurisprudência','TRT4','estudo-de-caso'],
+      level: 'Nível 4 - Roteiros e jurisprudência', sourceLayer: 'Camada 4 - Roteiros e jurisprudência',
     });
   }
   return layer4;
 }
 
-async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return [];
+export async function loadStudyCatalogCards(): Promise<CompleteCatalogCard[]> {
   const chunks = await Promise.all(COMPLETE_CATALOG_PARTS.map(async (path) => {
     const response = await fetch(new URL(path, document.baseURI));
     if (!response.ok) throw new Error(`builtin-catalog-fetch-failed:${path}:${response.status}`);
     return response.text();
   }));
   const parsed = JSON.parse(chunks.join('\n')) as CompleteCatalogFile;
-  const catalogCards = [...(parsed.cards || []), ...buildLayer4Cards(parsed.cards || [])];
+  const base = parsed.cards || [];
+  return [...qualifyCatalog(base), ...buildLayer4Cards(base)];
+}
+
+async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return [];
+  const catalogCards = await loadStudyCatalogCards();
   const groups = new Map<string, LegacyDeck>();
 
   for (const card of catalogCards) {
@@ -181,7 +187,7 @@ async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
       deck = {
         id: deckId,
         title: COMPLETE_DECK_TITLES[deckId] || card.disciplineName || deckId,
-        sourceNote: 'Edital Verticalizado TRT-4 AJAJ 2026 V3 · catálogo completo 1.437 cartões · 4 camadas',
+        sourceNote: 'Edital Verticalizado TRT-4 AJAJ 2026 V3 · material autoral · roteiros e cartões de conteúdo · pesos históricos de 2022',
         topics: [],
         cards: [],
       };
@@ -285,7 +291,7 @@ async function ensureTopics(client: SupabaseClient, user: User, profileId: strin
   return new Map((data || []).map((row:any) => [row.name,row.id]));
 }
 
-type ExistingBuiltinCard = { id: string; deck_id: string; legacy_id: string | null; subject_id: string | null; front: string; back: string };
+type ExistingBuiltinCard = { id: string; deck_id: string; legacy_id: string | null; subject_id: string | null; front: string; back: string; suspended?: boolean; deleted_at?: string | null };
 
 async function upsertCards(
   client: SupabaseClient,
@@ -301,7 +307,6 @@ async function upsertCards(
 ) {
   const rows:any[] = [];
   const reconcileRows:any[] = [];
-  const releaseLegacyIds = new Set<string>();
   let skipped = 0;
 
   for (const card of deck.cards || []) {
@@ -337,12 +342,9 @@ async function upsertCards(
 
     const contentMatch = existingBuiltinByContent.get(key);
     const legacyMatch = canonical ? existingBuiltinByLegacyId.get(legacyId) : undefined;
-    const existingBuiltin = canonical ? contentMatch || legacyMatch : contentMatch;
-    if (canonical && contentMatch && legacyMatch && contentMatch.id !== legacyMatch.id) {
-      releaseLegacyIds.add(legacyMatch.id);
-    }
+    const existingBuiltin = canonical ? legacyMatch || contentMatch : contentMatch;
     if (canonical && existingBuiltin) {
-      reconcileRows.push({ id: existingBuiltin.id, ...row });
+      reconcileRows.push({ id: existingBuiltin.id, ...row, suspended:existingBuiltin.suspended ?? false, deleted_at:existingBuiltin.deleted_at ?? null });
       seen.add(key);
       continue;
     }
@@ -353,14 +355,6 @@ async function upsertCards(
     }
     seen.add(key);
     rows.push(row);
-  }
-
-  const releaseIds = [...releaseLegacyIds];
-  for (let start=0; start<releaseIds.length; start+=100) {
-    const { error } = await client.from('cards')
-      .update({ legacy_id: null })
-      .in('id', releaseIds.slice(start,start+100));
-    if (error) throw error;
   }
 
   for (let start=0; start<reconcileRows.length; start+=100) {
@@ -383,9 +377,8 @@ export async function seedBuiltinStudyCatalog(client: SupabaseClient, user: User
   const [{ data: existingDecks, error: deckReadError }, existing] = await Promise.all([
     client.from('decks').select('id,is_builtin').eq('profile_id', profileId),
     requirePaged<ExistingBuiltinCard>((from, to) => client.from('cards')
-      .select('id,deck_id,legacy_id,subject_id,front,back')
+      .select('id,deck_id,legacy_id,subject_id,front,back,suspended,deleted_at')
       .eq('profile_id', profileId)
-      .is('deleted_at', null)
       .order('id')
       .range(from, to)),
   ]);

@@ -1,3 +1,4 @@
+import { isStudyContent } from './card-purpose';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 
 export type ProfileRow = {
@@ -139,7 +140,7 @@ export async function listCards(client: SupabaseClient, deckId: string): Promise
     .eq('deck_id', deckId)
     .is('deleted_at', null)
     .eq('suspended', false)
-    .or('card_type.is.null,card_type.neq.Lei seca')
+    .or('card_type.is.null,and(card_type.neq.Lei seca,card_type.neq.Roteiro de estudo)')
     .order('created_at')
     .range(from, to));
 }
@@ -165,9 +166,8 @@ export async function listOfficialEditalTopicIds(client: SupabaseClient, profile
   const data = await requirePaged<{ topic_id: string | null; card_type: string | null }>((from, to) => client.from('cards')
     .select('topic_id,card_type')
     .eq('profile_id', profileId)
-    .is('deleted_at', null)
-    .eq('suspended', false)
     .like('source', 'Edital Verticalizado TRT-4 AJAJ 2026 V3%')
+    .like('example', '%Camada 3 - Fechamento do edital%')
     .not('topic_id', 'is', null)
     .order('id')
     .range(from, to));
@@ -184,7 +184,7 @@ export type EditalTopicProgress = {
   leiSecaCount: number;
   reviewedCount: number;
   masteredCount: number;
-  status: 'Não iniciado' | 'Em estudo' | 'Revisado' | 'Dominado';
+  status: 'Não iniciado' | 'Em estudo' | 'Revisado' | 'Recuperado';
 };
 
 export async function listEditalTopicProgress(client: SupabaseClient, profileId: string): Promise<Map<string, EditalTopicProgress>> {
@@ -212,7 +212,7 @@ export async function listEditalTopicProgress(client: SupabaseClient, profileId:
     if (!card.topic_id) continue;
     const bucket = grouped.get(card.topic_id) ?? { studyCards: [], leiSecaCount: 0 };
     if (card.card_type === 'Lei seca') bucket.leiSecaCount += 1;
-    else bucket.studyCards.push(card.id);
+    else if (isStudyContent(card)) bucket.studyCards.push(card.id);
     grouped.set(card.topic_id, bucket);
   }
 
@@ -225,7 +225,7 @@ export async function listEditalTopicProgress(client: SupabaseClient, profileId:
     let status: EditalTopicProgress['status'] = 'Não iniciado';
     if (reviewedCount > 0 && reviewedCount < studyCardCount) status = 'Em estudo';
     else if (studyCardCount > 0 && reviewedCount >= studyCardCount && masteredCount < studyCardCount) status = 'Revisado';
-    else if (studyCardCount > 0 && masteredCount >= studyCardCount) status = 'Dominado';
+    else if (studyCardCount > 0 && masteredCount >= studyCardCount) status = 'Recuperado';
     result.set(topicId, { cardCount: studyCardCount, leiSecaCount: group.leiSecaCount, reviewedCount, masteredCount, status });
   }
   return result;
@@ -237,7 +237,7 @@ export async function listStudyCardCountsByTopic(client: SupabaseClient, profile
     .eq('profile_id', profileId)
     .is('deleted_at', null)
     .eq('suspended', false)
-    .or('card_type.is.null,card_type.neq.Lei seca')
+    .or('card_type.is.null,and(card_type.neq.Lei seca,card_type.neq.Roteiro de estudo)')
     .not('topic_id', 'is', null)
     .range(from, to));
   const counts = new Map<string, number>();

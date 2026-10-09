@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { seedBuiltinStudyCatalog } from '../modern/src/study/builtin-seed';
 
@@ -143,5 +144,33 @@ describe('seedBuiltinStudyCatalog contra o catálogo real do edital verticalizad
     const writing = db.tables.subjects.find((row) => row.name === 'Estudo de Caso Jurídico');
     expect(writing?.weight ?? null).toBeNull();
     expect(db.tables.subjects.some((row) => row.name.startsWith('Comece aqui'))).toBe(false);
+  });
+});
+
+
+describe('atualização editorial sem perder identidade ou estado do usuário', () => {
+  async function withCatalog(run: (db: FakeSupabase) => Promise<void>) {
+    vi.stubGlobal('window', {});
+    vi.stubGlobal('document', { baseURI:'https://example.test/' });
+    vi.stubGlobal('fetch', async (url: URL) => ({ ok:true, text:async () => readFileSync(`modern/public${url.pathname}`, 'utf8') }));
+    try { await run(new FakeSupabase()); } finally { vi.unstubAllGlobals(); }
+  }
+  it('preserva 1.437 IDs, 171 tópicos da matriz e o ID relacional na atualização', async () => {
+    await withCatalog(async (db) => {
+      await seedBuiltinStudyCatalog(db as unknown as SupabaseClient, USER, 'profile-1');
+      const original = new Map(db.tables.cards.map((row) => [row.legacy_id,row.id]));
+      expect(original.size).toBe(1437);
+      const canonical = db.tables.cards.find((row) => row.legacy_id?.startsWith('card-trt4-'))!;
+      canonical.back = 'Resposta antiga para testar reconciliação pelo ID';
+      canonical.read_at = '2026-10-01T00:00:00Z';
+      canonical.suspended = true;
+      canonical.deleted_at = '2026-10-02T00:00:00Z';
+      await seedBuiltinStudyCatalog(db as unknown as SupabaseClient, USER, 'profile-1');
+      expect(new Map(db.tables.cards.map((row) => [row.legacy_id,row.id]))).toEqual(original);
+      expect(canonical.read_at).toBe('2026-10-01T00:00:00Z');
+      expect(canonical.suspended).toBe(true);
+      expect(canonical.deleted_at).toBe('2026-10-02T00:00:00Z');
+      expect(new Set(db.tables.cards.filter((row) => row.example?.includes('Camada 3 - Fechamento do edital')).map((row) => row.topic_id)).size).toBe(171);
+    });
   });
 });
