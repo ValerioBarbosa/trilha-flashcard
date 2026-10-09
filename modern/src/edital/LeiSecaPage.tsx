@@ -197,7 +197,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
       <PageHeader
         eyebrow="LEI SECA"
         title="Leitura de Lei Seca"
-        subtitle="Leia um trecho por vez, marque o que já passou e avance pela legislação do edital sem poluição visual."
+        subtitle="Roteiros indicam o que ler; não são o texto integral da lei. Consulte a fonte oficial ou importe trechos e registre a leitura."
         action={
           <div className="lei-seca-header-actions">
             <div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar norma ou assunto" /></div>
@@ -211,9 +211,9 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
       <div className="dashboard-grid lei-seca-metrics">
         <MetricTile label="Assuntos com Lei Seca" value={`${coverage.coveredTopics}/${coverage.totalTopics}`} helper="do total de assuntos com base legal" />
         <MetricTile label="Disciplinas iniciadas" value={`${coverage.subjectsCovered}/${coverage.totalSubjects}`} helper="com ao menos 1 assunto cadastrado" />
-        <MetricTile label="Cartões de Lei Seca" value={coverage.totalCards} helper="trechos importados no total" />
+        <MetricTile label="Cartões de Lei Seca" value={coverage.totalCards} helper="roteiros e trechos; confira a origem" />
         <MetricTile label="Trechos lidos" value={`${coverage.readCards}/${coverage.totalCards}`} helper="marcados como lidos" />
-        <MetricTile label="Cobertura geral" value={coverage.totalTopics ? `${Math.round((coverage.coveredTopics / coverage.totalTopics) * 100)}%` : '0%'} helper="dos assuntos já com texto de lei" />
+        <MetricTile label="Cobertura geral" value={coverage.totalTopics ? `${Math.round((coverage.coveredTopics / coverage.totalTopics) * 100)}%` : '0%'} helper="dos assuntos com roteiro ou trecho vinculado" />
       </div>
       {!rows.length ? (
         <div className="study-empty">

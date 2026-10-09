@@ -1,3 +1,4 @@
+import { isStudyContent } from '../study/card-purpose';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { listLatestReviewsByCard } from '../study/domain-repository';
 
@@ -59,18 +60,18 @@ export async function loadPerformance(client: SupabaseClient, user: User, profil
   today.setHours(0, 0, 0, 0);
   const now = Date.now();
 
-  type ReviewRow = { rating: number; reviewed_at: string; cards: { subject_id: string | null }[] | { subject_id: string | null } | null };
-  const [reviewRows, { count: openErrors, error: errorCountError }, latestByCard, activeCards] = await Promise.all([
+  type ReviewRow = { rating: number; reviewed_at: string; cards: { subject_id: string | null; card_type?: string | null }[] | { subject_id: string | null; card_type?: string | null } | null };
+  const [allReviewRows, { count: openErrors, error: errorCountError }, latestByCard, activeCards] = await Promise.all([
     requirePaged<ReviewRow>((from, to) => client.from('reviews')
-      .select('rating,reviewed_at,cards(subject_id)')
+      .select('rating,reviewed_at,cards(subject_id,card_type)')
       .eq('user_id', user.id)
       .eq('profile_id', profileId)
       .order('reviewed_at')
       .range(from, to)),
     client.from('error_notebook').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('profile_id', profileId).eq('resolved', false),
     listLatestReviewsByCard(client, profileId),
-    requirePaged<{ id: string }>((from, to) => client.from('cards')
-      .select('id')
+    requirePaged<{ id: string; card_type?: string | null }>((from, to) => client.from('cards')
+      .select('id,card_type')
       .eq('profile_id', profileId)
       .is('deleted_at', null)
       .eq('suspended', false)
@@ -78,6 +79,7 @@ export async function loadPerformance(client: SupabaseClient, user: User, profil
       .range(from, to)),
   ]);
   if (errorCountError) throw errorCountError;
+  const reviewRows = allReviewRows.filter((row) => { const card = Array.isArray(row.cards) ? row.cards[0] : row.cards; return Boolean(card) && isStudyContent(card!); });
   const subjectIdOf = (row: (typeof reviewRows)[number]) => Array.isArray(row.cards) ? row.cards[0]?.subject_id ?? null : row.cards?.subject_id ?? null;
   const correctReviews = reviewRows.filter((row) => Number(row.rating) >= 3).length;
   const reviewedToday = reviewRows.filter((row) => new Date(row.reviewed_at) >= today).length;
@@ -85,7 +87,7 @@ export async function loadPerformance(client: SupabaseClient, user: User, profil
   const activeDays = new Set(reviewRows.map((row) => dateKey(new Date(row.reviewed_at))));
   const streakDays = computeStreak(activeDays, new Date());
 
-  const activeCardIds = new Set(activeCards.map((row) => row.id));
+  const activeCardIds = new Set(activeCards.filter(isStudyContent).map((row) => row.id));
   const dueNow = Array.from(latestByCard.entries()).filter(([cardId, row]) => activeCardIds.has(cardId) && new Date(row.due_at).getTime() <= now).length;
 
   const bySubjectMap = new Map<string, { reviews: number; correct: number }>();

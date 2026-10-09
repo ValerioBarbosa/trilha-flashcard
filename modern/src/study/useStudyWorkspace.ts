@@ -14,7 +14,7 @@ import {
   type TopicRow,
 } from './domain-repository';
 
-const BUILTIN_CATALOG_VERSION = 'trt4-ajaj-v3-1437-db-fingerprint-v5-2026-09-23';
+const BUILTIN_CATALOG_VERSION = 'v5-study-quality-20261009';
 const EXPECTED_BUILTIN_CATALOG_CARDS = 1437;
 
 function activeProfileKey(userId: string): string {
@@ -96,8 +96,6 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
         client.from('cards')
           .select('*', { count: 'exact', head: true })
           .eq('profile_id', resolvedProfile.id)
-          .is('deleted_at', null)
-          .eq('suspended', false)
           .like('source', 'Edital Verticalizado TRT-4 AJAJ 2026 V3%'),
       ]);
       if (countError) throw countError;
@@ -112,16 +110,14 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
           const { count: verifiedCount, error: verifyError } = await client.from('cards')
             .select('*', { count: 'exact', head: true })
             .eq('profile_id', resolvedProfile.id)
-            .is('deleted_at', null)
-            .eq('suspended', false)
             .like('source', 'Edital Verticalizado TRT-4 AJAJ 2026 V3%');
           if (verifyError) throw verifyError;
           if ((verifiedCount ?? 0) < EXPECTED_BUILTIN_CATALOG_CARDS) {
-            throw new Error(`Catálogo oficial incompleto: ${verifiedCount ?? 0}/${EXPECTED_BUILTIN_CATALOG_CARDS}. Tente novamente.`);
+            throw new Error(`Material de estudo incompleto: ${verifiedCount ?? 0}/${EXPECTED_BUILTIN_CATALOG_CARDS}. Tente novamente.`);
           }
           storeBuiltinCatalogVersion(user.id, resolvedProfile.id);
         } catch (seedError) {
-          throw new Error(`Falha ao atualizar catálogo oficial: ${errorMessage(seedError)}`);
+          throw new Error(`Falha ao atualizar material de estudo: ${errorMessage(seedError)}`);
         } finally {
           setSeeding(false);
         }

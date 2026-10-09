@@ -13,12 +13,13 @@ type Props = {
   topics: TopicRow[];
   onStudyTopic: (subjectId: string, topicId: string) => void;
   onOpenLeiSeca: () => void;
+  onPracticeSubject: (subjectId:string) => void;
 };
 
 type StatusFilter = 'all' | EditalTopicProgress['status'];
 type PriorityFilter = 'all' | 'A' | 'B' | 'C';
 
-const STATUS_ORDER: EditalTopicProgress['status'][] = ['Não iniciado', 'Em estudo', 'Revisado', 'Dominado'];
+const STATUS_ORDER: EditalTopicProgress['status'][] = ['Não iniciado', 'Em estudo', 'Revisado', 'Recuperado'];
 const COMPLEMENTARY_TOPICS = new Set(['Jurisprudência prioritária STF/TST', 'Estudo de Caso Jurídico - protocolo de treino']);
 
 function emptyProgress(): EditalTopicProgress {
@@ -26,13 +27,13 @@ function emptyProgress(): EditalTopicProgress {
 }
 
 function statusClass(status: EditalTopicProgress['status']): string {
-  if (status === 'Dominado') return 'status-mastered';
+  if (status === 'Recuperado') return 'status-mastered';
   if (status === 'Revisado') return 'status-reviewed';
   if (status === 'Em estudo') return 'status-studying';
   return 'status-not-started';
 }
 
-export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onStudyTopic, onOpenLeiSeca }: Props) {
+export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onStudyTopic, onOpenLeiSeca, onPracticeSubject }: Props) {
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [priority, setPriority] = useState<PriorityFilter>('all');
@@ -88,7 +89,7 @@ export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onS
         const item = progress.get(topic.id) ?? emptyProgress();
         if (item.cardCount > 0) coveredTopics += 1;
         if (item.leiSecaCount > 0 || Boolean(topic.legal_basis)) leiSecaTopics += 1;
-        if (item.status === 'Dominado') masteredTopics += 1;
+        if (item.status === 'Recuperado') masteredTopics += 1;
         totalCards += item.cardCount;
       }
     }
@@ -126,7 +127,7 @@ export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onS
         <div className="edital-overview-copy">
           <span className="page-eyebrow">PROGRESSO GERAL</span>
           <h2>{coverage.coveredTopics}/{coverage.totalTopics} tópicos com material de estudo</h2>
-          <p>O percentual abaixo mede cobertura do edital. “Dominado” só aparece quando os cartões do tópico já foram respondidos com desempenho suficiente.</p>
+          <p>O percentual mede presença de cartões de conteúdo, não domínio integral. “Recuperado” significa que todos os cartões receberam autoavaliação Bom/Fácil; valide o assunto com questões. Os pesos são referência histórica de 2022.</p>
         </div>
         <strong>{coveragePct}%</strong>
         <div className="edital-progress-track"><span style={{ width: `${coveragePct}%` }} /></div>
@@ -134,10 +135,10 @@ export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onS
 
       <div className="dashboard-grid edital-command-metrics">
         <MetricTile label="Tópicos cobertos" value={`${coverage.coveredTopics}/${coverage.totalTopics}`} helper="com flashcards vinculados" />
-        <MetricTile label="Dominados" value={coverage.masteredTopics} helper={`${masteredPct}% do edital`} />
-        <MetricTile label="Cartões de estudo" value={coverage.totalCards} helper="sem contar Lei Seca" />
+        <MetricTile label="Recuperados" value={coverage.masteredTopics} helper={`${masteredPct}% por autoavaliação`} />
+        <MetricTile label="Cartões de estudo" value={coverage.totalCards} helper="sem roteiros e sem Lei Seca" />
         <MetricTile label="Com base legal" value={coverage.leiSecaTopics} helper="aptos para leitura de Lei Seca" />
-        <MetricTile label="Camada 4" value="+360" helper="aprofundamento, jurisprudência e Estudo de Caso" />
+        <MetricTile label="Próxima etapa" value="Praticar" helper="questões autorais com gabarito explicado" />
       </div>
 
       <section className="edital-filter-bar">
@@ -196,14 +197,14 @@ export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onS
                         <div className="edital-topic-meta">
                           <span><strong>{item.cardCount}</strong> cartões</span>
                           <span><strong>{item.reviewedCount}</strong> respondidos</span>
-                          <span><strong>{item.masteredCount}</strong> consolidados</span>
-                          <span className={hasLaw ? 'available' : ''}>{hasLaw ? 'Lei Seca disponível' : 'Sem base legal cadastrada'}</span>
+                          <span><strong>{item.masteredCount}</strong> recuperados por autoavaliação</span>
+                          <span className={hasLaw ? 'available' : ''}>{hasLaw ? 'Roteiro de Lei Seca' : 'Sem base legal cadastrada'}</span>
                         </div>
                       </div>
                       <div className="edital-topic-actions">
                         <button className="primary-action" disabled={item.cardCount === 0} onClick={() => onStudyTopic(subject.id, topic.id)}>Estudar</button>
                         <button className="secondary-outline" disabled={!hasLaw} onClick={onOpenLeiSeca}>Lei Seca</button>
-                        <button className="secondary-outline" disabled title="Integração de questões ainda não ativada nesta tela">Questões</button>
+                        <button className="secondary-outline" onClick={() => onPracticeSubject(subject.id)}>Questões da disciplina</button>
                       </div>
                     </article>
                   );

@@ -1,3 +1,4 @@
+import { isStudyContent } from '../../../src/features/study/card-purpose';
 import type { CardRow, LatestReview } from './domain-repository';
 
 export type Scope = 'all' | 'new' | 'due' | 'wrong';
@@ -26,7 +27,7 @@ export function filterByScope(
   priority: '' | 'A' | 'B' | 'C',
   now: number = Date.now(),
 ): CardRow[] {
-  let pool = cards;
+  let pool = cards.filter(isStudyContent);
   if (priority) pool = pool.filter((item) => item.priority === priority);
   if (scope === 'new') pool = pool.filter((item) => !reviewMap.has(item.id));
   if (scope === 'due') pool = pool.filter((item) => {

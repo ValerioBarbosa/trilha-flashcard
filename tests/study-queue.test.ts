@@ -77,3 +77,15 @@ describe('shuffle', () => {
     expect([...result].sort()).toEqual(items);
   });
 });
+
+
+describe('roteiros não contam como recuperação', () => {
+  it('exclui roteiros e lei seca mesmo que estejam vencidos ou no caderno de erros', () => {
+    const guide = { ...makeCard('guide'), card_type:'Roteiro de estudo' };
+    const law = { ...makeCard('law'), card_type:'Lei seca' };
+    const rule = makeCard('rule');
+    const reviews = new Map([['guide',{rating:1,due_at:new Date(NOW-1).toISOString()}]]);
+    expect(filterByScope([guide,law,rule],reviews,new Set(['guide']),'all','',NOW)).toEqual([rule]);
+    expect(filterByScope([guide],reviews,new Set(['guide']),'wrong','',NOW)).toEqual([]);
+  });
+});

@@ -1,3 +1,4 @@
+import { loadQuestionAccuracy } from '../learning/practice-repository';
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { loadPerformance, type PerformanceSummary } from '@core/features/performance/performance-repository';
@@ -15,6 +16,8 @@ type Props = {
 };
 
 export function PerformancePage({ user, profileId, subjects, onReviewWrong, onReviewDue }: Props) {
+  const [questionScore, setQuestionScore] = useState<{total:number;correct:number;accuracy:number|null} | null>(null);
+  const [questionError, setQuestionError] = useState('');
   const [summary, setSummary] = useState<PerformanceSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +25,8 @@ export function PerformancePage({ user, profileId, subjects, onReviewWrong, onRe
   function load() {
     setLoading(true);
     setError(null);
+    setQuestionError('');
+    void loadQuestionAccuracy(getSupabaseClient(), user, profileId).then(setQuestionScore).catch(() => setQuestionError('Não foi possível carregar os resultados de questões.'));
     return loadPerformance(getSupabaseClient(), user, profileId)
       .then(setSummary)
       .catch((cause) => setError(cause instanceof Error ? cause.message : 'Não foi possível calcular o desempenho.'))
@@ -40,11 +45,13 @@ export function PerformancePage({ user, profileId, subjects, onReviewWrong, onRe
 
   return (
     <div className="page-wrap">
-      <PageHeader eyebrow="ANÁLISE" title="Desempenho" subtitle="Métricas reais das revisões de cartões gravadas no Supabase." />
+      <PageHeader eyebrow="ANÁLISE" title="Desempenho" subtitle="Acertos de questões separados da autoavaliação dos cartões. Não são previsão de nota da FCC." />
+      {questionError ? <div className="notice error">{questionError}</div> : null}
       <div className="dashboard-grid lei-seca-metrics">
+        <MetricTile label="Acertos em questões" value={questionScore?.accuracy == null ? "—" : `${questionScore.accuracy}%`} helper={`${questionScore?.correct ?? 0}/${questionScore?.total ?? 0} tentativas com gabarito; inclui repetições`} />
         <MetricTile label="Sequência" value={`${summary?.streakDays ?? 0} dia${summary?.streakDays === 1 ? '' : 's'}`} helper="de estudo seguido" />
         <MetricTile label="Revisões" value={summary?.totalReviews ?? 0} helper={`${summary?.reviewedToday ?? 0} hoje`} />
-        <MetricTile label="Acerto nos cartões" value={`${summary?.accuracy ?? 0}%`} helper={`${summary?.correctReviews ?? 0} respostas boas/fáceis`} />
+        <MetricTile label="Recuperação declarada" value={`${summary?.accuracy ?? 0}%`} helper={`${summary?.correctReviews ?? 0} autoavaliações boas/fáceis`} />
         <MetricTile label="Revisar hoje" value={summary?.dueNow ?? 0} helper="cartões vencidos para revisão" />
         <MetricTile label="Caderno de erros" value={summary?.openErrors ?? 0} helper="pendências abertas" />
       </div>
@@ -59,7 +66,7 @@ export function PerformancePage({ user, profileId, subjects, onReviewWrong, onRe
       </div>
 
       <section className="panel-card">
-        <span className="panel-label">DESEMPENHO POR DISCIPLINA</span>
+        <span className="panel-label">AUTOAVALIAÇÃO DOS CARTÕES POR DISCIPLINA</span>
         {bySubject.length ? (
           <div className="subject-performance-list">
             {bySubject.map((entry) => (

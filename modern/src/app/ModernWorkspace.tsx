@@ -16,9 +16,11 @@ import { ProfileSwitcher } from '../study/ProfileSwitcher';
 import { StudyPage, type StudyFocus } from '../study/StudyPage';
 import { useStudyWorkspace } from '../study/useStudyWorkspace';
 import { ThemeToggle } from '../shared/ThemeToggle';
+import { LearningPage } from '../learning/LearningPage';
+import { DISCIPLINES } from '../learning/LearningPage';
 import { CardManagerPage } from '../cards/CardManagerPage';
 
-type PageId = 'home' | 'study' | 'edital' | 'jurisprudence' | 'lei-seca' | 'cards' | 'performance' | 'data';
+type PageId = 'home' | 'learn' | 'practice' | 'cases' | 'study' | 'edital' | 'jurisprudence' | 'lei-seca' | 'cards' | 'performance' | 'data';
 
 type Props = {
   user: User;
@@ -27,7 +29,10 @@ type Props = {
 
 const NAV: Array<{ id: PageId; label: string; icon: string }> = [
   { id: 'home', label: 'Início', icon: '⌂' },
-  { id: 'study', label: 'Estudar', icon: '▣' },
+  { id: 'learn', label: 'Aprender', icon: '▥' },
+  { id: 'practice', label: 'Questões', icon: '?' },
+  { id: 'cases', label: 'Estudo de Caso', icon: '✎' },
+  { id: 'study', label: 'Revisar', icon: '▣' },
   { id: 'edital', label: 'Edital', icon: '☑' },
   { id: 'jurisprudence', label: 'Jurisprudência', icon: '§' },
   { id: 'lei-seca', label: 'Lei Seca', icon: '⚖' },
@@ -39,6 +44,7 @@ const NAV: Array<{ id: PageId; label: string; icon: string }> = [
 export function ModernWorkspace({ user, onSignOut }: Props) {
   const workspace = useStudyWorkspace(user);
   const [page, setPage] = useState<PageId>('home');
+  const [practiceSubject, setPracticeSubject] = useState('all');
   const [menuOpen, setMenuOpen] = useState(false);
   const [studyFocus, setStudyFocus] = useState<StudyFocus | null>(null);
 
@@ -89,8 +95,9 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
         ) : (
           <>
             {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} onStudySubject={(subjectId) => focusStudyTopic(subjectId, 'all')} onReviewDue={startDueReview} /> : null}
+            {['learn','practice','cases'].includes(page) ? <LearningPage mode={page === 'practice' ? 'practice' : page === 'cases' ? 'cases' : 'learn'} user={user} profileId={workspace.profile.id} subjects={workspace.subjects} initialSubject={practiceSubject} onReview={(discipline, name) => { const subject = workspace.subjects.find((row) => row.name === DISCIPLINES[discipline]); const topic = workspace.topics.find((row) => row.subject_id === subject?.id && row.name === name); if (subject) focusStudyTopic(subject.id, topic?.id || 'all'); }} /> : null}
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} focus={studyFocus} /> : null}
-            {page === 'edital' ? <EditalPage profileId={workspace.profile.id} isBuiltin={workspace.profile.is_builtin} subjects={workspace.subjects} topics={workspace.topics} onStudyTopic={focusStudyTopic} onOpenLeiSeca={() => selectPage('lei-seca')} /> : null}
+            {page === 'edital' ? <EditalPage profileId={workspace.profile.id} isBuiltin={workspace.profile.is_builtin} subjects={workspace.subjects} topics={workspace.topics} onStudyTopic={focusStudyTopic} onOpenLeiSeca={() => selectPage('lei-seca')} onPracticeSubject={(subjectId) => { const name = workspace.subjects.find((row) => row.id === subjectId)?.name; setPracticeSubject(Object.entries(DISCIPLINES).find(([,value]) => value === name)?.[0] || 'all'); selectPage('practice'); }} /> : null}
             {page === 'jurisprudence' ? <JurisprudencePage profileId={workspace.profile.id} /> : null}
             {page === 'lei-seca' ? <LeiSecaPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} onStudyTopic={focusStudyTopic} /> : null}
             {page === 'cards' ? <CardManagerPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} onChanged={workspace.refresh} /> : null}
@@ -104,7 +111,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
 }
 
 function LoadingView({ seeding }: { seeding: boolean }) {
-  return <div className="page-wrap loading-page"><div className="loading-orb" /><h2>{seeding ? 'Preparando seus baralhos…' : 'Carregando sua trilha…'}</h2><p>{seeding ? 'Atualizando e conferindo o catálogo oficial sem apagar seu histórico.' : 'Sincronizando estrutura e progresso.'}</p></div>;
+  return <div className="page-wrap loading-page"><div className="loading-orb" /><h2>{seeding ? 'Preparando seus baralhos…' : 'Carregando sua trilha…'}</h2><p>{seeding ? 'Atualizando e conferindo o material autoral sem apagar seu histórico.' : 'Sincronizando estrutura e progresso.'}</p></div>;
 }
 
 function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: {
@@ -145,7 +152,7 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
 
   const rootTopics = workspace.topics.filter((topic) => !topic.parent_id);
   const complementaryTopicNames = new Set(['Jurisprudência prioritária STF/TST', 'Estudo de Caso Jurídico - protocolo de treino']);
-  const officialRootTopics = rootTopics.filter((topic) => !complementaryTopicNames.has(topic.name));
+  const officialRootTopics = rootTopics.filter((topic) => !complementaryTopicNames.has(topic.name) && (!workspace.profile?.is_builtin || editalCoveredTopicIds.has(topic.id)));
   const leiSecaEligibleTopics = officialRootTopics.filter((topic) => topic.legal_basis && workspace.subjects.find((subject) => subject.id === topic.subject_id)?.name.trim().toLowerCase() !== 'português');
   const officialTopicTotal = workspace.profile?.is_builtin ? 171 : officialRootTopics.length;
   const editalCoveredTopics = officialRootTopics.filter((topic) => editalCoveredTopicIds.has(topic.id)).length;
@@ -154,14 +161,14 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
 
   const topDecks = workspace.decks.filter((deck) => deck.subject_id).slice(0, 4);
 
-  const heroAction = () => onNavigate('study');
-  const heroLabel = 'Continuar estudando →';
+  const heroAction = () => onNavigate('learn');
+  const heroLabel = 'Aprender e praticar →';
 
   const focusMessage = leiSecaPct < editalPct
-    ? { title: 'Avance na Lei Seca.', body: `A cobertura de Lei Seca está em ${leiSecaPct}%. Continue pelos assuntos do edital que ainda têm espaço para leitura dirigida.`, action: 'Abrir Lei Seca', onClick: () => onNavigate('lei-seca') }
+    ? { title: 'Avance na Lei Seca.', body: `Os roteiros de Lei Seca estão vinculados a ${leiSecaPct}%. Continue pelos assuntos do edital que ainda têm espaço para leitura dirigida.`, action: 'Abrir Lei Seca', onClick: () => onNavigate('lei-seca') }
     : editalPct < 100
-      ? { title: 'Continue avançando no edital.', body: `Você já cobriu ${editalPct}% dos tópicos. Priorize agora os assuntos ainda sem cobertura completa.`, action: 'Abrir edital', onClick: () => onNavigate('edital') }
-      : { title: 'Mantenha o ritmo.', body: 'O edital já está coberto por cartões. Agora o foco é estudar, praticar e consolidar os pontos mais difíceis.', action: 'Estudar agora', onClick: () => onNavigate('study') };
+      ? { title: 'Continue avançando no edital.', body: `Há material vinculado a ${editalPct}% dos tópicos. Priorize agora os assuntos ainda sem cobertura completa.`, action: 'Abrir edital', onClick: () => onNavigate('edital') }
+      : { title: 'Mantenha o ritmo.', body: 'A matriz está mapeada. Isso não significa domínio ou cobertura integral de conteúdo. Agora o foco é estudar, praticar e consolidar os pontos mais difíceis.', action: 'Estudar agora', onClick: () => onNavigate('study') };
 
   return (
     <div className="page-wrap home-page">
@@ -184,37 +191,37 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
       <section className="home-progress-card">
         <div className="home-progress-head">
           <div>
-            <span className="panel-label">COBERTURA DO EDITAL</span>
-            <h2>{Math.min(editalCoveredTopics, officialTopicTotal)}/{officialTopicTotal} tópicos cobertos</h2>
-            <p>{workspace.profile?.is_builtin ? `Catálogo TRT-4 AJAJ: ${catalogCardCount}/1.437 cartões oficiais carregados · 171 tópicos da matriz.` : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
+            <span className="panel-label">MATRIZ DE PREPARAÇÃO</span>
+            <h2>{Math.min(editalCoveredTopics, officialTopicTotal)}/{officialTopicTotal} assuntos mapeados</h2>
+            <p>{workspace.profile?.is_builtin ? `Catálogo TRT-4 AJAJ: ${catalogCardCount}/1.437 registros autorais carregados (roteiros e conteúdo) · 171 tópicos da matriz.` : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
           </div>
           <strong className="home-progress-percent">{editalPct}%</strong>
         </div>
         <div className="home-progress-track" aria-label={`Cobertura do edital: ${editalPct}%`}><span style={{ width: `${editalPct}%` }} /></div>
         <div className="home-progress-meta">
           <span><strong>{totalCardCount}</strong> cartões totais</span>
-          {workspace.profile?.is_builtin ? <span><strong>{catalogCardCount}</strong> catálogo oficial</span> : null}
-          <span><strong>{leiSecaCount}</strong> Lei Seca</span>
-          <span><strong>{performance?.accuracy ?? 0}%</strong> precisão</span>
+          {workspace.profile?.is_builtin ? <span><strong>{catalogCardCount}</strong> material autoral</span> : null}
+          <span><strong>{leiSecaCount}</strong> roteiros de Lei Seca</span>
+          <span><strong>{performance?.accuracy ?? 0}%</strong> recuperação declarada</span>
         </div>
       </section>
 
       <div className="home-metric-grid">
-        <MetricTile label="Cartões totais" value={totalCardCount} helper="flashcards + Lei Seca" />
+        <MetricTile label="Cartões totais" value={totalCardCount} helper="conteúdo e roteiros; não mede domínio" />
         <MetricTile label="Lei Seca" value={leiSecaCount} helper={`${leiSecaPct}% dos assuntos com base legal`} />
-        <MetricTile label="Precisão" value={`${performance?.accuracy ?? 0}%`} helper={`${performance?.totalReviews ?? 0} respostas registradas`} />
+        <MetricTile label="Recuperação declarada" value={`${performance?.accuracy ?? 0}%`} helper={`${performance?.totalReviews ?? 0} autoavaliações registradas`} />
         <MetricTile label="Erros abertos" value={performance?.openErrors ?? 0} helper="pontos para reforçar" />
       </div>
 
       <section className="home-quick-actions" aria-label="Atalhos de estudo">
-        <button onClick={() => onNavigate('study')}><span>▣</span><strong>Estudar</strong><small>Abrir sessão</small></button>
+        <button onClick={() => onNavigate('study')}><span>▣</span><strong>Revisar</strong><small>Abrir sessão</small></button>
         <button onClick={() => onNavigate('edital')}><span>☑</span><strong>Edital</strong><small>Ver cobertura</small></button>
         <button onClick={() => onNavigate('lei-seca')}><span>⚖</span><strong>Lei Seca</strong><small>Leitura dirigida</small></button>
-        <button onClick={() => onNavigate('performance')}><span>↗</span><strong>Desempenho</strong><small>Precisão e progresso</small></button>
+        <button onClick={() => onNavigate('performance')}><span>↗</span><strong>Desempenho</strong><small>Questões e revisões</small></button>
       </section>
 
       <div className="content-grid two-one home-bottom-grid">
-        <section className="panel-card"><div className="panel-heading"><div><span>BARALHOS</span><h2>Continuar por disciplina</h2></div><button className="link-button" onClick={() => onNavigate('study')}>Ver todos</button></div><div className="deck-list-clean">{topDecks.map((deck, index) => <button key={deck.id} onClick={() => onStudySubject(deck.subject_id!)}><span className="deck-number">{String(index + 1).padStart(2, '0')}</span><span className="deck-copy"><strong>{deck.name}</strong><small>{deck.is_builtin ? 'Baralho oficial' : 'Baralho personalizado'}</small></span><span className="chevron">›</span></button>)}</div></section>
+        <section className="panel-card"><div className="panel-heading"><div><span>BARALHOS</span><h2>Continuar por disciplina</h2></div><button className="link-button" onClick={() => onNavigate('study')}>Ver todos</button></div><div className="deck-list-clean">{topDecks.map((deck, index) => <button key={deck.id} onClick={() => onStudySubject(deck.subject_id!)}><span className="deck-number">{String(index + 1).padStart(2, '0')}</span><span className="deck-copy"><strong>{deck.name}</strong><small>{deck.is_builtin ? 'Baralho de preparação' : 'Baralho personalizado'}</small></span><span className="chevron">›</span></button>)}</div></section>
         <section className="panel-card accent-panel home-focus-panel"><span className="panel-label">PRÓXIMO FOCO</span><h2>{focusMessage.title}</h2><p>{focusMessage.body}</p><button onClick={focusMessage.onClick}>{focusMessage.action}</button></section>
       </div>
     </div>

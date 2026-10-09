@@ -651,3 +651,26 @@ button:disabled { cursor: not-allowed; opacity: .5; }
   .lei-seca-topic-actions { display: grid; grid-template-columns: 1fr 1fr; }
   .lei-seca-topic-actions .primary-action { grid-column: 1/-1; }
 }
+
+/* Guided learning and authored practice share the account's normal theme. */
+.public-learning { max-width: 1200px; margin: auto; padding: 20px; }
+.learning-tabs, .learning-sources { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+.learning-filter { display: flex; align-items: center; gap: 12px; margin: 16px 0; flex-wrap: wrap; }
+.learning-filter select { max-width: 100%; padding: 10px; border-radius: 8px; color: inherit; background: var(--surface, #fff); }
+.learning-lesson { margin: 14px 0; }
+.learning-lesson summary { cursor: pointer; display: grid; gap: 6px; }
+.learning-lesson summary strong { font-size: 1.1rem; }
+.learning-lesson summary span, .learning-lesson summary small { opacity: .75; }
+.learning-rule { border-top: 1px solid #94a3b840; margin-top: 16px; padding-top: 12px; }
+.learning-rule p, .learning-lesson p, .practice-card p { line-height: 1.65; white-space: pre-wrap; }
+.practice-options { display: grid; gap: 10px; margin: 20px 0; }
+.practice-options button { text-align: left; padding: 14px; border: 1px solid #94a3b8; border-radius: 10px; background: transparent; color: inherit; line-height: 1.5; cursor: pointer; }
+.practice-options button:disabled { cursor: default; opacity: 1; }
+.practice-options .practice-correct { border: 2px solid #15803d; background: #16a34a16; }
+.practice-options .practice-wrong { border: 2px solid #dc2626; background: #ef444416; }
+.practice-feedback { margin: 18px 0; padding: 18px; border-left: 4px solid #2563eb; background: #2563eb0a; }
+.learning-draft { display: grid; gap: 8px; margin: 16px 0; }
+.learning-draft textarea { width: 100%; box-sizing: border-box; padding: 14px; color: inherit; background: transparent; border: 1px solid #94a3b8; border-radius: 10px; font: inherit; line-height: 1.6; }
+.learning-check { display: flex; gap: 10px; align-items: start; margin: 12px 0; }
+.learning-sources a, .practice-feedback a { color: #2563eb; text-decoration: underline; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .public-learning { padding: 12px 0; } .practice-card h2 { font-size: 1.2rem; } .learning-tabs button { flex: 1 1 auto; } }

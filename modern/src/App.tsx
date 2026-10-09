@@ -1,3 +1,4 @@
+import { LearningPage } from './learning/LearningPage';
 import { useState } from 'react';
 import { ModernWorkspace } from './app/ModernWorkspace';
 import { useAuth } from './auth/AuthContext';
@@ -10,6 +11,7 @@ import './shared/quick-actions.css';
 
 export function App() {
   const { user, loading, initialized, error, signIn, signOut } = useAuth();
+  const [exploring, setExploring] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
   async function handleSignIn() {
@@ -33,6 +35,8 @@ export function App() {
     );
   }
 
+  if (exploring) return <main className="public-learning"><button className="secondary-outline" onClick={() => setExploring(false)}>Voltar para entrar</button><LearningPage /></main>;
+
   return (
     <main className="auth-screen">
       <section className="auth-visual">
@@ -54,6 +58,7 @@ export function App() {
             <span className="google-g">G</span>
             {loading ? 'Conectando…' : 'Continuar com Google'}
           </button>
+          <button className="secondary-outline" onClick={() => setExploring(true)}>Explorar estudo sem entrar</button>
           <small className="auth-note">A versão moderna usa o mesmo projeto Supabase e preserva o armazenamento local durante a migração.</small>
         </div>
       </section>
