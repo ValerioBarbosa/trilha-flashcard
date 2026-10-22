@@ -15,7 +15,7 @@ import {
 } from './domain-repository';
 
 const BUILTIN_CATALOG_VERSION = 'v6-edital-oficial-20261022';
-const EXPECTED_BUILTIN_CATALOG_CARDS = 1600;
+const EXPECTED_BUILTIN_CATALOG_CARDS = 1575;
 
 function activeProfileKey(userId: string): string {
   return `trilha-active-profile:${userId}`;
