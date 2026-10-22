@@ -166,8 +166,7 @@ export async function listOfficialEditalTopicIds(client: SupabaseClient, profile
   const data = await requirePaged<{ topic_id: string | null; card_type: string | null }>((from, to) => client.from('cards')
     .select('topic_id,card_type')
     .eq('profile_id', profileId)
-    .like('source', 'Edital Verticalizado TRT-4 AJAJ 2026 V3%')
-    .like('example', '%Camada 3 - Fechamento do edital%')
+    .eq('card_type', 'Tópico oficial')
     .not('topic_id', 'is', null)
     .order('id')
     .range(from, to));

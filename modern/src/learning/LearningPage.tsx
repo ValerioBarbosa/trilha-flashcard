@@ -13,7 +13,8 @@ export const DISCIPLINES: Record<string, string> = {
   'labor-procedure':'Direito Processual do Trabalho', 'labor-law':'Direito do Trabalho',
   portuguese:'Português', constitutional:'Direito Constitucional', administrative:'Direito Administrativo',
   'civil-procedure':'Direito Processual Civil', 'trt-legislation':'Regimento/Legislação TRT',
-  'math-logic':'Matemática + RLM', 'lgpd-digital':'LGPD e Direito Digital', 'study-case':'Estudo de Caso Jurídico',
+  'math-logic':'Matemática + RLM', 'human-rights':'Noções de Direitos Humanos', informatics:'Noções de Informática',
+  'civil-law':'Direito Civil', 'lgpd-digital':'LGPD e Direito Digital', 'study-case':'Estudo de Caso Jurídico',
 };
 
 export function LearningPage({ mode = 'learn', user, profileId, subjects, onReview, initialSubject = 'all' }: Props) {
@@ -40,7 +41,7 @@ export function LearningPage({ mode = 'learn', user, profileId, subjects, onRevi
     return groups;
   }, [cards]);
   return <div className="page-wrap learning-page">
-    <PageHeader eyebrow="APRENDER → PRATICAR → REVISAR" title="Estudo guiado" subtitle="Material autoral baseado na matriz de preparação. Os pesos de 2022 são referência histórica; o novo edital poderá alterar a matriz." />
+    <PageHeader eyebrow="APRENDER → PRATICAR → REVISAR" title="Estudo guiado" subtitle="Material alinhado ao Edital nº 1/2026. Priorize Conhecimentos Específicos, que têm peso 2, e treine o Estudo de Caso." />
     <div className="learning-tabs" role="group" aria-label="Etapas do estudo">
       <button className={active === 'learn' ? 'primary-action' : 'secondary-outline'} onClick={() => setActive('learn')}>Aprender</button>
       <button className={active === 'practice' ? 'primary-action' : 'secondary-outline'} onClick={() => setActive('practice')}>Questões</button>

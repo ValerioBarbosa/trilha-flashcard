@@ -110,11 +110,11 @@ Um workflow do GitHub Actions (`.github/workflows/ci.yml`) roda os testes a cada
 
 ## Atenção ao status do concurso
 
-O banco TRT-4 AJAJ acompanha a versão 3.0 do material **pré-edital 2026**, atualizada em 29/08/2026. O TRT-4 confirmou em 14/08/2026 que Analista Judiciário - Área Judiciária terá **Estudo de Caso** como prova discursiva. Por isso, o antigo baralho de Redação FCC foi convertido em Estudo de Caso Jurídico, preservando o identificador interno para não romper o histórico dos usuários.
+O banco TRT-4 AJAJ acompanha o **Edital nº 1/2026**, publicado em 22/10/2026. Para AJAJ, a prova terá 30 questões de Conhecimentos Gerais (peso 1), 30 de Conhecimentos Específicos (peso 2) e uma questão prática de Estudo de Caso. A matriz oficial acrescenta Noções de Direitos Humanos, Noções de Informática e Direito Civil.
 
-A FCC consta como fornecedora homologada para organizar o novo concurso em registro publicado no PNCP em 06/10/2026. A publicação é um ato de contratação direta; a assinatura do contrato ainda precisa de confirmação. Os pesos, os mínimos e o conteúdo programático do novo edital ainda dependem de publicação oficial. Os percentuais exibidos no aplicativo continuam sendo a fotografia histórica da prova FCC de 2022. Quando o novo edital for publicado, ele prevalecerá e o banco será revisado.
+A FCC é a organizadora. As inscrições vão de 26/10 a 25/11/2026 e as provas estão previstas para 31/01/2027, em Porto Alegre. A aplicação para Analista será à tarde.
 
-Fontes oficiais: [TRT-RS avança no planejamento do novo concurso público](https://www.trt4.jus.br/portais/trt4/modulos/noticias/51064882) e [registro da contratação no PNCP](https://pncp.gov.br/app/editais/00509968000148/2026/3411).
+Fonte oficial: [Edital nº 1/2026 no Diário Oficial da União](https://www.in.gov.br/web/dou/-/edital-n-1/2026-739927397).
 
 
 ### Estudo guiado — 09/10/2026

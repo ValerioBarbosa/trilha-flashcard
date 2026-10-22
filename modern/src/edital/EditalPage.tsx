@@ -5,6 +5,7 @@ import { listEditalTopicProgress, listOfficialEditalTopicIds, type EditalTopicPr
 import { getSupabaseClient } from '../lib/supabase-client';
 import { PageHeader } from '../shared/PageHeader';
 import { MetricTile } from '../shared/MetricTile';
+import { OFFICIAL_EDITAL_URL } from './official-edital-2026';
 
 type Props = {
   profileId: string;
@@ -113,7 +114,7 @@ export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onS
       <PageHeader
         eyebrow="EDITAL VERTICALIZADO"
         title="Centro de comando do edital"
-        subtitle="Veja exatamente o que precisa dominar, o que já possui material e qual é o próximo ponto de estudo."
+        subtitle="Anexo II do Edital nº 1/2026, publicado em 22/10/2026. AJAJ: 30 questões gerais (peso 1), 30 específicas (peso 2) e Estudo de Caso."
         action={
           <div className="edital-command-actions">
             <div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar disciplina, assunto ou base legal" /></div>
@@ -127,7 +128,7 @@ export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onS
         <div className="edital-overview-copy">
           <span className="page-eyebrow">PROGRESSO GERAL</span>
           <h2>{coverage.coveredTopics}/{coverage.totalTopics} tópicos com material de estudo</h2>
-          <p>O percentual mede presença de cartões de conteúdo, não domínio integral. “Recuperado” significa que todos os cartões receberam autoavaliação Bom/Fácil; valide o assunto com questões. Os pesos são referência histórica de 2022.</p>
+          <p>O percentual mede presença de cartões de conteúdo, não domínio integral. “Recuperado” significa que todos os cartões receberam autoavaliação Bom/Fácil; valide o assunto com questões. <a href={OFFICIAL_EDITAL_URL} target="_blank" rel="noreferrer">Abrir edital oficial ↗</a></p>
         </div>
         <strong>{coveragePct}%</strong>
         <div className="edital-progress-track"><span style={{ width: `${coveragePct}%` }} /></div>

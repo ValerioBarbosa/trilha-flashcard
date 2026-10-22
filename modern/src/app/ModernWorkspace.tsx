@@ -19,6 +19,7 @@ import { ThemeToggle } from '../shared/ThemeToggle';
 import { LearningPage } from '../learning/LearningPage';
 import { DISCIPLINES } from '../learning/LearningPage';
 import { CardManagerPage } from '../cards/CardManagerPage';
+import { OFFICIAL_TOPIC_COUNT } from '../edital/official-edital-2026';
 
 type PageId = 'home' | 'learn' | 'practice' | 'cases' | 'study' | 'edital' | 'jurisprudence' | 'lei-seca' | 'cards' | 'performance' | 'data';
 
@@ -137,7 +138,7 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
       loadPerformance(client, user, profileId),
       client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false),
       client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).eq('card_type', 'Lei seca'),
-      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).like('source', 'Edital Verticalizado TRT-4 AJAJ 2026 V3%'),
+      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).like('source', 'Edital nº 1/2026 TRT-4 AJAJ%'),
       listOfficialEditalTopicIds(client, profileId),
       listCardsByType(client, profileId, 'Lei seca'),
     ]).then(([summary, cards, leiSeca, catalogCards, officialTopicIds, leiSecaCards]) => {
@@ -154,7 +155,7 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
   const complementaryTopicNames = new Set(['Jurisprudência prioritária STF/TST', 'Estudo de Caso Jurídico - protocolo de treino']);
   const officialRootTopics = rootTopics.filter((topic) => !complementaryTopicNames.has(topic.name) && (!workspace.profile?.is_builtin || editalCoveredTopicIds.has(topic.id)));
   const leiSecaEligibleTopics = officialRootTopics.filter((topic) => topic.legal_basis && workspace.subjects.find((subject) => subject.id === topic.subject_id)?.name.trim().toLowerCase() !== 'português');
-  const officialTopicTotal = workspace.profile?.is_builtin ? 171 : officialRootTopics.length;
+  const officialTopicTotal = workspace.profile?.is_builtin ? OFFICIAL_TOPIC_COUNT : officialRootTopics.length;
   const editalCoveredTopics = officialRootTopics.filter((topic) => editalCoveredTopicIds.has(topic.id)).length;
   const editalPct = officialTopicTotal ? Math.round((Math.min(editalCoveredTopics, officialTopicTotal) / officialTopicTotal) * 100) : 0;
   const leiSecaPct = leiSecaEligibleTopics.length ? Math.round((leiSecaCoveredTopics / leiSecaEligibleTopics.length) * 100) : 0;
@@ -193,7 +194,7 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
           <div>
             <span className="panel-label">MATRIZ DE PREPARAÇÃO</span>
             <h2>{Math.min(editalCoveredTopics, officialTopicTotal)}/{officialTopicTotal} assuntos mapeados</h2>
-            <p>{workspace.profile?.is_builtin ? `Catálogo TRT-4 AJAJ: ${catalogCardCount}/1.437 registros autorais carregados (roteiros e conteúdo) · 171 tópicos da matriz.` : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
+            <p>{workspace.profile?.is_builtin ? `Edital nº 1/2026: ${OFFICIAL_TOPIC_COUNT} tópicos verticalizados · ${catalogCardCount} registros vinculados à versão oficial.` : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
           </div>
           <strong className="home-progress-percent">{editalPct}%</strong>
         </div>

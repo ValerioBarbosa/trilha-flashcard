@@ -1,6 +1,7 @@
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { qualifyCatalog, JURISPRUDENCE_NOTES } from '../learning/catalog-quality';
 import legacyDecks from '../generated/legacy-decks.json';
+import { OFFICIAL_EDITAL_2026, OFFICIAL_EDITAL_SOURCE } from '../edital/official-edital-2026';
 
 type LegacyCard = Record<string, unknown> & {
   id?: string; front?: string; back?: string; topic?: string; subtopic?: string;
@@ -23,16 +24,31 @@ const COMPLETE_CATALOG_PARTS = Array.from({ length: 6 }, (_, index) =>
 );
 
 const COMPLETE_DECK_TITLES: Record<string, string> = {
-  'labor-procedure': 'Direito Processual do Trabalho · 17,8%',
-  portuguese: 'Português · 16,7%',
-  administrative: 'Direito Administrativo · 16,7%',
-  'labor-law': 'Direito do Trabalho · 15,6%',
-  constitutional: 'Direito Constitucional · 11,1%',
-  'civil-procedure': 'Direito Processual Civil · 11,1%',
-  'math-logic': 'Matemática + RLM · 5,6%',
-  'trt-legislation': 'Regimento/Legislação TRT · 3,3%',
-  'lgpd-digital': 'LGPD e Direito Digital · 2,2%',
+  'labor-procedure': 'Direito Processual do Trabalho · Específicos (peso 2)',
+  portuguese: 'Língua Portuguesa · Gerais (peso 1)',
+  administrative: 'Direito Administrativo · Específicos (peso 2)',
+  'labor-law': 'Direito do Trabalho · Específicos (peso 2)',
+  constitutional: 'Direito Constitucional · Específicos (peso 2)',
+  'civil-procedure': 'Direito Processual Civil · Específicos (peso 2)',
+  'math-logic': 'Matemática e Raciocínio Lógico · Gerais (peso 1)',
+  'trt-legislation': 'Noções de Legislação · Gerais (peso 1)',
+  'lgpd-digital': 'LGPD e Direito Digital · material complementar',
   'study-case': 'Estudo de Caso Jurídico',
+};
+
+const NEW_SUBJECT_STARTERS: Record<string, Array<{ topic:string; front:string; back:string; legalBasis:string }>> = {
+  'human-rights': [
+    { topic:'Tratados de direitos humanos, Constituição e controle de convencionalidade', front:'O que é controle de convencionalidade?', back:'É a verificação da compatibilidade das normas internas com os tratados internacionais de direitos humanos aplicáveis ao Brasil.', legalBasis:'CF, art. 5º, §§ 2º e 3º; Convenção Americana sobre Direitos Humanos' },
+    { topic:'Sistema Interamericano de Direitos Humanos', front:'Quais são os dois principais órgãos do Sistema Interamericano de Direitos Humanos?', back:'A Comissão Interamericana de Direitos Humanos e a Corte Interamericana de Direitos Humanos.', legalBasis:'Convenção Americana sobre Direitos Humanos' },
+  ],
+  informatics: [
+    { topic:'Google Drive: criação, edição, compartilhamento e permissões', front:'Quais níveis de acesso devem ser diferenciados ao compartilhar um arquivo no Google Drive?', back:'Leitor, comentador e editor; o acesso também pode ser restrito a pessoas específicas ou liberado por link conforme a configuração.', legalBasis:'Google Workspace — compartilhamento e permissões' },
+    { topic:'Autenticação de dois fatores e gestão de senhas', front:'Por que a autenticação de dois fatores reduz o risco de invasão?', back:'Porque exige um segundo fator além da senha, dificultando o acesso mesmo quando a credencial principal é comprometida.', legalBasis:'Boas práticas de segurança cibernética' },
+  ],
+  'civil-law': [
+    { topic:'Negócio jurídico: elementos, defeitos e invalidade', front:'Quais são os requisitos de validade do negócio jurídico?', back:'Agente capaz, objeto lícito, possível, determinado ou determinável e forma prescrita ou não defesa em lei.', legalBasis:'Código Civil, art. 104' },
+    { topic:'Prescrição, decadência e prova', front:'Qual é a distinção central entre prescrição e decadência?', back:'Em regra, a prescrição atinge a pretensão; a decadência extingue o próprio direito potestativo pelo decurso do prazo.', legalBasis:'Código Civil, arts. 189 a 211' },
+  ],
 };
 
 
@@ -98,7 +114,7 @@ function buildLayer4Cards(cards: CompleteCatalogCard[]): CompleteCatalogCard[] {
 
   for (const card of deepestGaps) {
     const key = `${card.discipline}|${card.topic || ''}`;
-    const tags = ['AJAJ','Edital V3','Nível 4 - Roteiros e jurisprudência','TRT4','camada-4','roteiro-de-estudo'];
+    const tags = ['AJAJ','Edital 2026','Nível 4 - Roteiros e jurisprudência','TRT4','camada-4','roteiro-de-estudo'];
     layer4.push({
       id: `card-trt4-layer4-${stableHash(`${key}|caso`)}`,
       discipline: card.discipline, disciplineName: card.disciplineName, topic: card.topic,
@@ -124,7 +140,7 @@ function buildLayer4Cards(cards: CompleteCatalogCard[]): CompleteCatalogCard[] {
   }
 
   for (const [reference, theme, discipline, disciplineName] of LAYER4_JURISPRUDENCE) {
-    const tags = ['AJAJ','Edital V3','Nível 4 - Roteiros e jurisprudência','TRT4','jurisprudencia-prioritaria'];
+    const tags = ['AJAJ','Edital 2026','Nível 4 - Roteiros e jurisprudência','TRT4','jurisprudencia-prioritaria'];
     layer4.push({
       id: `card-trt4-layer4-${stableHash(`${reference}|mapa`)}`, discipline, disciplineName,
       topic: 'Jurisprudência prioritária STF/TST', subtopic: reference, legalBasis: reference,
@@ -152,11 +168,11 @@ function buildLayer4Cards(cards: CompleteCatalogCard[]): CompleteCatalogCard[] {
       id: `card-trt4-layer4-${stableHash(`study-case|${subtopic}`)}`,
       discipline: 'study-case', disciplineName: 'Estudo de Caso Jurídico',
       topic: 'Estudo de Caso Jurídico - protocolo de treino', subtopic,
-      legalBasis: 'Edital Verticalizado TRT-4 AJAJ V3, seção 19',
+      legalBasis: 'Edital nº 1/2026 TRT-4, Anexo II',
       type: 'Estudo de Caso', priority: 'A', difficulty: 'Difícil', front, back,
       complement: 'Treino transversal para a prova discursiva AJAJ.',
       trap: 'Não confunda conhecer o conteúdo com responder exatamente o que o comando e os fatos exigem.',
-      mnemonic: '', tags: ['AJAJ','Edital V3','Nível 4 - Roteiros e jurisprudência','TRT4','estudo-de-caso'],
+      mnemonic: '', tags: ['AJAJ','Edital 2026','Nível 4 - Roteiros e jurisprudência','TRT4','estudo-de-caso'],
       level: 'Nível 4 - Roteiros e jurisprudência', sourceLayer: 'Camada 4 - Roteiros e jurisprudência',
     });
   }
@@ -187,7 +203,7 @@ async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
       deck = {
         id: deckId,
         title: COMPLETE_DECK_TITLES[deckId] || card.disciplineName || deckId,
-        sourceNote: 'Edital Verticalizado TRT-4 AJAJ 2026 V3 · material autoral · roteiros e cartões de conteúdo · pesos históricos de 2022',
+        sourceNote: 'Material autoral legado TRT-4 AJAJ · preservado para revisão e remapeado ao Edital nº 1/2026',
         topics: [],
         cards: [],
       };
@@ -210,6 +226,35 @@ async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
       mnemonic: card.mnemonic,
       example: [card.level, card.sourceLayer].filter(Boolean).join(' · '),
     });
+  }
+  for (const subject of OFFICIAL_EDITAL_2026) {
+    let deck = groups.get(subject.id);
+    if (!deck) {
+      deck = { id:subject.id, title:`${subject.name} · ${subject.group === 'Conhecimentos Específicos' ? 'Específicos (peso 2)' : 'Gerais (peso 1)'}`, sourceNote:OFFICIAL_EDITAL_SOURCE, topics:[], cards:[] };
+      groups.set(subject.id, deck);
+    }
+    deck.sourceNote = OFFICIAL_EDITAL_SOURCE;
+    for (const topic of subject.topics) {
+      if (!deck.topics!.includes(topic.name)) deck.topics!.push(topic.name);
+      deck.cards!.push({
+        id:`card-trt4-edital-2026-${subject.id}-${slugify(topic.name).slice(0, 45)}`,
+        front:`Tópico oficial: ${topic.name}`,
+        back:`Incluído em ${subject.name}, no Anexo II do Edital nº 1/2026 para Analista Judiciário – Área Judiciária.`,
+        topic:topic.name,
+        legalBasis:topic.legalBasis || 'Edital nº 1/2026, Anexo II',
+        type:'Tópico oficial', priority:topic.priority, difficulty:'medium',
+        tags:['TRT4','AJAJ','Edital 2026','tópico-oficial'],
+        example:'Matriz oficial publicada em 22/10/2026',
+      });
+    }
+    for (const starter of NEW_SUBJECT_STARTERS[subject.id] || []) {
+      deck.cards!.push({
+        id:`card-trt4-edital-2026-starter-${stableHash(`${subject.id}|${starter.front}`)}`,
+        front:starter.front, back:starter.back, topic:starter.topic, legalBasis:starter.legalBasis,
+        type:'Conceito', priority:'A', difficulty:'medium', tags:['TRT4','AJAJ','Edital 2026','nova-disciplina'],
+        example:'Camada inicial pós-edital',
+      });
+    }
   }
   return [...groups.values()];
 }

@@ -3,14 +3,14 @@ import deckModule from "../decks.js";
 
 const { trt4Decks } = deckModule;
 
-describe("edital TRT-4 AJAJ versão 3", () => {
+describe("edital TRT-4 AJAJ 2026", () => {
   it("identifica a versão atual e a situação oficial de 2026", () => {
     const overview = trt4Decks.find((deck) => deck.id === "trt4-overview");
 
-    expect(overview.title).toContain("Edital V3");
-    expect(overview.sourceNote).toContain("29/08/2026");
-    expect(overview.sourceNote).toContain("06/10/2026");
-    expect(overview.sourceNote).toContain("https://pncp.gov.br/app/editais/00509968000148/2026/3411");
+    expect(overview.title).toContain("Edital nº 1/2026");
+    expect(overview.sourceNote).toContain("22/10/2026");
+    expect(overview.sourceNote).toContain("30 questões gerais com peso 1");
+    expect(overview.sourceNote).toContain("https://www.in.gov.br/web/dou/-/edital-n-1/2026-739927397");
     expect(overview.topics).toContain("Situação oficial do concurso em 2026");
   });
 

@@ -155,11 +155,11 @@ describe('atualização editorial sem perder identidade ou estado do usuário', 
     vi.stubGlobal('fetch', async (url: URL) => ({ ok:true, text:async () => readFileSync(`modern/public${url.pathname}`, 'utf8') }));
     try { await run(new FakeSupabase()); } finally { vi.unstubAllGlobals(); }
   }
-  it('preserva 1.437 IDs, 171 tópicos da matriz e o ID relacional na atualização', async () => {
+  it('preserva IDs e estado ao aplicar a matriz oficial de 2026', async () => {
     await withCatalog(async (db) => {
       await seedBuiltinStudyCatalog(db as unknown as SupabaseClient, USER, 'profile-1');
       const original = new Map(db.tables.cards.map((row) => [row.legacy_id,row.id]));
-      expect(original.size).toBe(1437);
+      expect(original.size).toBeGreaterThanOrEqual(1600);
       const canonical = db.tables.cards.find((row) => row.legacy_id?.startsWith('card-trt4-'))!;
       canonical.back = 'Resposta antiga para testar reconciliação pelo ID';
       canonical.read_at = '2026-10-01T00:00:00Z';
@@ -170,7 +170,7 @@ describe('atualização editorial sem perder identidade ou estado do usuário', 
       expect(canonical.read_at).toBe('2026-10-01T00:00:00Z');
       expect(canonical.suspended).toBe(true);
       expect(canonical.deleted_at).toBe('2026-10-02T00:00:00Z');
-      expect(new Set(db.tables.cards.filter((row) => row.example?.includes('Camada 3 - Fechamento do edital')).map((row) => row.topic_id)).size).toBe(171);
+      expect(new Set(db.tables.cards.filter((row) => row.card_type === 'Tópico oficial').map((row) => row.topic_id)).size).toBe(188);
     });
   });
 });

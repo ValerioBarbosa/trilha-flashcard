@@ -14,8 +14,8 @@ import {
   type TopicRow,
 } from './domain-repository';
 
-const BUILTIN_CATALOG_VERSION = 'v5-study-quality-20261009';
-const EXPECTED_BUILTIN_CATALOG_CARDS = 1437;
+const BUILTIN_CATALOG_VERSION = 'v6-edital-oficial-20261022';
+const EXPECTED_BUILTIN_CATALOG_CARDS = 1600;
 
 function activeProfileKey(userId: string): string {
   return `trilha-active-profile:${userId}`;
@@ -96,7 +96,7 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
         client.from('cards')
           .select('*', { count: 'exact', head: true })
           .eq('profile_id', resolvedProfile.id)
-          .like('source', 'Edital Verticalizado TRT-4 AJAJ 2026 V3%'),
+          .like('source', 'Edital nº 1/2026 TRT-4 AJAJ%'),
       ]);
       if (countError) throw countError;
       if (officialCountError) throw officialCountError;
@@ -110,7 +110,7 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
           const { count: verifiedCount, error: verifyError } = await client.from('cards')
             .select('*', { count: 'exact', head: true })
             .eq('profile_id', resolvedProfile.id)
-            .like('source', 'Edital Verticalizado TRT-4 AJAJ 2026 V3%');
+            .like('source', 'Edital nº 1/2026 TRT-4 AJAJ%');
           if (verifyError) throw verifyError;
           if ((verifiedCount ?? 0) < EXPECTED_BUILTIN_CATALOG_CARDS) {
             throw new Error(`Material de estudo incompleto: ${verifiedCount ?? 0}/${EXPECTED_BUILTIN_CATALOG_CARDS}. Tente novamente.`);

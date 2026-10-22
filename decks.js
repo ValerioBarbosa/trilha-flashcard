@@ -1,14 +1,14 @@
 const trt4Decks = [
   {
     id: "trt4-overview",
-    title: "Comece aqui · TRT4 AJAJ · Edital V3",
-    sourceNote: "Pré-edital TRT-4 AJAJ — versão 3.0, base atualizada em 29/08/2026. Estudo de Caso confirmado pelo TRT-4 em 14/08/2026. FCC homologada para organizar o concurso em registro publicado no PNCP em 06/10/2026 (https://pncp.gov.br/app/editais/00509968000148/2026/3411). Conteúdo, pesos e mínimos do novo edital ainda pendentes.",
+    title: "Comece aqui · TRT4 AJAJ · Edital nº 1/2026",
+    sourceNote: "Edital nº 1/2026 do TRT-4, publicado no DOU em 22/10/2026 (https://www.in.gov.br/web/dou/-/edital-n-1/2026-739927397). Para AJAJ: FCC; cadastro reserva; 30 questões gerais com peso 1; 30 específicas com peso 2; Estudo de Caso; prova prevista para 31/01/2027.",
     topics: [
       "Situação oficial do concurso em 2026",
       "Dashboard de preparação por disciplina",
-      "Estrutura histórica, pesos e mínimos de 2022",
+      "Estrutura oficial, pesos e mínimo do Edital nº 1/2026",
       "Prioridades A/B/C e núcleo duro",
-      "Base 2022 × atualização operacional 2026",
+      "Conteúdo programático oficial de 2026",
       "Estudo de Caso Jurídico",
     ],
     cards: [],
@@ -250,7 +250,7 @@ const trt4Decks = [
   {
     id: "fcc-writing",
     title: "Estudo de Caso Jurídico · AJAJ",
-    sourceNote: "Etapa confirmada pelo TRT-4 em 14/08/2026 para Analista Judiciário - Área Judiciária. Critérios completos dependerão do novo edital.",
+    sourceNote: "Estudo de Caso do Edital nº 1/2026: uma questão prática, resposta de 20 a 30 linhas, sobre Conhecimentos Específicos, sem consulta.",
     topics: [
       "Leitura e delimitação do problema",
       "Identificação do comando",
