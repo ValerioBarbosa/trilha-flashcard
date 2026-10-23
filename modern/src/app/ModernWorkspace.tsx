@@ -163,11 +163,29 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
   const leiSecaPct = leiSecaEligibleTopics.length ? Math.round((leiSecaCoveredTopics / leiSecaEligibleTopics.length) * 100) : 0;
 
   const topDecks = workspace.decks.filter((deck) => deck.subject_id).slice(0, 4);
+  const weakSubject = workspace.subjects
+    .map((subject) => {
+      const stats = performance?.bySubject.find((item) => item.subjectId === subject.id);
+      return { subject, reviews: stats?.reviews ?? 0, accuracy: stats?.accuracy ?? 0 };
+    })
+    .filter((item) => workspace.decks.some((deck) => deck.subject_id === item.subject.id))
+    .sort((a, b) => {
+      const aNeeds = a.reviews >= 3 ? a.accuracy : 101;
+      const bNeeds = b.reviews >= 3 ? b.accuracy : 101;
+      if (aNeeds !== bNeeds) return aNeeds - bNeeds;
+      if (a.reviews === 0 && b.reviews !== 0) return -1;
+      if (b.reviews === 0 && a.reviews !== 0) return 1;
+      return (b.subject.weight ?? 0) - (a.subject.weight ?? 0);
+    })[0];
 
-  const heroAction = () => onNavigate('learn');
-  const heroLabel = 'Aprender e praticar →';
+  const heroAction = () => weakSubject ? onStudySubject(weakSubject.subject.id) : onNavigate('learn');
+  const heroLabel = weakSubject ? `Estudar ${weakSubject.subject.name} →` : 'Aprender e praticar →';
 
-  const focusMessage = leiSecaPct < editalPct
+  const focusMessage = weakSubject && weakSubject.reviews >= 3 && weakSubject.accuracy < 75
+    ? { title: `Reforce ${weakSubject.subject.name}.`, body: `Sua recuperação declarada está em ${weakSubject.accuracy}% após ${weakSubject.reviews} respostas. Faça uma sessão curta antes de avançar.`, action: 'Abrir sessão', onClick: () => onStudySubject(weakSubject.subject.id) }
+    : weakSubject && weakSubject.reviews === 0
+      ? { title: `Comece por ${weakSubject.subject.name}.`, body: 'Ainda não há respostas registradas nessa disciplina. Uma sessão curta cria sua primeira linha de base.', action: 'Começar agora', onClick: () => onStudySubject(weakSubject.subject.id) }
+      : leiSecaPct < editalPct
     ? { title: 'Avance na Lei Seca.', body: `Os roteiros de Lei Seca estão vinculados a ${leiSecaPct}%. Continue pelos assuntos do edital que ainda têm espaço para leitura dirigida.`, action: 'Abrir Lei Seca', onClick: () => onNavigate('lei-seca') }
     : editalPct < 100
       ? { title: 'Continue avançando no edital.', body: `Há material vinculado a ${editalPct}% dos tópicos. Priorize agora os assuntos ainda sem cobertura completa.`, action: 'Abrir edital', onClick: () => onNavigate('edital') }
