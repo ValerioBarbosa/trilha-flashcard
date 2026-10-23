@@ -722,3 +722,21 @@ button:disabled { cursor: not-allowed; opacity: .5; }
   .health-grid strong { font-size:16px; }
   .health-actions > button { flex:1; }
 }
+
+
+/* Practice sources / cases / jurisprudence filters */
+.question-source-switch { display:inline-flex; gap:4px; margin:10px 0 14px; padding:4px; border:1px solid var(--line); border-radius:999px; background:var(--surface-soft); }
+.question-source-switch button { border:0; border-radius:999px; padding:7px 12px; background:transparent; color:var(--muted); font-size:11px; font-weight:800; }
+.question-source-switch button.active { background:var(--green); color:#fff; }
+.case-timer-row { display:flex; justify-content:space-between; gap:14px; align-items:center; margin:8px 0 14px; }
+.case-timer-row p { margin:0; }
+.case-timer { min-width:72px; text-align:center; padding:8px 10px; border-radius:12px; background:var(--green-soft); color:var(--green); font-size:18px; font-variant-numeric:tabular-nums; }
+.case-timer.overtime { background:var(--danger-soft); color:var(--danger); }
+.learning-draft small { color:var(--muted-2); }
+.juris-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+.juris-filters select { border:1px solid var(--line); border-radius:11px; background:var(--surface); color:var(--ink); padding:10px 11px; }
+@media(max-width:700px){
+  .case-timer-row { align-items:flex-start; }
+  .juris-filters { width:100%; justify-content:stretch; }
+  .juris-filters .search-field,.juris-filters select { width:100%; }
+}
