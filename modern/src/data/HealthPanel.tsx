@@ -6,6 +6,7 @@ import { seedBuiltinStudyCatalog } from '../study/builtin-seed';
 import { listOfficialEditalTopicIds } from '../study/domain-repository';
 import { offlineWorkspaceAge } from '../study/offline-cache';
 import { EXPECTED_BUILTIN_CATALOG_CARDS } from '../study/useStudyWorkspace';
+import { automaticBackupAt } from './auto-backup';
 
 const EXPECTED_CATALOG = EXPECTED_BUILTIN_CATALOG_CARDS;
 
@@ -99,6 +100,7 @@ export function HealthPanel({ user, profileId, onRepaired }: { user: User; profi
       <div><span>Catálogo oficial</span><strong>{health ? `${health.catalog}/${EXPECTED_CATALOG}` : '—'}</strong><small>{catalogOk ? 'Completo' : 'Precisa de reparo'}</small></div>
       <div><span>Matriz do edital</span><strong>{health ? `${Math.min(health.topics, OFFICIAL_TOPIC_COUNT)}/${OFFICIAL_TOPIC_COUNT}` : '—'}</strong><small>{topicsOk ? 'Tópicos vinculados' : 'Vínculos incompletos'}</small></div>
       <div><span>Cache offline</span><strong>{health?.cacheAt ? 'Disponível' : 'Ainda não'}</strong><small>{health?.cacheAt ? new Date(health.cacheAt).toLocaleString('pt-BR') : 'Abra o Trilha online ao menos uma vez'}</small></div>
+      <div><span>Backup automático</span><strong>{automaticBackupAt(profileId) ? 'Protegido' : 'Pendente'}</strong><small>{automaticBackupAt(profileId) ? new Date(automaticBackupAt(profileId)!).toLocaleString('pt-BR') : 'Será criado quando o banco estiver online'}</small></div>
     </div>
 
     {health?.error ? <div className="notice error"><strong>Diagnóstico</strong><span>{health.error}</span></div> : null}
