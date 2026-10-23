@@ -3,6 +3,7 @@ import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { createStudyProfile, ensureDefaultProfile, type NewProfileInput } from './study-repository';
 import { seedBuiltinStudyCatalog } from './builtin-seed';
+import { readWorkspaceOffline, saveWorkspaceOffline } from './offline-cache';
 import {
   listDecks,
   listProfiles,
@@ -63,6 +64,8 @@ export type StudyWorkspace = {
   loading: boolean;
   seeding: boolean;
   error: string | null;
+  warning: string | null;
+  offline: boolean;
   refresh: () => Promise<void>;
   switchProfile: (profileId: string) => void;
   createProfile: (input: NewProfileInput) => Promise<ProfileRow>;
@@ -77,11 +80,15 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
+  const [offline, setOffline] = useState(false);
   const [activeProfileId, setActiveProfileId] = useState<string | null>(() => readStoredProfileId(user.id));
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setWarning(null);
+    setOffline(false);
     try {
       const client = getSupabaseClient();
       const defaultProfile = await ensureDefaultProfile(client, user) as ProfileRow;
@@ -133,9 +140,27 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
       setSubjects(nextSubjects);
       setTopics(nextTopics);
       setDecks(nextDecks);
+      saveWorkspaceOffline(user.id, {
+        profile: resolvedProfile,
+        profiles: nextProfiles,
+        subjects: nextSubjects,
+        topics: nextTopics,
+        decks: nextDecks,
+      });
     } catch (cause) {
       setSeeding(false);
-      setError(errorMessage(cause));
+      const cached = readWorkspaceOffline(user.id);
+      if (cached) {
+        setProfile(cached.profile);
+        setProfiles(cached.profiles);
+        setSubjects(cached.subjects);
+        setTopics(cached.topics);
+        setDecks(cached.decks);
+        setOffline(true);
+        setWarning(`Modo offline: usando dados salvos em ${new Date(cached.savedAt).toLocaleString('pt-BR')}. Algumas ações de gravação exigem conexão.`);
+      } else {
+        setError(errorMessage(cause));
+      }
     } finally {
       setLoading(false);
     }
@@ -157,5 +182,5 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
     return created;
   }, [user, switchProfile]);
 
-  return { profile, profiles, subjects, topics, decks, loading, seeding, error, refresh, switchProfile, createProfile };
+  return { profile, profiles, subjects, topics, decks, loading, seeding, error, warning, offline, refresh, switchProfile, createProfile };
 }
