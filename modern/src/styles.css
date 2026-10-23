@@ -674,3 +674,51 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .learning-check { display: flex; gap: 10px; align-items: start; margin: 12px 0; }
 .learning-sources a, .practice-feedback a { color: #2563eb; text-decoration: underline; overflow-wrap: anywhere; }
 @media (max-width: 600px) { .public-learning { padding: 12px 0; } .practice-card h2 { font-size: 1.2rem; } .learning-tabs button { flex: 1 1 auto; } }
+
+
+/* Health / offline / study quality */
+.workspace-warning { padding-bottom: 0; }
+.health-panel {
+  margin: 18px 0;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+}
+.health-panel .section-heading { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; }
+.health-panel h2 { margin:6px 0; }
+.health-panel p { margin:0; color:var(--muted); }
+.health-badge { flex:0 0 auto; padding:7px 11px; border-radius:999px; font-size:11px; font-weight:900; }
+.health-badge.ok { background:var(--green-soft); color:var(--green); }
+.health-badge.warn { background:var(--warning-soft); color:var(--warning); }
+.health-badge.bad { background:var(--danger-soft); color:var(--danger); }
+.health-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:18px 0; }
+.health-grid > div { padding:14px; border:1px solid var(--line); border-radius:14px; background:var(--surface-soft); }
+.health-grid span,.health-grid small { display:block; color:var(--muted-2); font-size:10px; }
+.health-grid strong { display:block; margin:5px 0; font-size:18px; }
+.health-actions { display:flex; gap:10px; flex-wrap:wrap; }
+.health-note { display:block; margin-top:10px; color:var(--muted-2); }
+
+.quick-counts { display:flex; gap:6px; margin-top:8px; }
+.quick-counts button { border:1px solid var(--line); border-radius:999px; background:var(--surface-soft); color:var(--ink); padding:6px 12px; font-weight:800; }
+.card-complement { margin-top:12px; padding:12px; border-radius:12px; background:var(--surface-soft); display:grid; gap:4px; }
+.card-complement strong { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted-2); }
+
+.law-reader-citation { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+.law-favorite { flex:0 0 auto; border:0; background:transparent; color:var(--muted-2); font-size:28px; line-height:1; padding:0; }
+.law-favorite.active { color:var(--warning); }
+.law-personal-note { display:block; max-width:72ch; margin:24px auto 0; }
+.law-personal-note strong { display:block; margin-bottom:7px; font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted-2); }
+.law-personal-note textarea { width:100%; resize:vertical; border:1px solid var(--line); border-radius:12px; background:var(--surface-soft); color:var(--ink); padding:12px; font:inherit; line-height:1.5; }
+
+@media (max-width: 800px) {
+  .health-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 560px) {
+  .health-panel { padding:16px; border-radius:17px; }
+  .health-panel .section-heading { align-items:center; }
+  .health-grid { grid-template-columns:1fr 1fr; }
+  .health-grid > div { padding:11px; }
+  .health-grid strong { font-size:16px; }
+  .health-actions > button { flex:1; }
+}
