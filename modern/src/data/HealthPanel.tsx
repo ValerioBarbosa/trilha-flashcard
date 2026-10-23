@@ -5,8 +5,9 @@ import { getSupabaseClient } from '../lib/supabase-client';
 import { seedBuiltinStudyCatalog } from '../study/builtin-seed';
 import { listOfficialEditalTopicIds } from '../study/domain-repository';
 import { offlineWorkspaceAge } from '../study/offline-cache';
+import { EXPECTED_BUILTIN_CATALOG_CARDS } from '../study/useStudyWorkspace';
 
-const EXPECTED_CATALOG = 1575;
+const EXPECTED_CATALOG = EXPECTED_BUILTIN_CATALOG_CARDS;
 
 type Health = {
   online: boolean;
