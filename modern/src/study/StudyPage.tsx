@@ -12,6 +12,7 @@ import {
 } from './domain-repository';
 import { buildStudyQueue, SCOPE_LABEL, type Scope } from './study-queue';
 import { PageHeader } from '../shared/PageHeader';
+import { readDeckCardsOffline, saveDeckCardsOffline } from './offline-cache';
 
 type StudyTopic = { id: string; subject_id: string; parent_id: string | null; name: string };
 type StudyDeck = { id: string; name: string; subject_id: string | null };
@@ -98,8 +99,21 @@ export function StudyPage({ user, profileId, subjects, topics, decks, focus }: {
     setLoading(true);
     setMessage(null);
     void Promise.all([
-      Promise.all(subjectDecks.map((deck) => listCards(getSupabaseClient(), deck.id))),
-      refreshReviewState(),
+      Promise.all(subjectDecks.map(async (deck) => {
+        try {
+          const rows = await listCards(getSupabaseClient(), deck.id);
+          saveDeckCardsOffline(profileId, deck.id, rows);
+          return rows;
+        } catch (cause) {
+          const cached = readDeckCardsOffline(profileId, deck.id);
+          if (cached) {
+            setMessage('Modo offline: usando cartões salvos neste dispositivo.');
+            return cached;
+          }
+          throw cause;
+        }
+      })),
+      refreshReviewState().catch(() => undefined),
     ])
       .then(([groups]) => {
         const unique = new Map<string, CardRow>();
@@ -213,14 +227,14 @@ export function StudyPage({ user, profileId, subjects, topics, decks, focus }: {
         )}
         <small className="keyboard-hint">Espaço vira o cartão · ← → navega</small>
       </div>
-      {loading ? <div className="study-empty">Carregando cartões…</div> : !card ? <div className="study-empty"><strong>Nenhum cartão de conteúdo neste filtro.</strong><span>Consulte o roteiro em Aprender e a fonte indicada. Não considere este assunto concluído.</span></div> : <><button className={`flashcard-modern ${revealed ? 'revealed' : ''}`} onClick={() => setRevealed(true)}><div className="card-meta"><span>{card.priority ? `Prioridade ${card.priority}` : 'Flashcard'}</span>{card.tags?.[0] ? <span>{card.tags[0]}</span> : null}</div><div className="card-question"><small>PERGUNTA</small><h2>{card.front}</h2></div>{revealed ? <div className="card-answer"><small>RESPOSTA</small><p>{card.back}</p>{card.legal_basis ? <div className="legal-basis"><strong>Base legal</strong><span>{card.legal_basis}</span></div> : null}{card.pitfall ? <div className="pitfall"><strong>Pegadinha</strong><span>{card.pitfall}</span></div> : null}{card.mnemonic ? <div className="mnemonic"><strong>Mnemônico</strong><span>{card.mnemonic}</span></div> : null}</div> : <div className="reveal-hint">Toque no cartão para revelar</div>}</button>{revealed ? <div className="rating-row"><button className="rating again" onClick={() => void rate(1)}><strong>Errei</strong><span>rever logo</span></button><button className="rating hard" onClick={() => void rate(2)}><strong>Difícil</strong><span>1 dia</span></button><button className="rating good" onClick={() => void rate(3)}><strong>Bom</strong><span>7 dias</span></button><button className="rating easy" onClick={() => void rate(4)}><strong>Fácil</strong><span>30 dias</span></button></div> : null}<div className="study-navigation"><button className="secondary-action" onClick={goPrevious}>← Anterior</button><button className="secondary-action" onClick={goNext}>Próximo →</button></div></>}
+      {loading ? <div className="study-empty">Carregando cartões…</div> : !card ? <div className="study-empty"><strong>Nenhum cartão de conteúdo neste filtro.</strong><span>Consulte o roteiro em Aprender e a fonte indicada. Não considere este assunto concluído.</span></div> : <><button className={`flashcard-modern ${revealed ? 'revealed' : ''}`} onClick={() => setRevealed(true)}><div className="card-meta"><span>{card.priority ? `Prioridade ${card.priority}` : 'Flashcard'}</span>{card.tags?.[0] ? <span>{card.tags[0]}</span> : null}</div><div className="card-question"><small>PERGUNTA</small><h2>{card.front}</h2></div>{revealed ? <div className="card-answer"><small>RESPOSTA</small><p>{card.back}</p>{card.legal_basis ? <div className="legal-basis"><strong>Base legal</strong><span>{card.legal_basis}</span></div> : null}{card.complement ? <div className="card-complement"><strong>Complemento</strong><span>{card.complement}</span></div> : null}{card.pitfall ? <div className="pitfall"><strong>Pegadinha</strong><span>{card.pitfall}</span></div> : null}{card.mnemonic ? <div className="mnemonic"><strong>Mnemônico</strong><span>{card.mnemonic}</span></div> : null}</div> : <div className="reveal-hint">Toque no cartão para revelar</div>}</button>{revealed ? <div className="rating-row"><button className="rating again" onClick={() => void rate(1)}><strong>Errei</strong><span>rever logo</span></button><button className="rating hard" onClick={() => void rate(2)}><strong>Difícil</strong><span>1 dia</span></button><button className="rating good" onClick={() => void rate(3)}><strong>Bom</strong><span>7 dias</span></button><button className="rating easy" onClick={() => void rate(4)}><strong>Fácil</strong><span>30 dias</span></button></div> : null}<div className="study-navigation"><button className="secondary-action" onClick={goPrevious}>← Anterior</button><button className="secondary-action" onClick={goNext}>Próximo →</button></div></>}
       {message ? <p className="toast-note">{message}</p> : null}
 
       {builderOpen ? <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setBuilderOpen(false)}><div className="modal-card" role="dialog" aria-modal="true"><div className="modal-heading"><div><span className="page-eyebrow">SESSÃO PERSONALIZADA</span><h2>Montar sessão</h2><p>Filtra, embaralha e limita os cartões da disciplina/assunto já selecionados acima.</p></div><button className="modal-close" onClick={() => setBuilderOpen(false)}>×</button></div>
         <div className="form-grid">
           <label><span>Escopo</span><select value={scope} onChange={(event) => setScope(event.target.value as Scope)}>{(Object.keys(SCOPE_LABEL) as Scope[]).map((key) => <option key={key} value={key}>{SCOPE_LABEL[key]}</option>)}</select></label>
           <label><span>Prioridade</span><select value={priority} onChange={(event) => setPriority(event.target.value as '' | 'A' | 'B' | 'C')}><option value="">Todas</option><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></label>
-          <label className="full"><span>Quantidade de cartões</span><input type="number" min={1} max={200} value={count} onChange={(event) => setCount(Number(event.target.value) || 1)} /></label>
+          <label className="full"><span>Quantidade de cartões</span><input type="number" min={1} max={200} value={count} onChange={(event) => setCount(Number(event.target.value) || 1)} /><span className="quick-counts"><button type="button" onClick={() => setCount(10)}>10</button><button type="button" onClick={() => setCount(20)}>20</button><button type="button" onClick={() => setCount(30)}>30</button></span></label>
         </div>
         <div className="modal-actions"><button className="secondary-outline" onClick={() => setBuilderOpen(false)}>Cancelar</button><button className="primary-action" onClick={buildSession}>Iniciar sessão</button></div>
       </div></div> : null}
