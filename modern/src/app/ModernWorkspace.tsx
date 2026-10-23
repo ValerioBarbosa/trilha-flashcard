@@ -8,6 +8,7 @@ import { JurisprudencePage } from '../jurisprudence/JurisprudencePage';
 import { PerformancePage } from '../performance/PerformancePage';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { BackupPanel } from '../data/BackupPanel';
+import { HealthPanel } from '../data/HealthPanel';
 import { LegacyMigrationPanel } from '../migration/LegacyMigrationPanel';
 import { MetricTile } from '../shared/MetricTile';
 import { PageHeader } from '../shared/PageHeader';
@@ -95,6 +96,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
           <div className="page-wrap"><div className="notice">Nenhum perfil de estudos disponível.</div></div>
         ) : (
           <>
+            {workspace.warning ? <div className="page-wrap workspace-warning"><div className="notice"><strong>Modo offline ativo.</strong><span>{workspace.warning}</span><button onClick={() => void workspace.refresh()}>Tentar reconectar</button></div></div> : null}
             {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} onStudySubject={(subjectId) => focusStudyTopic(subjectId, 'all')} onReviewDue={startDueReview} /> : null}
             {['learn','practice','cases'].includes(page) ? <LearningPage mode={page === 'practice' ? 'practice' : page === 'cases' ? 'cases' : 'learn'} user={user} profileId={workspace.profile.id} subjects={workspace.subjects} initialSubject={practiceSubject} onReview={(discipline, name) => { const subject = workspace.subjects.find((row) => row.name === DISCIPLINES[discipline]); const topic = workspace.topics.find((row) => row.subject_id === subject?.id && row.name === name); if (subject) focusStudyTopic(subject.id, topic?.id || 'all'); }} /> : null}
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} focus={studyFocus} /> : null}
@@ -231,5 +233,5 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
 
 
 function DataPage({ user, workspace, onMigrated }: { user: User; workspace: ReturnType<typeof useStudyWorkspace>; onMigrated: () => Promise<void> }) {
-  return <div className="page-wrap"><PageHeader eyebrow="CONTA E DADOS" title="Sincronização" subtitle="Migre o legado, confira a nuvem e mantenha uma cópia local durante a transição." /><ProfileSwitcher profiles={workspace.profiles} activeProfileId={workspace.profile?.id ?? null} onSwitch={workspace.switchProfile} onCreate={workspace.createProfile} /><BackupPanel user={user} profile={workspace.profile ? { id: workspace.profile.id, name: workspace.profile.name, slug: workspace.profile.slug } : null} onRestored={onMigrated} /><LegacyMigrationPanel user={user} onMigrated={onMigrated} /><SyncPanel user={user} /></div>;
+  return <div className="page-wrap"><PageHeader eyebrow="CONTA E DADOS" title="Saúde, sincronização e backup" subtitle="Confira o estado do Trilha, repare o catálogo e mantenha cópias seguras dos seus dados." />{workspace.profile ? <HealthPanel user={user} profileId={workspace.profile.id} onRepaired={onMigrated} /> : null}<ProfileSwitcher profiles={workspace.profiles} activeProfileId={workspace.profile?.id ?? null} onSwitch={workspace.switchProfile} onCreate={workspace.createProfile} /><BackupPanel user={user} profile={workspace.profile ? { id: workspace.profile.id, name: workspace.profile.name, slug: workspace.profile.slug } : null} onRestored={onMigrated} /><LegacyMigrationPanel user={user} onMigrated={onMigrated} /><SyncPanel user={user} /></div>;
 }
