@@ -8,6 +8,9 @@ import { JurisprudencePage } from '../jurisprudence/JurisprudencePage';
 import { PerformancePage } from '../performance/PerformancePage';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { BackupPanel } from '../data/BackupPanel';
+import { exportBackup } from '../data/backup';
+import { automaticBackupDue, saveAutomaticBackup } from '../data/auto-backup';
+import { HealthPanel } from '../data/HealthPanel';
 import { LegacyMigrationPanel } from '../migration/LegacyMigrationPanel';
 import { MetricTile } from '../shared/MetricTile';
 import { PageHeader } from '../shared/PageHeader';
@@ -69,6 +72,15 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
     selectPage('study');
   };
 
+  useEffect(() => {
+    if (!workspace.profile || workspace.loading || workspace.offline || !automaticBackupDue(workspace.profile.id)) return;
+    let cancelled = false;
+    void exportBackup(getSupabaseClient(), { id: workspace.profile.id, name: workspace.profile.name, slug: workspace.profile.slug })
+      .then((payload) => cancelled ? undefined : saveAutomaticBackup(workspace.profile!.id, payload))
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [workspace.profile?.id, workspace.loading, workspace.offline]);
+
   return (
     <div className="modern-app">
       <aside className={`app-sidebar ${menuOpen ? 'open' : ''}`}>
@@ -95,6 +107,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
           <div className="page-wrap"><div className="notice">Nenhum perfil de estudos disponível.</div></div>
         ) : (
           <>
+            {workspace.warning ? <div className="page-wrap workspace-warning"><div className="notice"><strong>Modo offline ativo.</strong><span>{workspace.warning}</span><button onClick={() => void workspace.refresh()}>Tentar reconectar</button></div></div> : null}
             {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} onStudySubject={(subjectId) => focusStudyTopic(subjectId, 'all')} onReviewDue={startDueReview} /> : null}
             {['learn','practice','cases'].includes(page) ? <LearningPage mode={page === 'practice' ? 'practice' : page === 'cases' ? 'cases' : 'learn'} user={user} profileId={workspace.profile.id} subjects={workspace.subjects} initialSubject={practiceSubject} onReview={(discipline, name) => { const subject = workspace.subjects.find((row) => row.name === DISCIPLINES[discipline]); const topic = workspace.topics.find((row) => row.subject_id === subject?.id && row.name === name); if (subject) focusStudyTopic(subject.id, topic?.id || 'all'); }} /> : null}
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} focus={studyFocus} /> : null}
@@ -161,11 +174,29 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
   const leiSecaPct = leiSecaEligibleTopics.length ? Math.round((leiSecaCoveredTopics / leiSecaEligibleTopics.length) * 100) : 0;
 
   const topDecks = workspace.decks.filter((deck) => deck.subject_id).slice(0, 4);
+  const weakSubject = workspace.subjects
+    .map((subject) => {
+      const stats = performance?.bySubject.find((item) => item.subjectId === subject.id);
+      return { subject, reviews: stats?.reviews ?? 0, accuracy: stats?.accuracy ?? 0 };
+    })
+    .filter((item) => workspace.decks.some((deck) => deck.subject_id === item.subject.id))
+    .sort((a, b) => {
+      const aNeeds = a.reviews >= 3 ? a.accuracy : 101;
+      const bNeeds = b.reviews >= 3 ? b.accuracy : 101;
+      if (aNeeds !== bNeeds) return aNeeds - bNeeds;
+      if (a.reviews === 0 && b.reviews !== 0) return -1;
+      if (b.reviews === 0 && a.reviews !== 0) return 1;
+      return (b.subject.weight ?? 0) - (a.subject.weight ?? 0);
+    })[0];
 
-  const heroAction = () => onNavigate('learn');
-  const heroLabel = 'Aprender e praticar →';
+  const heroAction = () => weakSubject ? onStudySubject(weakSubject.subject.id) : onNavigate('learn');
+  const heroLabel = weakSubject ? `Estudar ${weakSubject.subject.name} →` : 'Aprender e praticar →';
 
-  const focusMessage = leiSecaPct < editalPct
+  const focusMessage = weakSubject && weakSubject.reviews >= 3 && weakSubject.accuracy < 75
+    ? { title: `Reforce ${weakSubject.subject.name}.`, body: `Sua recuperação declarada está em ${weakSubject.accuracy}% após ${weakSubject.reviews} respostas. Faça uma sessão curta antes de avançar.`, action: 'Abrir sessão', onClick: () => onStudySubject(weakSubject.subject.id) }
+    : weakSubject && weakSubject.reviews === 0
+      ? { title: `Comece por ${weakSubject.subject.name}.`, body: 'Ainda não há respostas registradas nessa disciplina. Uma sessão curta cria sua primeira linha de base.', action: 'Começar agora', onClick: () => onStudySubject(weakSubject.subject.id) }
+      : leiSecaPct < editalPct
     ? { title: 'Avance na Lei Seca.', body: `Os roteiros de Lei Seca estão vinculados a ${leiSecaPct}%. Continue pelos assuntos do edital que ainda têm espaço para leitura dirigida.`, action: 'Abrir Lei Seca', onClick: () => onNavigate('lei-seca') }
     : editalPct < 100
       ? { title: 'Continue avançando no edital.', body: `Há material vinculado a ${editalPct}% dos tópicos. Priorize agora os assuntos ainda sem cobertura completa.`, action: 'Abrir edital', onClick: () => onNavigate('edital') }
@@ -231,5 +262,5 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
 
 
 function DataPage({ user, workspace, onMigrated }: { user: User; workspace: ReturnType<typeof useStudyWorkspace>; onMigrated: () => Promise<void> }) {
-  return <div className="page-wrap"><PageHeader eyebrow="CONTA E DADOS" title="Sincronização" subtitle="Migre o legado, confira a nuvem e mantenha uma cópia local durante a transição." /><ProfileSwitcher profiles={workspace.profiles} activeProfileId={workspace.profile?.id ?? null} onSwitch={workspace.switchProfile} onCreate={workspace.createProfile} /><BackupPanel user={user} profile={workspace.profile ? { id: workspace.profile.id, name: workspace.profile.name, slug: workspace.profile.slug } : null} onRestored={onMigrated} /><LegacyMigrationPanel user={user} onMigrated={onMigrated} /><SyncPanel user={user} /></div>;
+  return <div className="page-wrap"><PageHeader eyebrow="CONTA E DADOS" title="Saúde, sincronização e backup" subtitle="Confira o estado do Trilha, repare o catálogo e mantenha cópias seguras dos seus dados." />{workspace.profile ? <HealthPanel user={user} profileId={workspace.profile.id} onRepaired={onMigrated} /> : null}<ProfileSwitcher profiles={workspace.profiles} activeProfileId={workspace.profile?.id ?? null} onSwitch={workspace.switchProfile} onCreate={workspace.createProfile} /><BackupPanel user={user} profile={workspace.profile ? { id: workspace.profile.id, name: workspace.profile.name, slug: workspace.profile.slug } : null} onRestored={onMigrated} /><LegacyMigrationPanel user={user} onMigrated={onMigrated} /><SyncPanel user={user} /></div>;
 }

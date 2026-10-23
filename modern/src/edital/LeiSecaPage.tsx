@@ -42,6 +42,9 @@ type Props = {
 export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyTopic }: Props) {
   const [query, setQuery] = useState('');
   const [onlyMissing, setOnlyMissing] = useState(false);
+  const [onlyUnread, setOnlyUnread] = useState(false);
+  const [readerNote, setReaderNote] = useState('');
+  const [readerFavorite, setReaderFavorite] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [reader, setReader] = useState<{ topicId: string; index: number } | null>(null);
   const [cardsByTopic, setCardsByTopic] = useState<Map<string, CardRow[]>>(new Map());
@@ -56,11 +59,22 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const baseRows = useMemo(() => buildLeiSecaSubjects(subjects, topics, query), [subjects, topics, query]);
   const allSubjects = useMemo(() => buildLeiSecaSubjects(subjects, topics, ''), [subjects, topics]);
   const rows = useMemo(() => {
-    if (!onlyMissing) return baseRows;
-    return baseRows
-      .map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter((topic) => (cardsByTopic.get(topic.id)?.length ?? 0) === 0) }))
-      .filter((subject) => subject.rootTopics.length > 0);
-  }, [baseRows, onlyMissing, cardsByTopic]);
+    let result = baseRows;
+    if (onlyMissing) {
+      result = result
+        .map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter((topic) => (cardsByTopic.get(topic.id)?.length ?? 0) === 0) }))
+        .filter((subject) => subject.rootTopics.length > 0);
+    }
+    if (onlyUnread) {
+      result = result
+        .map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter((topic) => {
+          const cards = cardsByTopic.get(topic.id) ?? [];
+          return cards.some((card) => !card.read_at);
+        }) }))
+        .filter((subject) => subject.rootTopics.length > 0);
+    }
+    return result;
+  }, [baseRows, onlyMissing, onlyUnread, cardsByTopic]);
 
   const coverage = useMemo(() => {
     let totalTopics = 0;
@@ -160,10 +174,33 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
     }
   }
 
+  function readerStorageKey(cardId: string) { return `trilha-law-note:${profileId}:${cardId}`; }
+  function favoriteStorageKey(cardId: string) { return `trilha-law-favorite:${profileId}:${cardId}`; }
+  function loadReaderMeta(cardId: string) {
+    try {
+      setReaderNote(window.localStorage.getItem(readerStorageKey(cardId)) || '');
+      setReaderFavorite(window.localStorage.getItem(favoriteStorageKey(cardId)) === '1');
+    } catch {
+      setReaderNote('');
+      setReaderFavorite(false);
+    }
+  }
+  function saveReaderNote(cardId: string, value: string) {
+    setReaderNote(value);
+    try { value.trim() ? window.localStorage.setItem(readerStorageKey(cardId), value) : window.localStorage.removeItem(readerStorageKey(cardId)); } catch { /* local-only */ }
+  }
+  function toggleFavorite(cardId: string) {
+    const next = !readerFavorite;
+    setReaderFavorite(next);
+    try { next ? window.localStorage.setItem(favoriteStorageKey(cardId), '1') : window.localStorage.removeItem(favoriteStorageKey(cardId)); } catch { /* local-only */ }
+  }
+
   function openReader(topicId: string, startIndex = 0) {
     const cards = cardsByTopic.get(topicId) ?? [];
     if (!cards.length) return;
-    setReader({ topicId, index: Math.min(Math.max(startIndex, 0), cards.length - 1) });
+    const nextIndex = Math.min(Math.max(startIndex, 0), cards.length - 1);
+    setReader({ topicId, index: nextIndex });
+    loadReaderMeta(cards[nextIndex].id);
   }
 
   function closeReader() {
@@ -175,7 +212,9 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
       if (!current) return current;
       const cards = cardsByTopic.get(current.topicId) ?? [];
       if (!cards.length) return null;
-      return { ...current, index: (current.index + delta + cards.length) % cards.length };
+      const nextIndex = (current.index + delta + cards.length) % cards.length;
+      loadReaderMeta(cards[nextIndex].id);
+      return { ...current, index: nextIndex };
     });
   }
 
@@ -202,7 +241,10 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
           <div className="lei-seca-header-actions">
             <div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar norma ou assunto" /></div>
             <button type="button" className={`missing-toggle ${onlyMissing ? 'active' : ''}`} onClick={() => setOnlyMissing((current) => !current)}>
-              {onlyMissing ? '✓ ' : ''}Só o que falta
+              {onlyMissing ? '✓ ' : ''}Sem Lei Seca
+            </button>
+            <button type="button" className={`missing-toggle ${onlyUnread ? 'active' : ''}`} onClick={() => setOnlyUnread((current) => !current)}>
+              {onlyUnread ? '✓ ' : ''}Não lidos
             </button>
           </div>
         }
@@ -308,9 +350,13 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
               </div>
 
               <article className={`law-reader-paper ${card.read_at ? 'is-read' : ''}`}>
-                <div className="law-reader-citation">{card.front}</div>
+                <div className="law-reader-citation">
+                  <span>{card.front}</span>
+                  <button className={`law-favorite ${readerFavorite ? 'active' : ''}`} onClick={() => toggleFavorite(card.id)} aria-label={readerFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}>{readerFavorite ? '★' : '☆'}</button>
+                </div>
                 <div className="law-reader-text">{card.back}</div>
                 {card.complement ? <aside className="law-reader-note"><strong>Observação</strong><p>{card.complement}</p></aside> : null}
+                <label className="law-personal-note"><strong>Minha anotação neste dispositivo</strong><textarea rows={3} value={readerNote} onChange={(event) => saveReaderNote(card.id, event.target.value)} placeholder="Escreva uma observação, exceção ou macete pessoal…" /></label>
               </article>
 
               <footer className="law-reader-footer">
