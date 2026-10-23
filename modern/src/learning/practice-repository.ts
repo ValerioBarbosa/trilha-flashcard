@@ -1,19 +1,21 @@
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import type { PracticeQuestion } from './practice-bank';
 
-const PROVIDER = 'trilha-autoral-20261009';
+const AUTHORED_PROVIDER = 'trilha-autoral-20261009';
 const LETTERS = 'ABCDE';
 
-async function questionIdentity(userId: string, profileId: string, questionId: string) {
-  const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${PROVIDER}|${userId}|${profileId}|${questionId}`));
+async function questionIdentity(userId: string, profileId: string, provider: string, questionId: string) {
+  const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${provider}|${userId}|${profileId}|${questionId}`));
   const hex = Array.from(new Uint8Array(bytes).slice(0, 16), (byte) => byte.toString(16).padStart(2, '0')).join('');
   return `${hex.slice(0,8)}-${hex.slice(8,12)}-5${hex.slice(13,16)}-a${hex.slice(17,20)}-${hex.slice(20)}`;
 }
 
 export async function savePracticeAttempt(client: SupabaseClient, user: User, profileId: string, question: PracticeQuestion, input: { answer: number; responseMs: number; attemptId: string; subjectId?: string }) {
   if (!Number.isInteger(input.answer) || input.answer < 0 || input.answer >= question.options.length) throw new Error('Alternativa inválida.');
-  const id = await questionIdentity(user.id, profileId, question.id);
-  const { data: existing, error: readError } = await client.from('questions').select('id').eq('user_id', user.id).eq('profile_id', profileId).eq('source_provider', PROVIDER).eq('external_id', question.id).is('deleted_at', null).maybeSingle();
+  const provider = question.origin === 'quest-api' ? 'quest-api' : AUTHORED_PROVIDER;
+  const externalId = question.externalId || question.id;
+  const id = await questionIdentity(user.id, profileId, provider, externalId);
+  const { data: existing, error: readError } = await client.from('questions').select('id').eq('user_id', user.id).eq('profile_id', profileId).eq('source_provider', provider).eq('external_id', externalId).is('deleted_at', null).maybeSingle();
   if (readError) throw readError;
   let questionId = existing?.id as string | undefined;
   if (!questionId) {
@@ -22,8 +24,13 @@ export async function savePracticeAttempt(client: SupabaseClient, user: User, pr
       statement:question.statement, alternatives:question.options.map((text, index) => ({ key:LETTERS[index], text })),
       correct_answer:LETTERS[question.answer], explanation:question.explanation,
       legal_basis:question.basis, source_url:question.source || null,
-      source:'Trilha — questão autoral, não é prova FCC', source_provider:PROVIDER, external_id:question.id,
-      tags:['autoral', question.discipline],
+      board: question.board || null,
+      exam: question.exam || null,
+      exam_year: question.year || null,
+      source: question.origin === 'quest-api' ? 'Quest.API' : 'Trilha — questão autoral',
+      source_provider:provider,
+      external_id:externalId,
+      tags:[question.origin === 'quest-api' ? 'quest-api' : 'autoral', question.discipline],
     });
     if (error && error.code !== '23505') throw error;
     if (error) {
