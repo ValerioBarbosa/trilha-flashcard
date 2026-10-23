@@ -8,6 +8,8 @@ import { JurisprudencePage } from '../jurisprudence/JurisprudencePage';
 import { PerformancePage } from '../performance/PerformancePage';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { BackupPanel } from '../data/BackupPanel';
+import { exportBackup } from '../data/backup';
+import { automaticBackupDue, saveAutomaticBackup } from '../data/auto-backup';
 import { HealthPanel } from '../data/HealthPanel';
 import { LegacyMigrationPanel } from '../migration/LegacyMigrationPanel';
 import { MetricTile } from '../shared/MetricTile';
@@ -69,6 +71,15 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
     setStudyFocus({ subjectId: 'all', topicId: 'all', token: Date.now(), scope: 'due' });
     selectPage('study');
   };
+
+  useEffect(() => {
+    if (!workspace.profile || workspace.loading || workspace.offline || !automaticBackupDue(workspace.profile.id)) return;
+    let cancelled = false;
+    void exportBackup(getSupabaseClient(), { id: workspace.profile.id, name: workspace.profile.name, slug: workspace.profile.slug })
+      .then((payload) => cancelled ? undefined : saveAutomaticBackup(workspace.profile!.id, payload))
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [workspace.profile?.id, workspace.loading, workspace.offline]);
 
   return (
     <div className="modern-app">
