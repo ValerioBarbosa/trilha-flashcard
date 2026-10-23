@@ -26,7 +26,7 @@ const TOPIC_COLUMNS = 'id,subject_id,parent_id,name,slug,edital_text,legal_basis
 const DECK_COLUMNS = 'id,subject_id,name,slug,description,source,is_builtin,is_archived';
 const CARD_COLUMNS = 'id,deck_id,subject_id,topic_id,legacy_id,front,back,card_type,legal_basis,example,complement,pitfall,mnemonic,priority,difficulty,tags,source,source_page,read_at,suspended,deleted_at';
 const REVIEW_COLUMNS = 'id,card_id,rating,response_ms,interval_days,due_at,reviewed_at,algorithm';
-const ERROR_COLUMNS = 'id,subject_id,topic_id,card_id,kind,title,note,correction,legal_basis,resolved,resolved_at';
+const ERROR_COLUMNS = 'id,subject_id,topic_id,card_id,kind,category,title,note,correction,legal_basis,resolved,resolved_at';
 const PAGE_SIZE = 1000;
 
 async function fetchAll(client: SupabaseClient, table: string, columns: string, profileId: string): Promise<Array<Record<string, unknown>>> {

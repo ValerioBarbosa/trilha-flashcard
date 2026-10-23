@@ -2,6 +2,11 @@ export type PracticeQuestion = {
   id: string; discipline: string; subject: string; topic: string;
   statement: string; options: string[]; answer: number; explanation: string;
   basis: string; source: string; rubric?: string[];
+  origin?: 'authored' | 'quest-api';
+  externalId?: string;
+  board?: string;
+  year?: number;
+  exam?: string;
 };
 
 export const SOURCES = {

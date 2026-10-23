@@ -9,6 +9,8 @@ import { PageHeader } from '../shared/PageHeader';
 export function JurisprudencePage({ profileId }: { profileId: string }) {
   const [rows, setRows] = useState<JurisprudenceRow[]>([]);
   const [query, setQuery] = useState('');
+  const [courtFilter, setCourtFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [catalogCards, setCatalogCards] = useState<CardRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,12 +37,24 @@ export function JurisprudencePage({ profileId }: { profileId: string }) {
   }, [profileId]);
 
   const normalizedQuery = query.trim().toLowerCase();
-  const filtered = rows.filter((row) => `${row.court} ${row.theme || ''} ${row.thesis} ${row.summary || ''}`.toLowerCase().includes(normalizedQuery));
-  const filteredCatalogCards = catalogCards.filter((card) => `${card.front} ${card.back} ${card.legal_basis || ''}`.toLowerCase().includes(normalizedQuery));
+  const courtOptions = [...new Set(rows.map((row) => row.court).filter(Boolean))].sort();
+  const statusOptions = [...new Set(rows.map((row) => row.status).filter(Boolean))].sort();
+  const filtered = rows.filter((row) => {
+    if (courtFilter !== 'all' && row.court !== courtFilter) return false;
+    if (statusFilter !== 'all' && row.status !== statusFilter) return false;
+    return `${row.court} ${row.theme || ''} ${row.thesis} ${row.summary || ''}`.toLowerCase().includes(normalizedQuery);
+  });
+  const filteredCatalogCards = catalogCards.filter((card) => {
+    const basis = card.legal_basis || '';
+    const inferredCourt = basis.startsWith('STF') ? 'STF' : basis.startsWith('TST') ? 'TST' : 'TRT-4';
+    if (courtFilter !== 'all' && inferredCourt !== courtFilter) return false;
+    if (statusFilter !== 'all') return false;
+    return `${card.front} ${card.back} ${basis}`.toLowerCase().includes(normalizedQuery);
+  });
 
   return (
     <div className="page-wrap">
-      <PageHeader eyebrow="JURISPRUDÊNCIA VIVA" title="Jurisprudência" subtitle="Teses ligadas ao edital, com foco de cobrança e status de atualização." action={<div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar tese ou tribunal" /></div>} />
+      <PageHeader eyebrow="JURISPRUDÊNCIA VIVA" title="Jurisprudência" subtitle="Teses ligadas ao edital, com foco de cobrança, tribunal e status de atualização." action={<div className="juris-filters"><div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar tese ou tema" /></div><select value={courtFilter} onChange={(event) => setCourtFilter(event.target.value)}><option value="all">Todos os tribunais</option>{courtOptions.map((court) => <option key={court} value={court}>{court}</option>)}{!courtOptions.includes('STF') ? <option value="STF">STF</option> : null}{!courtOptions.includes('TST') ? <option value="TST">TST</option> : null}</select><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="all">Todos os status</option>{statusOptions.map((status) => <option key={status} value={status}>{status}</option>)}</select></div>} />
       {error ? <div className="notice error"><strong>Falha ao carregar jurisprudência.</strong><span>{error}</span><button onClick={() => void load()}>Tentar novamente</button></div> : null}
       {loading ? <div className="study-empty">Carregando jurisprudência…</div> : !error && !filtered.length && !filteredCatalogCards.length ? (
         <EmptyFeature title="Nenhuma jurisprudência encontrada." text="O catálogo está pronto para receber teses vinculadas ao edital." />
