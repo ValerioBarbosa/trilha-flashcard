@@ -128,7 +128,19 @@ export function CardManagerPage({ user, profileId, subjects, topics, decks, onCh
     }
   }
 
-  async function moveToTrash(cardId: string) { await softDeleteCard(getSupabaseClient(), cardId); await refresh(); await onChanged?.(); }
+  async function moveToTrash(cardId: string) {
+    const client = getSupabaseClient();
+    const { count, error } = await client.from('reviews').select('*', { count: 'exact', head: true }).eq('card_id', cardId);
+    if (error) { setMessage(error.message); return; }
+    const reviewCount = count ?? 0;
+    const confirmed = window.confirm(reviewCount
+      ? `Este cartão possui ${reviewCount} revisão${reviewCount === 1 ? '' : 'ões'} vinculada${reviewCount === 1 ? '' : 's'}. Ele será enviado para a Lixeira e o histórico será preservado. Continuar?`
+      : 'Enviar este cartão para a Lixeira? Você poderá restaurá-lo depois.');
+    if (!confirmed) return;
+    await softDeleteCard(client, cardId);
+    await refresh();
+    await onChanged?.();
+  }
   async function restore(cardId: string) { try { await restoreCard(getSupabaseClient(), cardId); await refresh(); await onChanged?.(); } catch (cause) { setMessage(cause instanceof Error && cause.message === 'card-duplicate' ? 'Não foi possível restaurar: já existe um cartão igual ativo.' : String(cause)); } }
   async function toggleSuspend(card: ManagedCard) { await setCardSuspended(getSupabaseClient(), card.id, !card.suspended); await refresh(); }
 
