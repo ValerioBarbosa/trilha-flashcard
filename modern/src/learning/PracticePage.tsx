@@ -4,7 +4,21 @@ import { getSupabaseClient } from '../lib/supabase-client';
 import { PRACTICE_BANK, scorePractice, type PracticeQuestion } from './practice-bank';
 import { savePracticeAttempt } from './practice-repository';
 import { loadQuestApiQuestions } from './quest-api-client';
-import { DISCIPLINES } from './LearningPage';
+
+const QUEST_SUBJECT_LABELS: Record<string,string> = {
+  'labor-procedure':'Direito Processual do Trabalho',
+  'labor-law':'Direito do Trabalho',
+  portuguese:'Língua Portuguesa',
+  constitutional:'Direito Constitucional',
+  administrative:'Direito Administrativo',
+  'civil-procedure':'Direito Processual Civil',
+  'trt-legislation':'Noções de Legislação',
+  'math-logic':'Matemática e Raciocínio Lógico',
+  'human-rights':'Noções de Direitos Humanos',
+  informatics:'Noções de Informática',
+  'civil-law':'Direito Civil',
+  'lgpd-digital':'LGPD',
+};
 
 export function PracticePage({ cases, discipline, user, profileId, subjects = [] }: { cases:boolean; discipline:string; user?:User; profileId?:string; subjects?:Array<{id:string;name:string}> }) {
   const authoredBank = useMemo(() => PRACTICE_BANK.filter((question) => (discipline === 'all' || question.discipline === discipline || cases && discipline === 'study-case') && (!cases || question.rubric)), [discipline,cases]);
@@ -95,7 +109,7 @@ export function PracticePage({ cases, discipline, user, profileId, subjects = []
     }
     let cancelled = false;
     setExternalLoading(true);
-    const subjectLabel = discipline === 'all' ? undefined : DISCIPLINES[discipline];
+    const subjectLabel = discipline === 'all' ? undefined : QUEST_SUBJECT_LABELS[discipline];
     void loadQuestApiQuestions(getSupabaseClient(), { discipline, subjectLabel, perPage: 20 })
       .then((rows) => { if (!cancelled) setExternalBank(rows); })
       .catch((cause) => { if (!cancelled) setExternalError(cause instanceof Error ? cause.message : String(cause)); })
