@@ -345,7 +345,7 @@ async function upsertCards(
     const key = contentKey(front, back);
     const legacyId = card.id?.trim() || `card-${stableHash(`${deck.id}|${front}|${back}`)}`;
     const canonical = legacyId.startsWith('card-trt4-');
-    const row = {
+    const row: any = {
       user_id:user.id,
       profile_id:profileId,
       deck_id:deckId,
