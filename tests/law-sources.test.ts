@@ -7,7 +7,7 @@ describe('fontes oficiais da Lei Seca', () => {
   });
   it('reconhece referências com e sem pontuação', () => {
     expect(officialLawSources('Lei 8112/1990')).toEqual(officialLawSources('Lei 8.112/1990'));
-    expect(officialLawSources('LGPD')[0]?.url).toContain('l13709compilada.htm');
+    expect(officialLawSources('LGPD')[0]?.url).toContain('l13709compilado.htm');
   });
   it('não gera URL a partir de referência arbitrária', () => {
     expect(officialLawSources('https://example.com')).toEqual([]);
