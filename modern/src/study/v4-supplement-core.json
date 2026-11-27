@@ -434,6 +434,76 @@
       "front": "A ação monitória pode ser proposta com prova escrita sem eficácia de título executivo?",
       "back": "Sim, nas condições do art. 700 do CPC.",
       "legalBasis": "CPC, art. 700"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 3,
+      "front": "Quem responde pela secretaria de uma Vara do Trabalho?",
+      "back": "A secretaria tem um diretor, designado pelo presidente do TRT, mediante proposta do juiz titular, observada a organização legal.",
+      "legalBasis": "CLT, art. 710"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 4,
+      "front": "Se o oficial de justiça avaliador não cumprir o mandado no prazo legal, pode haver redistribuição?",
+      "back": "Sim. Se não houver motivo justificado, o juiz pode atribuir o ato a outro oficial; o prazo previsto para a realização do ato é de nove dias.",
+      "legalBasis": "CLT, art. 721, §§ 2º e 3º"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 12,
+      "front": "Quem representa judicialmente a massa falida, ativa e passivamente?",
+      "back": "O administrador judicial. Não se confunde a representação processual da massa com a representação ordinária da sociedade empresária.",
+      "legalBasis": "CPC, art. 75, V; Lei 11.101/2005, art. 22, III, c"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 15,
+      "front": "Como deve ser apresentada a exceção de incompetência territorial antes da audiência trabalhista?",
+      "back": "Em cinco dias contados da notificação, em peça que sinalize a exceção, antes da audiência. O processo fica suspenso até sua decisão.",
+      "legalBasis": "CLT, art. 800, caput e § 1º"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 24,
+      "front": "Qual é o prazo mínimo de vigência de uma decisão normativa para que possa ser revista por alteração das circunstâncias?",
+      "back": "Mais de um ano de vigência, quando as circunstâncias que a determinaram tiverem mudado a ponto de torná-la injusta ou inaplicável.",
+      "legalBasis": "CLT, art. 873"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 26,
+      "front": "Na execução de prestações sucessivas por tempo determinado, quais parcelas são abrangidas inicialmente?",
+      "back": "As prestações devidas até a data do ingresso na execução, conforme a regra específica da CLT.",
+      "legalBasis": "CLT, art. 891"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 28,
+      "front": "Decretada a falência, até que momento a Justiça do Trabalho processa a ação trabalhista contra a devedora?",
+      "back": "Até apurar o crédito trabalhista, que será inscrito no quadro-geral de credores pelo valor determinado judicialmente, observadas as regras do juízo falimentar.",
+      "legalBasis": "Lei 11.101/2005, art. 6º, § 2º"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 34,
+      "front": "Na execução trabalhista, quem suporta as custas e quando elas são pagas?",
+      "back": "O executado é responsável pelas custas do processo de execução, pagas ao final, conforme a tabela legal.",
+      "legalBasis": "CLT, art. 789-A"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 38,
+      "front": "Que características os tribunais devem assegurar à sua jurisprudência ao uniformizá-la?",
+      "back": "Estabilidade, integridade e coerência. A uniformização não autoriza desconsiderar as circunstâncias fáticas dos precedentes.",
+      "legalBasis": "CPC, art. 926"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 39,
+      "front": "Qual diferença central existe entre os pressupostos do IRDR e do IAC?",
+      "back": "O IRDR exige efetiva repetição de processos sobre a mesma questão exclusivamente de direito e risco à isonomia e à segurança jurídica. O IAC pressupõe questão relevante de direito, com grande repercussão social, sem repetição em múltiplos processos.",
+      "legalBasis": "CPC, arts. 947 e 976"
     }
   ]
 }
