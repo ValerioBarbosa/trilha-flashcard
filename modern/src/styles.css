@@ -773,3 +773,14 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .law-favorites-item { display:grid; gap:6px; padding:14px; text-align:left; color:inherit; background:var(--surface); border:1px solid var(--line); border-radius:12px; overflow-wrap:anywhere; }
 .law-favorites-item small,.law-favorites-list p { color:var(--muted); }
 .law-favorites-item span { color:var(--green); font-size:13px; }
+
+/* Realce por expressões: cores com texto legível em ambos os temas. */
+.law-highlight { color:inherit; background:transparent; border-bottom:2px solid var(--highlight-color); box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+.law-highlight-prazo { --highlight-color:#3b82f6; }
+.law-highlight-vedacao { --highlight-color:#ef4444; }
+.law-highlight-direito { --highlight-color:#16a34a; }
+.law-highlight-excecao { --highlight-color:#d97706; }
+.law-highlight-competencia { --highlight-color:#a855f7; }
+.law-highlight-legend { padding:0 24px; color:var(--muted); font-size:12px; }
+.law-highlight-legend > div { display:flex; flex-wrap:wrap; gap:8px 12px; margin-top:6px; }
+@media(max-width:600px){ .law-highlight-legend { padding:0 16px; } }
