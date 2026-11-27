@@ -1,0 +1,112 @@
+{
+  "entries": [
+    {
+      "id": "lp-001",
+      "disciplineId": "labor-procedure",
+      "number": 7,
+      "front": "O juiz determinou que o exequente indique bens penhoráveis. Ele descumpriu a determinação na execução. Qual o prazo da prescrição intercorrente e seu marco inicial?",
+      "back": "Dois anos, contados do momento em que o exequente deixa de cumprir determinação judicial no curso da execução.",
+      "legalBasis": "CLT, art. 11-A, caput e § 1º",
+      "trap": "Não contar automaticamente do trânsito em julgado."
+    },
+    {
+      "id": "lp-002",
+      "disciplineId": "labor-procedure",
+      "number": 8,
+      "front": "Em prazo processual trabalhista de cinco dias, o sábado intermediário é dia útil para contagem?",
+      "back": "Não, em regra. A contagem é em dias úteis, excluindo o dia do começo e incluindo o do vencimento.",
+      "legalBasis": "CLT, art. 775",
+      "trap": "Não confundir prazo processual com prazo material."
+    },
+    {
+      "id": "lp-003",
+      "disciplineId": "labor-procedure",
+      "number": 15,
+      "front": "Uma irregularidade processual não causou prejuízo às partes. A CLT exige que seja declarada a nulidade?",
+      "back": "Não. A nulidade depende de manifesto prejuízo às partes litigantes.",
+      "legalBasis": "CLT, art. 794",
+      "trap": "A mera irregularidade não basta."
+    },
+    {
+      "id": "lp-004",
+      "disciplineId": "labor-procedure",
+      "number": 15,
+      "front": "A parte percebe nulidade relativa em audiência, mas permanece silenciosa. Pode guardá-la para alegar somente no recurso?",
+      "back": "Em regra, não. Deve arguir a nulidade na primeira oportunidade em que tiver de falar em audiência ou nos autos.",
+      "legalBasis": "CLT, art. 795",
+      "trap": "Não confundir com nulidades cognoscíveis de ofício."
+    },
+    {
+      "id": "lp-005",
+      "disciplineId": "labor-procedure",
+      "number": 16,
+      "front": "O reclamado não comparece à audiência, mas seu advogado está presente. A contestação e os documentos podem ser recebidos?",
+      "back": "Sim. A ausência do reclamado não impede o recebimento da contestação e dos documentos apresentados pelo advogado presente.",
+      "legalBasis": "CLT, art. 844, § 5º",
+      "trap": "Recebimento da defesa não significa afastamento automático da revelia."
+    },
+    {
+      "id": "lp-006",
+      "disciplineId": "labor-procedure",
+      "number": 20,
+      "front": "Uma reclamação de valor equivalente a 30 salários mínimos tem como réu município. Deve seguir o rito sumaríssimo?",
+      "back": "Não. As demandas envolvendo a Administração Pública direta, autárquica e fundacional estão excluídas desse procedimento.",
+      "legalBasis": "CLT, art. 852-A, parágrafo único",
+      "trap": "O valor da causa não é o único critério."
+    },
+    {
+      "id": "lp-007",
+      "disciplineId": "labor-procedure",
+      "number": 20,
+      "front": "No rito sumaríssimo, cada parte pretende ouvir três testemunhas. É esse o limite legal?",
+      "back": "Não. O limite é de duas testemunhas por parte no procedimento sumaríssimo.",
+      "legalBasis": "CLT, art. 852-H, § 2º",
+      "trap": "Não confundir com o limite geral de três."
+    },
+    {
+      "id": "lp-008",
+      "disciplineId": "labor-procedure",
+      "number": 23,
+      "front": "Na liquidação, o credor pretende incluir parcela não deferida na sentença. É possível modificar a decisão liquidanda?",
+      "back": "Não. Na liquidação não se pode modificar ou inovar a sentença liquidanda nem discutir matéria pertinente à causa principal.",
+      "legalBasis": "CLT, art. 879, § 1º",
+      "trap": "Liquidação não é nova fase de conhecimento."
+    },
+    {
+      "id": "lp-009",
+      "disciplineId": "labor-procedure",
+      "number": 23,
+      "front": "Elaborada a conta de liquidação, qual prazo comum para impugnação fundamentada dos cálculos?",
+      "back": "Oito dias, com indicação dos itens e valores objeto da discordância, sob pena de preclusão.",
+      "legalBasis": "CLT, art. 879, § 2º",
+      "trap": "Não confundir com o prazo de embargos à execução."
+    },
+    {
+      "id": "lp-010",
+      "disciplineId": "labor-procedure",
+      "number": 25,
+      "front": "O recurso trabalhista possui, como regra, efeito suspensivo automático?",
+      "back": "Não. Em regra, os recursos têm efeito meramente devolutivo, permitindo execução provisória até a penhora.",
+      "legalBasis": "CLT, art. 899, caput",
+      "trap": "A regra não exclui hipóteses excepcionais de suspensão."
+    },
+    {
+      "id": "lp-011",
+      "disciplineId": "labor-procedure",
+      "number": 29,
+      "front": "Na fase de execução, qual recurso cabe contra a decisão que resolve o incidente de desconsideração da personalidade jurídica?",
+      "back": "Agravo de petição, independentemente de garantia do juízo.",
+      "legalBasis": "CLT, art. 855-A, § 1º, II",
+      "trap": "Na fase de conhecimento, a regra recursal é diferente."
+    },
+    {
+      "id": "lp-012",
+      "disciplineId": "labor-procedure",
+      "number": 35,
+      "front": "A parte opõe embargos de declaração tempestivos, assinados e com representação regular. O prazo dos demais recursos fica apenas suspenso?",
+      "back": "Não. Os embargos de declaração interrompem o prazo para outros recursos por qualquer das partes, ressalvadas as hipóteses legais.",
+      "legalBasis": "CLT, art. 897-A, § 3º",
+      "trap": "Interrupção reinicia a contagem; suspensão apenas conserva o saldo."
+    }
+  ]
+}
