@@ -431,6 +431,114 @@
       "back": "Não. A supressão ou redução do número de dias de férias devidos ao empregado constitui objeto ilícito de convenção ou acordo coletivo.",
       "legalBasis": "CLT, art. 611-B, XI",
       "trap": "A prevalência do negociado não é ilimitada."
+    },
+    {
+      "id": "ad-001",
+      "disciplineId": "administrative",
+      "number": 3,
+      "front": "Um prefeito insere seu nome e fotografia em publicidade institucional de obras públicas com finalidade de promoção pessoal. A Constituição permite essa prática?",
+      "back": "Não. A publicidade oficial deve ter caráter educativo, informativo ou de orientação social, sem nomes, símbolos ou imagens que caracterizem promoção pessoal de autoridades ou servidores.",
+      "legalBasis": "CF, art. 37, § 1º",
+      "trap": "Publicidade institucional não autoriza promoção pessoal."
+    },
+    {
+      "id": "ad-002",
+      "disciplineId": "administrative",
+      "number": 5,
+      "front": "Uma autoridade fundamenta decisão administrativa exclusivamente em valores jurídicos abstratos, sem considerar consequências práticas. A LINDB admite essa fundamentação isolada?",
+      "back": "Não. Nas esferas administrativa, controladora e judicial, não se decidirá com base em valores jurídicos abstratos sem considerar as consequências práticas da decisão.",
+      "legalBasis": "LINDB, art. 20",
+      "trap": "Não confundir consideração das consequências com autorização para descumprir a lei."
+    },
+    {
+      "id": "ad-003",
+      "disciplineId": "administrative",
+      "number": 7,
+      "front": "Um agente competente pratica ato visando finalidade pessoal, diversa daquela prevista na lei. Qual modalidade de abuso de poder está caracterizada?",
+      "back": "Desvio de finalidade (ou desvio de poder). O agente utiliza sua competência para atingir finalidade diversa da prevista explícita ou implicitamente na regra de competência.",
+      "legalBasis": "Lei 4.717/1965, art. 2º, parágrafo único, e",
+      "trap": "Excesso de poder relaciona-se aos limites da competência; desvio, à finalidade."
+    },
+    {
+      "id": "ad-004",
+      "disciplineId": "administrative",
+      "number": 12,
+      "front": "A Administração identifica ato válido que deixou de ser conveniente. Deve anulá-lo ou revogá-lo?",
+      "back": "Pode revogá-lo por conveniência ou oportunidade, respeitados os direitos adquiridos e os limites legais. A anulação decorre de vício de legalidade.",
+      "legalBasis": "Lei 9.784/1999, art. 53",
+      "trap": "Revogação não é sanção por ilegalidade."
+    },
+    {
+      "id": "ad-005",
+      "disciplineId": "administrative",
+      "number": 12,
+      "front": "Um ato administrativo federal apresenta defeito sanável. A Administração pode convalidá-lo mesmo que haja prejuízo a terceiros?",
+      "back": "Não. A convalidação de defeitos sanáveis pressupõe que não haja lesão ao interesse público nem prejuízo a terceiros.",
+      "legalBasis": "Lei 9.784/1999, art. 55",
+      "trap": "Nem todo vício admite convalidação."
+    },
+    {
+      "id": "ad-006",
+      "disciplineId": "administrative",
+      "number": 13,
+      "front": "Em processo administrativo federal, a autoridade pretende delegar a edição de atos normativos a outro órgão. A Lei 9.784/1999 admite essa delegação?",
+      "back": "Não. A edição de atos de caráter normativo, a decisão de recursos administrativos e as matérias de competência exclusiva não podem ser objeto de delegação.",
+      "legalBasis": "Lei 9.784/1999, art. 13",
+      "trap": "Delegação é admitida em geral, mas há proibições expressas."
+    },
+    {
+      "id": "ad-007",
+      "disciplineId": "administrative",
+      "number": 13,
+      "front": "A Administração federal identifica ato favorável ao destinatário praticado há seis anos, sem má-fé demonstrada. Qual é a regra geral do prazo decadencial para anulação?",
+      "back": "Cinco anos, contados da prática do ato, salvo comprovada má-fé. Em efeitos patrimoniais contínuos, conta-se da percepção do primeiro pagamento.",
+      "legalBasis": "Lei 9.784/1999, art. 54",
+      "trap": "Não tratar o poder de anulação como ilimitado; considerar regimes e exceções específicas."
+    },
+    {
+      "id": "ad-008",
+      "disciplineId": "administrative",
+      "number": 17,
+      "front": "O Tribunal de Contas da União julga as contas anuais prestadas pelo Presidente da República?",
+      "back": "Não. O TCU aprecia essas contas mediante parecer prévio, elaborado em sessenta dias do recebimento; compete ao Congresso Nacional julgá-las.",
+      "legalBasis": "CF, arts. 49, IX, e 71, I",
+      "trap": "Distinguir apreciar com parecer prévio de julgar contas de administradores."
+    },
+    {
+      "id": "ad-009",
+      "disciplineId": "administrative",
+      "number": 34,
+      "front": "Um candidato é nomeado para cargo público federal. A nomeação, por si só, constitui a investidura no cargo?",
+      "back": "Não. A investidura em cargo público ocorre com a posse, conforme o regime dos servidores federais.",
+      "legalBasis": "Lei 8.112/1990, art. 7º",
+      "trap": "Nomeação é forma de provimento; posse é investidura."
+    },
+    {
+      "id": "ad-010",
+      "disciplineId": "administrative",
+      "number": 35,
+      "front": "Servidor federal empossado pretende iniciar suas atribuições após vinte dias. Qual é o prazo legal geral para entrar em exercício?",
+      "back": "Quinze dias, contados da data da posse. O servidor será exonerado do cargo se não entrar em exercício no prazo legal.",
+      "legalBasis": "Lei 8.112/1990, art. 15, §§ 1º e 2º",
+      "trap": "Não confundir com o prazo de trinta dias para posse."
+    },
+    {
+      "id": "ad-011",
+      "disciplineId": "administrative",
+      "number": 39,
+      "front": "Servidor federal é absolvido criminalmente porque ficou comprovado que não foi o autor do fato. Qual efeito sobre a responsabilidade administrativa pelo mesmo fato?",
+      "back": "A responsabilidade administrativa será afastada no caso de absolvição criminal que negue a existência do fato ou sua autoria.",
+      "legalBasis": "Lei 8.112/1990, art. 126",
+      "trap": "Nem toda absolvição criminal produz esse efeito na esfera administrativa."
+    },
+    {
+      "id": "ad-012",
+      "disciplineId": "administrative",
+      "number": 41,
+      "front": "Um agente público, nessa qualidade, causa dano a terceiro. A Constituição exige que a vítima demonstre dolo ou culpa do agente para responsabilizar a pessoa jurídica?",
+      "back": "Não, na hipótese de responsabilidade objetiva do art. 37, § 6º, demonstrados seus pressupostos. O direito de regresso contra o agente exige dolo ou culpa.",
+      "legalBasis": "CF, art. 37, § 6º",
+      "trap": "Distinguir responsabilidade da pessoa jurídica e responsabilidade regressiva do agente."
     }
   ]
 }
