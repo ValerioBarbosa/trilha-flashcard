@@ -686,6 +686,244 @@
       "front": "Qual é a finalidade do julgamento com perspectiva de gênero no Poder Judiciário?",
       "back": "Identificar desigualdades estruturais e estereótipos relevantes para a análise do caso, evitando que preconceitos comprometam a interpretação dos fatos e a aplicação do direito.",
       "legalBasis": "CNJ, Resolução 492/2023"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 8,
+      "front": "A mera divergência na interpretação de lei configura abuso de autoridade?",
+      "back": "Não. A divergência interpretativa ou na avaliação de fatos e provas não configura abuso de autoridade; os crimes exigem finalidade específica prevista na lei.",
+      "legalBasis": "Lei 13.869/2019, art. 1º, §§ 1º e 2º"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 9,
+      "front": "Todo ato administrativo possui autoexecutoriedade?",
+      "back": "Não. A execução direta sem ordem judicial depende de autorização legal ou situação urgente que a justifique. A presunção de legitimidade é relativa.",
+      "legalBasis": "Doutrina: atributos dos atos administrativos"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 10,
+      "front": "Quais são os cinco elementos clássicos do ato administrativo?",
+      "back": "Competência, finalidade, forma, motivo e objeto. A Lei da Ação Popular disciplina vícios associados a esses elementos.",
+      "legalBasis": "Lei 4.717/1965, art. 2º"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 11,
+      "front": "Qual a diferença entre ato complexo e ato composto?",
+      "back": "O complexo resulta da conjugação de vontades de órgãos distintos para formar um ato único. O composto envolve um ato principal e outro instrumental de aprovação ou controle.",
+      "legalBasis": "Doutrina: classificação dos atos administrativos"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 12,
+      "front": "Quais defeitos de um ato administrativo federal podem ser convalidados?",
+      "back": "Defeitos sanáveis, quando não houver lesão ao interesse público nem prejuízo a terceiros. Vícios insanáveis não admitem convalidação.",
+      "legalBasis": "Lei 9.784/1999, art. 55"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 14,
+      "front": "A Administração pode rever seus próprios atos ilegais sem ordem judicial?",
+      "back": "Sim. Deve anular atos ilegais e pode revogar atos válidos por conveniência ou oportunidade, respeitados direitos adquiridos e limites legais.",
+      "legalBasis": "Lei 9.784/1999, arts. 53 e 54"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 15,
+      "front": "Qual a diferença entre controle de legalidade e controle de mérito administrativo?",
+      "back": "O primeiro verifica conformidade com o ordenamento; o segundo examina conveniência e oportunidade dentro dos limites da discricionariedade.",
+      "legalBasis": "Doutrina: controle administrativo"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 16,
+      "front": "Quem exerce o controle externo federal sobre a gestão financeira e orçamentária?",
+      "back": "O Congresso Nacional, com auxílio do Tribunal de Contas da União. Cada Poder mantém sistema de controle interno.",
+      "legalBasis": "CF, arts. 70, 71 e 74"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 17,
+      "front": "O TCU julga as contas anuais do Presidente da República?",
+      "back": "Não. Emite parecer prévio em sessenta dias a partir do recebimento. O julgamento compete ao Congresso Nacional.",
+      "legalBasis": "CF, arts. 49, IX, e 71, I"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 19,
+      "front": "A seleção da proposta de menor preço é o único objetivo da licitação?",
+      "back": "Não. A licitação busca resultado mais vantajoso, tratamento isonômico, justa competição, prevenção de sobrepreço e incentivo à inovação e ao desenvolvimento sustentável.",
+      "legalBasis": "Lei 14.133/2021, art. 11"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 20,
+      "front": "Quais são as modalidades de licitação na Lei 14.133/2021?",
+      "back": "Pregão, concorrência, concurso, leilão e diálogo competitivo. É vedada a criação de outras modalidades ou a combinação das previstas.",
+      "legalBasis": "Lei 14.133/2021, art. 28"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 22,
+      "front": "A revogação de licitação pode decorrer de mera vontade da autoridade?",
+      "back": "Não. Deve resultar de fato superveniente devidamente comprovado, assegurada prévia manifestação dos interessados nos casos previstos.",
+      "legalBasis": "Lei 14.133/2021, art. 71, §§ 2º e 3º"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 23,
+      "front": "Quais sanções administrativas a Lei 14.133/2021 prevê para infrações de licitantes e contratados?",
+      "back": "Advertência, multa, impedimento de licitar e contratar e declaração de inidoneidade para licitar ou contratar.",
+      "legalBasis": "Lei 14.133/2021, art. 156"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 24,
+      "front": "Em qual diploma estão tipificados os crimes de licitações e contratos administrativos introduzidos pela Lei 14.133/2021?",
+      "back": "No Código Penal, nos arts. 337-E a 337-P, observando-se que o art. 337-P disciplina a pena de multa.",
+      "legalBasis": "Código Penal, arts. 337-E a 337-P"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 25,
+      "front": "A Administração pode alterar unilateralmente contratos administrativos?",
+      "back": "Sim, nas hipóteses e limites legais. Cláusulas econômico-financeiras e monetárias não podem ser alteradas sem prévia concordância do contratado.",
+      "legalBasis": "Lei 14.133/2021, art. 104"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 26,
+      "front": "É válido contrato verbal com a Administração Pública?",
+      "back": "Em regra, é nulo. A exceção legal abrange pequenas compras ou serviços de pronto pagamento dentro do limite atualizado aplicável.",
+      "legalBasis": "Lei 14.133/2021, art. 95, § 2º"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 27,
+      "front": "Qual a duração máxima das prorrogações sucessivas de contratos de serviços e fornecimentos contínuos?",
+      "back": "Podem alcançar vigência máxima de dez anos, desde que haja previsão no edital e sejam atendidas as condições legais de vantajosidade.",
+      "legalBasis": "Lei 14.133/2021, art. 107"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 28,
+      "front": "Quando se utiliza termo de colaboração e quando se utiliza termo de fomento?",
+      "back": "Com transferência de recursos, o termo de colaboração formaliza proposta da Administração; o termo de fomento formaliza proposta da organização da sociedade civil.",
+      "legalBasis": "Lei 13.019/2014, art. 2º, VII e VIII"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 29,
+      "front": "Qual a distinção legal entre concessão e permissão de serviço público?",
+      "back": "A concessão é delegada mediante licitação a pessoa jurídica ou consórcio, por prazo determinado; a permissão é delegação precária, mediante licitação, a pessoa física ou jurídica.",
+      "legalBasis": "Lei 8.987/1995, art. 2º, II e IV"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 30,
+      "front": "O usuário de serviço público pode apresentar manifestação sobre sua prestação?",
+      "back": "Sim. Pode apresentar reclamações, denúncias, sugestões, elogios e outros pronunciamentos relativos aos serviços públicos, nos canais previstos em lei.",
+      "legalBasis": "Lei 13.460/2017, arts. 2º e 9º"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 31,
+      "front": "Qual a diferença entre encampação e caducidade da concessão?",
+      "back": "Encampação é retomada por interesse público, mediante lei autorizativa específica e indenização prévia; caducidade decorre de inadimplemento da concessionária, observados os requisitos legais.",
+      "legalBasis": "Lei 8.987/1995, arts. 37 e 38"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 32,
+      "front": "Qual a diferença entre concessão patrocinada e concessão administrativa na PPP?",
+      "back": "Na patrocinada há tarifa dos usuários e contraprestação pecuniária pública. Na administrativa a Administração é usuária direta ou indireta do serviço.",
+      "legalBasis": "Lei 11.079/2004, art. 2º, §§ 1º e 2º"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 33,
+      "front": "O conceito de agente público exige necessariamente vínculo efetivo remunerado?",
+      "back": "Não. Abrange pessoas que exercem função pública, ainda que transitoriamente ou sem remuneração, conforme o regime jurídico aplicável.",
+      "legalBasis": "Lei 8.429/1992, art. 2º"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 34,
+      "front": "Em que momento ocorre a investidura em cargo público federal?",
+      "back": "Com a posse. Nomeação é ato de provimento; exercício é o efetivo desempenho das atribuições do cargo ou função.",
+      "legalBasis": "Lei 8.112/1990, arts. 7º e 15"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 35,
+      "front": "Quais são os prazos ordinários para posse e exercício do servidor público federal nomeado?",
+      "back": "A posse ocorre em até trinta dias da publicação do ato de provimento; o exercício deve começar em até quinze dias contados da posse.",
+      "legalBasis": "Lei 8.112/1990, arts. 13, § 1º, e 15, § 1º"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 36,
+      "front": "Quais são as carreiras dos quadros de pessoal do Poder Judiciário da União previstas na Lei 11.416/2006?",
+      "back": "Analista Judiciário, Técnico Judiciário e Auxiliar Judiciário, organizados conforme as áreas e atribuições legais.",
+      "legalBasis": "Lei 11.416/2006, art. 2º"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 37,
+      "front": "Após quanto tempo o servidor nomeado para cargo efetivo mediante concurso adquire estabilidade?",
+      "back": "Após três anos de efetivo exercício, exigida avaliação especial de desempenho por comissão instituída para essa finalidade.",
+      "legalBasis": "CF, art. 41, caput e § 4º"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 38,
+      "front": "O ingresso em emprego público efetivo dispensa concurso por ser regido pela CLT?",
+      "back": "Não. A regra constitucional do concurso alcança cargos e empregos públicos, ressalvadas as exceções constitucionais.",
+      "legalBasis": "CF, art. 37, II"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 39,
+      "front": "As responsabilidades civil, penal e administrativa do servidor federal podem cumular-se?",
+      "back": "Sim. São independentes, mas a absolvição criminal que negue a existência do fato ou a autoria afasta a responsabilidade administrativa.",
+      "legalBasis": "Lei 8.112/1990, arts. 125 e 126"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 40,
+      "front": "Quais são as fases do processo administrativo disciplinar federal?",
+      "back": "Instauração, com publicação do ato constitutivo da comissão; inquérito administrativo, que inclui instrução, defesa e relatório; e julgamento.",
+      "legalBasis": "Lei 8.112/1990, art. 151"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 41,
+      "front": "Qual a regra constitucional de responsabilidade civil estatal por danos causados por agentes nessa qualidade?",
+      "back": "Responsabilidade objetiva das pessoas jurídicas de direito público e das privadas prestadoras de serviços públicos, assegurado regresso contra o agente em caso de dolo ou culpa.",
+      "legalBasis": "CF, art. 37, § 6º"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 42,
+      "front": "Bens públicos podem ser adquiridos por usucapião?",
+      "back": "Não. O uso por terceiros pode ser disciplinado por instrumentos administrativos próprios, sem que a ocupação gere aquisição por usucapião.",
+      "legalBasis": "Código Civil, art. 102; CF, arts. 183, § 3º, e 191, parágrafo único"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 43,
+      "front": "Qual o prazo de resposta a pedido de informação quando não for possível o acesso imediato?",
+      "back": "Até vinte dias, prorrogáveis por mais dez mediante justificativa expressa comunicada ao requerente.",
+      "legalBasis": "Lei 12.527/2011, art. 11, §§ 1º e 2º"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 44,
+      "front": "A LGPD exige consentimento para toda operação de tratamento de dados pessoais?",
+      "back": "Não. O consentimento é uma das bases legais; outras incluem obrigação legal, execução de políticas públicas e exercício regular de direitos, conforme a hipótese.",
+      "legalBasis": "Lei 13.709/2018, art. 7º"
     }
   ]
 }
