@@ -1,0 +1,236 @@
+{
+  "version": "4.0",
+  "entries": [
+    {
+      "disciplineId": "civil-law",
+      "number": 1,
+      "front": "Quando começa, em regra, a personalidade civil da pessoa natural no Código Civil?",
+      "back": "Com o nascimento com vida, resguardados desde a concepção os direitos do nascituro.",
+      "legalBasis": "Código Civil, art. 2º"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 2,
+      "front": "A afetação de um bem público pode alterar sua destinação jurídica?",
+      "back": "Sim. A afetação o vincula a finalidade pública; a desafetação pode retirar essa destinação conforme o regime jurídico aplicável.",
+      "legalBasis": "Código Civil, arts. 98 a 103"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 3,
+      "front": "Quais são os três requisitos gerais de validade do negócio jurídico?",
+      "back": "Agente capaz; objeto lícito, possível, determinado ou determinável; forma prescrita ou não defesa em lei.",
+      "legalBasis": "Código Civil, art. 104"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 4,
+      "front": "Condição, termo e encargo são elementos essenciais de validade ou acidentais do negócio jurídico?",
+      "back": "São elementos acidentais: modulam efeitos, mas não integram necessariamente os requisitos gerais do art. 104.",
+      "legalBasis": "Código Civil, arts. 121 e seguintes"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 5,
+      "front": "O estado de perigo e a lesão são classificados como quê no regime do negócio jurídico?",
+      "back": "Defeitos do negócio jurídico que podem fundamentar sua anulabilidade, conforme os requisitos legais.",
+      "legalBasis": "Código Civil, arts. 156, 157 e 171, II"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 6,
+      "front": "Qual é a distinção central entre prescrição e decadência?",
+      "back": "Em regra, a prescrição atinge a pretensão; a decadência alcança o exercício de direito potestativo no prazo aplicável.",
+      "legalBasis": "Código Civil, arts. 189 a 211"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 7,
+      "front": "Qual princípio determina que os contratos devem observar a função social?",
+      "back": "A liberdade contratual é exercida nos limites da função social do contrato.",
+      "legalBasis": "Código Civil, art. 421"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 8,
+      "front": "Em regra, qual é a diferença entre vício redibitório e evicção?",
+      "back": "Vício redibitório é defeito oculto da coisa; evicção decorre de perda da coisa por direito anterior de terceiro reconhecido nas condições legais.",
+      "legalBasis": "Código Civil, arts. 441 e 447"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 9,
+      "front": "A posse exige sempre que o possuidor seja proprietário do bem?",
+      "back": "Não. Posse e propriedade são situações jurídicas distintas; o possuidor exerce de fato algum poder inerente à propriedade.",
+      "legalBasis": "Código Civil, art. 1.196"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 10,
+      "front": "A aquisição da posse depende necessariamente de transmissão contratual?",
+      "back": "Não. A posse pode ser adquirida quando se torna possível exercer, em nome próprio, algum poder inerente à propriedade.",
+      "legalBasis": "Código Civil, art. 1.204"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 11,
+      "front": "A função social da posse equivale a título de propriedade registrado?",
+      "back": "Não. É noção distinta: a função social pode orientar análise da posse, mas não substitui automaticamente requisitos de aquisição de propriedade.",
+      "legalBasis": "Direito das Coisas; Código Civil"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 12,
+      "front": "O exercício da posse pode ser juridicamente protegido mesmo sem domínio registrado?",
+      "back": "Sim. A tutela possessória protege a posse nas hipóteses legais, sem exigir prova prévia de propriedade.",
+      "legalBasis": "Código Civil, arts. 1.210 e seguintes"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 13,
+      "front": "Qual é a distinção básica entre posse e propriedade?",
+      "back": "Posse é exercício fático de poderes inerentes à propriedade; propriedade é direito real com faculdades de usar, gozar, dispor e reaver.",
+      "legalBasis": "Código Civil, arts. 1.196 e 1.228"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 14,
+      "front": "O Código Civil afirma que o direito de propriedade deve atender a qual diretriz?",
+      "back": "A propriedade deve ser exercida em consonância com suas finalidades econômicas e sociais, com as exigências ambientais previstas em lei.",
+      "legalBasis": "Código Civil, art. 1.228, § 1º"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 15,
+      "front": "Qual é a característica típica da propriedade fiduciária?",
+      "back": "A titularidade resolúvel é transferida ao credor fiduciário como garantia, nos termos do regime legal aplicável.",
+      "legalBasis": "Código Civil, arts. 1.361 e seguintes"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 16,
+      "front": "Qual direito real permite usar e fruir temporariamente bem alheio preservando a nua-propriedade?",
+      "back": "O usufruto, nos limites e prazos do título constitutivo e da lei.",
+      "legalBasis": "Código Civil, arts. 1.390 e seguintes"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 17,
+      "front": "O direito real de laje implica necessariamente divisão do terreno em condomínio tradicional?",
+      "back": "Não. A laje possui disciplina própria como direito real sobre unidade autônoma em construção-base, observados requisitos legais.",
+      "legalBasis": "Código Civil, arts. 1.510-A e seguintes"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 18,
+      "front": "Quando o promitente comprador pode ter direito real à aquisição do imóvel?",
+      "back": "Quando presentes os requisitos legais da promessa de compra e venda sem arrependimento e do registro correspondente.",
+      "legalBasis": "Código Civil, arts. 1.417 e 1.418"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 19,
+      "front": "Penhor e hipoteca são exemplos de qual categoria de direitos reais?",
+      "back": "Direitos reais de garantia, que asseguram obrigação por vinculação jurídica de bens.",
+      "legalBasis": "Código Civil, art. 1.225 e disposições sobre garantias"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 20,
+      "front": "O casamento entre pessoas do mesmo sexo pode ser recusado por essa razão pelos cartórios?",
+      "back": "Não. A Resolução CNJ nº 175/2013 veda a recusa de habilitação, celebração ou conversão de união estável em casamento entre pessoas do mesmo sexo.",
+      "legalBasis": "Resolução CNJ nº 175/2013"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 21,
+      "front": "O divórcio depende da demonstração de culpa de um dos cônjuges?",
+      "back": "Não. A dissolução pelo divórcio independe de declaração de culpa.",
+      "legalBasis": "CF/88, art. 226, § 6º"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 22,
+      "front": "Após a EC 66/2010, é necessário prévio período de separação para requerer divórcio?",
+      "back": "Não. A Constituição não exige prévia separação como condição temporal do divórcio.",
+      "legalBasis": "CF/88, art. 226, § 6º"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 23,
+      "front": "Em decisões relativas à guarda e convivência, qual referência constitucional orienta a proteção dos filhos?",
+      "back": "A prioridade absoluta dos direitos de crianças e adolescentes, conjugada com o melhor interesse da criança.",
+      "legalBasis": "CF/88, art. 227"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 24,
+      "front": "O poder familiar pertence exclusivamente ao pai?",
+      "back": "Não. O poder familiar compete a ambos os pais, em igualdade de condições, conforme a legislação.",
+      "legalBasis": "Código Civil, art. 1.631"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 25,
+      "front": "Qual é a diferença entre meação e herança?",
+      "back": "Meação decorre do regime patrimonial aplicável e representa a parcela própria do cônjuge/companheiro; herança é aquisição sucessória após a morte.",
+      "legalBasis": "Código Civil, regimes de bens e sucessões"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 26,
+      "front": "A proteção legal do bem de família pode atingir o imóvel residencial próprio da entidade familiar?",
+      "back": "Sim. A Lei nº 8.009/1990 estabelece impenhorabilidade do imóvel residencial familiar, ressalvadas as exceções legais.",
+      "legalBasis": "Lei nº 8.009/1990"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 27,
+      "front": "A Constituição reconhece a união estável como entidade familiar?",
+      "back": "Sim, nos termos do art. 226, § 3º, e da interpretação constitucional aplicável às uniões homoafetivas.",
+      "legalBasis": "CF/88, art. 226, § 3º"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 28,
+      "front": "A união estável exige necessariamente escritura pública para sua existência?",
+      "back": "Não. Sua caracterização depende dos requisitos fáticos e jurídicos legais, sem exigência geral de escritura constitutiva.",
+      "legalBasis": "Código Civil, art. 1.723"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 29,
+      "front": "Na ausência de contrato escrito entre companheiros, qual regime patrimonial se aplica, em regra, à união estável?",
+      "back": "A comunhão parcial de bens, no que couber.",
+      "legalBasis": "Código Civil, art. 1.725"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 30,
+      "front": "A herança se transmite apenas quando termina o inventário?",
+      "back": "Não. Aberta a sucessão, a herança transmite-se desde logo aos herdeiros legítimos e testamentários.",
+      "legalBasis": "Código Civil, art. 1.784"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 31,
+      "front": "Qual é o destino jurídico da herança jacente sem sucessores habilitados, após os procedimentos legais?",
+      "back": "Pode ser declarada vacante, observadas as condições e prazos legais.",
+      "legalBasis": "Código Civil, arts. 1.819 e seguintes"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 32,
+      "front": "A sucessão legítima afasta sempre qualquer possibilidade de sucessão testamentária?",
+      "back": "Não. A sucessão pode decorrer da lei e de disposição de última vontade, respeitados os limites legais, como a legítima dos herdeiros necessários.",
+      "legalBasis": "Código Civil, arts. 1.786 e 1.789"
+    },
+    {
+      "disciplineId": "civil-law",
+      "number": 33,
+      "front": "A partilha pode atribuir bens aos herdeiros sem observar a igualdade das quotas hereditárias?",
+      "back": "A partilha deve respeitar os direitos e quotas de cada interessado, admitidas as modalidades e compensações previstas em lei.",
+      "legalBasis": "Código Civil, arts. 2.013 e seguintes"
+    }
+  ]
+}
