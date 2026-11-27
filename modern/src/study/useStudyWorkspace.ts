@@ -113,7 +113,10 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
 
       const catalogOutdated = readBuiltinCatalogVersion(user.id, resolvedProfile.id) !== BUILTIN_CATALOG_VERSION;
       const catalogIncomplete = (officialCount ?? 0) < EXPECTED_BUILTIN_CATALOG_CARDS;
-      if (resolvedProfile.is_builtin && ((count ?? 0) === 0 || catalogOutdated || catalogIncomplete)) {
+      if (resolvedProfile.is_builtin && catalogIncomplete && !catalogOutdated) {
+        setWarning(`Complemento V4: ${officialCount ?? 0}/${EXPECTED_BUILTIN_CATALOG_CARDS} cartões identificados. Confira duplicidades e sincronização no Painel de Saúde.`);
+      }
+      if (resolvedProfile.is_builtin && ((count ?? 0) === 0 || catalogOutdated)) {
         setSeeding(true);
         try {
           await seedBuiltinStudyCatalog(client, user, resolvedProfile.id);
@@ -125,11 +128,11 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
             .like('legacy_id', 'card-trt4-v4-%');
           if (verifyError) throw verifyError;
           if ((verifiedCount ?? 0) < EXPECTED_BUILTIN_CATALOG_CARDS) {
-            throw new Error(`Cartões V4 incompletos: ${verifiedCount ?? 0}/${EXPECTED_BUILTIN_CATALOG_CARDS}. Confira o Painel de Saúde e tente reparar.`);
+            setWarning(`Matriz V4 parcialmente sincronizada: ${verifiedCount ?? 0}/${EXPECTED_BUILTIN_CATALOG_CARDS} cartões novos identificados. Cartões com conteúdo já existente podem ter sido deduplicados. Confira o Painel de Saúde.`);
           }
           storeBuiltinCatalogVersion(user.id, resolvedProfile.id);
         } catch (seedError) {
-          throw new Error(`Falha ao atualizar material de estudo: ${errorMessage(seedError)}`);
+          setWarning(`Não foi possível concluir a atualização da V4: ${errorMessage(seedError)}. Seus estudos anteriores continuam acessíveis; use Reparar catálogo em Dados.`);
         } finally {
           setSeeding(false);
         }
