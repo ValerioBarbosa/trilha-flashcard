@@ -867,7 +867,7 @@
       "number": 36,
       "front": "Quais são as carreiras dos quadros de pessoal do Poder Judiciário da União previstas na Lei 11.416/2006?",
       "back": "Analista Judiciário, Técnico Judiciário e Auxiliar Judiciário, organizados conforme as áreas e atribuições legais.",
-      "legalBasis": "Lei 11.416/2006, art. 2º"
+      "legalBasis": "Lei 11.416/2006, arts. 1º e 2º"
     },
     {
       "disciplineId": "administrative",
@@ -907,9 +907,9 @@
     {
       "disciplineId": "administrative",
       "number": 42,
-      "front": "Bens públicos podem ser adquiridos por usucapião?",
-      "back": "Não. O uso por terceiros pode ser disciplinado por instrumentos administrativos próprios, sem que a ocupação gere aquisição por usucapião.",
-      "legalBasis": "Código Civil, art. 102; CF, arts. 183, § 3º, e 191, parágrafo único"
+      "front": "Quais instrumentos podem permitir a utilização privativa de bens públicos por terceiros?",
+      "back": "Autorização, permissão e concessão de uso, conforme a natureza do bem, a finalidade e a legislação aplicável. Não se confundem com a alienação do domínio público.",
+      "legalBasis": "Doutrina: uso privativo de bens públicos; Lei 14.133/2021, art. 2º, IV"
     },
     {
       "disciplineId": "administrative",
@@ -1138,9 +1138,9 @@
     {
       "disciplineId": "labor-law",
       "number": 41,
-      "front": "Qual o papel de uma instrução normativa do TST diante de lei trabalhista hierarquicamente superior?",
-      "back": "Orientar ou disciplinar a aplicação da legislação dentro da competência do tribunal, sem revogar nem contrariar a lei. Deve-se conferir seu objeto e vigência.",
-      "legalBasis": "CF, art. 96, I, a; TST, IN 41/2018 (exemplo de disciplina processual da Reforma)"
+      "front": "Uma instrução normativa do TST pode criar obrigação material trabalhista contrária à CLT?",
+      "back": "Não. Atos normativos do tribunal devem respeitar sua competência e a legislação hierarquicamente superior; não substituem a lei material.",
+      "legalBasis": "CF, arts. 5º, II, e 96, I, a"
     },
     {
       "disciplineId": "labor-law",
@@ -1237,15 +1237,15 @@
       "disciplineId": "civil-procedure",
       "number": 18,
       "front": "Qual a consequência do não pagamento voluntário de condenação em quantia certa no prazo do art. 523 do CPC?",
-      "back": "Após quinze dias sem pagamento, incidem multa de 10% e honorários de advogado de 10%, sobre o saldo não pago.",
-      "legalBasis": "CPC, art. 523, §§ 1º e 2º"
+      "back": "Após quinze dias úteis sem pagamento, incidem multa de 10% e honorários advocatícios de 10% sobre o saldo não pago.",
+      "legalBasis": "CPC, arts. 219 e 523, §§ 1º e 2º"
     },
     {
       "disciplineId": "civil-procedure",
       "number": 19,
       "front": "Qual o prazo geral para impugnação ao cumprimento de sentença de pagar quantia entre particulares?",
-      "back": "Quinze dias após o término do prazo para pagamento voluntário, independentemente de penhora ou nova intimação.",
-      "legalBasis": "CPC, art. 525"
+      "back": "Quinze dias úteis, após o término do prazo para pagamento voluntário, sem necessidade de penhora ou nova intimação.",
+      "legalBasis": "CPC, arts. 219 e 525"
     },
     {
       "disciplineId": "civil-procedure",
