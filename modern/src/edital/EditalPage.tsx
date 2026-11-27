@@ -20,17 +20,18 @@ type Props = {
 type StatusFilter = 'all' | EditalTopicProgress['status'];
 type PriorityFilter = 'all' | 'A' | 'B' | 'C';
 
-const STATUS_ORDER: EditalTopicProgress['status'][] = ['Não iniciado', 'Em estudo', 'Revisado', 'Recuperado'];
+const STATUS_ORDER: EditalTopicProgress['status'][] = ['Sem material', 'Não iniciado', 'Em estudo', 'Revisado', 'Recuperado'];
 const COMPLEMENTARY_TOPICS = new Set(['Jurisprudência prioritária STF/TST', 'Estudo de Caso Jurídico - protocolo de treino']);
 
 function emptyProgress(): EditalTopicProgress {
-  return { cardCount: 0, leiSecaCount: 0, reviewedCount: 0, masteredCount: 0, status: 'Não iniciado' };
+  return { cardCount: 0, leiSecaCount: 0, reviewedCount: 0, masteredCount: 0, status: 'Sem material' };
 }
 
 function statusClass(status: EditalTopicProgress['status']): string {
   if (status === 'Recuperado') return 'status-mastered';
   if (status === 'Revisado') return 'status-reviewed';
   if (status === 'Em estudo') return 'status-studying';
+  if (status === 'Sem material') return 'status-uncovered';
   return 'status-not-started';
 }
 
@@ -128,7 +129,7 @@ export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onS
       <section className="edital-overview">
         <div className="edital-overview-copy">
           <span className="page-eyebrow">PROGRESSO GERAL</span>
-          <h2>{coverage.coveredTopics}/{coverage.totalTopics} tópicos com material de estudo</h2>
+          <h2>{coverage.coveredTopics}/{coverage.totalTopics} recortes com material de estudo</h2>
           <p>Os recortes subdividem o Anexo II para acompanhamento, sem representar uma contagem oficial da FCC. Cobertura exige cartão de conteúdo vinculado; identificação do tópico não é flashcard. “Recuperado” é autoavaliação, não garantia de domínio. <a href={OFFICIAL_EDITAL_URL} target="_blank" rel="noreferrer">Ver edital ↗</a></p>
         </div>
         <strong>{coveragePct}%</strong>
@@ -136,7 +137,7 @@ export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onS
       </section>
 
       <div className="dashboard-grid edital-command-metrics">
-        <MetricTile label="Tópicos cobertos" value={`${coverage.coveredTopics}/${coverage.totalTopics}`} helper="com flashcards vinculados" />
+        <MetricTile label="Tópicos com material" value={`${coverage.coveredTopics}/${coverage.totalTopics}`} helper="cartões de conteúdo vinculados à V4" />
         <MetricTile label="Recuperados" value={coverage.masteredTopics} helper={`${masteredPct}% por autoavaliação`} />
         <MetricTile label="Cartões de estudo" value={coverage.totalCards} helper="sem roteiros e sem Lei Seca" />
         <MetricTile label="Com base legal" value={coverage.leiSecaTopics} helper="aptos para leitura de Lei Seca" />
