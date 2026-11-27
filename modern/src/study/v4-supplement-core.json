@@ -1,0 +1,439 @@
+{
+  "version": "4.0",
+  "entries": [
+    {
+      "disciplineId": "portuguese",
+      "number": 2,
+      "front": "O uso do acento indicativo de crase decorre da fusão de quais elementos?",
+      "back": "Em regra, da preposição a exigida pela regência e do artigo feminino a/as, ou do a inicial de determinados demonstrativos.",
+      "legalBasis": "Gramática normativa"
+    },
+    {
+      "disciplineId": "portuguese",
+      "number": 3,
+      "front": "Interpretar um texto exige apenas repetir informações expressas?",
+      "back": "Não. Compreensão identifica informações expressas; interpretação pode exigir inferências sustentadas pelo texto, sem extrapolação.",
+      "legalBasis": "Interpretação de textos"
+    },
+    {
+      "disciplineId": "portuguese",
+      "number": 6,
+      "front": "Em 'infelizmente', há qual processo de formação de palavras?",
+      "back": "Derivação prefixal e sufixal, pois a palavra combina prefixo in- e sufixo -mente à base.",
+      "legalBasis": "Morfologia"
+    },
+    {
+      "disciplineId": "portuguese",
+      "number": 7,
+      "front": "Na concordância verbal com sujeito simples, o verbo concorda com qual núcleo?",
+      "back": "Com o núcleo do sujeito, em pessoa e número, observadas as construções especiais.",
+      "legalBasis": "Concordância verbal"
+    },
+    {
+      "disciplineId": "portuguese",
+      "number": 10,
+      "front": "Em 'O candidato obedeceu à norma', por que aparece crase?",
+      "back": "O verbo obedecer rege a preposição a e 'norma' admite artigo feminino a.",
+      "legalBasis": "Regência verbal e crase"
+    },
+    {
+      "disciplineId": "portuguese",
+      "number": 11,
+      "front": "Em provas FCC de reescrita, o que deve permanecer para haver equivalência correta?",
+      "back": "O sentido original e a correção gramatical, inclusive relações lógicas, tempos, regência e pontuação pertinentes.",
+      "legalBasis": "Reescrita"
+    },
+    {
+      "disciplineId": "math-logic",
+      "number": 1,
+      "front": "Se todos os A são B, conclui-se que todos os B são A?",
+      "back": "Não. A inclusão de A em B não autoriza inverter a relação.",
+      "legalBasis": "Raciocínio lógico"
+    },
+    {
+      "disciplineId": "math-logic",
+      "number": 4,
+      "front": "Qual é o critério central de validade de um argumento dedutivo?",
+      "back": "Não ser possível ter premissas verdadeiras e conclusão falsa na mesma interpretação.",
+      "legalBasis": "Lógica dedutiva"
+    },
+    {
+      "disciplineId": "math-logic",
+      "number": 5,
+      "front": "Em uma expressão sem parênteses, multiplicação e divisão têm prioridade sobre soma e subtração?",
+      "back": "Sim. Operações do mesmo nível seguem a sequência convencionada da esquerda para a direita.",
+      "legalBasis": "Aritmética"
+    },
+    {
+      "disciplineId": "math-logic",
+      "number": 8,
+      "front": "Se a razão A:B é 2:3 e A=10, qual é B?",
+      "back": "B=15, pois cada parte vale 5.",
+      "legalBasis": "Razões e proporções"
+    },
+    {
+      "disciplineId": "math-logic",
+      "number": 10,
+      "front": "Um produto de R$ 200 com desconto de 10% passa a custar quanto?",
+      "back": "R$ 180. O desconto é de R$ 20.",
+      "legalBasis": "Porcentagem"
+    },
+    {
+      "disciplineId": "math-logic",
+      "number": 11,
+      "front": "Qual medida de tendência central sofre, em geral, maior influência de valores extremos: média ou mediana?",
+      "back": "A média aritmética tende a ser mais sensível a valores extremos do que a mediana.",
+      "legalBasis": "Estatística descritiva"
+    },
+    {
+      "disciplineId": "trt-legislation",
+      "number": 1,
+      "front": "Qual resolução do CNJ disciplina a política de sustentabilidade no Poder Judiciário?",
+      "back": "A Resolução CNJ nº 400/2021.",
+      "legalBasis": "Resolução CNJ nº 400/2021"
+    },
+    {
+      "disciplineId": "trt-legislation",
+      "number": 2,
+      "front": "Qual norma instituiu o Código de Conduta e Valores Éticos do TRT da 4ª Região?",
+      "back": "A Portaria GP.TRT4 nº 4.573/2023, conforme o recorte do edital.",
+      "legalBasis": "Portaria GP.TRT4 nº 4.573/2023"
+    },
+    {
+      "disciplineId": "trt-legislation",
+      "number": 3,
+      "front": "Qual portaria atualizou o texto compilado do Código de Conduta do TRT-4 mencionado no edital?",
+      "back": "A Portaria GP.TRT4 nº 2.808/2025.",
+      "legalBasis": "Portaria GP.TRT4 nº 2.808/2025"
+    },
+    {
+      "disciplineId": "trt-legislation",
+      "number": 4,
+      "front": "Até quais atos o edital exige considerar o Regimento Interno do TRT-4?",
+      "back": "Até a RA nº 31/2026 e o Assento Regimental nº 04/2026, conforme o Anexo II.",
+      "legalBasis": "RA nº 31/2026; Assento Regimental nº 04/2026"
+    },
+    {
+      "disciplineId": "trt-legislation",
+      "number": 5,
+      "front": "Qual resolução do CSJT trata da política de prevenção e enfrentamento da violência, assédio e discriminação no primeiro e segundo graus da Justiça do Trabalho?",
+      "back": "A Resolução CSJT nº 360/2023.",
+      "legalBasis": "Resolução CSJT nº 360/2023"
+    },
+    {
+      "disciplineId": "trt-legislation",
+      "number": 6,
+      "front": "Qual resolução do CNJ trata da política de prevenção e enfrentamento do assédio moral, sexual e discriminação no Judiciário?",
+      "back": "A Resolução CNJ nº 351/2020.",
+      "legalBasis": "Resolução CNJ nº 351/2020"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 2,
+      "front": "Norma constitucional de eficácia plena depende de lei posterior para produzir seus efeitos essenciais?",
+      "back": "Não. Possui aplicabilidade direta, imediata e integral, sem depender de regulamentação para o núcleo essencial.",
+      "legalBasis": "Classificação da eficácia constitucional"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 3,
+      "front": "Qual é a diferença básica entre controle difuso e concentrado de constitucionalidade?",
+      "back": "Difuso é exercido incidentalmente no julgamento de casos concretos pelos órgãos competentes; concentrado envolve ações de controle abstrato perante o tribunal competente.",
+      "legalBasis": "CF/88"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 4,
+      "front": "Quem possui competência para processar e julgar ADI de lei federal em face da Constituição Federal?",
+      "back": "O Supremo Tribunal Federal, na forma do art. 102, I, a, da Constituição.",
+      "legalBasis": "CF/88, art. 102, I, a"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 5,
+      "front": "A ADC perante o STF pode ter por objeto lei municipal?",
+      "back": "Não. A ADC perante o STF tem por objeto lei ou ato normativo federal.",
+      "legalBasis": "CF/88, art. 102, I, a"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 9,
+      "front": "Qual princípio norteia o ingresso em cargo público efetivo, como regra?",
+      "back": "A aprovação prévia em concurso público de provas ou de provas e títulos, ressalvadas hipóteses constitucionais.",
+      "legalBasis": "CF/88, art. 37, II"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 14,
+      "front": "A competência originária do STF é definida livremente por lei ordinária?",
+      "back": "Não. Suas competências constitucionais estão previstas na própria Constituição, sem livre ampliação por lei ordinária.",
+      "legalBasis": "CF/88, art. 102"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 17,
+      "front": "Quais são os órgãos da Justiça do Trabalho relacionados no art. 111 da Constituição?",
+      "back": "Tribunal Superior do Trabalho, Tribunais Regionais do Trabalho e Juízes do Trabalho.",
+      "legalBasis": "CF/88, art. 111"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 18,
+      "front": "Qual órgão exerce a supervisão administrativa, orçamentária, financeira e patrimonial da Justiça do Trabalho de primeiro e segundo graus?",
+      "back": "O Conselho Superior da Justiça do Trabalho, na forma constitucional.",
+      "legalBasis": "CF/88, art. 111-A, § 2º, II"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 1,
+      "front": "A Administração Pública em sentido subjetivo designa o quê?",
+      "back": "O conjunto de órgãos, agentes e entidades que desempenham a função administrativa.",
+      "legalBasis": "Direito Administrativo"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 2,
+      "front": "Quais princípios clássicos integram o núcleo do regime jurídico-administrativo?",
+      "back": "Supremacia do interesse público e indisponibilidade do interesse público, em leitura compatível com direitos fundamentais e a ordem constitucional.",
+      "legalBasis": "Regime jurídico-administrativo"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 3,
+      "front": "Quais princípios expressos constam do caput do art. 37 da Constituição?",
+      "back": "Legalidade, impessoalidade, moralidade, publicidade e eficiência.",
+      "legalBasis": "CF/88, art. 37"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 4,
+      "front": "O princípio da motivação admite decisões administrativas sem justificativa em todas as hipóteses?",
+      "back": "Não. Os atos administrativos devem observar os deveres de motivação aplicáveis, especialmente nos casos previstos em lei.",
+      "legalBasis": "Lei nº 9.784/1999, art. 50"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 5,
+      "front": "Segundo a LINDB, decisões administrativas podem considerar apenas valores jurídicos abstratos sem avaliar consequências práticas?",
+      "back": "Não. A decisão baseada em valores jurídicos abstratos deve considerar suas consequências práticas.",
+      "legalBasis": "LINDB, art. 20"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 6,
+      "front": "Qual poder administrativo permite apurar e punir infrações funcionais dentro de vínculo específico?",
+      "back": "O poder disciplinar, observados competência, devido processo e proporcionalidade.",
+      "legalBasis": "Poder disciplinar"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 7,
+      "front": "O abuso de poder pode ocorrer tanto por excesso quanto por desvio de finalidade?",
+      "back": "Sim. Excesso de poder e desvio de finalidade são modalidades tradicionalmente apontadas de abuso de poder.",
+      "legalBasis": "Atos administrativos"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 13,
+      "front": "A Lei nº 9.784/1999 disciplina, em regra, o processo administrativo de qual âmbito federativo?",
+      "back": "Da Administração Pública Federal, com o alcance previsto na própria lei.",
+      "legalBasis": "Lei nº 9.784/1999"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 18,
+      "front": "Qual lei contém as normas gerais atuais de licitações e contratos administrativos mencionadas no edital?",
+      "back": "A Lei nº 14.133/2021, que estabelece normas gerais de licitação e contratação no âmbito administrativo indicado pela lei.",
+      "legalBasis": "Lei nº 14.133/2021"
+    },
+    {
+      "disciplineId": "administrative",
+      "number": 21,
+      "front": "Dispensa e inexigibilidade de licitação são sinônimos?",
+      "back": "Não. Na inexigibilidade há inviabilidade de competição; na dispensa a lei autoriza não licitar nas hipóteses previstas.",
+      "legalBasis": "Lei nº 14.133/2021, arts. 74 e 75"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 1,
+      "front": "Pelo princípio da primazia da realidade, qual elemento prevalece em caso de divergência comprovada entre documentos e fatos trabalhistas?",
+      "back": "A realidade efetiva da prestação de serviços, nos limites da prova e da lei.",
+      "legalBasis": "Princípios do Direito do Trabalho"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 2,
+      "front": "Qual dispositivo constitucional concentra direitos fundamentais dos trabalhadores urbanos e rurais?",
+      "back": "O art. 7º da Constituição Federal.",
+      "legalBasis": "CF/88, art. 7º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 3,
+      "front": "Quais elementos básicos caracterizam a relação de emprego?",
+      "back": "Prestação pessoal por pessoa física, não eventualidade, onerosidade e subordinação jurídica.",
+      "legalBasis": "CLT, arts. 2º e 3º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 5,
+      "front": "O contrato intermitente exige forma escrita?",
+      "back": "Sim. A CLT exige contrato por escrito e disciplina convocação e períodos de prestação de serviços.",
+      "legalBasis": "CLT, art. 452-A"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 11,
+      "front": "Suspensão e interrupção do contrato produzem os mesmos efeitos?",
+      "back": "Não. Em regra, na interrupção subsiste pagamento de salários; na suspensão ficam sustadas as principais obrigações, ressalvadas exceções legais.",
+      "legalBasis": "CLT, arts. 471 e seguintes"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 16,
+      "front": "Na jornada superior a seis horas, qual é o intervalo intrajornada padrão da CLT, ressalvadas regras específicas?",
+      "back": "Em regra, mínimo de uma hora e máximo de duas horas, observadas hipóteses legais de ajuste.",
+      "legalBasis": "CLT, art. 71"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 18,
+      "front": "Qual adicional mínimo constitucional incide sobre a hora extraordinária?",
+      "back": "50% sobre a hora normal, sem prejuízo de regras mais favoráveis.",
+      "legalBasis": "CF/88, art. 7º, XVI"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 26,
+      "front": "A equiparação salarial se verifica apenas porque dois empregados possuem o mesmo cargo formal?",
+      "back": "Não. Exige os requisitos legais relativos à identidade de função e trabalho de igual valor, além das demais condições da CLT.",
+      "legalBasis": "CLT, art. 461"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 28,
+      "front": "Qual é o prazo prescricional constitucional básico dos créditos trabalhistas para trabalhadores urbanos e rurais?",
+      "back": "Cinco anos durante a relação laboral, até o limite de dois anos após sua extinção, nos termos constitucionais.",
+      "legalBasis": "CF/88, art. 7º, XXIX"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 36,
+      "front": "Qual dispositivo da CLT trata do teletrabalho e trabalho remoto?",
+      "back": "O art. 75-A e seguintes da CLT.",
+      "legalBasis": "CLT, arts. 75-A e seguintes"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 1,
+      "front": "Quais são os órgãos da Justiça do Trabalho previstos constitucionalmente?",
+      "back": "TST, TRTs e Juízes do Trabalho.",
+      "legalBasis": "CF/88, art. 111"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 2,
+      "front": "Qual é o grau de jurisdição típico de julgamento do recurso ordinário contra sentença da Vara do Trabalho?",
+      "back": "O Tribunal Regional do Trabalho competente, observadas exceções processuais.",
+      "legalBasis": "CLT, art. 895"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 5,
+      "front": "A perícia judicial gratuita significa sempre inexistência de honorários periciais no processo?",
+      "back": "Não. A gratuidade e a responsabilidade pelos honorários seguem regras legais e decisões vinculantes aplicáveis.",
+      "legalBasis": "CLT, art. 790-B; STF ADI 5.766"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 7,
+      "front": "Na omissão do processo trabalhista, o CPC aplica-se automaticamente mesmo quando incompatível?",
+      "back": "Não. A aplicação subsidiária ou supletiva exige compatibilidade e observância das regras aplicáveis.",
+      "legalBasis": "CLT, art. 769; CPC, art. 15"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 16,
+      "front": "Qual é uma consequência típica do não comparecimento injustificado do reclamante à audiência inicial?",
+      "back": "O arquivamento da reclamação, observadas as disposições legais e exceções.",
+      "legalBasis": "CLT, art. 844"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 20,
+      "front": "Qual é, em regra, o teto de valor do procedimento sumaríssimo trabalhista?",
+      "back": "Quarenta salários mínimos vigentes na data de ajuizamento da reclamação.",
+      "legalBasis": "CLT, art. 852-A"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 23,
+      "front": "Quais modalidades clássicas de liquidação são previstas no art. 879 da CLT?",
+      "back": "Liquidação por cálculo, por arbitramento ou por artigos, conforme o caso.",
+      "legalBasis": "CLT, art. 879"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 35,
+      "front": "Qual recurso trabalhista tem como finalidade típica levar ao TRT matéria decidida por Vara do Trabalho?",
+      "back": "O recurso ordinário, respeitados cabimento e pressupostos previstos na CLT.",
+      "legalBasis": "CLT, art. 895"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 3,
+      "front": "Capacidade de ser parte e capacidade postulatória são conceitos idênticos?",
+      "back": "Não. Capacidade de ser parte diz respeito à aptidão para integrar relação processual; postulatória é aptidão para atuar em juízo nos termos legais.",
+      "legalBasis": "CPC"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 7,
+      "front": "A competência absoluta pode ser modificada por acordo entre as partes?",
+      "back": "Não. Competência absoluta não se modifica por convenção; a relativa admite alterações nas hipóteses legais.",
+      "legalBasis": "CPC, arts. 62 e 63"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 10,
+      "front": "A prática de ato processual fora do prazo gera, em regra, qual fenômeno?",
+      "back": "Preclusão temporal, observadas hipóteses legais de restituição ou justa causa.",
+      "legalBasis": "CPC, arts. 218 e 223"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 12,
+      "front": "Na petição inicial, o pedido deve ser sempre absolutamente indeterminado?",
+      "back": "Não. Deve ser certo e determinado, ressalvadas as hipóteses legais de pedido genérico.",
+      "legalBasis": "CPC, arts. 322 e 324"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 13,
+      "front": "A revelia produz, de modo absoluto, presunção de veracidade de toda alegação do autor?",
+      "back": "Não. A presunção pode sofrer exceções expressas e não dispensa o exame jurídico dos pedidos.",
+      "legalBasis": "CPC, arts. 344 e 345"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 17,
+      "front": "A coisa julgada material alcança, em regra, decisão de mérito transitada em julgado?",
+      "back": "Sim, com os limites objetivos e subjetivos previstos em lei.",
+      "legalBasis": "CPC, arts. 502 e seguintes"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 20,
+      "front": "A apelação é, em regra, recurso cabível contra qual pronunciamento?",
+      "back": "Sentença, observadas as hipóteses legais de cabimento.",
+      "legalBasis": "CPC, art. 1.009"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 24,
+      "front": "A ação monitória pode ser proposta com prova escrita sem eficácia de título executivo?",
+      "back": "Sim, nas condições do art. 700 do CPC.",
+      "legalBasis": "CPC, art. 700"
+    }
+  ]
+}

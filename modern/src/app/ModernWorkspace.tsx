@@ -22,7 +22,8 @@ import { ThemeToggle } from '../shared/ThemeToggle';
 import { LearningPage } from '../learning/LearningPage';
 import { DISCIPLINES } from '../learning/LearningPage';
 import { CardManagerPage } from '../cards/CardManagerPage';
-import { OFFICIAL_TOPIC_COUNT } from '../edital/official-edital-2026';
+import { OFFICIAL_EDITAL_2026, OFFICIAL_TOPIC_COUNT } from '../edital/official-edital-2026';
+import { V4_NEW_CONTENT_COUNT } from '../study/v4-supplement';
 
 type PageId = 'home' | 'learn' | 'practice' | 'cases' | 'study' | 'edital' | 'jurisprudence' | 'lei-seca' | 'cards' | 'performance' | 'data';
 
@@ -107,7 +108,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
           <div className="page-wrap"><div className="notice">Nenhum perfil de estudos disponível.</div></div>
         ) : (
           <>
-            {workspace.warning ? <div className="page-wrap workspace-warning"><div className="notice"><strong>Modo offline ativo.</strong><span>{workspace.warning}</span><button onClick={() => void workspace.refresh()}>Tentar reconectar</button></div></div> : null}
+            {workspace.warning ? <div className="page-wrap workspace-warning"><div className="notice"><strong>{workspace.offline ? 'Modo offline ativo.' : 'Atenção à sincronização.'}</strong><span>{workspace.warning}</span><button onClick={() => void workspace.refresh()}>Tentar reconectar</button></div></div> : null}
             {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} onStudySubject={(subjectId) => focusStudyTopic(subjectId, 'all')} onReviewDue={startDueReview} /> : null}
             {['learn','practice','cases'].includes(page) ? <LearningPage mode={page === 'practice' ? 'practice' : page === 'cases' ? 'cases' : 'learn'} user={user} profileId={workspace.profile.id} subjects={workspace.subjects} initialSubject={practiceSubject} onReview={(discipline, name) => { const subject = workspace.subjects.find((row) => row.name === DISCIPLINES[discipline]); const topic = workspace.topics.find((row) => row.subject_id === subject?.id && row.name === name); if (subject) focusStudyTopic(subject.id, topic?.id || 'all'); }} /> : null}
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} focus={studyFocus} /> : null}
@@ -151,7 +152,7 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
       loadPerformance(client, user, profileId),
       client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false),
       client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).eq('card_type', 'Lei seca'),
-      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).like('source', 'Edital nº 1/2026 TRT-4 AJAJ%'),
+      client.from('cards').select('*', { count: 'exact', head: true }).eq('profile_id', profileId).is('deleted_at', null).eq('suspended', false).like('legacy_id', 'card-trt4-v4-%'),
       listOfficialEditalTopicIds(client, profileId),
       listCardsByType(client, profileId, 'Lei seca'),
     ]).then(([summary, cards, leiSeca, catalogCards, officialTopicIds, leiSecaCards]) => {
@@ -165,8 +166,12 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
   }, [user.id, workspace.profile?.id]);
 
   const rootTopics = workspace.topics.filter((topic) => !topic.parent_id);
-  const complementaryTopicNames = new Set(['Jurisprudência prioritária STF/TST', 'Estudo de Caso Jurídico - protocolo de treino']);
-  const officialRootTopics = rootTopics.filter((topic) => !complementaryTopicNames.has(topic.name) && (!workspace.profile?.is_builtin || editalCoveredTopicIds.has(topic.id)));
+  const officialNamesBySubject = new Map(OFFICIAL_EDITAL_2026.map((entry) => [entry.name, new Set(entry.topics.map((topic) => topic.name))]));
+  const officialRootTopics = rootTopics.filter((topic) => {
+    if (!workspace.profile?.is_builtin) return true;
+    const subjectName = workspace.subjects.find((subject) => subject.id === topic.subject_id)?.name;
+    return Boolean(subjectName && officialNamesBySubject.get(subjectName)?.has(topic.name));
+  });
   const leiSecaEligibleTopics = officialRootTopics.filter((topic) => topic.legal_basis && workspace.subjects.find((subject) => subject.id === topic.subject_id)?.name.trim().toLowerCase() !== 'português');
   const officialTopicTotal = workspace.profile?.is_builtin ? OFFICIAL_TOPIC_COUNT : officialRootTopics.length;
   const editalCoveredTopics = officialRootTopics.filter((topic) => editalCoveredTopicIds.has(topic.id)).length;
@@ -224,15 +229,15 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
         <div className="home-progress-head">
           <div>
             <span className="panel-label">MATRIZ DE PREPARAÇÃO</span>
-            <h2>{Math.min(editalCoveredTopics, officialTopicTotal)}/{officialTopicTotal} assuntos mapeados</h2>
-            <p>{workspace.profile?.is_builtin ? `Edital nº 1/2026: ${OFFICIAL_TOPIC_COUNT} tópicos verticalizados · ${catalogCardCount} registros vinculados à versão oficial.` : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
+            <h2>{Math.min(editalCoveredTopics, officialTopicTotal)}/{officialTopicTotal} recortes com material</h2>
+            <p>{workspace.profile?.is_builtin ? `Edital nº 1/2026: ${OFFICIAL_TOPIC_COUNT} recortes de conteúdo nas 11 disciplinas · ${catalogCardCount}/${V4_NEW_CONTENT_COUNT} novos cartões V4.` : 'Cobertura calculada a partir dos tópicos com cartões vinculados.'}</p>
           </div>
           <strong className="home-progress-percent">{editalPct}%</strong>
         </div>
         <div className="home-progress-track" aria-label={`Cobertura do edital: ${editalPct}%`}><span style={{ width: `${editalPct}%` }} /></div>
         <div className="home-progress-meta">
           <span><strong>{totalCardCount}</strong> cartões totais</span>
-          {workspace.profile?.is_builtin ? <span><strong>{catalogCardCount}</strong> material autoral</span> : null}
+          {workspace.profile?.is_builtin ? <span><strong>{catalogCardCount}</strong> cartões V4 novos</span> : null}
           <span><strong>{leiSecaCount}</strong> roteiros de Lei Seca</span>
           <span><strong>{performance?.accuracy ?? 0}%</strong> recuperação declarada</span>
         </div>
@@ -262,5 +267,5 @@ function HomePage({ user, workspace, onNavigate, onStudySubject, onReviewDue }: 
 
 
 function DataPage({ user, workspace, onMigrated }: { user: User; workspace: ReturnType<typeof useStudyWorkspace>; onMigrated: () => Promise<void> }) {
-  return <div className="page-wrap"><PageHeader eyebrow="CONTA E DADOS" title="Saúde, sincronização e backup" subtitle="Confira o estado do Trilha, repare o catálogo e mantenha cópias seguras dos seus dados." />{workspace.profile ? <HealthPanel user={user} profileId={workspace.profile.id} onRepaired={onMigrated} /> : null}<ProfileSwitcher profiles={workspace.profiles} activeProfileId={workspace.profile?.id ?? null} onSwitch={workspace.switchProfile} onCreate={workspace.createProfile} /><BackupPanel user={user} profile={workspace.profile ? { id: workspace.profile.id, name: workspace.profile.name, slug: workspace.profile.slug } : null} onRestored={onMigrated} /><LegacyMigrationPanel user={user} onMigrated={onMigrated} /><SyncPanel user={user} /></div>;
+  return <div className="page-wrap"><PageHeader eyebrow="CONTA E DADOS" title="Saúde, sincronização e backup" subtitle="Confira o estado do Trilha, repare o catálogo e mantenha cópias seguras dos seus dados." />{workspace.profile ? <HealthPanel user={user} profileId={workspace.profile.id} isBuiltin={workspace.profile.is_builtin} onRepaired={onMigrated} /> : null}<ProfileSwitcher profiles={workspace.profiles} activeProfileId={workspace.profile?.id ?? null} onSwitch={workspace.switchProfile} onCreate={workspace.createProfile} /><BackupPanel user={user} profile={workspace.profile ? { id: workspace.profile.id, name: workspace.profile.name, slug: workspace.profile.slug } : null} onRestored={onMigrated} /><LegacyMigrationPanel user={user} onMigrated={onMigrated} /><SyncPanel user={user} /></div>;
 }

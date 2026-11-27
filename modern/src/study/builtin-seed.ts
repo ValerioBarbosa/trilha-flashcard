@@ -2,6 +2,7 @@ import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { qualifyCatalog, JURISPRUDENCE_NOTES } from '../learning/catalog-quality';
 import legacyDecks from '../generated/legacy-decks.json';
 import { OFFICIAL_EDITAL_2026, OFFICIAL_EDITAL_SOURCE } from '../edital/official-edital-2026';
+import { V4_NEW_CONTENT_CARDS } from './v4-supplement';
 
 type LegacyCard = Record<string, unknown> & {
   id?: string; front?: string; back?: string; topic?: string; subtopic?: string;
@@ -35,22 +36,6 @@ const COMPLETE_DECK_TITLES: Record<string, string> = {
   'lgpd-digital': 'LGPD e Direito Digital · material complementar',
   'study-case': 'Estudo de Caso Jurídico',
 };
-
-const NEW_SUBJECT_STARTERS: Record<string, Array<{ topic:string; front:string; back:string; legalBasis:string }>> = {
-  'human-rights': [
-    { topic:'Tratados de direitos humanos, Constituição e controle de convencionalidade', front:'O que é controle de convencionalidade?', back:'É a verificação da compatibilidade das normas internas com os tratados internacionais de direitos humanos aplicáveis ao Brasil.', legalBasis:'CF, art. 5º, §§ 2º e 3º; Convenção Americana sobre Direitos Humanos' },
-    { topic:'Sistema Interamericano de Direitos Humanos', front:'Quais são os dois principais órgãos do Sistema Interamericano de Direitos Humanos?', back:'A Comissão Interamericana de Direitos Humanos e a Corte Interamericana de Direitos Humanos.', legalBasis:'Convenção Americana sobre Direitos Humanos' },
-  ],
-  informatics: [
-    { topic:'Google Drive: criação, edição, compartilhamento e permissões', front:'Quais níveis de acesso devem ser diferenciados ao compartilhar um arquivo no Google Drive?', back:'Leitor, comentador e editor; o acesso também pode ser restrito a pessoas específicas ou liberado por link conforme a configuração.', legalBasis:'Google Workspace — compartilhamento e permissões' },
-    { topic:'Autenticação de dois fatores e gestão de senhas', front:'Por que a autenticação de dois fatores reduz o risco de invasão?', back:'Porque exige um segundo fator além da senha, dificultando o acesso mesmo quando a credencial principal é comprometida.', legalBasis:'Boas práticas de segurança cibernética' },
-  ],
-  'civil-law': [
-    { topic:'Negócio jurídico: elementos, defeitos e invalidade', front:'Quais são os requisitos de validade do negócio jurídico?', back:'Agente capaz, objeto lícito, possível, determinado ou determinável e forma prescrita ou não defesa em lei.', legalBasis:'Código Civil, art. 104' },
-    { topic:'Prescrição, decadência e prova', front:'Qual é a distinção central entre prescrição e decadência?', back:'Em regra, a prescrição atinge a pretensão; a decadência extingue o próprio direito potestativo pelo decurso do prazo.', legalBasis:'Código Civil, arts. 189 a 211' },
-  ],
-};
-
 
 const LAYER4_JURISPRUDENCE: Array<[string,string,string,string]> = [
   ['TST Súmulas 6, 51 e 85','Equiparação salarial; regulamento empresarial; compensação de jornada','labor-law','Direito do Trabalho'],
@@ -227,6 +212,20 @@ async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
       example: [card.level, card.sourceLayer].filter(Boolean).join(' · '),
     });
   }
+  for (const card of V4_NEW_CONTENT_CARDS) {
+    let deck = groups.get(card.discipline);
+    if (!deck) {
+      deck = { id:card.discipline, title:card.disciplineName, sourceNote:OFFICIAL_EDITAL_SOURCE, topics:[], cards:[] };
+      groups.set(card.discipline, deck);
+    }
+    deck.cards!.push({
+      id:card.id, front:card.front, back:card.back,
+      topic:card.topic, legalBasis:card.legalBasis, type:card.type,
+      priority:card.priority, difficulty:card.difficulty,
+      tags:card.tags, example:[card.level,card.sourceLayer].join(' · '),
+    });
+  }
+
   for (const subject of OFFICIAL_EDITAL_2026) {
     let deck = groups.get(subject.id);
     if (!deck) {
@@ -236,24 +235,6 @@ async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
     deck.sourceNote = OFFICIAL_EDITAL_SOURCE;
     for (const topic of subject.topics) {
       if (!deck.topics!.includes(topic.name)) deck.topics!.push(topic.name);
-      deck.cards!.push({
-        id:`card-trt4-edital-2026-${subject.id}-${slugify(topic.name).slice(0, 45)}`,
-        front:`Tópico oficial: ${topic.name}`,
-        back:`Incluído em ${subject.name}, no Anexo II do Edital nº 1/2026 para Analista Judiciário – Área Judiciária.`,
-        topic:topic.name,
-        legalBasis:topic.legalBasis || 'Edital nº 1/2026, Anexo II',
-        type:'Tópico oficial', priority:topic.priority, difficulty:'medium',
-        tags:['TRT4','AJAJ','Edital 2026','tópico-oficial'],
-        example:'Matriz oficial publicada em 22/10/2026',
-      });
-    }
-    for (const starter of NEW_SUBJECT_STARTERS[subject.id] || []) {
-      deck.cards!.push({
-        id:`card-trt4-edital-2026-starter-${stableHash(`${subject.id}|${starter.front}`)}`,
-        front:starter.front, back:starter.back, topic:starter.topic, legalBasis:starter.legalBasis,
-        type:'Conceito', priority:'A', difficulty:'medium', tags:['TRT4','AJAJ','Edital 2026','nova-disciplina'],
-        example:'Camada inicial pós-edital',
-      });
     }
   }
   return [...groups.values()];
@@ -318,6 +299,8 @@ async function ensureTopics(client: SupabaseClient, user: User, profileId: strin
       || topicCards.find((card) => Array.isArray(card.tags) && card.tags.includes('Nível 1 - Matriz verticalizada'))
       || topicCards[0];
     const focusCard = topicCards.find((card) => card.subtopic?.trim() === 'Núcleo de cobrança');
+    const officialSubject = OFFICIAL_EDITAL_2026.find((item) => item.id === deck.id);
+    const official = officialSubject?.topics.find((item) => item.name === name);
     return {
       user_id:user.id,
       profile_id:profileId,
@@ -326,9 +309,9 @@ async function ensureTopics(client: SupabaseClient, user: User, profileId: strin
       name,
       slug:slugify(name),
       sort_order:index,
-      legal_basis: typeof baseCard?.legalBasis === 'string' ? baseCard.legalBasis : null,
-      priority: normalizedPriority(baseCard?.priority || focusCard?.priority),
-      edital_text: typeof focusCard?.back === 'string' ? focusCard.back : null,
+      legal_basis: official?.legalBasis || (typeof baseCard?.legalBasis === 'string' ? baseCard.legalBasis : null),
+      priority: official?.priority || normalizedPriority(baseCard?.priority || focusCard?.priority),
+      edital_text: official ? name : (typeof focusCard?.back === 'string' ? focusCard.back : null),
     };
   });
   const { data, error } = await client.from('topics').upsert(rows, { onConflict:'subject_id,parent_id,slug' }).select('id,name');
@@ -362,7 +345,7 @@ async function upsertCards(
     const key = contentKey(front, back);
     const legacyId = card.id?.trim() || `card-${stableHash(`${deck.id}|${front}|${back}`)}`;
     const canonical = legacyId.startsWith('card-trt4-');
-    const row = {
+    const row: any = {
       user_id:user.id,
       profile_id:profileId,
       deck_id:deckId,
@@ -380,14 +363,23 @@ async function upsertCards(
       priority:normalizedPriority(card.priority),
       difficulty:normalizedDifficulty(card.difficulty),
       tags:tagsFor(card),
-      source:deck.sourceNote || 'Catálogo nativo Trilha Flashcard',
+      source:legacyId.startsWith('card-trt4-v4-') ? OFFICIAL_EDITAL_SOURCE : 'Material autoral legado TRT-4 AJAJ · preservado após o edital oficial',
       deleted_at:null,
       suspended:false,
     };
 
     const contentMatch = existingBuiltinByContent.get(key);
     const legacyMatch = canonical ? existingBuiltinByLegacyId.get(legacyId) : undefined;
-    const existingBuiltin = canonical ? legacyMatch || contentMatch : contentMatch;
+    // O banco usa unicidade por pergunta/resposta em todo o perfil.
+    // Nunca substituir o texto de um registro antigo com legacy_id igual mas conteúdo diferente.
+    if (canonical && legacyMatch && !contentMatch && contentKey(legacyMatch.front, legacyMatch.back) !== key) {
+      skipped += 1;
+      continue;
+    }
+    if (canonical && contentMatch && legacyMatch && contentMatch.id !== legacyMatch.id) {
+      row.legacy_id = contentMatch.legacy_id || null;
+    }
+    const existingBuiltin = canonical ? contentMatch || legacyMatch : contentMatch;
     if (canonical && existingBuiltin) {
       reconcileRows.push({ id: existingBuiltin.id, ...row, suspended:existingBuiltin.suspended ?? false, deleted_at:existingBuiltin.deleted_at ?? null });
       seen.add(key);

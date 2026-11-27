@@ -166,13 +166,14 @@ export async function listOfficialEditalTopicIds(client: SupabaseClient, profile
   const data = await requirePaged<{ topic_id: string | null; card_type: string | null }>((from, to) => client.from('cards')
     .select('topic_id,card_type')
     .eq('profile_id', profileId)
-    .eq('card_type', 'Tópico oficial')
+    .is('deleted_at', null)
+    .eq('suspended', false)
     .not('topic_id', 'is', null)
     .order('id')
     .range(from, to));
   const topicIds = new Set<string>();
   for (const row of data) {
-    if (!row.topic_id || row.card_type === 'Lei seca') continue;
+    if (!row.topic_id || row.card_type === 'Lei seca' || row.card_type === 'Tópico oficial' || row.card_type === 'Roteiro de estudo') continue;
     topicIds.add(row.topic_id);
   }
   return topicIds;

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { buildEditalSubjects } from '@core/features/edital/edital-model';
 import type { SubjectRow, TopicRow } from '@core/features/study/domain-repository';
-import { listEditalTopicProgress, listOfficialEditalTopicIds, type EditalTopicProgress } from '../study/domain-repository';
+import { listEditalTopicProgress, type EditalTopicProgress } from '../study/domain-repository';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { PageHeader } from '../shared/PageHeader';
 import { MetricTile } from '../shared/MetricTile';
-import { OFFICIAL_EDITAL_URL } from './official-edital-2026';
+import { OFFICIAL_EDITAL_URL, OFFICIAL_EDITAL_2026, OFFICIAL_TOPIC_COUNT } from './official-edital-2026';
 
 type Props = {
   profileId: string;
@@ -40,26 +40,27 @@ export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onS
   const [priority, setPriority] = useState<PriorityFilter>('all');
   const [status, setStatus] = useState<StatusFilter>('all');
   const [progress, setProgress] = useState<Map<string, EditalTopicProgress>>(new Map());
-  const [officialTopicIds, setOfficialTopicIds] = useState<Set<string>>(new Set());
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const officialFilter = (topic: TopicRow) => !COMPLEMENTARY_TOPICS.has(topic.name) && (!isBuiltin || officialTopicIds.has(topic.id));
-  const allSubjects = useMemo(() => buildEditalSubjects(subjects, topics, '').map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter(officialFilter) })).filter((subject) => subject.rootTopics.length > 0), [subjects, topics, isBuiltin, officialTopicIds]);
-  const searchedSubjects = useMemo(() => buildEditalSubjects(subjects, topics, query).map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter(officialFilter) })).filter((subject) => subject.rootTopics.length > 0), [subjects, topics, query, isBuiltin, officialTopicIds]);
+  const officialNamesBySubject = new Map(OFFICIAL_EDITAL_2026.map((entry) => [
+    entry.name, new Set(entry.topics.map((topic) => topic.name)),
+  ]));
+  const officialFilter = (topic: TopicRow) => {
+    if (COMPLEMENTARY_TOPICS.has(topic.name)) return false;
+    if (!isBuiltin) return true;
+    const subjectName = subjects.find((subject) => subject.id === topic.subject_id)?.name;
+    return Boolean(subjectName && officialNamesBySubject.get(subjectName)?.has(topic.name));
+  };
+  const allSubjects = useMemo(() => buildEditalSubjects(subjects, topics, '').map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter(officialFilter) })).filter((subject) => subject.rootTopics.length > 0), [subjects, topics, isBuiltin]);
+  const searchedSubjects = useMemo(() => buildEditalSubjects(subjects, topics, query).map((subject) => ({ ...subject, rootTopics: subject.rootTopics.filter(officialFilter) })).filter((subject) => subject.rootTopics.length > 0), [subjects, topics, query, isBuiltin]);
 
   useEffect(() => {
     let cancelled = false;
     setLoadError(null);
     const client = getSupabaseClient();
-    void Promise.all([
-      listEditalTopicProgress(client, profileId),
-      isBuiltin ? listOfficialEditalTopicIds(client, profileId) : Promise.resolve(new Set<string>()),
-    ])
-      .then(([rows, ids]) => {
-        if (!cancelled) {
-          setProgress(rows);
-          setOfficialTopicIds(ids);
-        }
+    void listEditalTopicProgress(client, profileId)
+      .then((rows) => {
+        if (!cancelled) setProgress(rows);
       })
       .catch((cause) => { if (!cancelled) setLoadError(cause instanceof Error ? cause.message : 'Não foi possível carregar o progresso do edital.'); });
     return () => { cancelled = true; };
@@ -114,7 +115,7 @@ export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onS
       <PageHeader
         eyebrow="EDITAL VERTICALIZADO"
         title="Centro de comando do edital"
-        subtitle="Anexo II do Edital nº 1/2026, publicado em 22/10/2026. AJAJ: 30 questões gerais (peso 1), 30 específicas (peso 2) e Estudo de Caso."
+        subtitle={`Edital nº 01/2026 · Anexo II · ${OFFICIAL_TOPIC_COUNT} recortes de estudo em 11 disciplinas. Objetiva: 30 gerais (peso 1), 30 específicas (peso 2) e Estudo de Caso.`}
         action={
           <div className="edital-command-actions">
             <div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar disciplina, assunto ou base legal" /></div>
@@ -128,7 +129,7 @@ export function EditalPage({ profileId, isBuiltin = false, subjects, topics, onS
         <div className="edital-overview-copy">
           <span className="page-eyebrow">PROGRESSO GERAL</span>
           <h2>{coverage.coveredTopics}/{coverage.totalTopics} tópicos com material de estudo</h2>
-          <p>O percentual mede presença de cartões de conteúdo, não domínio integral. “Recuperado” significa que todos os cartões receberam autoavaliação Bom/Fácil; valide o assunto com questões. <a href={OFFICIAL_EDITAL_URL} target="_blank" rel="noreferrer">Abrir edital oficial ↗</a></p>
+          <p>Os recortes subdividem o Anexo II para acompanhamento, sem representar uma contagem oficial da FCC. Cobertura exige cartão de conteúdo vinculado; identificação do tópico não é flashcard. “Recuperado” é autoavaliação, não garantia de domínio. <a href={OFFICIAL_EDITAL_URL} target="_blank" rel="noreferrer">Ver edital ↗</a></p>
         </div>
         <strong>{coveragePct}%</strong>
         <div className="edital-progress-track"><span style={{ width: `${coveragePct}%` }} /></div>

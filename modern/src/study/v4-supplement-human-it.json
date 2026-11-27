@@ -1,0 +1,299 @@
+{
+  "version": "4.0",
+  "entries": [
+    {
+      "disciplineId": "human-rights",
+      "number": 1,
+      "front": "Qual marco internacional de 1948 consolidou um catálogo de direitos humanos após a Segunda Guerra Mundial?",
+      "back": "A Declaração Universal dos Direitos Humanos, aprovada pela Assembleia Geral das Nações Unidas.",
+      "legalBasis": "DUDH, 1948"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 2,
+      "front": "Em uma perspectiva jusnaturalista, de onde decorre a titularidade dos direitos humanos?",
+      "back": "Da condição humana, independentemente de concessão estatal; a positivação jurídica é distinta de sua fundamentação filosófica.",
+      "legalBasis": "Fundamentos filosóficos dos direitos humanos"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 3,
+      "front": "Qual característica impede interpretar os direitos humanos como compartimentos isolados?",
+      "back": "A interdependência e indivisibilidade: direitos civis, políticos, sociais, econômicos e culturais se reforçam mutuamente.",
+      "legalBasis": "Declaração e Programa de Ação de Viena, 1993"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 4,
+      "front": "Qual princípio deve orientar a interpretação de normas concorrentes de proteção dos direitos humanos?",
+      "back": "O princípio pro persona: privilegiar a interpretação ou norma mais favorável à proteção da pessoa, respeitado o sistema aplicável.",
+      "legalBasis": "Interpretação de tratados de direitos humanos"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 5,
+      "front": "Colisão entre dois direitos fundamentais autoriza anular automaticamente um deles?",
+      "back": "Não. Exige identificação do conflito concreto e fundamentação da solução, observando proporcionalidade e proteção do núcleo essencial.",
+      "legalBasis": "CF/88; teoria dos direitos fundamentais"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 6,
+      "front": "Tratado internacional de direitos humanos aprovado em dois turnos, por 3/5 de cada Casa do Congresso, tem qual hierarquia?",
+      "back": "Equivale às emendas constitucionais, nos termos do art. 5º, § 3º, da Constituição.",
+      "legalBasis": "CF/88, art. 5º, § 3º"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 7,
+      "front": "O que se examina no controle de convencionalidade?",
+      "back": "A compatibilidade da norma ou prática interna com os tratados internacionais de direitos humanos aplicáveis.",
+      "legalBasis": "Convenção Americana de Direitos Humanos; CF/88"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 8,
+      "front": "A Declaração Universal de 1948 é, por sua natureza, um tratado internacional ratificado pelo Brasil?",
+      "back": "Não. É declaração da Assembleia Geral da ONU; sua influência normativa é relevante, mas sua forma não é a de tratado ratificado.",
+      "legalBasis": "Declaração Universal dos Direitos Humanos, 1948"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 9,
+      "front": "Qual pacto de 1966 trata especialmente das liberdades civis e dos direitos de participação política?",
+      "back": "O Pacto Internacional sobre Direitos Civis e Políticos (PIDCP).",
+      "legalBasis": "PIDCP, 1966"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 10,
+      "front": "Qual pacto de 1966 se concentra em direitos sociais, econômicos e culturais?",
+      "back": "O Pacto Internacional sobre Direitos Econômicos, Sociais e Culturais (PIDESC).",
+      "legalBasis": "PIDESC, 1966"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 11,
+      "front": "Qual é o objetivo central da Convenção Internacional sobre a Eliminação de Todas as Formas de Discriminação Racial?",
+      "back": "Combater e eliminar a discriminação racial, com compromissos de prevenção, proteção e medidas estatais.",
+      "legalBasis": "Convenção sobre Eliminação da Discriminação Racial"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 12,
+      "front": "Qual convenção internacional específica trata da eliminação da discriminação contra a mulher?",
+      "back": "A CEDAW, que impõe medidas para eliminar a discriminação contra mulheres em diferentes esferas da vida.",
+      "legalBasis": "CEDAW"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 13,
+      "front": "Na Convenção sobre os Direitos da Criança, qual parâmetro deve receber consideração primordial em decisões que afetem crianças?",
+      "back": "O interesse superior da criança.",
+      "legalBasis": "Convenção sobre os Direitos da Criança, art. 3º"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 14,
+      "front": "Qual modelo de tratamento da deficiência prevalece na Convenção da ONU sobre os Direitos das Pessoas com Deficiência?",
+      "back": "O modelo de direitos humanos, atento às barreiras que, em interação com impedimentos, restringem participação em igualdade de condições.",
+      "legalBasis": "Convenção sobre Direitos das Pessoas com Deficiência, art. 1º"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 15,
+      "front": "A Convenção sobre Diversidade Biológica tem entre seus objetivos apenas preservar espécies?",
+      "back": "Não. Também prevê uso sustentável dos componentes da biodiversidade e repartição justa e equitativa dos benefícios dos recursos genéticos.",
+      "legalBasis": "Convenção sobre Diversidade Biológica, art. 1º"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 16,
+      "front": "A Declaração da ONU sobre os Direitos dos Povos Indígenas reconhece qual direito coletivo central?",
+      "back": "O direito à autodeterminação, articulado com proteção da identidade, cultura e instituições próprias.",
+      "legalBasis": "Declaração da ONU sobre os Direitos dos Povos Indígenas, art. 3º"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 17,
+      "front": "Quais órgãos compõem o núcleo institucional do Sistema Interamericano de proteção aos direitos humanos?",
+      "back": "A Comissão Interamericana de Direitos Humanos e a Corte Interamericana de Direitos Humanos.",
+      "legalBasis": "Convenção Americana sobre Direitos Humanos"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 18,
+      "front": "A Declaração Americana dos Direitos e Deveres do Homem foi aprovada antes ou depois da DUDH?",
+      "back": "Antes: foi aprovada em abril de 1948; a Declaração Universal foi aprovada em dezembro de 1948.",
+      "legalBasis": "Declaração Americana, 1948"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 19,
+      "front": "Qual tratado regional é conhecido como Pacto de San José da Costa Rica?",
+      "back": "A Convenção Americana sobre Direitos Humanos.",
+      "legalBasis": "Convenção Americana sobre Direitos Humanos, 1969"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 20,
+      "front": "Qual é a diferença funcional essencial entre a Comissão e a Corte Interamericana?",
+      "back": "A Comissão recebe e processa petições e monitora direitos; a Corte exerce funções contenciosa e consultiva nas condições de sua competência.",
+      "legalBasis": "Convenção Americana sobre Direitos Humanos, arts. 33 e seguintes"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 21,
+      "front": "Uma vítima pode, em regra, ajuizar diretamente ação contenciosa perante a Corte Interamericana?",
+      "back": "Não. A submissão contenciosa à Corte segue o sistema previsto na Convenção, com legitimidade dos Estados-partes e da Comissão.",
+      "legalBasis": "Convenção Americana sobre Direitos Humanos, art. 61"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 22,
+      "front": "Por que proteção de grupos vulneráveis exige análise das barreiras concretas?",
+      "back": "Porque igualdade material pode exigir medidas específicas para remover discriminações estruturais e garantir exercício efetivo de direitos.",
+      "legalBasis": "CF/88, arts. 3º e 5º"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 23,
+      "front": "A tutela dos direitos humanos de grupos historicamente discriminados admite tratar toda situação como idêntica?",
+      "back": "Não. A análise deve reconhecer discriminações múltiplas e necessidades específicas, sem perder universalidade e igualdade de direitos.",
+      "legalBasis": "CF/88, arts. 3º e 5º"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 24,
+      "front": "Qual resolução do CNJ instituiu o Protocolo para Julgamento com Perspectiva de Gênero?",
+      "back": "A Resolução CNJ nº 492/2023.",
+      "legalBasis": "Resolução CNJ nº 492/2023"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 25,
+      "front": "Qual resolução do CSJT instituiu o Programa de Equidade de Raça, Gênero e Diversidade na Justiça do Trabalho?",
+      "back": "A Resolução CSJT nº 368/2023.",
+      "legalBasis": "Resolução CSJT nº 368/2023"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 26,
+      "front": "Qual instrumento criou o Tribunal Penal Internacional permanente?",
+      "back": "O Estatuto de Roma; no Brasil foi promulgado pelo Decreto nº 4.388/2002.",
+      "legalBasis": "Estatuto de Roma; Decreto nº 4.388/2002"
+    },
+    {
+      "disciplineId": "human-rights",
+      "number": 27,
+      "front": "A Corte Internacional de Justiça julga, como regra, responsabilidade penal individual?",
+      "back": "Não. A CIJ resolve controvérsias entre Estados e emite pareceres consultivos; responsabilidade penal individual é tema de tribunais penais.",
+      "legalBasis": "Carta da ONU; Estatuto da Corte Internacional de Justiça"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 1,
+      "front": "Qual a diferença prática entre conta de usuário padrão e administrador no Windows?",
+      "back": "A conta padrão tem permissões limitadas para alterações do sistema; o administrador pode autorizar mudanças com privilégios elevados.",
+      "legalBasis": "Windows 10 e 11"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 2,
+      "front": "Em planilhas do Microsoft 365/Google Workspace, o que indica uma referência absoluta como $A$1?",
+      "back": "A coluna e a linha ficam fixas ao copiar a fórmula para outra célula.",
+      "legalBasis": "Planilhas eletrônicas"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 3,
+      "front": "Qual a diferença entre compartilhar um arquivo para leitura e compartilhá-lo para edição?",
+      "back": "A permissão de leitura autoriza visualizar; a de edição permite modificar o conteúdo conforme a ferramenta e a configuração.",
+      "legalBasis": "Google Workspace"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 4,
+      "front": "No Google Drive, quem possui permissão de Comentador pode alterar diretamente o conteúdo original?",
+      "back": "Em regra não: pode visualizar e comentar, mas não editar o conteúdo como um Editor.",
+      "legalBasis": "Google Drive"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 5,
+      "front": "Qual recurso permite convidar participantes e adicionar link de videoconferência a evento?",
+      "back": "O Google Agenda, com integração ao Google Meet para videoconferência.",
+      "legalBasis": "Google Agenda/Meet"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 6,
+      "front": "No Gmail, marcadores substituem tecnicamente as pastas tradicionais?",
+      "back": "Os marcadores classificam mensagens e uma mesma conversa pode ter mais de um marcador; não funcionam exatamente como pastas exclusivas.",
+      "legalBasis": "Gmail"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 7,
+      "front": "Em Documentos Google, qual recurso permite registrar sugestões sem substituir diretamente o texto?",
+      "back": "O modo Sugestão, sujeito às permissões do documento.",
+      "legalBasis": "Documentos Google"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 8,
+      "front": "Qual é a diferença básica entre internet e intranet?",
+      "back": "A internet é rede pública global de redes; intranet é ambiente de acesso restrito da organização que usa tecnologias de rede.",
+      "legalBasis": "Redes de computadores"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 9,
+      "front": "O que significa navegar em janela privativa/anônima?",
+      "back": "O navegador reduz a persistência local de histórico/cookies da sessão, mas não torna o usuário invisível ao provedor, site ou rede.",
+      "legalBasis": "Firefox, Chrome e Edge"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 10,
+      "front": "Em um mecanismo de busca, para que servem aspas em uma expressão de pesquisa?",
+      "back": "Para solicitar resultados que contenham a expressão exata, conforme o comportamento do buscador.",
+      "legalBasis": "Mecanismos de busca"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 11,
+      "front": "Qual é a diferença entre caminho de arquivo e extensão?",
+      "back": "O caminho localiza o arquivo na estrutura de pastas; a extensão identifica convencionalmente o formato/tipo de conteúdo.",
+      "legalBasis": "Organização de arquivos"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 12,
+      "front": "Qual princípio da segurança da informação assegura que somente pessoas autorizadas acessem determinado dado?",
+      "back": "Confidencialidade; integridade protege contra alteração indevida e disponibilidade assegura acesso quando necessário.",
+      "legalBasis": "Segurança da informação"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 13,
+      "front": "Qual distinção clássica entre vírus e worm?",
+      "back": "O vírus se associa a um hospedeiro ou execução; o worm é malware capaz de se propagar autonomamente por redes ou sistemas vulneráveis.",
+      "legalBasis": "Malware"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 14,
+      "front": "Firewall e antivírus exercem exatamente a mesma função?",
+      "back": "Não. Firewall controla tráfego segundo regras; antivírus identifica e bloqueia software malicioso por diferentes técnicas.",
+      "legalBasis": "Ferramentas de segurança"
+    },
+    {
+      "disciplineId": "informatics",
+      "number": 15,
+      "front": "Por que um código de autenticação de dois fatores não deve ser compartilhado com terceiros?",
+      "back": "Porque ele pode servir como segundo fator para uma tentativa fraudulenta de acesso, mesmo quando a senha já foi comprometida.",
+      "legalBasis": "Autenticação multifator"
+    }
+  ]
+}

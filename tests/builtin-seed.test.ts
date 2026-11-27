@@ -159,7 +159,7 @@ describe('atualização editorial sem perder identidade ou estado do usuário', 
     await withCatalog(async (db) => {
       await seedBuiltinStudyCatalog(db as unknown as SupabaseClient, USER, 'profile-1');
       const original = new Map(db.tables.cards.map((row) => [row.legacy_id,row.id]));
-      expect(original.size).toBeGreaterThanOrEqual(1600);
+      expect(original.size).toBeGreaterThanOrEqual(1500);
       const canonical = db.tables.cards.find((row) => row.legacy_id?.startsWith('card-trt4-'))!;
       canonical.back = 'Resposta antiga para testar reconciliação pelo ID';
       canonical.read_at = '2026-10-01T00:00:00Z';
@@ -170,7 +170,8 @@ describe('atualização editorial sem perder identidade ou estado do usuário', 
       expect(canonical.read_at).toBe('2026-10-01T00:00:00Z');
       expect(canonical.suspended).toBe(true);
       expect(canonical.deleted_at).toBe('2026-10-02T00:00:00Z');
-      expect(new Set(db.tables.cards.filter((row) => row.card_type === 'Tópico oficial').map((row) => row.topic_id)).size).toBe(188);
+      expect(db.tables.cards.filter((row) => row.card_type === 'Tópico oficial')).toHaveLength(0);
+      expect(new Set(db.tables.cards.filter((row) => row.legacy_id?.startsWith('card-trt4-v4-')).map((row) => row.legacy_id)).size).toBe(137);
     });
   });
 });
