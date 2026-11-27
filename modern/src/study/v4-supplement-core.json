@@ -1155,6 +1155,146 @@
       "front": "Segundo o Tema 1046 do STF, a negociação coletiva pode limitar direitos trabalhistas sem indicar vantagens compensatórias específicas?",
       "back": "Sim, desde que respeitados os direitos absolutamente indisponíveis e os limites da adequação setorial negociada.",
       "legalBasis": "STF, Tema 1046"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 1,
+      "front": "Quais requisitos gerais o CPC exige para postular em juízo?",
+      "back": "Interesse e legitimidade. A ausência de qualquer deles enseja, em regra, extinção sem resolução do mérito.",
+      "legalBasis": "CPC, arts. 17 e 485, VI"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 2,
+      "front": "O advogado pode confessar em nome do cliente com procuração geral para o foro?",
+      "back": "Não. Confessar exige cláusula específica, assim como reconhecer a procedência do pedido, transigir, desistir e outros atos enumerados na lei.",
+      "legalBasis": "CPC, art. 105"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 4,
+      "front": "A parte pode alterar deliberadamente a verdade dos fatos no processo civil?",
+      "back": "Não. Expor os fatos conforme a verdade é dever processual; sua alteração pode caracterizar litigância de má-fé e ensejar sanções.",
+      "legalBasis": "CPC, arts. 77, I, 80, II, e 81"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 5,
+      "front": "A alienação da coisa litigiosa por ato entre vivos altera automaticamente a legitimidade das partes?",
+      "back": "Não. O adquirente somente sucede o alienante no processo com consentimento da parte contrária, podendo intervir como assistente litisconsorcial.",
+      "legalBasis": "CPC, art. 109"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 6,
+      "front": "Quando o litisconsórcio é necessário?",
+      "back": "Quando a lei o exige ou quando, pela natureza da relação jurídica controvertida, a eficácia da sentença depende da citação de todos os litisconsortes.",
+      "legalBasis": "CPC, art. 114"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 8,
+      "front": "Qual é o foro competente para ação fundada em direito real sobre imóvel?",
+      "back": "Em regra, o da situação da coisa. O autor pode optar pelo domicílio do réu ou foro de eleição se o litígio não envolver as matérias ressalvadas no art. 47, § 1º.",
+      "legalBasis": "CPC, art. 47"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 9,
+      "front": "Em que momento o réu deve alegar incompetência absoluta ou relativa?",
+      "back": "Em preliminar de contestação. A absoluta também pode ser alegada em qualquer tempo e grau de jurisdição e deve ser reconhecida de ofício.",
+      "legalBasis": "CPC, art. 64"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 11,
+      "front": "A propositura da ação é considerada ocorrida em qual momento?",
+      "back": "Com o protocolo da petição inicial. Os efeitos em relação ao réu previstos no art. 240 dependem de citação válida, observadas as exceções legais.",
+      "legalBasis": "CPC, arts. 240 e 312"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 14,
+      "front": "Pode o juiz distribuir dinamicamente o ônus da prova?",
+      "back": "Sim, nas hipóteses legais, por decisão fundamentada que permita à parte cumprir o encargo, sem impor prova impossível ou excessivamente difícil.",
+      "legalBasis": "CPC, art. 373, §§ 1º e 2º"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 15,
+      "front": "A parte pode juntar documentos novos depois da petição inicial ou da contestação?",
+      "back": "Sim, para provar fatos posteriores ou contrapor documentos produzidos nos autos; documentos conhecidos ou acessíveis posteriormente também são admitidos nas condições legais.",
+      "legalBasis": "CPC, art. 435"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 16,
+      "front": "Quando a audiência inicial de conciliação ou mediação não será realizada?",
+      "back": "Quando ambas as partes manifestarem expressamente desinteresse na composição consensual ou quando a autocomposição não for admitida.",
+      "legalBasis": "CPC, art. 334, § 4º"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 18,
+      "front": "Qual a consequência do não pagamento voluntário de condenação em quantia certa no prazo do art. 523 do CPC?",
+      "back": "Após quinze dias sem pagamento, incidem multa de 10% e honorários de advogado de 10%, sobre o saldo não pago.",
+      "legalBasis": "CPC, art. 523, §§ 1º e 2º"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 19,
+      "front": "Qual o prazo geral para impugnação ao cumprimento de sentença de pagar quantia entre particulares?",
+      "back": "Quinze dias após o término do prazo para pagamento voluntário, independentemente de penhora ou nova intimação.",
+      "legalBasis": "CPC, art. 525"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 21,
+      "front": "Quais características deve reunir a obrigação para fundamentar execução de título extrajudicial?",
+      "back": "Deve ser certa, líquida e exigível, representada por título executivo nos termos da lei.",
+      "legalBasis": "CPC, arts. 783 e 784"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 22,
+      "front": "É necessário garantir o juízo para opor embargos à execução no CPC?",
+      "back": "Não. O executado pode oferecer embargos independentemente de penhora, depósito ou caução; a concessão de efeito suspensivo segue requisitos próprios.",
+      "legalBasis": "CPC, arts. 914 e 919, § 1º"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 23,
+      "front": "A satisfação integral da obrigação extingue a execução automaticamente sem pronunciamento judicial?",
+      "back": "A satisfação é causa de extinção, mas a extinção somente produz efeito quando declarada por sentença.",
+      "legalBasis": "CPC, arts. 924, II, e 925"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 25,
+      "front": "Qual o prazo decadencial para impetrar mandado de segurança individual?",
+      "back": "Cento e vinte dias, contados da ciência do ato impugnado pelo interessado.",
+      "legalBasis": "Lei 12.016/2009, art. 23"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 26,
+      "front": "A Defensoria Pública possui legitimidade para propor ação civil pública?",
+      "back": "Sim. Integra o rol legal de legitimados coletivos, ao lado do Ministério Público e dos demais entes e associações nas condições legais.",
+      "legalBasis": "Lei 7.347/1985, art. 5º, II"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 27,
+      "front": "Em causas de até vinte salários mínimos no Juizado Especial Cível estadual, é obrigatória a assistência por advogado em primeiro grau?",
+      "back": "Não. As partes podem comparecer pessoalmente, facultada a assistência. Acima desse valor ela é obrigatória; no recurso, advogado é exigido.",
+      "legalBasis": "Lei 9.099/1995, arts. 9º e 41, § 2º"
+    },
+    {
+      "disciplineId": "civil-procedure",
+      "number": 28,
+      "front": "Uma pessoa pode ser obrigada a permanecer em procedimento de mediação?",
+      "back": "Não. Embora cláusula contratual de mediação possa exigir comparecimento à primeira reunião, ninguém é obrigado a permanecer no procedimento.",
+      "legalBasis": "Lei 13.140/2015, art. 2º, §§ 1º e 2º"
     }
   ]
 }
