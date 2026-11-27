@@ -171,7 +171,7 @@ describe('atualização editorial sem perder identidade ou estado do usuário', 
       expect(canonical.suspended).toBe(true);
       expect(canonical.deleted_at).toBe('2026-10-02T00:00:00Z');
       expect(db.tables.cards.filter((row) => row.card_type === 'Tópico oficial')).toHaveLength(0);
-      expect(new Set(db.tables.cards.filter((row) => row.legacy_id?.startsWith('card-trt4-v4-')).map((row) => row.legacy_id)).size).toBe(173);
+      expect(new Set(db.tables.cards.filter((row) => row.legacy_id?.startsWith('card-trt4-v4-')).map((row) => row.legacy_id)).size).toBe(207);
     });
   });
 });
