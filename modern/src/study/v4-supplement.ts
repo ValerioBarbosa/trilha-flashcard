@@ -1,5 +1,6 @@
 import humanIt from './v4-supplement-human-it.json';
 import civil from './v4-supplement-civil.json';
+import core from './v4-supplement-core.json';
 import { OFFICIAL_EDITAL_2026 } from '../edital/official-edital-2026';
 
 export type V4NewCard = {
@@ -9,7 +10,7 @@ export type V4NewCard = {
 };
 
 type Entry = { disciplineId: string; number: number; front: string; back: string; legalBasis: string };
-const entries = [...humanIt.entries, ...civil.entries] as Entry[];
+const entries = [...humanIt.entries, ...civil.entries, ...core.entries] as Entry[];
 
 function compile() {
   const seen = new Set<string>();
