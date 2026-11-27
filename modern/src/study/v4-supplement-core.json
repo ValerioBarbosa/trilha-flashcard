@@ -504,6 +504,188 @@
       "front": "Qual diferença central existe entre os pressupostos do IRDR e do IAC?",
       "back": "O IRDR exige efetiva repetição de processos sobre a mesma questão exclusivamente de direito e risco à isonomia e à segurança jurídica. O IAC pressupõe questão relevante de direito, com grande repercussão social, sem repetição em múltiplos processos.",
       "legalBasis": "CPC, arts. 947 e 976"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 6,
+      "front": "Quem chefia o Ministério Público do Trabalho?",
+      "back": "O Procurador-Geral do Trabalho, escolhido conforme o procedimento previsto na Lei Complementar 75/1993.",
+      "legalBasis": "LC 75/1993, arts. 85 e 87"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 8,
+      "front": "Como se contam os prazos processuais previstos na CLT?",
+      "back": "Contam-se apenas os dias úteis, sem computar o dia inicial e computando o dia do vencimento.",
+      "legalBasis": "CLT, art. 775"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 9,
+      "front": "Qual é a alíquota das custas no processo trabalhista de conhecimento?",
+      "back": "Dois por cento, observado o mínimo de R$ 10,64 e o máximo de quatro vezes o limite dos benefícios do RGPS, sobre a base definida conforme o resultado do processo.",
+      "legalBasis": "CLT, art. 789"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 10,
+      "front": "Uma empresa pública que explora atividade econômica é automaticamente isenta de custas pela regra da Fazenda Pública?",
+      "back": "Não. A isenção do art. 790-A não abrange entidades fiscalizadoras do exercício profissional e contempla os entes públicos e suas autarquias e fundações públicas que não explorem atividade econômica, além do MPT.",
+      "legalBasis": "CLT, art. 790-A"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 11,
+      "front": "O sindicato que defende judicialmente direitos da categoria atua necessariamente como mero representante?",
+      "back": "Não. Pode atuar como substituto processual, em nome próprio na defesa de direitos da categoria, nos limites constitucionais.",
+      "legalBasis": "CF, art. 8º, III; CPC, art. 18"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 13,
+      "front": "Quando duas pessoas podem litigar conjuntamente em um mesmo processo?",
+      "back": "Entre outras hipóteses, quando houver comunhão de direitos ou obrigações, conexão pelo pedido ou causa de pedir, ou afinidade por questão comum de fato ou direito.",
+      "legalBasis": "CPC, art. 113; CLT, art. 769"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 14,
+      "front": "Qual a faixa percentual dos honorários sucumbenciais trabalhistas?",
+      "back": "De 5% a 15%, sobre a base legal aplicável, inclusive quando o advogado atua em causa própria. Honorários contratuais são instituto distinto.",
+      "legalBasis": "CLT, art. 791-A"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 17,
+      "front": "Qual providência deve a secretaria adotar ao receber a reclamação trabalhista?",
+      "back": "Em 48 horas, remeter a segunda via ao reclamado, notificando-o para comparecer à primeira audiência desimpedida após cinco dias.",
+      "legalBasis": "CLT, art. 841"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 18,
+      "front": "Quais requisitos específicos deve conter o pedido da reclamação trabalhista escrita?",
+      "back": "Deve ser certo, determinado e acompanhado da indicação de seu valor, além dos demais requisitos da petição inicial.",
+      "legalBasis": "CLT, art. 840, § 1º"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 19,
+      "front": "Quem pode apresentar reclamação trabalhista segundo o art. 839 da CLT?",
+      "back": "Empregados e empregadores, pessoalmente ou por representantes, e sindicatos de classe; o Ministério Público do Trabalho atua nas hipóteses legais.",
+      "legalBasis": "CLT, art. 839; LC 75/1993, art. 83"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 21,
+      "front": "Qual o prazo para ajuizar inquérito de apuração de falta grave de empregado estável suspenso?",
+      "back": "Trinta dias contados da suspensão do empregado, mediante reclamação escrita ao juízo competente.",
+      "legalBasis": "CLT, art. 853"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 22,
+      "front": "A coisa julgada material torna imutáveis todos os fundamentos da sentença?",
+      "back": "Não. Em regra, os motivos e a verdade dos fatos não fazem coisa julgada; a questão prejudicial pode adquiri-la se preenchidos os requisitos legais.",
+      "legalBasis": "CPC, arts. 502 a 504"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 25,
+      "front": "Qual o limite da execução provisória previsto na regra geral recursal da CLT?",
+      "back": "Os recursos têm, em regra, efeito devolutivo, admitindo-se execução provisória até a penhora, conforme o art. 899.",
+      "legalBasis": "CLT, art. 899"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 27,
+      "front": "Qual prazo tem a Fazenda Pública para impugnar cumprimento de sentença de pagar quantia?",
+      "back": "Trinta dias, mediante intimação na pessoa de seu representante judicial, observada a disciplina do cumprimento contra a Fazenda Pública.",
+      "legalBasis": "CPC, art. 535"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 29,
+      "front": "A decisão sobre o IDPJ na execução trabalhista admite agravo de petição sem garantia do juízo?",
+      "back": "Sim. Na fase de execução, cabe agravo de petição independentemente de garantia; na cognição, a decisão não admite recurso imediato.",
+      "legalBasis": "CLT, art. 855-A, § 1º, I e II"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 30,
+      "front": "Qual o prazo dado ao executado trabalhista para pagar ou garantir a execução após a citação?",
+      "back": "Quarenta e oito horas, sob pena de penhora, na hipótese de execução por quantia certa.",
+      "legalBasis": "CLT, art. 880"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 31,
+      "front": "Para substituir penhora, qual valor mínimo deve ter o seguro garantia judicial segundo o CPC?",
+      "back": "O valor do débito indicado na inicial acrescido de 30%, observadas as exigências específicas aplicáveis na Justiça do Trabalho.",
+      "legalBasis": "CPC, art. 835, § 2º; CLT, art. 882"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 32,
+      "front": "A proteção contra penhora de remunerações prevista no CPC é absoluta?",
+      "back": "Não. O § 2º do art. 833 prevê exceções para prestação alimentícia e valores superiores a cinquenta salários mínimos mensais; a aplicação trabalhista depende do caso e da jurisprudência pertinente.",
+      "legalBasis": "CPC, art. 833, IV e § 2º"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 33,
+      "front": "O imóvel residencial da família pode ser penhorado em qualquer execução trabalhista?",
+      "back": "Não. A regra é a impenhorabilidade do bem de família, ressalvadas as exceções expressamente previstas na legislação.",
+      "legalBasis": "Lei 8.009/1990, arts. 1º e 3º"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 36,
+      "front": "Quando se considera praticado o ato processual eletrônico?",
+      "back": "Na data e hora do envio ao sistema judicial, com emissão de protocolo. Para prazo, a transmissão pode ocorrer até as 24 horas do último dia, observadas as regras de indisponibilidade.",
+      "legalBasis": "Lei 11.419/2006, arts. 3º e 10"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 37,
+      "front": "Qual prazo de prescrição intercorrente foi introduzido pela Reforma Trabalhista?",
+      "back": "Dois anos, iniciados quando o exequente deixa de cumprir determinação judicial no curso da execução, nos termos do art. 11-A.",
+      "legalBasis": "CLT, art. 11-A; Lei 13.467/2017"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 40,
+      "front": "O jus postulandi permite ao trabalhador interpor recurso diretamente ao TST sem advogado?",
+      "back": "Não. A Súmula 425 limita o jus postulandi às Varas e TRTs e exclui, entre outras hipóteses, recursos de competência do TST.",
+      "legalBasis": "TST, Súmula 425"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 41,
+      "front": "Qual é o objeto da Instrução Normativa 39/2016 do TST?",
+      "back": "Identificar, de modo não exaustivo, disposições do CPC de 2015 aplicáveis e inaplicáveis ao processo do trabalho, respeitando suas regras especiais.",
+      "legalBasis": "TST, IN 39/2016"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 42,
+      "front": "Órgão fracionário pode afastar uma lei por inconstitucionalidade sem observar a reserva de plenário?",
+      "back": "Em regra, não, ainda que não declare expressamente a inconstitucionalidade. Devem ser observadas as hipóteses legais de dispensa de nova submissão.",
+      "legalBasis": "CF, art. 97; STF, SV 10; CPC, art. 949"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 43,
+      "front": "Segundo o Tema 1232 do STF, qual é a regra para executar empresa do grupo econômico que não participou da fase de conhecimento?",
+      "back": "Em regra, não se pode direcionar a execução contra essa empresa. A tese admite hipóteses excepcionais de redirecionamento, como sucessão empresarial e abuso da personalidade jurídica, observados os procedimentos aplicáveis.",
+      "legalBasis": "STF, RE 1.387.795, Tema 1232"
+    },
+    {
+      "disciplineId": "labor-procedure",
+      "number": 44,
+      "front": "Qual é a finalidade do julgamento com perspectiva de gênero no Poder Judiciário?",
+      "back": "Identificar desigualdades estruturais e estereótipos relevantes para a análise do caso, evitando que preconceitos comprometam a interpretação dos fatos e a aplicação do direito.",
+      "legalBasis": "CNJ, Resolução 492/2023"
     }
   ]
 }
