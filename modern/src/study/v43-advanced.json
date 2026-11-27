@@ -539,6 +539,114 @@
       "back": "Não, na hipótese de responsabilidade objetiva do art. 37, § 6º, demonstrados seus pressupostos. O direito de regresso contra o agente exige dolo ou culpa.",
       "legalBasis": "CF, art. 37, § 6º",
       "trap": "Distinguir responsabilidade da pessoa jurídica e responsabilidade regressiva do agente."
+    },
+    {
+      "id": "ad-013",
+      "disciplineId": "administrative",
+      "number": 20,
+      "front": "A Administração pretende contratar bens comuns cujos padrões de desempenho e qualidade podem ser objetivamente definidos por especificações usuais de mercado. Qual modalidade é obrigatória?",
+      "back": "Pregão, observadas as hipóteses legais de exclusão, como serviços técnicos especializados de natureza predominantemente intelectual e obras, ressalvados os serviços comuns de engenharia.",
+      "legalBasis": "Lei 14.133/2021, arts. 6º, XLI, e 29",
+      "trap": "Não confundir bem comum com contratação necessariamente de pequeno valor."
+    },
+    {
+      "id": "ad-014",
+      "disciplineId": "administrative",
+      "number": 20,
+      "front": "Uma autoridade pretende criar modalidade licitatória que combine elementos do pregão e da concorrência. A lei admite essa inovação?",
+      "back": "Não. É vedada a criação de outras modalidades de licitação ou a combinação das modalidades previstas no art. 28.",
+      "legalBasis": "Lei 14.133/2021, art. 28, § 2º",
+      "trap": "Modalidade não se confunde com critério de julgamento."
+    },
+    {
+      "id": "ad-015",
+      "disciplineId": "administrative",
+      "number": 21,
+      "front": "A Administração precisa contratar objeto que somente pode ser fornecido por produtor, empresa ou representante comercial exclusivo. Qual hipótese de contratação direta se aplica?",
+      "back": "Inexigibilidade, quando demonstrada a inviabilidade de competição e comprovada a exclusividade por documento idôneo, vedada a preferência por marca específica.",
+      "legalBasis": "Lei 14.133/2021, art. 74, I e § 1º",
+      "trap": "Inexigibilidade pressupõe inviabilidade de competição; dispensa possui hipóteses legais próprias."
+    },
+    {
+      "id": "ad-016",
+      "disciplineId": "administrative",
+      "number": 21,
+      "front": "Uma contratação direta dispensa a instauração de processo administrativo e a justificativa de preço?",
+      "back": "Não. O processo de contratação direta deve conter os elementos exigidos pelo art. 72, incluindo justificativa de preço e razão da escolha do contratado.",
+      "legalBasis": "Lei 14.133/2021, art. 72",
+      "trap": "Contratação direta não significa ausência de formalização."
+    },
+    {
+      "id": "ad-017",
+      "disciplineId": "administrative",
+      "number": 22,
+      "front": "Após o julgamento e a habilitação, a autoridade identifica ilegalidade insanável no procedimento licitatório. Qual providência deve adotar?",
+      "back": "Deve anular a licitação, de ofício ou mediante provocação de terceiros, quando presente ilegalidade insanável, assegurada a prévia manifestação dos interessados.",
+      "legalBasis": "Lei 14.133/2021, art. 71, III e § 3º",
+      "trap": "Revogação exige motivo de conveniência e oportunidade decorrente de fato superveniente devidamente comprovado."
+    },
+    {
+      "id": "ad-018",
+      "disciplineId": "administrative",
+      "number": 23,
+      "front": "Uma empresa recebe sanção de impedimento de licitar e contratar com base na Lei 14.133/2021. Qual o alcance territorial institucional e prazo máximo dessa sanção?",
+      "back": "Impede licitar ou contratar no âmbito da Administração direta e indireta do ente federativo que aplicou a sanção, pelo prazo máximo de três anos.",
+      "legalBasis": "Lei 14.133/2021, art. 156, § 4º",
+      "trap": "Não confundir com declaração de inidoneidade, que alcança todos os entes federativos."
+    },
+    {
+      "id": "ad-019",
+      "disciplineId": "administrative",
+      "number": 23,
+      "front": "Qual o prazo legal da declaração de inidoneidade para licitar ou contratar e seu alcance?",
+      "back": "Prazo mínimo de três e máximo de seis anos, impedindo licitar ou contratar no âmbito da Administração direta e indireta de todos os entes federativos.",
+      "legalBasis": "Lei 14.133/2021, art. 156, § 5º",
+      "trap": "Não inverter o alcance e os prazos das duas sanções."
+    },
+    {
+      "id": "ad-020",
+      "disciplineId": "administrative",
+      "number": 26,
+      "front": "Em alteração unilateral de contrato administrativo de reforma de edifício, qual limite especial o contratado deve aceitar para acréscimos?",
+      "back": "Até cinquenta por cento do valor inicial atualizado do contrato, nas mesmas condições contratuais. O limite especial não se estende às supressões.",
+      "legalBasis": "Lei 14.133/2021, art. 125",
+      "trap": "O limite ordinário de acréscimos ou supressões é de 25%; a exceção refere-se aos acréscimos em reforma."
+    },
+    {
+      "id": "ad-021",
+      "disciplineId": "administrative",
+      "number": 40,
+      "front": "A comissão de PAD federal é composta por três servidores, mas um deles não possui estabilidade. A composição atende à regra legal?",
+      "back": "Não. O processo disciplinar será conduzido por comissão composta de três servidores estáveis designados pela autoridade competente, observados os requisitos legais para a presidência.",
+      "legalBasis": "Lei 8.112/1990, art. 149",
+      "trap": "Não confundir servidor efetivo com servidor necessariamente estável."
+    },
+    {
+      "id": "ad-022",
+      "disciplineId": "administrative",
+      "number": 40,
+      "front": "A comissão de PAD federal necessita de mais tempo para concluir a instrução. Qual é o prazo geral de conclusão do processo disciplinar e sua possível prorrogação?",
+      "back": "Sessenta dias, contados da publicação do ato que constituir a comissão, admitida prorrogação por igual prazo quando as circunstâncias o exigirem.",
+      "legalBasis": "Lei 8.112/1990, art. 152",
+      "trap": "Não confundir o prazo da comissão com o prazo de julgamento da autoridade."
+    },
+    {
+      "id": "ad-023",
+      "disciplineId": "administrative",
+      "number": 31,
+      "front": "O poder concedente decide retomar serviço concedido durante o prazo da concessão por motivo de interesse público. Qual instituto se aplica e quais são seus requisitos?",
+      "back": "Encampação, mediante lei autorizativa específica e prévio pagamento da indenização, na forma da legislação.",
+      "legalBasis": "Lei 8.987/1995, art. 37",
+      "trap": "Caducidade decorre de inadimplemento da concessionária, não de mera conveniência pública."
+    },
+    {
+      "id": "ad-024",
+      "disciplineId": "administrative",
+      "number": 32,
+      "front": "O ente público pretende celebrar parceria público-privada com prazo de prestação de serviço de quatro anos. A lei admite esse prazo?",
+      "back": "Não. É vedada PPP com período de prestação de serviço inferior a cinco anos; o prazo contratual deve ser compatível com a amortização dos investimentos e não pode superar trinta e cinco anos, incluindo prorrogação.",
+      "legalBasis": "Lei 11.079/2004, arts. 2º, § 4º, II, e 5º, I",
+      "trap": "Não confundir o prazo das PPPs com o das concessões comuns."
     }
   ]
 }
