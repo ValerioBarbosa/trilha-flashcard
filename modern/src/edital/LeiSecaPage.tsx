@@ -10,6 +10,7 @@ import { parseLeiSecaPdfImport } from '../cards/pdf-import';
 import '../cards/card-manager.css';
 import '../cards/pdf-import.css';
 import { highlightLawText, LAW_HIGHLIGHT_LABELS } from './law-highlights';
+import { officialLawSources } from './law-sources';
 
 type LeiSecaSubject = SubjectRow & { rootTopics: TopicRow[] };
 
@@ -55,6 +56,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const [immersive, setImmersive] = useState(false);
   const [highlights, setHighlights] = useState(false);
   const [readerFavorite, setReaderFavorite] = useState(false);
+  const [checkedAt, setCheckedAt] = useState('');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [reader, setReader] = useState<{ topicId: string; index: number } | null>(null);
   const [cardsByTopic, setCardsByTopic] = useState<Map<string, CardRow[]>>(new Map());
@@ -201,9 +203,11 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   function favoriteStorageKey(cardId: string) { return `trilha-law-favorite:${profileId}:${cardId}`; }
   function loadReaderMeta(cardId: string) {
     try {
+      setCheckedAt(window.localStorage.getItem(`trilha-law-checked:${profileId}:${cardId}`) || '');
       setReaderNote(window.localStorage.getItem(readerStorageKey(cardId)) || '');
       setReaderFavorite(window.localStorage.getItem(favoriteStorageKey(cardId)) === '1');
     } catch {
+      setCheckedAt('');
       setReaderNote('');
       setReaderFavorite(false);
     }
@@ -395,6 +399,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         const cards = cardsByTopic.get(reader.topicId) ?? [];
         const card = cards[reader.index];
         if (!topic || !card) return null;
+        const sources = officialLawSources(`${card.front} ${card.legal_basis || topic.legal_basis || ''}`);
         const readCount = cards.filter((entry) => entry.read_at).length;
         const pct = cards.length ? Math.round((readCount / cards.length) * 100) : 0;
         return (
@@ -427,6 +432,19 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                   <span>{card.front}</span>
                   <button className={`law-favorite ${readerFavorite ? 'active' : ''}`} onClick={() => toggleFavorite(card.id)} aria-label={readerFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}>{readerFavorite ? '★' : '☆'}</button>
                 </div>
+                {!immersive ? <aside className="law-source-panel">
+                  <strong>Conferência da fonte e vigência</strong>
+                  <small>{checkedAt ? 'Conferência pessoal registrada em ' + new Date(checkedAt).toLocaleDateString('pt-BR') : 'Vigência não conferida neste dispositivo.'} O registro não certifica a vigência atual.</small>
+                  <div>{sources.length ? sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noopener noreferrer">{source.name} ↗</a>) : <a href="https://www4.planalto.gov.br/legislacao" target="_blank" rel="noopener noreferrer">Pesquisar legislação federal ↗</a>}</div>
+                  <button type="button" className="secondary-outline" onClick={() => {
+                    const value = checkedAt ? '' : new Date().toISOString();
+                    try {
+                      const key = `trilha-law-checked:${profileId}:${card.id}`;
+                      value ? window.localStorage.setItem(key, value) : window.localStorage.removeItem(key);
+                      setCheckedAt(value);
+                    } catch { setLoadError('Não foi possível registrar a conferência neste dispositivo.'); }
+                  }}>{checkedAt ? 'Limpar registro de conferência' : 'Registrar que conferi a fonte'}</button>
+                </aside> : null}
                 <div className="law-reader-text" style={{ fontSize: readerFont }}>{card.back.split(/(?<=\n)/).map((line, index) => <span key={index} className={`law-block ${/^\s*(?:Art\.\s*\d|§\s*\d|Parágrafo único)/i.test(line) ? 'law-block-heading' : /^\s*[IVXLCDM]+\s*[-–—]/.test(line) ? 'law-block-inciso' : /^\s*[a-z]\)/.test(line) ? 'law-block-alinea' : ''}`}>{highlights ? highlightLawText(line).map((segment, i) => segment.kind ? <mark key={i} className={'law-highlight law-highlight-' + segment.kind} title={LAW_HIGHLIGHT_LABELS[segment.kind]}>{segment.text}</mark> : <span key={i}>{segment.text}</span>) : line}</span>)}</div>
                 {!immersive && card.complement ? <aside className="law-reader-note"><strong>Observação</strong><p>{card.complement}</p></aside> : null}
                 {!immersive ? <label className="law-personal-note"><strong>Minha anotação neste dispositivo</strong><textarea rows={3} value={readerNote} onChange={(event) => saveReaderNote(card.id, event.target.value)} placeholder="Escreva uma observação, exceção ou macete pessoal…" /></label> : null}
