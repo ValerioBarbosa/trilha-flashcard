@@ -7,8 +7,8 @@ O app inclui:
 - perfis separados por concurso, com cargo, banca e ano do edital;
 - Banco de Matérias com disciplinas mesmo antes de terem cartões, peso no edital, assuntos e subassuntos;
 
-- um baralho inicial atualizado para a versão 3.0, com situação oficial de 2026, prioridades e alerta pré-edital;
-- doze baralhos por disciplina, seguindo o edital verticalizado, incluindo um baralho de Estudo de Caso Jurídico com protocolo e cartões de treino;
+- uma matriz V4 alinhada ao Anexo II do Edital nº 01/2026, com 285 recortes didáticos em 11 disciplinas e 137 novos cartões de conteúdo;
+- baralhos por disciplina e material complementar de Estudo de Caso Jurídico com protocolo e cartões de treino;
 - virada animada do cartão;
 - navegação por botões ou teclado;
 - marcação “Lembrei” e “Não lembrei”;
@@ -51,7 +51,7 @@ Depois acesse `http://localhost:4173`.
 - `Espaço`: virar o cartão
 - `←` / `→`: navegar
 
-Os cartões ficam definidos em `decks.js` e podem ser editados sem alterar a interface. Cada baralho começa vazio (`cards: []`); adicione cartões no formato:
+No leitor legado, os cartões ficam definidos em `decks.js` e podem ser editados sem alterar a interface. Cada baralho começa vazio (`cards: []`); adicione cartões no formato:
 
 ```js
 { id: "card-id-permanente", front: "Pergunta", back: "Resposta", topic: "Assunto (opcional, usado no filtro)", example: "Observação opcional" }
@@ -117,14 +117,25 @@ A FCC é a organizadora. As inscrições vão de 26/10 a 25/11/2026 e as provas 
 Fonte oficial: [Edital nº 1/2026 no Diário Oficial da União](https://www.in.gov.br/web/dou/-/edital-n-1/2026-739927397).
 
 
-### Estudo guiado — 09/10/2026
+### Estudo guiado — matriz V4
 
-A versão moderna tem **Aprender**, **Questões** e **Estudo de Caso**, além da revisão de cartões. Os 171 assuntos são a matriz de preparação, não confirmação do conteúdo de novo edital. Os percentuais das disciplinas permanecem como referência histórica de 2022.
+A versão moderna tem **Aprender**, **Questões** e **Estudo de Caso**, além da revisão de cartões. Os 285 recortes são divisões didáticas do conteúdo do Anexo II, não uma contagem oficial de tópicos da FCC. Os percentuais das disciplinas permanecem como referência histórica de 2022.
 
 - Roteiros de leitura não entram na fila de recuperação nem no indicador de autoavaliação. A leitura de Lei Seca distingue roteiro de transcrição.
 - O banco autoral tem 31 questões de cinco alternativas em nove disciplinas e 11 minicasos para escrita com espelho e checklist. Não são questões da FCC nem simulados oficiais; não cobrem todos os assuntos.
-- Tentativas objetivas na conta usam `questions`/`question_attempts`, respeitando RLS e os gatilhos existentes do caderno de erros. Autoavaliações de casos não entram no percentual objetivo. Visitantes podem explorar sem registro; rascunhos de casos são apenas da sessão.
-- Atualizações preservam IDs relacionais e históricos de cartões, inclusive leitura, suspensão e exclusão. Nenhuma migração de banco é necessária.
+- Tentativas objetivas na conta usam `questions`/`question_attempts`, respeitando RLS e os gatilhos existentes do caderno de erros. Autoavaliações de casos não entram no percentual objetivo. Visitantes podem explorar sem registro; o estudo de caso possui cronômetro, rascunho local e histórico de tentativas.
+- Atualizações preservam IDs relacionais e históricos de cartões, inclusive leitura, suspensão e exclusão. Consulte as migrations aplicáveis à versão instalada antes de atualizar o banco.
 - A jurisprudência inclui alertas sobre os itens cancelados pela Resolução TST 225/2025. Atualização monetária é roteiro de consulta, sem fórmula automática apresentada como vigente.
 
 Validação: testes Vitest, build TypeScript/Vite e teste visual do fluxo público. O funcionamento com uma conta real depende da sessão autenticada e das políticas já existentes no Supabase.
+
+## Auditoria de cobertura V4
+
+- A matriz cadastrada e a cobertura por cartões de conteúdo são indicadores distintos. Um recorte cadastrado não implica material disponível nem domínio do assunto.
+- Os 137 novos cartões V4 complementam o catálogo legado; não representam o total ativo de uma conta.
+- Em Edital, o estado **Sem material** distingue ausência de conteúdo de **Não iniciado**.
+- O Painel de Saúde audita cartões ativos, possíveis duplicidades, vínculos fora da matriz e fundamentos legais ausentes. Campo vazio não comprova desatualização jurídica.
+- O remapeamento sugerido de cartões legados exige confirmação e preserva IDs e revisões. Cartões pessoais e casos ambíguos não são remapeados automaticamente.
+- Antes de ampliar o catálogo, conferir os recortes sem material e a equivalência temática dos cartões existentes. Não criar cartões artificiais apenas para aumentar cobertura.
+
+Referências de implementação: [PR #111](https://github.com/ValerioBarbosa/trilha-flashcard/pull/111), [PR #112](https://github.com/ValerioBarbosa/trilha-flashcard/pull/112), [PR #113](https://github.com/ValerioBarbosa/trilha-flashcard/pull/113).
