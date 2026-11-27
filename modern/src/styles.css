@@ -764,3 +764,12 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .law-reader-text { white-space:pre-wrap; overflow-wrap:anywhere; }
 .law-reader-immersive .law-reader-paper { padding-bottom:24px; }
 @media (max-width:600px) { .law-reader-controls { padding:0 16px; } .law-reader-footer { padding-bottom:max(14px, env(safe-area-inset-bottom)); } }
+
+/* Lei Seca: hierarquia de dispositivos já separados no texto original */
+.law-block-heading { font-weight:700; }
+.law-block-inciso { display:block; padding-inline-start:0.8em; }
+.law-block-alinea { display:block; padding-inline-start:1.6em; }
+.law-favorites-list { display:grid; gap:10px; }
+.law-favorites-item { display:grid; gap:6px; padding:14px; text-align:left; color:inherit; background:var(--surface); border:1px solid var(--line); border-radius:12px; overflow-wrap:anywhere; }
+.law-favorites-item small,.law-favorites-list p { color:var(--muted); }
+.law-favorites-item span { color:var(--green); font-size:13px; }
