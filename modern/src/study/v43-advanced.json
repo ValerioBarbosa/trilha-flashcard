@@ -863,6 +863,114 @@
       "back": "Dez dias úteis, contados da ciência da sentença, mediante petição escrita com razões e pedido, sendo obrigatória a representação por advogado.",
       "legalBasis": "Lei 9.099/1995, arts. 12-A, 41, § 2º, e 42",
       "trap": "Não aplicar automaticamente o prazo de quinze dias da apelação do CPC."
+    },
+    {
+      "id": "co-001",
+      "disciplineId": "constitutional",
+      "number": 6,
+      "front": "Uma autoridade pretende ingressar em residência sem consentimento do morador, exclusivamente por determinação judicial, durante a noite. A Constituição autoriza essa entrada?",
+      "back": "Não. A entrada por determinação judicial sem consentimento é admitida durante o dia. Flagrante delito, desastre ou prestação de socorro constituem hipóteses distintas.",
+      "legalBasis": "CF, art. 5º, XI",
+      "trap": "Não estender a limitação diurna às outras exceções constitucionais."
+    },
+    {
+      "id": "co-002",
+      "disciplineId": "constitutional",
+      "number": 6,
+      "front": "Um cidadão deseja conhecer dados referentes à sua própria pessoa constantes de banco de dados de entidade governamental. Qual remédio constitucional é adequado, observados os requisitos legais?",
+      "back": "Habeas data, que assegura o conhecimento de informações relativas à pessoa do impetrante e permite sua retificação nas hipóteses constitucionais.",
+      "legalBasis": "CF, art. 5º, LXXII",
+      "trap": "Não confundir acesso a dados pessoais com acesso geral a informações públicas."
+    },
+    {
+      "id": "co-003",
+      "disciplineId": "constitutional",
+      "number": 6,
+      "front": "Uma associação regularmente constituída e em funcionamento há oito meses pretende impetrar mandado de segurança coletivo na condição de associação. Satisfaz o requisito temporal constitucional?",
+      "back": "Não. A associação deve estar legalmente constituída e em funcionamento há pelo menos um ano, para defesa dos interesses de seus membros ou associados.",
+      "legalBasis": "CF, art. 5º, LXX, b",
+      "trap": "O requisito temporal não se estende indistintamente a todos os legitimados."
+    },
+    {
+      "id": "co-004",
+      "disciplineId": "constitutional",
+      "number": 7,
+      "front": "Um brasileiro alfabetizado de dezessete anos pretende votar. O alistamento eleitoral e o voto são obrigatórios nessa idade?",
+      "back": "Não. O alistamento e o voto são facultativos para os maiores de dezesseis e menores de dezoito anos, conforme a Constituição.",
+      "legalBasis": "CF, art. 14, § 1º, II, c",
+      "trap": "Não confundir capacidade eleitoral ativa com requisitos de elegibilidade."
+    },
+    {
+      "id": "co-005",
+      "disciplineId": "constitutional",
+      "number": 8,
+      "front": "Um Estado pretende legislar sobre matéria de competência legislativa privativa da União. Qual instrumento pode autorizá-lo a legislar sobre questões específicas dessa matéria?",
+      "back": "Lei complementar federal poderá autorizar os Estados a legislar sobre questões específicas das matérias de competência privativa da União.",
+      "legalBasis": "CF, art. 22, parágrafo único",
+      "trap": "Não confundir competência privativa com competência legislativa concorrente."
+    },
+    {
+      "id": "co-006",
+      "disciplineId": "constitutional",
+      "number": 8,
+      "front": "Em matéria de competência concorrente, inexiste lei federal sobre normas gerais. Os Estados podem exercer competência legislativa plena?",
+      "back": "Sim, para atender a suas peculiaridades. A superveniência de lei federal sobre normas gerais suspende a eficácia da lei estadual no que lhe for contrário.",
+      "legalBasis": "CF, art. 24, §§ 3º e 4º",
+      "trap": "A Constituição prevê suspensão da eficácia, e não revogação automática da lei estadual."
+    },
+    {
+      "id": "co-007",
+      "disciplineId": "constitutional",
+      "number": 9,
+      "front": "Um candidato aprovado em concurso público questiona a possibilidade de prorrogação do prazo de validade originalmente fixado em dois anos. Qual é o limite constitucional?",
+      "back": "O prazo de validade do concurso será de até dois anos, prorrogável uma vez, por igual período.",
+      "legalBasis": "CF, art. 37, III",
+      "trap": "A prorrogação não pode ocorrer sucessivas vezes."
+    },
+    {
+      "id": "co-008",
+      "disciplineId": "constitutional",
+      "number": 12,
+      "front": "Uma proposta de emenda constitucional é rejeitada. Pode ser reapresentada com a mesma matéria na mesma sessão legislativa?",
+      "back": "Não. A matéria constante de proposta de emenda rejeitada ou havida por prejudicada não pode ser objeto de nova proposta na mesma sessão legislativa.",
+      "legalBasis": "CF, art. 60, § 5º",
+      "trap": "Não confundir com a regra constitucional de reapresentação de projetos de lei rejeitados."
+    },
+    {
+      "id": "co-009",
+      "disciplineId": "constitutional",
+      "number": 3,
+      "front": "Um órgão fracionário de tribunal pretende declarar a inconstitucionalidade de uma lei. Qual quórum a Constituição exige para essa declaração pelo tribunal?",
+      "back": "Maioria absoluta dos membros do tribunal ou dos membros do respectivo órgão especial, observadas as hipóteses de dispensa de nova submissão previstas na legislação processual.",
+      "legalBasis": "CF, art. 97; CPC, art. 949, parágrafo único",
+      "trap": "Reserva de plenário não se confunde com maioria simples do órgão fracionário."
+    },
+    {
+      "id": "co-010",
+      "disciplineId": "constitutional",
+      "number": 4,
+      "front": "Uma entidade de classe de âmbito nacional pretende propor ação direta de inconstitucionalidade perante o STF. Integra o rol constitucional de legitimados?",
+      "back": "Sim. Confederação sindical ou entidade de classe de âmbito nacional integra o rol de legitimados, observados os demais requisitos, inclusive pertinência temática quando exigida.",
+      "legalBasis": "CF, art. 103, IX",
+      "trap": "A abrangência nacional não dispensa os demais requisitos de legitimidade."
+    },
+    {
+      "id": "co-011",
+      "disciplineId": "constitutional",
+      "number": 15,
+      "front": "O Conselho Nacional de Justiça pode reformar uma sentença judicial simplesmente por discordar da interpretação jurídica adotada pelo magistrado?",
+      "back": "Não. O CNJ exerce controle da atuação administrativa e financeira do Poder Judiciário e do cumprimento dos deveres funcionais dos juízes, não funciona como instância recursal jurisdicional.",
+      "legalBasis": "CF, art. 103-B, § 4º",
+      "trap": "Controle administrativo e disciplinar não equivale à revisão jurisdicional de sentenças."
+    },
+    {
+      "id": "co-012",
+      "disciplineId": "constitutional",
+      "number": 17,
+      "front": "Um trabalhador ajuíza ação de indenização por dano moral decorrente de relação de trabalho. Qual ramo do Judiciário possui competência constitucional para a hipótese?",
+      "back": "A Justiça do Trabalho, nos termos da competência constitucional para ações de indenização por dano moral ou patrimonial decorrentes da relação de trabalho, observadas as delimitações jurisprudenciais aplicáveis.",
+      "legalBasis": "CF, art. 114, VI",
+      "trap": "A natureza indenizatória do pedido não desloca, por si só, a competência para a Justiça comum."
     }
   ]
 }
