@@ -1295,6 +1295,181 @@
       "front": "Uma pessoa pode ser obrigada a permanecer em procedimento de mediação?",
       "back": "Não. Embora cláusula contratual de mediação possa exigir comparecimento à primeira reunião, ninguém é obrigado a permanecer no procedimento.",
       "legalBasis": "Lei 13.140/2015, art. 2º, §§ 1º e 2º"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 1,
+      "front": "Qual a diferença entre normas constitucionais de eficácia contida e limitada?",
+      "back": "As de eficácia contida têm aplicação imediata, mas admitem restrição juridicamente autorizada; as limitadas dependem de integração normativa para produzir plenamente seus efeitos, embora tenham eficácia jurídica desde a promulgação.",
+      "legalBasis": "Doutrina constitucional: classificação da eficácia das normas"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 6,
+      "front": "Qual remédio constitucional protege direito líquido e certo não amparado por habeas corpus ou habeas data?",
+      "back": "Mandado de segurança, quando a ilegalidade ou abuso de poder for imputável a autoridade pública ou agente de pessoa jurídica no exercício de atribuições do poder público.",
+      "legalBasis": "CF, art. 5º, LXIX"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 7,
+      "front": "Quais são as hipóteses constitucionais de voto facultativo?",
+      "back": "Analfabetos, maiores de setenta anos e maiores de dezesseis e menores de dezoito anos.",
+      "legalBasis": "CF, art. 14, § 1º, II"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 8,
+      "front": "O Distrito Federal pode ser dividido em municípios?",
+      "back": "Não. A Constituição veda sua divisão em municípios e atribui ao DF as competências legislativas reservadas aos estados e municípios.",
+      "legalBasis": "CF, art. 32, caput e § 1º"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 10,
+      "front": "Quem sucede o Presidente da República em caso de vaga e quem o substitui em impedimento?",
+      "back": "O Vice-Presidente da República sucede em caso de vaga e substitui em caso de impedimento.",
+      "legalBasis": "CF, art. 79"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 11,
+      "front": "Qual quórum da Câmara dos Deputados autoriza a instauração de processo contra o Presidente da República?",
+      "back": "Dois terços de seus membros, observadas as competências constitucionais para julgamento de infrações penais comuns e crimes de responsabilidade.",
+      "legalBasis": "CF, arts. 51, I, e 86"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 12,
+      "front": "Qual o quórum de aprovação de proposta de emenda constitucional?",
+      "back": "Três quintos dos votos dos membros de cada Casa do Congresso Nacional, em dois turnos de votação em cada uma.",
+      "legalBasis": "CF, art. 60, § 2º"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 13,
+      "front": "Quais aspectos da fiscalização contábil, financeira, orçamentária, operacional e patrimonial são previstos no art. 70?",
+      "back": "Legalidade, legitimidade, economicidade, aplicação das subvenções e renúncia de receitas, mediante controle externo e sistemas de controle interno.",
+      "legalBasis": "CF, art. 70"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 15,
+      "front": "O CNJ pode rever o mérito de decisão jurisdicional como se fosse tribunal recursal?",
+      "back": "Não. Sua competência abrange controle administrativo e financeiro do Judiciário e cumprimento dos deveres funcionais dos magistrados, não revisão jurisdicional de decisões.",
+      "legalBasis": "CF, art. 103-B, § 4º"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 16,
+      "front": "Qual é o número mínimo de ministros do Superior Tribunal de Justiça?",
+      "back": "Trinta e três ministros, observada a composição e os requisitos previstos na Constituição.",
+      "legalBasis": "CF, art. 104"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 19,
+      "front": "Quais são os princípios institucionais do Ministério Público?",
+      "back": "Unidade, indivisibilidade e independência funcional. A instituição possui autonomia funcional e administrativa nos termos constitucionais.",
+      "legalBasis": "CF, art. 127, §§ 1º e 2º"
+    },
+    {
+      "disciplineId": "constitutional",
+      "number": 20,
+      "front": "Qual instituição presta orientação jurídica e defesa integral e gratuita aos necessitados?",
+      "back": "A Defensoria Pública, instituição permanente e essencial à função jurisdicional do Estado, com atuação judicial e extrajudicial, individual e coletiva.",
+      "legalBasis": "CF, art. 134"
+    },
+    {
+      "disciplineId": "portuguese",
+      "number": 1,
+      "front": "Por que a forma 'idéia' está incorreta na ortografia vigente?",
+      "back": "O ditongo aberto ei em palavra paroxítona perdeu o acento com o Acordo Ortográfico: escreve-se ideia. Em oxítonas como papéis, o acento permanece.",
+      "legalBasis": "Acordo Ortográfico, Base IX"
+    },
+    {
+      "disciplineId": "portuguese",
+      "number": 4,
+      "front": "Em 'a notícia caiu como uma bomba', a palavra bomba tem sentido denotativo?",
+      "back": "Não. Tem sentido conotativo, figurado, indicando o forte impacto da notícia, não um artefato explosivo real.",
+      "legalBasis": "Semântica: denotação e conotação"
+    },
+    {
+      "disciplineId": "portuguese",
+      "number": 5,
+      "front": "Qual figura de linguagem ocorre em 'Li Machado de Assis durante as férias'?",
+      "back": "Metonímia: substitui-se a obra pelo nome do autor, em razão da relação de associação entre ambos.",
+      "legalBasis": "Figuras de linguagem"
+    },
+    {
+      "disciplineId": "portuguese",
+      "number": 8,
+      "front": "Como transformar 'A comissão analisou os recursos' em voz passiva analítica?",
+      "back": "Os recursos foram analisados pela comissão. O objeto direto torna-se sujeito paciente e o sujeito original, agente da passiva.",
+      "legalBasis": "Sintaxe: vozes verbais"
+    },
+    {
+      "disciplineId": "portuguese",
+      "number": 9,
+      "front": "Qual forma verbal completa corretamente 'Se ele estudasse mais, ___ melhores resultados'?",
+      "back": "Obteria. A hipótese expressa pelo pretérito imperfeito do subjuntivo combina, nesse contexto, com o futuro do pretérito do indicativo.",
+      "legalBasis": "Correlação verbal"
+    },
+    {
+      "disciplineId": "portuguese",
+      "number": 12,
+      "front": "Qual relação sintática existe em 'Embora estivesse cansado, continuou estudando'?",
+      "back": "A primeira oração é subordinada adverbial concessiva; expressa circunstância contrária à expectativa sem impedir o fato da oração principal.",
+      "legalBasis": "Sintaxe do período composto"
+    },
+    {
+      "disciplineId": "portuguese",
+      "number": 13,
+      "front": "A substituição de 'portanto' por 'contudo' preserva o sentido lógico do período?",
+      "back": "Não. Portanto introduz conclusão; contudo introduz oposição ou contraste. A substituição altera a relação semântica.",
+      "legalBasis": "Coesão e equivalência textual"
+    },
+    {
+      "disciplineId": "math-logic",
+      "number": 2,
+      "front": "Ana chegou antes de Bruno, e Carlos chegou depois de Bruno. Qual é a ordem obrigatória de chegada?",
+      "back": "Ana, Bruno, Carlos. A relação de anterioridade é transitiva e permite concluir que Ana também chegou antes de Carlos.",
+      "legalBasis": "Raciocínio dedutivo"
+    },
+    {
+      "disciplineId": "math-logic",
+      "number": 3,
+      "front": "Qual o próximo termo da sequência 2, 5, 10, 17, 26, considerando diferenças ímpares consecutivas?",
+      "back": "37. As diferenças são 3, 5, 7 e 9; a próxima é 11, portanto 26 + 11 = 37.",
+      "legalBasis": "Raciocínio sequencial"
+    },
+    {
+      "disciplineId": "math-logic",
+      "number": 6,
+      "front": "Qual o mínimo múltiplo comum de 12 e 18?",
+      "back": "36. Pela fatoração, 12 = 2² × 3 e 18 = 2 × 3²; o MMC usa as maiores potências: 2² × 3² = 36.",
+      "legalBasis": "Múltiplos e divisores"
+    },
+    {
+      "disciplineId": "math-logic",
+      "number": 7,
+      "front": "Qual o resultado de três quartos menos um sexto?",
+      "back": "Sete doze avos. Com denominador comum 12, temos 9/12 − 2/12 = 7/12.",
+      "legalBasis": "Operações com frações"
+    },
+    {
+      "disciplineId": "math-logic",
+      "number": 9,
+      "front": "Como dividir R$ 600 em partes diretamente proporcionais a 2 e 3?",
+      "back": "R$ 240 e R$ 360. A soma das partes da razão é 5; cada parte vale R$ 120, multiplicados por 2 e 3.",
+      "legalBasis": "Proporcionalidade"
+    },
+    {
+      "disciplineId": "math-logic",
+      "number": 12,
+      "front": "Em um gráfico de setores, qual ângulo representa 25% do total?",
+      "back": "90 graus, pois o círculo completo mede 360 graus e 25% de 360 corresponde a 90.",
+      "legalBasis": "Interpretação de gráficos"
     }
   ]
 }
