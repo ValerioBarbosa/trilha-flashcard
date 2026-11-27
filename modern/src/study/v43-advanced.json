@@ -647,6 +647,114 @@
       "back": "Não. É vedada PPP com período de prestação de serviço inferior a cinco anos; o prazo contratual deve ser compatível com a amortização dos investimentos e não pode superar trinta e cinco anos, incluindo prorrogação.",
       "legalBasis": "Lei 11.079/2004, arts. 2º, § 4º, II, e 5º, I",
       "trap": "Não confundir o prazo das PPPs com o das concessões comuns."
+    },
+    {
+      "id": "cp-001",
+      "disciplineId": "civil-procedure",
+      "number": 9,
+      "front": "O réu apresenta contestação sem alegar incompetência relativa do juízo. Qual é a consequência em regra?",
+      "back": "Prorroga-se a competência relativa se o réu não alegar a incompetência em preliminar de contestação, ressalvadas as hipóteses legais.",
+      "legalBasis": "CPC, arts. 64 e 65",
+      "trap": "Não confundir com incompetência absoluta, cognoscível de ofício."
+    },
+    {
+      "id": "cp-002",
+      "disciplineId": "civil-procedure",
+      "number": 9,
+      "front": "O juiz reconhece incompetência absoluta após já ter proferido decisão interlocutória. Essa decisão perde automaticamente seus efeitos?",
+      "back": "Não. Salvo decisão judicial em sentido contrário, conservam-se os efeitos da decisão proferida pelo juízo incompetente até que outra seja proferida pelo juízo competente, se for o caso.",
+      "legalBasis": "CPC, art. 64, § 4º",
+      "trap": "Incompetência não implica automaticamente nulidade de todos os atos decisórios."
+    },
+    {
+      "id": "cp-003",
+      "disciplineId": "civil-procedure",
+      "number": 6,
+      "front": "Em litisconsórcio unitário, a omissão de um litisconsorte pode prejudicar os demais?",
+      "back": "Não. Os atos e omissões de um litisconsorte não prejudicam os outros, mas poderão beneficiá-los, quando unitário o litisconsórcio.",
+      "legalBasis": "CPC, art. 117",
+      "trap": "Distinguir os efeitos dos atos no litisconsórcio unitário e no simples."
+    },
+    {
+      "id": "cp-004",
+      "disciplineId": "civil-procedure",
+      "number": 10,
+      "front": "As partes possuem advogados de escritórios distintos em processo com autos eletrônicos. O prazo em dobro do art. 229 é aplicável?",
+      "back": "Não. O prazo em dobro dos litisconsortes com procuradores de escritórios distintos não se aplica aos processos em autos eletrônicos.",
+      "legalBasis": "CPC, art. 229, caput e § 2º",
+      "trap": "A existência de procuradores diferentes não basta nos autos eletrônicos."
+    },
+    {
+      "id": "cp-005",
+      "disciplineId": "civil-procedure",
+      "number": 12,
+      "front": "O juiz identifica defeito sanável na petição inicial. Antes de indeferi-la por esse motivo, qual providência deve adotar?",
+      "back": "Determinar que o autor a emende ou complete em quinze dias, indicando com precisão o que deve ser corrigido ou completado.",
+      "legalBasis": "CPC, art. 321",
+      "trap": "Não indeferir imediatamente por defeito sanável sem oportunizar a correção."
+    },
+    {
+      "id": "cp-006",
+      "disciplineId": "civil-procedure",
+      "number": 13,
+      "front": "O réu pretende apresentar pretensão própria conexa com a ação principal. Deve ajuizar necessariamente demanda autônoma?",
+      "back": "Não. Na contestação, é lícito ao réu propor reconvenção para manifestar pretensão própria, conexa com a ação principal ou com o fundamento da defesa.",
+      "legalBasis": "CPC, art. 343, caput",
+      "trap": "Reconvenção não se confunde com mera defesa contra o pedido do autor."
+    },
+    {
+      "id": "cp-007",
+      "disciplineId": "civil-procedure",
+      "number": 13,
+      "front": "Um autor demonstra probabilidade do direito e perigo de dano, mas a tutela de urgência antecipada requerida apresenta perigo de irreversibilidade dos efeitos. Qual é a regra legal?",
+      "back": "A tutela de urgência de natureza antecipada não será concedida quando houver perigo de irreversibilidade dos efeitos da decisão, sem prejuízo da análise das particularidades e da jurisprudência aplicável.",
+      "legalBasis": "CPC, art. 300, caput e § 3º",
+      "trap": "Probabilidade e perigo de dano não são os únicos requisitos relevantes."
+    },
+    {
+      "id": "cp-008",
+      "disciplineId": "civil-procedure",
+      "number": 14,
+      "front": "O juiz redistribui o ônus da prova em razão de maior facilidade da parte contrária para produzir a prova. Pode fazê-lo sem fundamentação e sem oportunidade de cumprimento?",
+      "back": "Não. A distribuição diversa exige decisão fundamentada e oportunidade para a parte se desincumbir do ônus atribuído; não pode gerar encargo impossível ou excessivamente difícil.",
+      "legalBasis": "CPC, art. 373, §§ 1º e 2º",
+      "trap": "Distribuição dinâmica não significa inversão arbitrária."
+    },
+    {
+      "id": "cp-009",
+      "disciplineId": "civil-procedure",
+      "number": 16,
+      "front": "Em causa que admite autocomposição, somente o autor manifesta desinteresse na audiência de conciliação. Isso basta, por si só, para dispensá-la?",
+      "back": "Não. Na hipótese de desinteresse, ambas as partes devem manifestá-lo expressamente; também não haverá audiência quando não se admitir autocomposição.",
+      "legalBasis": "CPC, art. 334, § 4º",
+      "trap": "O desinteresse unilateral não equivale ao desinteresse de ambas as partes."
+    },
+    {
+      "id": "cp-010",
+      "disciplineId": "civil-procedure",
+      "number": 17,
+      "front": "Os motivos da sentença fazem coisa julgada material apenas porque foram importantes para determinar o alcance da parte dispositiva?",
+      "back": "Não. Os motivos, ainda que importantes para determinar o alcance da parte dispositiva, não fazem coisa julgada. A questão prejudicial decidida expressamente pode ficar abrangida se preenchidos os requisitos legais.",
+      "legalBasis": "CPC, arts. 503, § 1º, e 504, I",
+      "trap": "Distinguir motivos da sentença e questão prejudicial submetida aos requisitos do art. 503."
+    },
+    {
+      "id": "cp-011",
+      "disciplineId": "civil-procedure",
+      "number": 18,
+      "front": "No cumprimento de sentença por quantia certa, o devedor paga apenas parte do débito no prazo legal. Sobre qual valor incidem a multa e os honorários do art. 523?",
+      "back": "Sobre o restante não pago. A multa de 10% e os honorários de advogado de 10% incidem sobre o saldo remanescente quando há pagamento parcial tempestivo.",
+      "legalBasis": "CPC, art. 523, §§ 1º e 2º",
+      "trap": "Não calcular os acréscimos sobre a parcela paga tempestivamente."
+    },
+    {
+      "id": "cp-012",
+      "disciplineId": "civil-procedure",
+      "number": 20,
+      "front": "Uma parte pretende opor embargos de declaração contra decisão judicial. Qual é o prazo e o efeito sobre o prazo dos demais recursos?",
+      "back": "Cinco dias, sem preparo, em regra interrompendo o prazo para interposição de recurso. Os embargos não possuem efeito suspensivo automático.",
+      "legalBasis": "CPC, arts. 219, 1.023 e 1.026",
+      "trap": "Interrupção do prazo recursal não se confunde com suspensão da eficácia da decisão."
     }
   ]
 }
