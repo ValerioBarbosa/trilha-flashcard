@@ -5,19 +5,22 @@ import { listCardsByType, listStudyCardCountsByTopic, setCardReadAt, type CardRo
 import { getSupabaseClient } from '../lib/supabase-client';
 import { PageHeader } from '../shared/PageHeader';
 import { MetricTile } from '../shared/MetricTile';
-import { importCards, markImportDuplicates, type ImportCandidate } from '../cards/card-manager-repository';
+import { createCard, importCards, markImportDuplicates, type ImportCandidate, type CardDraft } from '../cards/card-manager-repository';
 import { parseLeiSecaPdfImport } from '../cards/pdf-import';
 import '../cards/card-manager.css';
 import '../cards/pdf-import.css';
+import { highlightLawText, LAW_HIGHLIGHT_LABELS } from './law-highlights';
+import { officialLawSources } from './law-sources';
 
 type LeiSecaSubject = SubjectRow & { rootTopics: TopicRow[] };
 
-const LEI_SECA_EXCLUDED_SUBJECTS = new Set(['português']);
+const LEI_SECA_EXCLUDED_SUBJECTS = new Set(['portugues', 'lingua portuguesa', 'matematica e raciocinio logico', 'matematica rlm', 'raciocinio logico', 'nocoes de informatica', 'informatica']);
+const normalizeSearch = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
 
 function buildLeiSecaSubjects(subjects: SubjectRow[], topics: TopicRow[], query: string): LeiSecaSubject[] {
-  const normalized = query.trim().toLowerCase();
+  const normalized = normalizeSearch(query);
   return subjects
-    .filter((subject) => !LEI_SECA_EXCLUDED_SUBJECTS.has(subject.name.trim().toLowerCase()))
+    .filter((subject) => !LEI_SECA_EXCLUDED_SUBJECTS.has(normalizeSearch(subject.name)))
     .map((subject) => ({
       ...subject,
       rootTopics: topics.filter((topic) => topic.subject_id === subject.id && !topic.parent_id && topic.legal_basis),
@@ -25,8 +28,8 @@ function buildLeiSecaSubjects(subjects: SubjectRow[], topics: TopicRow[], query:
     .filter((subject) => subject.rootTopics.length > 0)
     .filter((subject) => {
       if (!normalized) return true;
-      return subject.name.toLowerCase().includes(normalized)
-        || subject.rootTopics.some((topic) => `${topic.name} ${topic.legal_basis ?? ''}`.toLowerCase().includes(normalized));
+      return normalizeSearch(subject.name).includes(normalized)
+        || subject.rootTopics.some((topic) => normalizeSearch(`${topic.name} ${topic.legal_basis ?? ''}`).includes(normalized));
     });
 }
 
@@ -43,8 +46,17 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const [query, setQuery] = useState('');
   const [onlyMissing, setOnlyMissing] = useState(false);
   const [onlyUnread, setOnlyUnread] = useState(false);
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [favoriteVersion, setFavoriteVersion] = useState(0);
   const [readerNote, setReaderNote] = useState('');
+  const [draft, setDraft] = useState<CardDraft | null>(null);
+  const [draftBusy, setDraftBusy] = useState(false);
+  const [draftStatus, setDraftStatus] = useState('');
+  const [readerFont, setReaderFont] = useState(19);
+  const [immersive, setImmersive] = useState(false);
+  const [highlights, setHighlights] = useState(false);
   const [readerFavorite, setReaderFavorite] = useState(false);
+  const [checkedAt, setCheckedAt] = useState('');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [reader, setReader] = useState<{ topicId: string; index: number } | null>(null);
   const [cardsByTopic, setCardsByTopic] = useState<Map<string, CardRow[]>>(new Map());
@@ -75,6 +87,19 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
     }
     return result;
   }, [baseRows, onlyMissing, onlyUnread, cardsByTopic]);
+
+  const favoriteCards = useMemo(() => {
+    const allowed = new Set(baseRows.flatMap((subject) => subject.rootTopics.map((topic) => topic.id)));
+    return [...cardsByTopic.entries()].flatMap(([topicId, cards]) => {
+      if (!allowed.has(topicId)) return [];
+      return cards.flatMap((card, index) => {
+        try {
+          return window.localStorage.getItem(`trilha-law-favorite:${profileId}:${card.id}`) === '1' && (!onlyUnread || !card.read_at)
+            ? [{ card, topicId, index }] : [];
+        } catch { return []; }
+      });
+    });
+  }, [baseRows, cardsByTopic, profileId, favoriteVersion, onlyUnread]);
 
   const coverage = useMemo(() => {
     let totalTopics = 0;
@@ -178,9 +203,11 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   function favoriteStorageKey(cardId: string) { return `trilha-law-favorite:${profileId}:${cardId}`; }
   function loadReaderMeta(cardId: string) {
     try {
+      setCheckedAt(window.localStorage.getItem(`trilha-law-checked:${profileId}:${cardId}`) || '');
       setReaderNote(window.localStorage.getItem(readerStorageKey(cardId)) || '');
       setReaderFavorite(window.localStorage.getItem(favoriteStorageKey(cardId)) === '1');
     } catch {
+      setCheckedAt('');
       setReaderNote('');
       setReaderFavorite(false);
     }
@@ -191,8 +218,11 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   }
   function toggleFavorite(cardId: string) {
     const next = !readerFavorite;
-    setReaderFavorite(next);
-    try { next ? window.localStorage.setItem(favoriteStorageKey(cardId), '1') : window.localStorage.removeItem(favoriteStorageKey(cardId)); } catch { /* local-only */ }
+    try {
+      next ? window.localStorage.setItem(favoriteStorageKey(cardId), '1') : window.localStorage.removeItem(favoriteStorageKey(cardId));
+      setReaderFavorite(next);
+      setFavoriteVersion((version) => version + 1);
+    } catch { setLoadError('Não foi possível salvar o favorito neste dispositivo.'); }
   }
 
   function openReader(topicId: string, startIndex = 0) {
@@ -203,11 +233,40 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
     loadReaderMeta(cards[nextIndex].id);
   }
 
+  function beginFlashcard(card: CardRow, topic: TopicRow) {
+    const deck = decks.find((entry) => entry.id === card.deck_id && entry.subject_id === topic.subject_id) || decks.find((entry) => entry.subject_id === topic.subject_id);
+    if (!deck) { setDraftStatus('Nenhum baralho desta disciplina está disponível.'); return; }
+    setDraftStatus('');
+    setDraft({
+      deckId: deck.id, subjectId: topic.subject_id, topicId: topic.id,
+      front: '', back: card.back, legalBasis: card.legal_basis || topic.legal_basis || '',
+      source: 'Criação manual a partir da Lei Seca: ' + card.front,
+      cardType: 'Pergunta e resposta', tags: ['lei-seca', 'criação-manual'],
+    });
+  }
+  async function saveFlashcard() {
+    if (!draft || draftBusy || !draft.front.trim() || !draft.back.trim()) return;
+    setDraftBusy(true); setDraftStatus('');
+    try {
+      await createCard(getSupabaseClient(), user, profileId, draft);
+      setDraft(null);
+      setDraftStatus('Flashcard criado no baralho da disciplina.');
+      setStudyTopicIds((ids) => new Set([...ids, draft.topicId!]));
+    } catch (cause) {
+      setDraftStatus(cause instanceof Error && cause.message === 'card-duplicate'
+        ? 'Já existe um cartão com esta pergunta e resposta na disciplina.'
+        : 'Não foi possível salvar. Confira a conexão e tente novamente.');
+    } finally { setDraftBusy(false); }
+  }
   function closeReader() {
+    if (draftBusy) return;
+    setDraft(null); setDraftStatus('');
     setReader(null);
   }
 
   function moveReader(delta: number) {
+    if (draft || draftBusy) return;
+    setDraftStatus('');
     setReader((current) => {
       if (!current) return current;
       const cards = cardsByTopic.get(current.topicId) ?? [];
@@ -240,12 +299,13 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         action={
           <div className="lei-seca-header-actions">
             <div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar norma ou assunto" /></div>
-            <button type="button" className={`missing-toggle ${onlyMissing ? 'active' : ''}`} onClick={() => setOnlyMissing((current) => !current)}>
+            <button type="button" className={`missing-toggle ${onlyMissing ? 'active' : ''}`} onClick={() => { setShowFavorites(false); setOnlyMissing((current) => !current); }}>
               {onlyMissing ? '✓ ' : ''}Sem Lei Seca
             </button>
             <button type="button" className={`missing-toggle ${onlyUnread ? 'active' : ''}`} onClick={() => setOnlyUnread((current) => !current)}>
               {onlyUnread ? '✓ ' : ''}Não lidos
             </button>
+            <button type="button" className={`missing-toggle ${showFavorites ? 'active' : ''}`} aria-pressed={showFavorites} onClick={() => { setOnlyMissing(false); setShowFavorites((value) => !value); }}>★ Favoritos ({favoriteCards.length})</button>
           </div>
         }
       />
@@ -257,7 +317,16 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         <MetricTile label="Trechos lidos" value={`${coverage.readCards}/${coverage.totalCards}`} helper="marcados como lidos" />
         <MetricTile label="Cobertura geral" value={coverage.totalTopics ? `${Math.round((coverage.coveredTopics / coverage.totalTopics) * 100)}%` : '0%'} helper="dos assuntos com roteiro ou trecho vinculado" />
       </div>
-      {!rows.length ? (
+      {showFavorites ? (
+        <section className="law-favorites-list" aria-label="Trechos favoritos neste dispositivo">
+          <p>Favoritos salvos neste dispositivo. A busca e o filtro Não lidos também se aplicam.</p>
+          {!favoriteCards.length ? <div className="study-empty">Nenhum favorito corresponde aos filtros.</div> : favoriteCards.map(({ card, topicId, index }) => (
+            <button type="button" className="law-favorites-item" key={card.id} onClick={() => openReader(topicId, index)}>
+              <strong>{card.front}</strong><small>{topics.find((topic) => topic.id === topicId)?.name}</small><span>{card.read_at ? 'Lido' : 'Não lido'} · Abrir →</span>
+            </button>
+          ))}
+        </section>
+      ) : !rows.length ? (
         <div className="study-empty">
           <strong>{onlyMissing ? 'Tudo coberto por aqui! 🎉' : 'Nenhum artigo cadastrado ainda.'}</strong>
           <span>{onlyMissing ? 'Todos os assuntos com base legal já têm ao menos um trecho de Lei Seca.' : 'Quando os assuntos tiverem base legal registrada, eles aparecerão aqui por matéria.'}</span>
@@ -330,11 +399,12 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         const cards = cardsByTopic.get(reader.topicId) ?? [];
         const card = cards[reader.index];
         if (!topic || !card) return null;
+        const sources = officialLawSources(`${card.front} ${card.legal_basis || topic.legal_basis || ''}`);
         const readCount = cards.filter((entry) => entry.read_at).length;
-        const pct = cards.length ? Math.round(((reader.index + 1) / cards.length) * 100) : 0;
+        const pct = cards.length ? Math.round((readCount / cards.length) * 100) : 0;
         return (
           <div className="law-reader-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeReader()}>
-            <section className="law-reader" role="dialog" aria-modal="true" aria-label={`Leitura de ${topic.name}`}>
+            <section className={`law-reader${immersive ? ' law-reader-immersive' : ''}`} role="dialog" aria-modal="true" aria-label={`Leitura de ${topic.name}`}>
               <header className="law-reader-header">
                 <div>
                   <span className="page-eyebrow">{subject?.name || 'LEI SECA'}</span>
@@ -346,23 +416,58 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
 
               <div className="law-reader-progress">
                 <div><span style={{ width: `${pct}%` }} /></div>
-                <small>Trecho {reader.index + 1} de {cards.length} · {readCount} lidos</small>
+                <small>Trecho {reader.index + 1} de {cards.length} · {readCount} lidos · {pct}% concluído</small>
               </div>
 
-              <article className={`law-reader-paper ${card.read_at ? 'is-read' : ''}`}>
+              <div className="law-reader-controls" aria-label="Opções de leitura">
+                <button type="button" className="secondary-outline" disabled={readerFont <= 16} onClick={() => setReaderFont((size) => Math.max(16, size - 2))} aria-label="Diminuir fonte">A−</button>
+                <span aria-live="polite">{readerFont}px</span>
+                <button type="button" className="secondary-outline" disabled={readerFont >= 29} onClick={() => setReaderFont((size) => Math.min(29, size + 2))} aria-label="Aumentar fonte">A+</button>
+                <button type="button" className="secondary-outline" disabled={!!draft || draftBusy} aria-pressed={immersive} onClick={() => setImmersive((value) => !value)}>{immersive ? 'Mostrar anotações' : 'Leitura focada'}</button>
+                <button type="button" className="secondary-outline" aria-pressed={highlights} onClick={() => setHighlights((value) => !value)}>{highlights ? 'Ocultar destaques' : 'Destacar expressões'}</button>
+              </div>
+              {highlights ? <div className="law-highlight-legend"><small>Indícios por palavras-chave; não substituem a interpretação jurídica.</small><div>{Object.entries(LAW_HIGHLIGHT_LABELS).map(([kind, label]) => <span key={kind} className={'law-highlight law-highlight-' + kind}>{label}</span>)}</div></div> : null}
+              <article key={card.id} className={`law-reader-paper ${card.read_at ? 'is-read' : ''}`}>
                 <div className="law-reader-citation">
                   <span>{card.front}</span>
                   <button className={`law-favorite ${readerFavorite ? 'active' : ''}`} onClick={() => toggleFavorite(card.id)} aria-label={readerFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}>{readerFavorite ? '★' : '☆'}</button>
                 </div>
-                <div className="law-reader-text">{card.back}</div>
-                {card.complement ? <aside className="law-reader-note"><strong>Observação</strong><p>{card.complement}</p></aside> : null}
-                <label className="law-personal-note"><strong>Minha anotação neste dispositivo</strong><textarea rows={3} value={readerNote} onChange={(event) => saveReaderNote(card.id, event.target.value)} placeholder="Escreva uma observação, exceção ou macete pessoal…" /></label>
+                {!immersive ? <aside className="law-source-panel">
+                  <strong>Conferência da fonte e vigência</strong>
+                  <small>{checkedAt ? 'Conferência pessoal registrada em ' + new Date(checkedAt).toLocaleDateString('pt-BR') : 'Vigência não conferida neste dispositivo.'} O registro não certifica a vigência atual.</small>
+                  <div>{sources.length ? sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noopener noreferrer">{source.name} ↗</a>) : <a href="https://www4.planalto.gov.br/legislacao" target="_blank" rel="noopener noreferrer">Pesquisar legislação federal ↗</a>}</div>
+                  <button type="button" className="secondary-outline" onClick={() => {
+                    const value = checkedAt ? '' : new Date().toISOString();
+                    try {
+                      const key = `trilha-law-checked:${profileId}:${card.id}`;
+                      value ? window.localStorage.setItem(key, value) : window.localStorage.removeItem(key);
+                      setCheckedAt(value);
+                    } catch { setLoadError('Não foi possível registrar a conferência neste dispositivo.'); }
+                  }}>{checkedAt ? 'Limpar registro de conferência' : 'Registrar que conferi a fonte'}</button>
+                </aside> : null}
+                <div className="law-reader-text" style={{ fontSize: readerFont }}>{card.back.split(/(?<=\n)/).map((line, index) => <span key={index} className={`law-block ${/^\s*(?:Art\.\s*\d|§\s*\d|Parágrafo único)/i.test(line) ? 'law-block-heading' : /^\s*[IVXLCDM]+\s*[-–—]/.test(line) ? 'law-block-inciso' : /^\s*[a-z]\)/.test(line) ? 'law-block-alinea' : ''}`}>{highlights ? highlightLawText(line).map((segment, i) => segment.kind ? <mark key={i} className={'law-highlight law-highlight-' + segment.kind} title={LAW_HIGHLIGHT_LABELS[segment.kind]}>{segment.text}</mark> : <span key={i}>{segment.text}</span>) : line}</span>)}</div>
+                {!immersive && card.complement ? <aside className="law-reader-note"><strong>Observação</strong><p>{card.complement}</p></aside> : null}
+                {!immersive ? <label className="law-personal-note"><strong>Minha anotação neste dispositivo</strong><textarea rows={3} value={readerNote} onChange={(event) => saveReaderNote(card.id, event.target.value)} placeholder="Escreva uma observação, exceção ou macete pessoal…" /></label> : null}
+                {!immersive ? <div className="law-flashcard-editor">
+                  {!draft ? <button type="button" className="secondary-outline" onClick={() => beginFlashcard(card, topic)}>+ Criar flashcard deste trecho</button> : <>
+                    <strong>Novo flashcard de revisão</strong>
+                    <small>Edite a pergunta e a resposta. O trecho de origem não será alterado.</small>
+                    <label>Pergunta<textarea rows={2} value={draft.front} disabled={draftBusy} onChange={(event) => setDraft({ ...draft, front: event.target.value })} placeholder="O que devo lembrar deste dispositivo?" /></label>
+                    <label>Resposta<textarea rows={5} value={draft.back} disabled={draftBusy} onChange={(event) => setDraft({ ...draft, back: event.target.value })} /></label>
+                    <label>Fundamento legal<input value={draft.legalBasis || ''} disabled={draftBusy} onChange={(event) => setDraft({ ...draft, legalBasis: event.target.value })} /></label>
+                    <div className="law-flashcard-actions">
+                      <button type="button" className="secondary-outline" disabled={draftBusy} onClick={() => { setDraft(null); setDraftStatus(''); }}>Cancelar</button>
+                      <button type="button" className="primary-action" disabled={draftBusy || !draft.front.trim() || !draft.back.trim()} onClick={() => void saveFlashcard()}>{draftBusy ? 'Salvando…' : 'Salvar flashcard'}</button>
+                    </div>
+                  </>}
+                  {draftStatus ? <p role="status">{draftStatus}</p> : null}
+                </div> : null}
               </article>
 
               <footer className="law-reader-footer">
-                <button className="secondary-outline" onClick={() => moveReader(-1)} disabled={cards.length < 2}>← Anterior</button>
+                <button className="secondary-outline" onClick={() => moveReader(-1)} disabled={cards.length < 2 || !!draft || draftBusy}>← Anterior</button>
                 <button className={`read-toggle law-reader-read ${card.read_at ? 'is-read' : ''}`} onClick={() => toggleRead(card)}>{card.read_at ? '✓ Lido' : 'Marcar como lido'}</button>
-                <button className="primary-action" onClick={() => moveReader(1)} disabled={cards.length < 2}>Próximo →</button>
+                <button className="primary-action" onClick={() => moveReader(1)} disabled={cards.length < 2 || !!draft || draftBusy}>Próximo →</button>
               </footer>
             </section>
           </div>
