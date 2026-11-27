@@ -20,11 +20,12 @@ describe('TRT-4 AJAJ V4 official syllabus', () => {
     expect(OFFICIAL_EDITAL_2026.every((subject) => subject.topics.every((topic) => topic.name.trim().length > 3))).toBe(true);
   });
 
-  it('assigns 207 substantive cards to existing official cuts, with no filler', () => {
-    expect(V4_NEW_CONTENT_CARDS).toHaveLength(207);
-    expect(new Set(V4_NEW_CONTENT_CARDS.map((card) => card.id)).size).toBe(207);
+  it('assigns 240 substantive cards to existing official cuts, with no filler', () => {
+    expect(V4_NEW_CONTENT_CARDS).toHaveLength(240);
+    expect(new Set(V4_NEW_CONTENT_CARDS.map((card) => card.id)).size).toBe(240);
     expect(V4_NEW_CONTENT_CARDS.filter((card) => card.discipline === 'labor-procedure')).toHaveLength(44);
     expect(V4_NEW_CONTENT_CARDS.filter((card) => card.discipline === 'administrative')).toHaveLength(44);
+    expect(V4_NEW_CONTENT_CARDS.filter((card) => card.discipline === 'labor-law')).toHaveLength(43);
     expect(V4_NEW_CONTENT_CARDS.every((card) => {
       const subject = OFFICIAL_EDITAL_2026.find((item) => item.id === card.discipline);
       return Boolean(subject?.topics.some((topic) => topic.name === card.topic))
