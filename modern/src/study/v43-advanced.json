@@ -323,6 +323,114 @@
       "back": "Integra a remuneração, que abrange o salário devido e pago diretamente pelo empregador e as gorjetas recebidas.",
       "legalBasis": "CLT, art. 457, caput",
       "trap": "Salário e remuneração não são conceitos idênticos."
+    },
+    {
+      "id": "ll-013",
+      "disciplineId": "labor-law",
+      "number": 29,
+      "front": "O representante dos empregados eleito para cargo de direção da CIPA pode ser dispensado arbitrariamente durante a candidatura e o mandato?",
+      "back": "A dispensa arbitrária ou sem justa causa é vedada desde o registro da candidatura até um ano após o final do mandato do empregado eleito para cargo de direção da CIPA.",
+      "legalBasis": "ADCT, art. 10, II, a; CLT, art. 165",
+      "trap": "Não estender automaticamente a garantia aos representantes indicados pelo empregador."
+    },
+    {
+      "id": "ll-014",
+      "disciplineId": "labor-law",
+      "number": 31,
+      "front": "Uma empregada engravida durante o aviso prévio indenizado. A gravidez ocorrida nesse período pode gerar garantia provisória de emprego?",
+      "back": "Sim. A confirmação do estado de gravidez durante o contrato de trabalho, inclusive no prazo do aviso prévio trabalhado ou indenizado, garante a estabilidade provisória prevista no ADCT.",
+      "legalBasis": "CLT, art. 391-A; ADCT, art. 10, II, b",
+      "trap": "Aviso prévio indenizado não afasta por si só a proteção à gestante."
+    },
+    {
+      "id": "ll-015",
+      "disciplineId": "labor-law",
+      "number": 31,
+      "front": "Uma empregada gestante solicita licença-maternidade. Qual é a duração constitucional ordinária da licença, sem prejuízo do emprego e do salário?",
+      "back": "Cento e vinte dias, ressalvadas as hipóteses legais de prorrogação ou regimes especiais.",
+      "legalBasis": "CF, art. 7º, XVIII; CLT, art. 392",
+      "trap": "Distinguir duração da licença e período de garantia provisória de emprego."
+    },
+    {
+      "id": "ll-016",
+      "disciplineId": "labor-law",
+      "number": 26,
+      "front": "Dois empregados exercem função idêntica com trabalho de igual valor para o mesmo empregador e estabelecimento. Um possui cinco anos a mais de serviço para o empregador. O requisito temporal da equiparação está satisfeito?",
+      "back": "Não. A diferença de tempo de serviço para o mesmo empregador não pode ser superior a quatro anos, nem a diferença de tempo na função superior a dois anos.",
+      "legalBasis": "CLT, art. 461, caput e § 1º",
+      "trap": "Os limites temporais são cumulativos."
+    },
+    {
+      "id": "ll-017",
+      "disciplineId": "labor-law",
+      "number": 24,
+      "front": "O empregador concede prêmio genuíno por desempenho superior ao ordinariamente esperado. A habitualidade, por si só, torna a parcela integrante da remuneração?",
+      "back": "Não. Os prêmios que atendem à definição legal não integram a remuneração, ainda que habituais; a mera denominação de prêmio não basta.",
+      "legalBasis": "CLT, art. 457, §§ 2º e 4º",
+      "trap": "Distinguir prêmio verdadeiro de salário disfarçado."
+    },
+    {
+      "id": "ll-018",
+      "disciplineId": "labor-law",
+      "number": 28,
+      "front": "Em contrato comum de emprego regido pela CLT, qual é o percentual ordinário do depósito mensal do FGTS devido pelo empregador?",
+      "back": "Oito por cento da remuneração paga ou devida no mês anterior, observadas as parcelas integrantes da base legal e os regimes especiais.",
+      "legalBasis": "Lei 8.036/1990, art. 15, caput",
+      "trap": "Não confundir depósito mensal com indenização rescisória."
+    },
+    {
+      "id": "ll-019",
+      "disciplineId": "labor-law",
+      "number": 28,
+      "front": "Uma empresa contrata aprendiz. Aplica-se a mesma alíquota ordinária de depósito do FGTS de 8%?",
+      "back": "Não. Nos contratos de aprendizagem, a alíquota legal do FGTS é de dois por cento.",
+      "legalBasis": "Lei 8.036/1990, art. 15, § 7º",
+      "trap": "O contrato de aprendizagem tem alíquota especial."
+    },
+    {
+      "id": "ll-020",
+      "disciplineId": "labor-law",
+      "number": 30,
+      "front": "Em atividade classificada como insalubre, quais são os percentuais legais correspondentes aos graus máximo, médio e mínimo?",
+      "back": "Quarenta, vinte e dez por cento, respectivamente. A questão da base de cálculo exige análise própria e não se confunde com os percentuais.",
+      "legalBasis": "CLT, art. 192",
+      "trap": "Não aplicar os 30% da periculosidade à insalubridade."
+    },
+    {
+      "id": "ll-021",
+      "disciplineId": "labor-law",
+      "number": 30,
+      "front": "Um empregado sujeito a atividade perigosa, enquadrada na legislação, pergunta qual o percentual geral do adicional de periculosidade previsto na CLT.",
+      "back": "Trinta por cento sobre o salário, sem acréscimos resultantes de gratificações, prêmios ou participações nos lucros da empresa, observados regimes especiais.",
+      "legalBasis": "CLT, art. 193, § 1º",
+      "trap": "Não confundir a base legal da periculosidade com a da insalubridade."
+    },
+    {
+      "id": "ll-022",
+      "disciplineId": "labor-law",
+      "number": 36,
+      "front": "Um trabalhador em teletrabalho comparece habitualmente ao estabelecimento para atividades específicas que exigem sua presença. Isso descaracteriza necessariamente o teletrabalho?",
+      "back": "Não. O comparecimento, ainda que habitual, para atividades específicas que exijam a presença no estabelecimento não descaracteriza o regime de teletrabalho ou trabalho remoto.",
+      "legalBasis": "CLT, art. 75-B, § 1º",
+      "trap": "Teletrabalho não exige ausência absoluta do estabelecimento."
+    },
+    {
+      "id": "ll-023",
+      "disciplineId": "labor-law",
+      "number": 36,
+      "front": "Todo empregado em teletrabalho está automaticamente excluído do regime de duração do trabalho?",
+      "back": "Não. A exclusão legal do art. 62, III, alcança os empregados em teletrabalho que prestam serviço por produção ou tarefa.",
+      "legalBasis": "CLT, arts. 62, III, e 75-B, §§ 2º e 3º",
+      "trap": "Distinguir teletrabalho por jornada de teletrabalho por produção ou tarefa."
+    },
+    {
+      "id": "ll-024",
+      "disciplineId": "labor-law",
+      "number": 34,
+      "front": "Uma convenção coletiva pretende reduzir o número de dias de férias devidos ao empregado. A CLT admite essa redução como objeto de negociação coletiva?",
+      "back": "Não. A supressão ou redução do número de dias de férias devidos ao empregado constitui objeto ilícito de convenção ou acordo coletivo.",
+      "legalBasis": "CLT, art. 611-B, XI",
+      "trap": "A prevalência do negociado não é ilimitada."
     }
   ]
 }
