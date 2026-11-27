@@ -756,3 +756,11 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .catalog-audit-details li{font-size:12px;line-height:1.5;margin-bottom:8px}
 .edital-status-pill.status-uncovered{background:var(--surface-soft);color:var(--muted);border:1px solid var(--line)}
 @media(max-width:700px){.catalog-audit-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.catalog-audit{padding:12px}}
+
+/* Lei Seca: controles acessíveis e leitura focada */
+.law-reader-controls { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:0 24px; }
+.law-reader-controls button { min-height:44px; }
+.law-reader-controls span { font-size:12px; color:var(--muted); }
+.law-reader-text { white-space:pre-wrap; overflow-wrap:anywhere; }
+.law-reader-immersive .law-reader-paper { padding-bottom:24px; }
+@media (max-width:600px) { .law-reader-controls { padding:0 16px; } .law-reader-footer { padding-bottom:max(14px, env(safe-area-inset-bottom)); } }
