@@ -3,6 +3,7 @@ import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabase-client';
 import { createStudyProfile, ensureDefaultProfile, type NewProfileInput } from './study-repository';
 import { seedBuiltinStudyCatalog } from './builtin-seed';
+import { V4_NEW_CONTENT_COUNT } from './v4-supplement';
 import { readWorkspaceOffline, saveWorkspaceOffline } from './offline-cache';
 import {
   listDecks,
@@ -15,8 +16,8 @@ import {
   type TopicRow,
 } from './domain-repository';
 
-const BUILTIN_CATALOG_VERSION = 'v6-edital-oficial-20261022';
-export const EXPECTED_BUILTIN_CATALOG_CARDS = 1575;
+const BUILTIN_CATALOG_VERSION = 'v7-edital-2026-v4-285-cortes-75-conteudo';
+export const EXPECTED_BUILTIN_CATALOG_CARDS = V4_NEW_CONTENT_COUNT;
 
 function activeProfileKey(userId: string): string {
   return `trilha-active-profile:${userId}`;
@@ -103,7 +104,9 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
         client.from('cards')
           .select('*', { count: 'exact', head: true })
           .eq('profile_id', resolvedProfile.id)
-          .like('source', 'Edital nº 1/2026 TRT-4 AJAJ%'),
+          .is('deleted_at', null)
+          .eq('suspended', false)
+          .like('legacy_id', 'card-trt4-v4-%'),
       ]);
       if (countError) throw countError;
       if (officialCountError) throw officialCountError;
@@ -117,10 +120,12 @@ export function useStudyWorkspace(user: User): StudyWorkspace {
           const { count: verifiedCount, error: verifyError } = await client.from('cards')
             .select('*', { count: 'exact', head: true })
             .eq('profile_id', resolvedProfile.id)
-            .like('source', 'Edital nº 1/2026 TRT-4 AJAJ%');
+            .is('deleted_at', null)
+            .eq('suspended', false)
+            .like('legacy_id', 'card-trt4-v4-%');
           if (verifyError) throw verifyError;
           if ((verifiedCount ?? 0) < EXPECTED_BUILTIN_CATALOG_CARDS) {
-            throw new Error(`Material de estudo incompleto: ${verifiedCount ?? 0}/${EXPECTED_BUILTIN_CATALOG_CARDS}. Tente novamente.`);
+            throw new Error(`Cartões V4 incompletos: ${verifiedCount ?? 0}/${EXPECTED_BUILTIN_CATALOG_CARDS}. Confira o Painel de Saúde e tente reparar.`);
           }
           storeBuiltinCatalogVersion(user.id, resolvedProfile.id);
         } catch (seedError) {
