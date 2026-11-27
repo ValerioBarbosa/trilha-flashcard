@@ -9,6 +9,7 @@ import { importCards, markImportDuplicates, type ImportCandidate } from '../card
 import { parseLeiSecaPdfImport } from '../cards/pdf-import';
 import '../cards/card-manager.css';
 import '../cards/pdf-import.css';
+import { highlightLawText, LAW_HIGHLIGHT_LABELS } from './law-highlights';
 
 type LeiSecaSubject = SubjectRow & { rootTopics: TopicRow[] };
 
@@ -49,6 +50,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const [readerNote, setReaderNote] = useState('');
   const [readerFont, setReaderFont] = useState(19);
   const [immersive, setImmersive] = useState(false);
+  const [highlights, setHighlights] = useState(false);
   const [readerFavorite, setReaderFavorite] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [reader, setReader] = useState<{ topicId: string; index: number } | null>(null);
@@ -385,13 +387,15 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                 <span aria-live="polite">{readerFont}px</span>
                 <button type="button" className="secondary-outline" disabled={readerFont >= 29} onClick={() => setReaderFont((size) => Math.min(29, size + 2))} aria-label="Aumentar fonte">A+</button>
                 <button type="button" className="secondary-outline" aria-pressed={immersive} onClick={() => setImmersive((value) => !value)}>{immersive ? 'Mostrar anotações' : 'Leitura focada'}</button>
+                <button type="button" className="secondary-outline" aria-pressed={highlights} onClick={() => setHighlights((value) => !value)}>{highlights ? 'Ocultar destaques' : 'Destacar expressões'}</button>
               </div>
+              {highlights ? <div className="law-highlight-legend"><small>Indícios por palavras-chave; não substituem a interpretação jurídica.</small><div>{Object.entries(LAW_HIGHLIGHT_LABELS).map(([kind, label]) => <span key={kind} className={'law-highlight law-highlight-' + kind}>{label}</span>)}</div></div> : null}
               <article key={card.id} className={`law-reader-paper ${card.read_at ? 'is-read' : ''}`}>
                 <div className="law-reader-citation">
                   <span>{card.front}</span>
                   <button className={`law-favorite ${readerFavorite ? 'active' : ''}`} onClick={() => toggleFavorite(card.id)} aria-label={readerFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}>{readerFavorite ? '★' : '☆'}</button>
                 </div>
-                <div className="law-reader-text" style={{ fontSize: readerFont }}>{card.back.split(/(?<=\n)/).map((line, index) => <span key={index} className={`law-block ${/^\s*(?:Art\.\s*\d|§\s*\d|Parágrafo único)/i.test(line) ? 'law-block-heading' : /^\s*[IVXLCDM]+\s*[-–—]/.test(line) ? 'law-block-inciso' : /^\s*[a-z]\)/.test(line) ? 'law-block-alinea' : ''}`}>{line}</span>)}</div>
+                <div className="law-reader-text" style={{ fontSize: readerFont }}>{card.back.split(/(?<=\n)/).map((line, index) => <span key={index} className={`law-block ${/^\s*(?:Art\.\s*\d|§\s*\d|Parágrafo único)/i.test(line) ? 'law-block-heading' : /^\s*[IVXLCDM]+\s*[-–—]/.test(line) ? 'law-block-inciso' : /^\s*[a-z]\)/.test(line) ? 'law-block-alinea' : ''}`}>{highlights ? highlightLawText(line).map((segment, i) => segment.kind ? <mark key={i} className={'law-highlight law-highlight-' + segment.kind} title={LAW_HIGHLIGHT_LABELS[segment.kind]}>{segment.text}</mark> : <span key={i}>{segment.text}</span>) : line}</span>)}</div>
                 {!immersive && card.complement ? <aside className="law-reader-note"><strong>Observação</strong><p>{card.complement}</p></aside> : null}
                 {!immersive ? <label className="law-personal-note"><strong>Minha anotação neste dispositivo</strong><textarea rows={3} value={readerNote} onChange={(event) => saveReaderNote(card.id, event.target.value)} placeholder="Escreva uma observação, exceção ou macete pessoal…" /></label> : null}
               </article>
