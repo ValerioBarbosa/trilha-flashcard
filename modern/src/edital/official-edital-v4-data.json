@@ -6,1995 +6,1995 @@
   "nature": "recortes didáticos do edital, não contagem oficial da FCC",
   "rows": [
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-01",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-01",
       "disciplineId": "portuguese",
       "name": "Redação Oficial; Ortografia e acentuação",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-02",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-02",
       "disciplineId": "portuguese",
       "name": "Emprego do sinal indicativo de crase",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-03",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-03",
       "disciplineId": "portuguese",
       "name": "Compreensão e interpretação de textos de gêneros variados",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-04",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-04",
       "disciplineId": "portuguese",
       "name": "Relação do texto com seu contexto histórico; Denotação e conotação",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-05",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-05",
       "disciplineId": "portuguese",
       "name": "Discurso direto, discurso indireto e discurso indireto livre; Intertextualidade; Figuras de linguagem; Morfossintaxe",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-06",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-06",
       "disciplineId": "portuguese",
       "name": "Elementos estruturais e processos de formação de palavras; Sinonímia e antonímia; Pontuação; Pronomes",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-07",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-07",
       "disciplineId": "portuguese",
       "name": "Concordância nominal e concordância verbal",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-08",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-08",
       "disciplineId": "portuguese",
       "name": "Flexão nominal e flexão verbal; Vozes do verbo",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-09",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-09",
       "disciplineId": "portuguese",
       "name": "Correlação de tempos e modos verbais",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-10",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-10",
       "disciplineId": "portuguese",
       "name": "Regência nominal e regência verbal; Coordenação e subordinação; Conectivos",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-11",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-11",
       "disciplineId": "portuguese",
       "name": "Redação: confronto e reconhecimento de frases corretas e incorretas",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-12",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-12",
       "disciplineId": "portuguese",
       "name": "Organização e reorganização de orações e períodos",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-LÍNGUAPO-13",
+      "id": "TRT4-AJAJ-V4-PORTUGUESE-13",
       "disciplineId": "portuguese",
       "name": "Equivalência e transformação de estruturas",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-MATEMÁTI-01",
+      "id": "TRT4-AJAJ-V4-MATH-LOGIC-01",
       "disciplineId": "math-logic",
       "name": "Estrutura lógica de relações arbitrárias entre pessoas, lugares, objetos ou eventos fictícios",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-MATEMÁTI-02",
+      "id": "TRT4-AJAJ-V4-MATH-LOGIC-02",
       "disciplineId": "math-logic",
       "name": "deduzir novas informações das relações fornecidas e avaliar as condições usadas para estabelecer a estrutura daquelas relações",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-MATEMÁTI-03",
+      "id": "TRT4-AJAJ-V4-MATH-LOGIC-03",
       "disciplineId": "math-logic",
       "name": "Compreensão e elaboração da lógica das situações por meio de: raciocínio verbal, raciocínio matemático, raciocínio sequencial, orientação espacial e temporal, formação de conceitos, discriminação de elementos",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-MATEMÁTI-04",
+      "id": "TRT4-AJAJ-V4-MATH-LOGIC-04",
       "disciplineId": "math-logic",
       "name": "Compreensão do processo lógico que, a partir de um conjunto de hipóteses, conduz, de forma válida, a conclusões determinadas",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-MATEMÁTI-05",
+      "id": "TRT4-AJAJ-V4-MATH-LOGIC-05",
       "disciplineId": "math-logic",
       "name": "Números inteiros e racionais: operações (adição, subtração, multiplicação, divisão, potenciação); expressões numéricas",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-MATEMÁTI-06",
+      "id": "TRT4-AJAJ-V4-MATH-LOGIC-06",
       "disciplineId": "math-logic",
       "name": "múltiplos e divisores de números naturais; problemas",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-MATEMÁTI-07",
+      "id": "TRT4-AJAJ-V4-MATH-LOGIC-07",
       "disciplineId": "math-logic",
       "name": "Frações e operações com frações",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-MATEMÁTI-08",
+      "id": "TRT4-AJAJ-V4-MATH-LOGIC-08",
       "disciplineId": "math-logic",
       "name": "Números e grandezas proporcionais: razões e proporções",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-MATEMÁTI-09",
+      "id": "TRT4-AJAJ-V4-MATH-LOGIC-09",
       "disciplineId": "math-logic",
       "name": "divisão em partes proporcionais; regra de três",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-MATEMÁTI-10",
+      "id": "TRT4-AJAJ-V4-MATH-LOGIC-10",
       "disciplineId": "math-logic",
       "name": "porcentagem e problemas envolvendo regra de três simples, cálculos de porcentagem, acréscimos e descontos",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-MATEMÁTI-11",
+      "id": "TRT4-AJAJ-V4-MATH-LOGIC-11",
       "disciplineId": "math-logic",
       "name": "Noções de Estatísticas: medidas de tendência central (moda, mediana, média aritmética simples e ponderada) e de dispersão (desvio médio, amplitude, variância, desvio padrão)",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-MATEMÁTI-12",
+      "id": "TRT4-AJAJ-V4-MATH-LOGIC-12",
       "disciplineId": "math-logic",
       "name": "leitura e interpretação de gráficos (histogramas, setores, infográficos) e tabelas.",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-01",
+      "id": "TRT4-AJAJ-V4-TRT-LEGISLATION-01",
       "disciplineId": "trt-legislation",
       "name": "Noções de Sustentabilidade: Resolução CNJ nº 400/2021 (Dispõe sobre a política de sustentabilidade no âmbito do Poder Judiciário)",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-02",
+      "id": "TRT4-AJAJ-V4-TRT-LEGISLATION-02",
       "disciplineId": "trt-legislation",
       "name": "Código de Conduta e Valores Éticos do TRT-4 — Portaria GP.TRT4 nº 4.573/2023",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-03",
+      "id": "TRT4-AJAJ-V4-TRT-LEGISLATION-03",
       "disciplineId": "trt-legislation",
       "name": "Alterações ao Código de Conduta e Valores Éticos do TRT-4 — Portaria GP.TRT4 nº 2.808/2025",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-04",
+      "id": "TRT4-AJAJ-V4-TRT-LEGISLATION-04",
       "disciplineId": "trt-legislation",
       "name": "Regimento Interno do TRT-4 atualizado até RA nº 31/2026 e Assento Regimental nº 04/2026",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-05",
+      "id": "TRT4-AJAJ-V4-TRT-LEGISLATION-05",
       "disciplineId": "trt-legislation",
       "name": "Resolução CSJT nº 360/2023 (Política de Prevenção e Enfrentamento da Violência, do Assédio e de Todas as Formas de Discriminação no âmbito da Justiça do Trabalho de primeiro e segundo graus)",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-06",
+      "id": "TRT4-AJAJ-V4-TRT-LEGISLATION-06",
       "disciplineId": "trt-legislation",
       "name": "Resolução CNJ nº 351/2020 (Institui no âmbito do Poder Judiciário, a Política de Prevenção e Enfrentamento do Assédio Moral, do Assédio Sexual e da Discriminação).",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-01",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-01",
       "disciplineId": "human-rights",
       "name": "Direitos Humanos: Evolução histórica dos Direitos Humanos",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-02",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-02",
       "disciplineId": "human-rights",
       "name": "Os fundamentos filosóficos dos Direitos Humanos",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-03",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-03",
       "disciplineId": "human-rights",
       "name": "Fontes, classificação, princípios, características e gerações de direitos humanos",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-04",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-04",
       "disciplineId": "human-rights",
       "name": "Interpretação dos tratados de Direitos Humanos",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-05",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-05",
       "disciplineId": "human-rights",
       "name": "Colisão entre direitos humanos: Teorias para resolução",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-06",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-06",
       "disciplineId": "human-rights",
       "name": "Tratados internacionais de Direitos Humanos em face da Constituição da República Federativa do Brasil de 1988",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-07",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-07",
       "disciplineId": "human-rights",
       "name": "Controle de convencionalidade",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-08",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-08",
       "disciplineId": "human-rights",
       "name": "Declaração Universal dos Direitos Humanos",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-09",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-09",
       "disciplineId": "human-rights",
       "name": "Pacto Internacional dos Direitos Civis e Políticos (PIDCP) e protocolos facultativos",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-10",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-10",
       "disciplineId": "human-rights",
       "name": "Pacto Internacional dos Direitos Econômicos, Sociais e Culturais (PIDESC) e protocolos facultativos",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-11",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-11",
       "disciplineId": "human-rights",
       "name": "Convenção sobre a eliminação de todas as formas de discriminação racial",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-12",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-12",
       "disciplineId": "human-rights",
       "name": "Convenção sobre a eliminação de todas as formas de discriminação contra a mulher e protocolo facultativo",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-13",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-13",
       "disciplineId": "human-rights",
       "name": "Convenção sobre os direitos da criança e seus protocolos facultativos",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-14",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-14",
       "disciplineId": "human-rights",
       "name": "Convenção sobre os direitos da pessoa com deficiência e seu protocolo facultativo",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-15",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-15",
       "disciplineId": "human-rights",
       "name": "Convenção relativa à proteção do patrimônio mundial, cultural e natural – “Declaração de Estocolmo”. Convenção sobre a diversidade biológica",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-16",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-16",
       "disciplineId": "human-rights",
       "name": "Declaração das Nações Unidas sobre os direitos dos povos indígenas",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-17",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-17",
       "disciplineId": "human-rights",
       "name": "Sistema Regional Interamericano de Proteção aos Direitos Humanos",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-18",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-18",
       "disciplineId": "human-rights",
       "name": "Declaração Americana dos Direitos e Deveres do Homem",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-19",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-19",
       "disciplineId": "human-rights",
       "name": "Convenção Americana sobre Direitos Humanos",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-20",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-20",
       "disciplineId": "human-rights",
       "name": "Protocolo adicional à Convenção Americana sobre Direitos Humanos em matéria de direitos econômicos, sociais e culturais – “Protocolo de San Salvador”. Comissão Interamericana de Direitos Humanos e Corte Interamericana de Direitos Humanos: composição, funcionamento, atribuições e histórico de decisões",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-21",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-21",
       "disciplineId": "human-rights",
       "name": "Mecanismos de proteção aos direitos humanos na ordem jurídica nacional e internacional",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-22",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-22",
       "disciplineId": "human-rights",
       "name": "Direitos Humanos em espécie e grupos vulneráveis",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-23",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-23",
       "disciplineId": "human-rights",
       "name": "Direitos Humanos das minorias e de vítimas de injustiças históricas: Mulher, Negro, Criança e Adolescente, Idoso, Pessoa com Deficiência, Pessoas em situação de rua, Povos Indígenas, LGBT, Quilombolas, Sem-teto, Sem-terra, Imigrantes e Refugiados",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-24",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-24",
       "disciplineId": "human-rights",
       "name": "Perspectiva de Gênero no Poder Judiciário e o Comitê de Incentivo à Participação Institucional Feminina no Poder Judiciário (Resolução CNJ nº 492/2023)",
       "priority": "A",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-25",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-25",
       "disciplineId": "human-rights",
       "name": "Programa de Equidade de Raça, Gênero e Diversidade no âmbito da Justiça do Trabalho (Resolução CSJT nº 368/2023)",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-26",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-26",
       "disciplineId": "human-rights",
       "name": "Tribunal Penal Internacional: Estatuto de Roma e Decreto nº 4.388/2002",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-27",
+      "id": "TRT4-AJAJ-V4-HUMAN-RIGHTS-27",
       "disciplineId": "human-rights",
       "name": "Carta das Nações Unidas, da qual faz parte integrante o anexo Estatuto da Corte Internacional de Justiça (Decreto nº 19.841/1945), Protocolos para Atuação e Julgamento na Justiça do Trabalho.",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-01",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-01",
       "disciplineId": "informatics",
       "name": "Noções de sistema operacional: Windows 10 e 11",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-02",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-02",
       "disciplineId": "informatics",
       "name": "E-mail, edição de textos, planilhas, agenda e apresentações: Google Workspace e Microsoft Office 365",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-03",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-03",
       "disciplineId": "informatics",
       "name": "Compartilhamento de arquivos: Google Workspace",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-04",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-04",
       "disciplineId": "informatics",
       "name": "Google Drive: Criar arquivos, editar, compartilhamento de arquivos e permissões",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-05",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-05",
       "disciplineId": "informatics",
       "name": "Agenda: Criar eventos, convidar participantes, ajustar horários, anexar documentos, adicionar videoconferência; Tarefas; Google Meet",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-06",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-06",
       "disciplineId": "informatics",
       "name": "Gmail: Configurações rápidas, painel de visualização, marcadores",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-07",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-07",
       "disciplineId": "informatics",
       "name": "editor de texto (documentos Google)",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-08",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-08",
       "disciplineId": "informatics",
       "name": "Redes de Computadores: Conceitos básicos, ferramentas, aplicativos e procedimentos de internet e intranet",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-09",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-09",
       "disciplineId": "informatics",
       "name": "Navegadores web: Mozilla Firefox, Google Chrome, Microsoft Edge",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-10",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-10",
       "disciplineId": "informatics",
       "name": "Sítios de busca e pesquisa na internet: Utilização de mecanismos de busca como Google, Bing",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-11",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-11",
       "disciplineId": "informatics",
       "name": "Conceitos de organização e de gerenciamento de informações: Arquivos, pastas e programas",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-12",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-12",
       "disciplineId": "informatics",
       "name": "Segurança da informação: Procedimentos de segurança",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-13",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-13",
       "disciplineId": "informatics",
       "name": "noções de vírus, worms e outras pragas virtuais",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-14",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-14",
       "disciplineId": "informatics",
       "name": "aplicativos para segurança (antivírus, firewall, antispyware etc.)",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-NOÇÕESDE-15",
+      "id": "TRT4-AJAJ-V4-INFORMATICS-15",
       "disciplineId": "informatics",
       "name": "boas práticas de segurança cibernética, incluindo autenticação de dois fatores e gestão de senhas.",
       "priority": "B",
       "group": "CONHECIMENTOS GERAIS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-01",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-01",
       "disciplineId": "constitutional",
       "name": "Direito constitucional: Da aplicabilidade e interpretação das normas constitucionais",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-02",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-02",
       "disciplineId": "constitutional",
       "name": "vigência e eficácia das normas constitucionais",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-03",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-03",
       "disciplineId": "constitutional",
       "name": "Controle de constitucionalidade: sistemas difuso e concentrado",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-04",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-04",
       "disciplineId": "constitutional",
       "name": "ação direta de inconstitucionalidade",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-05",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-05",
       "disciplineId": "constitutional",
       "name": "ação declaratória de constitucionalidade e arguição de descumprimento de preceito fundamental; Princípios fundamentais",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-06",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-06",
       "disciplineId": "constitutional",
       "name": "Dos direitos e garantias fundamentais: dos direitos e deveres individuais e coletivos; dos direitos sociais",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-07",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-07",
       "disciplineId": "constitutional",
       "name": "dos direitos de nacionalidade; dos direitos políticos; dos partidos políticos",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-08",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-08",
       "disciplineId": "constitutional",
       "name": "Da organização do Estado: da organização político administrativa: da União; dos Estados Federados; dos Municípios; Do Distrito Federal; dos Territórios; da intervenção",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-09",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-09",
       "disciplineId": "constitutional",
       "name": "Da Administração Pública: disposições gerais; dos servidores públicos; Da Organização dos Poderes",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-10",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-10",
       "disciplineId": "constitutional",
       "name": "Do Poder Executivo: do Presidente e do Vice- Presidente da República",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-11",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-11",
       "disciplineId": "constitutional",
       "name": "Das atribuições e responsabilidades do Presidente da República; Dos Ministros de Estado",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-12",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-12",
       "disciplineId": "constitutional",
       "name": "Do Poder Legislativo: do processo legislativo",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-13",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-13",
       "disciplineId": "constitutional",
       "name": "Da fiscalização contábil, financeira e orçamentária",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-14",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-14",
       "disciplineId": "constitutional",
       "name": "Do Poder Judiciário: disposições gerais; do Supremo Tribunal Federal",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-15",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-15",
       "disciplineId": "constitutional",
       "name": "do Conselho Nacional de Justiça: organização e competência",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-16",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-16",
       "disciplineId": "constitutional",
       "name": "do Superior Tribunal de Justiça",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-17",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-17",
       "disciplineId": "constitutional",
       "name": "do Tribunal Superior do Trabalho, dos Tribunais Regionais do Trabalho e dos Juízes do Trabalho",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-18",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-18",
       "disciplineId": "constitutional",
       "name": "do Conselho Superior da Justiça do Trabalho: organização e competência",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-19",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-19",
       "disciplineId": "constitutional",
       "name": "Das funções essenciais à Justiça: do Ministério Público; da Advocacia Pública",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-20",
+      "id": "TRT4-AJAJ-V4-CONSTITUTIONAL-20",
       "disciplineId": "constitutional",
       "name": "da Advocacia e da Defensoria Pública.",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-01",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-01",
       "disciplineId": "administrative",
       "name": "Administração Pública",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-02",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-02",
       "disciplineId": "administrative",
       "name": "Regime jurídico administrativo",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-03",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-03",
       "disciplineId": "administrative",
       "name": "Princípios constitucionais e legais da Administração Pública",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-04",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-04",
       "disciplineId": "administrative",
       "name": "Princípios administrativos implícitos",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-05",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-05",
       "disciplineId": "administrative",
       "name": "Lei de Introdução às normas do Direito Brasileiro e sua aplicação na Administração Pública (Decreto-Lei nº 4.657/1942 e suas alterações)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-06",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-06",
       "disciplineId": "administrative",
       "name": "Poderes da Administração Pública: poder hierárquico, poder disciplinar, poder regulamentar, poder de polícia",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-07",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-07",
       "disciplineId": "administrative",
       "name": "Poderes e deveres dos administradores públicos; Uso e abuso do poder",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-08",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-08",
       "disciplineId": "administrative",
       "name": "Crimes de abuso de autoridade (Lei nº 13.869/2019 e suas alterações); Ato administrativo",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-09",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-09",
       "disciplineId": "administrative",
       "name": "Conceito, características e atributos",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-10",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-10",
       "disciplineId": "administrative",
       "name": "Elementos e requisitos de validade",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-11",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-11",
       "disciplineId": "administrative",
       "name": "Classificação dos atos administrativos; Formação e efeitos",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-12",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-12",
       "disciplineId": "administrative",
       "name": "Extinção, revogação, invalidação e convalidação; Cassação e caducidade",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-13",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-13",
       "disciplineId": "administrative",
       "name": "Processo administrativo no âmbito da Administração Pública Federal (Lei nº 9.784/1999 e suas alterações)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-14",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-14",
       "disciplineId": "administrative",
       "name": "Controle da Administração Pública",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-15",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-15",
       "disciplineId": "administrative",
       "name": "Classificações relativas ao controle da Administração Pública",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-16",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-16",
       "disciplineId": "administrative",
       "name": "Controle interno e controle externo",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-17",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-17",
       "disciplineId": "administrative",
       "name": "Controle exercido pelo Poder Judiciário, pelo Poder Legislativo e pelos Tribunais de Contas",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-18",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-18",
       "disciplineId": "administrative",
       "name": "Lei de Licitações e contratos administrativos (Lei nº 14.133/2021 e suas alterações)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-19",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-19",
       "disciplineId": "administrative",
       "name": "Licitação: conceito, natureza jurídica, objeto e finalidade",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-20",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-20",
       "disciplineId": "administrative",
       "name": "princípios básicos e correlatos; modalidades",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-21",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-21",
       "disciplineId": "administrative",
       "name": "obrigatoriedade, dispensa e inexigibilidade; procedimento licitatório",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-22",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-22",
       "disciplineId": "administrative",
       "name": "anulação, revogação e recursos administrativos",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-23",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-23",
       "disciplineId": "administrative",
       "name": "sanções e procedimento sancionatório",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-24",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-24",
       "disciplineId": "administrative",
       "name": "crimes em licitações e contratos administrativos",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-25",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-25",
       "disciplineId": "administrative",
       "name": "Contrato administrativo: conceito, principais características e espécies",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-26",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-26",
       "disciplineId": "administrative",
       "name": "formalização, execução e inexecução",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-27",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-27",
       "disciplineId": "administrative",
       "name": "duração, prorrogação, renovação e extinção; revisão e rescisão; reajustamento; Convênios administrativos",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-28",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-28",
       "disciplineId": "administrative",
       "name": "Parcerias entre a Administração Pública e o terceiro setor (Lei nº 13.019/2014 e suas alterações); Serviço público: conceito; classificação; princípios",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-29",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-29",
       "disciplineId": "administrative",
       "name": "formas de delegação de serviço público",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-30",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-30",
       "disciplineId": "administrative",
       "name": "Direitos dos usuários de serviço público",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-31",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-31",
       "disciplineId": "administrative",
       "name": "Concessão e permissão de serviços públicos (Lei nº 8.987/1995 e suas alterações); Extinção, reversão dos bens",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-32",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-32",
       "disciplineId": "administrative",
       "name": "Parcerias Público-Privadas: normas gerais para licitação e contratação de parceria público-privada no âmbito da Administração Pública (Lei nº 11.079/2004 e suas alterações)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-33",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-33",
       "disciplineId": "administrative",
       "name": "Agentes públicos: classificação",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-34",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-34",
       "disciplineId": "administrative",
       "name": "cargo, emprego e função pública; provimento e investidura; exercício e afastamentos; Direito de Greve",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-35",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-35",
       "disciplineId": "administrative",
       "name": "Regime jurídico dos servidores públicos civis da União, das autarquias e das fundações públicas federais (Lei nº 8.112/1990 consolidada nos termos da Lei nº 9.527/1997 e suas alterações)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-36",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-36",
       "disciplineId": "administrative",
       "name": "Lei nº 11.416/2006 (dispõe sobre as carreiras dos servidores públicos do Poder Judiciário Federal)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-37",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-37",
       "disciplineId": "administrative",
       "name": "Regime constitucional dos servidores públicos na Constituição Federal de 1988",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-38",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-38",
       "disciplineId": "administrative",
       "name": "Regime de emprego público e disposições da Consolidação das Leis do Trabalho (CLT) aplicáveis",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-39",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-39",
       "disciplineId": "administrative",
       "name": "Responsabilidade civil, administrativa e penal dos agentes públicos",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-40",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-40",
       "disciplineId": "administrative",
       "name": "Regime e processo administrativo disciplinar",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-41",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-41",
       "disciplineId": "administrative",
       "name": "Responsabilidade extracontratual do Estado; Bens Públicos",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-42",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-42",
       "disciplineId": "administrative",
       "name": "Formas de utilização dos bens públicos por terceiros",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-43",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-43",
       "disciplineId": "administrative",
       "name": "Lei de acesso a informações (Lei nº 12.527/2011 e suas alterações)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOA-44",
+      "id": "TRT4-AJAJ-V4-ADMINISTRATIVE-44",
       "disciplineId": "administrative",
       "name": "Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018 com redação dada pela Lei nº 13.853/2019).",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-01",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-01",
       "disciplineId": "labor-law",
       "name": "Dos princípios e fontes do Direito do Trabalho",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-02",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-02",
       "disciplineId": "labor-law",
       "name": "Dos direitos constitucionais dos trabalhadores (artigo 7º da Constituição Federal de 1988)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-03",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-03",
       "disciplineId": "labor-law",
       "name": "Da relação de trabalho e da relação de emprego: requisitos e distinção",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-04",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-04",
       "disciplineId": "labor-law",
       "name": "relações de trabalho lato sensu: trabalho autônomo, trabalho eventual, trabalho temporário e trabalho avulso",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-05",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-05",
       "disciplineId": "labor-law",
       "name": "Trabalho intermitente: regramento legal; características; peculiaridades",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-06",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-06",
       "disciplineId": "labor-law",
       "name": "Dos sujeitos do contrato de trabalho stricto sensu: do empregado e do empregador: conceito e caracterização",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-07",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-07",
       "disciplineId": "labor-law",
       "name": "dos poderes do empregador no contrato de trabalho; Do grupo econômico; da sucessão de empregadores",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-08",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-08",
       "disciplineId": "labor-law",
       "name": "da responsabilidade solidária e subsidiária",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-09",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-09",
       "disciplineId": "labor-law",
       "name": "Do contrato individual de trabalho: conceito, classificação e características",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-10",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-10",
       "disciplineId": "labor-law",
       "name": "Da alteração do contrato de trabalho: alteração unilateral e bilateral; o jus variandi",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-11",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-11",
       "disciplineId": "labor-law",
       "name": "Da suspensão e interrupção do contrato de trabalho: caracterização e distinção",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-12",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-12",
       "disciplineId": "labor-law",
       "name": "Da rescisão do contrato de trabalho: das justas causas; da despedida indireta; da dispensa arbitrária",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-13",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-13",
       "disciplineId": "labor-law",
       "name": "da rescisão por acordo mútuo; da despedida coletiva; da culpa recíproca; da indenização; Do aviso prévio; Prazo do aviso prévio",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-14",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-14",
       "disciplineId": "labor-law",
       "name": "Da estabilidade e das garantias provisórias de emprego: das formas de estabilidade",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-15",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-15",
       "disciplineId": "labor-law",
       "name": "da despedida e da reintegração de empregado estável; Da duração do trabalho; da jornada de trabalho; dos períodos de descanso",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-16",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-16",
       "disciplineId": "labor-law",
       "name": "do intervalo para repouso e alimentação",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-17",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-17",
       "disciplineId": "labor-law",
       "name": "do descanso semanal remunerado",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-18",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-18",
       "disciplineId": "labor-law",
       "name": "do trabalho noturno e do trabalho extraordinário",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-19",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-19",
       "disciplineId": "labor-law",
       "name": "do sistema de compensação de horas",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-20",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-20",
       "disciplineId": "labor-law",
       "name": "Do salário mínimo: irredutibilidade e garantia",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-21",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-21",
       "disciplineId": "labor-law",
       "name": "Das férias: do direito a férias e da sua duração",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-22",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-22",
       "disciplineId": "labor-law",
       "name": "da concessão e da época das férias",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-23",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-23",
       "disciplineId": "labor-law",
       "name": "da remuneração e do abono de férias",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-24",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-24",
       "disciplineId": "labor-law",
       "name": "Do salário e da remuneração: conceito e distinções; composição do salário; modalidades de salário",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-25",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-25",
       "disciplineId": "labor-law",
       "name": "formas e meios de pagamento do salário; 13º salário",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-26",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-26",
       "disciplineId": "labor-law",
       "name": "Da equiparação salarial: hipóteses ensejadoras e forma de aferição",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-27",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-27",
       "disciplineId": "labor-law",
       "name": "do princípio da igualdade de salário; do desvio de função; Da arbitragem",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-28",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-28",
       "disciplineId": "labor-law",
       "name": "Do Fundo de Garantia do Tempo de Serviço (FGTS); Da prescrição e decadência",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-29",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-29",
       "disciplineId": "labor-law",
       "name": "Da segurança e medicina no trabalho: da CIPA",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-30",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-30",
       "disciplineId": "labor-law",
       "name": "das atividades insalubres ou perigosas",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-31",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-31",
       "disciplineId": "labor-law",
       "name": "Da proteção ao trabalho da mulher, da gestante e do menor; Da estabilidade da gestante; da licença-maternidade",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-32",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-32",
       "disciplineId": "labor-law",
       "name": "Do direito coletivo do trabalho: da liberdade sindical (Convenção nº 87 da OIT)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-33",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-33",
       "disciplineId": "labor-law",
       "name": "da organização sindical: conceito de categoria; categoria diferenciada",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-34",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-34",
       "disciplineId": "labor-law",
       "name": "das convenções e dos acordos coletivos de trabalho; Do direito de greve; dos serviços essenciais",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-35",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-35",
       "disciplineId": "labor-law",
       "name": "Das comissões de Conciliação Prévia; Da renúncia e transação",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-36",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-36",
       "disciplineId": "labor-law",
       "name": "Do teletrabalho (Lei nº 13.467/2017)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-37",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-37",
       "disciplineId": "labor-law",
       "name": "Dano moral e material nas relações de trabalho",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-38",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-38",
       "disciplineId": "labor-law",
       "name": "Precedentes vinculantes (IRDR e IAC)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-39",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-39",
       "disciplineId": "labor-law",
       "name": "Súmulas e Orientações da Jurisprudência uniformizada do Tribunal Superior do Trabalho sobre Direito do Trabalho",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-40",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-40",
       "disciplineId": "labor-law",
       "name": "Súmulas Vinculantes do Supremo Tribunal Federal relativas ao Direito do Trabalho",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-41",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-41",
       "disciplineId": "labor-law",
       "name": "Instruções e atos Normativos do TST em matéria de Direito do Trabalho",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-42",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-42",
       "disciplineId": "labor-law",
       "name": "Reforma Trabalhista (Lei nº 13.467/2017)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOD-43",
+      "id": "TRT4-AJAJ-V4-LABOR-LAW-43",
       "disciplineId": "labor-law",
       "name": "Teses de Repercussão Geral do STF em matéria trabalhista.",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-01",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-01",
       "disciplineId": "labor-procedure",
       "name": "Da Justiça do Trabalho: organização e competência",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-02",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-02",
       "disciplineId": "labor-procedure",
       "name": "Das Varas do Trabalho, dos Tribunais Regionais do Trabalho e do Tribunal Superior do Trabalho: jurisdição e competência",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-03",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-03",
       "disciplineId": "labor-procedure",
       "name": "Dos serviços auxiliares da Justiça do Trabalho: das secretarias das Varas do Trabalho; dos distribuidores",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-04",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-04",
       "disciplineId": "labor-procedure",
       "name": "dos oficiais de justiça avaliadores",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-05",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-05",
       "disciplineId": "labor-procedure",
       "name": "Dos Peritos Judiciais: responsabilidade pelos honorários periciais, Gratuidade de Justiça",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-06",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-06",
       "disciplineId": "labor-procedure",
       "name": "Do Ministério Público do Trabalho: organização",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-07",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-07",
       "disciplineId": "labor-procedure",
       "name": "Do processo judiciário do trabalho: princípios gerais do processo trabalhista (aplicação subsidiária do CPC); Prescrição e decadência; Prescrição intercorrente",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-08",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-08",
       "disciplineId": "labor-procedure",
       "name": "Dos atos, termos e prazos processuais; Da distribuição",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-09",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-09",
       "disciplineId": "labor-procedure",
       "name": "Do valor da causa no Processo do Trabalho; Das custas e emolumentos",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-10",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-10",
       "disciplineId": "labor-procedure",
       "name": "Custas e emolumentos para a Fazenda Pública; Hipóteses de isenção; Das partes e procuradores; do jus postulandi",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-11",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-11",
       "disciplineId": "labor-procedure",
       "name": "da substituição e representação processuais",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-12",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-12",
       "disciplineId": "labor-procedure",
       "name": "Da representação da massa falida e das empresas em Recuperação judicial",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-13",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-13",
       "disciplineId": "labor-procedure",
       "name": "Do litisconsórcio no Processo do Trabalho; da assistência judiciária",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-14",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-14",
       "disciplineId": "labor-procedure",
       "name": "dos honorários de advogado: sucumbenciais e honorários contratados",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-15",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-15",
       "disciplineId": "labor-procedure",
       "name": "Das nulidades e das exceções: hipóteses ensejadoras, prazo e forma de arguição",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-16",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-16",
       "disciplineId": "labor-procedure",
       "name": "Das audiências: de conciliação, de instrução e de julgamento; da notificação das partes; do arquivamento do processo; da revelia e confissão; Das provas",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-17",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-17",
       "disciplineId": "labor-procedure",
       "name": "Dos dissídios individuais: da forma de reclamação e notificação",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-18",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-18",
       "disciplineId": "labor-procedure",
       "name": "da reclamação escrita e verbal",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-19",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-19",
       "disciplineId": "labor-procedure",
       "name": "da legitimidade para ajuizar",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-20",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-20",
       "disciplineId": "labor-procedure",
       "name": "Do procedimento ordinário e sumaríssimo",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-21",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-21",
       "disciplineId": "labor-procedure",
       "name": "Dos procedimentos especiais: inquérito para apuração de falta grave, ação rescisória e mandado de segurança; Da ação civil pública",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-22",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-22",
       "disciplineId": "labor-procedure",
       "name": "Da sentença e da coisa julgada",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-23",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-23",
       "disciplineId": "labor-procedure",
       "name": "da liquidação da sentença: por cálculo, por artigos e por arbitramento",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-24",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-24",
       "disciplineId": "labor-procedure",
       "name": "Dos dissídios coletivos: extensão, cumprimento e revisão da sentença normativa",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-25",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-25",
       "disciplineId": "labor-procedure",
       "name": "Da execução: execução provisória",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-26",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-26",
       "disciplineId": "labor-procedure",
       "name": "execução por prestações sucessivas",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-27",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-27",
       "disciplineId": "labor-procedure",
       "name": "execução contra a Fazenda Pública",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-28",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-28",
       "disciplineId": "labor-procedure",
       "name": "execução contra a massa falida",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-29",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-29",
       "disciplineId": "labor-procedure",
       "name": "Do Incidente de Desconsideração da Personalidade Jurídica; Da citação",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-30",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-30",
       "disciplineId": "labor-procedure",
       "name": "do depósito da condenação e da nomeação de bens; Garantias na execução",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-31",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-31",
       "disciplineId": "labor-procedure",
       "name": "Seguro-fiança e seguro-garantia; do mandado e da penhora",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-32",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-32",
       "disciplineId": "labor-procedure",
       "name": "dos bens penhoráveis e impenhoráveis",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-33",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-33",
       "disciplineId": "labor-procedure",
       "name": "da impenhorabilidade do bem de família (Lei nº 8.009/1990 e alterações); Dos embargos à execução; da impugnação à sentença; dos embargos de terceiros; Da praça e leilão",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-34",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-34",
       "disciplineId": "labor-procedure",
       "name": "da arrematação; das custas na execução",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-35",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-35",
       "disciplineId": "labor-procedure",
       "name": "Dos recursos no processo do trabalho",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-36",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-36",
       "disciplineId": "labor-procedure",
       "name": "Normas atinentes ao Processo Judicial Eletrônico",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-37",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-37",
       "disciplineId": "labor-procedure",
       "name": "Lei nº 13.467/2017 (Reforma Trabalhista)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-38",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-38",
       "disciplineId": "labor-procedure",
       "name": "Uniformização de jurisprudência à luz do CPC e sua aplicação ao processo do trabalho",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-39",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-39",
       "disciplineId": "labor-procedure",
       "name": "Precedentes Obrigatórios (IAC e IRDR)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-40",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-40",
       "disciplineId": "labor-procedure",
       "name": "Súmulas e Orientações Jurisprudenciais do TST em matéria de Direito Processual do Trabalho",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-41",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-41",
       "disciplineId": "labor-procedure",
       "name": "Instruções Normativas e Atos em Geral do TST em matéria de Direito Processual do Trabalho",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-42",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-42",
       "disciplineId": "labor-procedure",
       "name": "Súmulas Vinculantes do Supremo Tribunal Federal relativas ao Direito Processual do Trabalho",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-43",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-43",
       "disciplineId": "labor-procedure",
       "name": "Teses de Repercussão Geral do STF em matéria afeta ao processo do trabalho",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-44",
+      "id": "TRT4-AJAJ-V4-LABOR-PROCEDURE-44",
       "disciplineId": "labor-procedure",
       "name": "Protocolos para atuação e julgamento na Justiça do Trabalho.",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-01",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-01",
       "disciplineId": "civil-law",
       "name": "Da Pessoa Natural; Personalidade e Capacidade; Direitos da Personalidade; Das Pessoas Jurídicas; Domicílio Civil",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-02",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-02",
       "disciplineId": "civil-law",
       "name": "Dos Bens: classificação, afetação e desafetação",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-03",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-03",
       "disciplineId": "civil-law",
       "name": "Do Negócio Jurídico: Conceito; Classificação; Elementos essenciais gerais",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-04",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-04",
       "disciplineId": "civil-law",
       "name": "Elementos acidentais (condição, termo, encargo)",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-05",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-05",
       "disciplineId": "civil-law",
       "name": "Defeitos do negócio jurídico (erro ou ignorância, dolo, coação, estado de perigo, lesão, fraude contra credores), invalidade do negócio jurídico",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-06",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-06",
       "disciplineId": "civil-law",
       "name": "Da prescrição e da decadência; Da prova; Do Direito das Obrigações",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-07",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-07",
       "disciplineId": "civil-law",
       "name": "Dos contratos em geral e em espécie",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-08",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-08",
       "disciplineId": "civil-law",
       "name": "Dos vícios redibitórios e da evicção; Da responsabilidade civil; Do Direito de Empresa; Do nome empresarial; Direito das coisas; Posse; Teorias da posse",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-09",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-09",
       "disciplineId": "civil-law",
       "name": "Conceito, classificação, aquisição, efeitos, proteção e perda da posse; Função social da posse",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-10",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-10",
       "disciplineId": "civil-law",
       "name": "Teorias da função social da posse",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-11",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-11",
       "disciplineId": "civil-law",
       "name": "Conceito, conteúdo e concretização da função social da posse",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-12",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-12",
       "disciplineId": "civil-law",
       "name": "Função socioambiental da posse; Direitos reais; Propriedade",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-13",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-13",
       "disciplineId": "civil-law",
       "name": "Conceito, classificação, aquisição, proteção e perda da propriedade",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-14",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-14",
       "disciplineId": "civil-law",
       "name": "Função social da propriedade: conceito, conteúdo e concretização da função social da propriedade; Direitos de vizinhança; Condomínio geral; Condomínio edilício; Propriedade resolúvel",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-15",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-15",
       "disciplineId": "civil-law",
       "name": "Propriedade fiduciária",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-16",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-16",
       "disciplineId": "civil-law",
       "name": "Direitos reais sobre coisa alheia; Superfície; Servidões; Uso; Usufruto; Habitação",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-17",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-17",
       "disciplineId": "civil-law",
       "name": "A concessão de uso especial para fins de moradia; A laje; Direito real à aquisição",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-18",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-18",
       "disciplineId": "civil-law",
       "name": "Direito do promitente comprador",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-19",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-19",
       "disciplineId": "civil-law",
       "name": "Compromisso de venda e compra; Adjudicação compulsória; Direitos reais em garantia; Penhor; Hipoteca; Do direito de família; Esponsais",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-20",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-20",
       "disciplineId": "civil-law",
       "name": "Casamento heteroafetivo e homoafetivo: capacidade, impedimentos, causas suspensivas, habilitação, celebração, eficácia, direitos e deveres",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-21",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-21",
       "disciplineId": "civil-law",
       "name": "Dissolução do vínculo conjugal",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-22",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-22",
       "disciplineId": "civil-law",
       "name": "Invalidade do casamento, separação e divórcio",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-23",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-23",
       "disciplineId": "civil-law",
       "name": "Da proteção da pessoa dos filhos",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-24",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-24",
       "disciplineId": "civil-law",
       "name": "Das relações de parentesco e da filiação; Do Poder Familiar; Direito patrimonial; Regime de bens: espécies; Pacto antenupcial",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-25",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-25",
       "disciplineId": "civil-law",
       "name": "Meação e sucessão do cônjuge",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-26",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-26",
       "disciplineId": "civil-law",
       "name": "Usufruto e administração de bens de filhos incapazes; Bem de família",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-27",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-27",
       "disciplineId": "civil-law",
       "name": "União estável heteorafetiva e homoafetiva; Aspectos constitucionais",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-28",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-28",
       "disciplineId": "civil-law",
       "name": "Características, estado, impedimentos, direitos, deveres e efeitos patrimoniais",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-29",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-29",
       "disciplineId": "civil-law",
       "name": "Regime de bens, meação e sucessão do companheiro",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-30",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-30",
       "disciplineId": "civil-law",
       "name": "Uniões estáveis concomitantes; Concubinato; Sucessão; Disposições gerais; Herança; Vocação hereditária; Aceitação e renúncia; Exclusão da sucessão; Herança jacente",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-31",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-31",
       "disciplineId": "civil-law",
       "name": "Herança vacante",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-32",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-32",
       "disciplineId": "civil-law",
       "name": "Sucessão legítima e sucessão testamentária; Inventário e partilha; Arrolamentos; Alvarás judiciais",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOC-33",
+      "id": "TRT4-AJAJ-V4-CIVIL-LAW-33",
       "disciplineId": "civil-law",
       "name": "Partilha de bens e direitos.",
       "priority": "B",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-01",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-01",
       "disciplineId": "civil-procedure",
       "name": "Da jurisdição e da ação: conceito, natureza e características; das condições da ação; Magistratura; Auxiliares da Justiça; Do Ministério Público; Defensoria Pública",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-02",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-02",
       "disciplineId": "civil-procedure",
       "name": "Advocacia",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-03",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-03",
       "disciplineId": "civil-procedure",
       "name": "Das partes e procuradores: da capacidade processual e postulatória",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-04",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-04",
       "disciplineId": "civil-procedure",
       "name": "dos deveres das partes e de seus procuradores",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-05",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-05",
       "disciplineId": "civil-procedure",
       "name": "Da sucessão das partes e dos procuradores",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-06",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-06",
       "disciplineId": "civil-procedure",
       "name": "Do litisconsórcio e da assistência; Da intervenção de terceiros",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-07",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-07",
       "disciplineId": "civil-procedure",
       "name": "Da competência: em razão do valor e da matéria",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-08",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-08",
       "disciplineId": "civil-procedure",
       "name": "competência funcional e territorial",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-09",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-09",
       "disciplineId": "civil-procedure",
       "name": "modificações de competência e declaração de incompetência; Do Juiz",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-10",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-10",
       "disciplineId": "civil-procedure",
       "name": "Dos atos processuais: da forma dos atos; dos prazos; da comunicação dos atos; das nulidades; Preclusão",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-11",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-11",
       "disciplineId": "civil-procedure",
       "name": "Da formação, suspensão e extinção do processo",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-12",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-12",
       "disciplineId": "civil-procedure",
       "name": "Do processo de conhecimento: da petição inicial: requisitos, pedido e indeferimento; Valor da causa",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-13",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-13",
       "disciplineId": "civil-procedure",
       "name": "Da resposta do réu: contestação, exceções e reconvenção; Da revelia; Da tutela provisória",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-14",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-14",
       "disciplineId": "civil-procedure",
       "name": "Do julgamento conforme o estado do processo; Das provas: ônus da prova; depoimento pessoal; confissão",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-15",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-15",
       "disciplineId": "civil-procedure",
       "name": "provas documental e testemunhal",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-16",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-16",
       "disciplineId": "civil-procedure",
       "name": "Da audiência: da conciliação e da instrução e julgamento",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-17",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-17",
       "disciplineId": "civil-procedure",
       "name": "Da sentença e da coisa julgada",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-18",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-18",
       "disciplineId": "civil-procedure",
       "name": "Da liquidação e do cumprimento da sentença",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-19",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-19",
       "disciplineId": "civil-procedure",
       "name": "Impugnação ao cumprimento de sentença; Da ação rescisória",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-20",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-20",
       "disciplineId": "civil-procedure",
       "name": "Dos recursos: disposições gerais e recursos em espécie",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-21",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-21",
       "disciplineId": "civil-procedure",
       "name": "Do processo de execução: da execução em geral",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-22",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-22",
       "disciplineId": "civil-procedure",
       "name": "das diversas espécies de execução; Dos embargos à execução",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-23",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-23",
       "disciplineId": "civil-procedure",
       "name": "Da suspensão e extinção do processo de execução",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-24",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-24",
       "disciplineId": "civil-procedure",
       "name": "Dos procedimentos especiais: ação de consignação em pagamento; embargos de terceiro; ação monitória; ações possessórias",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-25",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-25",
       "disciplineId": "civil-procedure",
       "name": "Mandado de segurança individual e coletivo",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-26",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-26",
       "disciplineId": "civil-procedure",
       "name": "Ação civil pública (Lei nº 7.347/1985 e suas alterações)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-27",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-27",
       "disciplineId": "civil-procedure",
       "name": "Juizados Especiais Cíveis e Criminais (Lei nº 9.099/1995 e suas alterações)",
       "priority": "A",
       "group": "CONHECIMENTOS ESPECÍFICOS"
     },
     {
-      "id": "TRT4-AJAJ-V4-DIREITOP-28",
+      "id": "TRT4-AJAJ-V4-CIVIL-PROCEDURE-28",
       "disciplineId": "civil-procedure",
       "name": "Lei nº 13.140/2015 (Mediação).",
       "priority": "A",
