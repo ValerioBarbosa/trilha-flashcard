@@ -784,3 +784,10 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .law-highlight-legend { padding:0 24px; color:var(--muted); font-size:12px; }
 .law-highlight-legend > div { display:flex; flex-wrap:wrap; gap:8px 12px; margin-top:6px; }
 @media(max-width:600px){ .law-highlight-legend { padding:0 16px; } }
+
+.law-flashcard-editor { display:grid; gap:10px; margin-top:20px; padding-top:16px; border-top:1px solid var(--line); }
+.law-flashcard-editor label { display:grid; gap:5px; font-size:14px; font-weight:600; }
+.law-flashcard-editor textarea,.law-flashcard-editor input { width:100%; box-sizing:border-box; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:inherit; font:inherit; font-size:16px; }
+.law-flashcard-editor small,.law-flashcard-editor p { color:var(--muted); font-size:13px; }
+.law-flashcard-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.law-flashcard-actions button { flex:1; min-height:44px; }
