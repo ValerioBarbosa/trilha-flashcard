@@ -154,6 +154,10 @@ export function buildCatalogAudit(
   const topicsById = new Map(topics.map((topic) => [topic.id, topic]));
   const decksById = new Map(decks.map((deck) => [deck.id, deck]));
   const allStudyCards = cards.filter(isStudyContent);
+  const coreStudyCards = allStudyCards.filter((card) => {
+    const topic = card.topic_id ? topicsById.get(card.topic_id) : null;
+    return !topic || (topic.name !== 'Jurisprudência prioritária STF/TST' && topic.name !== 'Estudo de Caso Jurídico - protocolo de treino');
+  });
   const covered = new Set(allStudyCards.map((card) => card.topic_id).filter((id): id is string => Boolean(id) && officialIds.has(id)));
   const distinctByFingerprint = new Set<string>();
   const distinctRelaxed = new Set<string>();
@@ -169,7 +173,7 @@ export function buildCatalogAudit(
 
   const candidates: SafeTopicMapping[] = [];
   const legacyByTopic = new Map<string, AuditCard[]>();
-  for (const card of allStudyCards) {
+  for (const card of coreStudyCards) {
     if (!card.topic_id || officialIds.has(card.topic_id)) continue;
     const deck = decksById.get(card.deck_id);
     if (!deck?.is_builtin || !card.legacy_id?.startsWith('card-trt4-')) continue;
@@ -204,18 +208,18 @@ export function buildCatalogAudit(
     potentialCoveredAfterMapping: new Set([...covered, ...pendingTargets]).size,
     totalActiveCards: cards.length,
     studyCards: allStudyCards.length,
-    lawCards: cards.length - allStudyCards.length,
+    lawCards: cards.filter((card) => card.card_type === 'Lei seca').length,
     v4Cards:cards.filter((card) => card.legacy_id?.startsWith('card-trt4-v4-')).length,
     legacyStudyCards:allStudyCards.filter((card) => card.legacy_id?.startsWith('card-trt4-') && !card.legacy_id.startsWith('card-trt4-v4-')).length,
-    withoutTopic:allStudyCards.filter((card) => !card.topic_id).length,
-    outsideOfficialMatrix:allStudyCards.filter((card) => card.topic_id && topicsById.has(card.topic_id) && !officialIds.has(card.topic_id)).length,
-    unknownTopic:allStudyCards.filter((card) => card.topic_id && !topicsById.has(card.topic_id)).length,
+    withoutTopic:coreStudyCards.filter((card) => !card.topic_id).length,
+    outsideOfficialMatrix:coreStudyCards.filter((card) => card.topic_id && topicsById.has(card.topic_id) && !officialIds.has(card.topic_id)).length,
+    unknownTopic:coreStudyCards.filter((card) => card.topic_id && !topicsById.has(card.topic_id)).length,
     missingLegalBasis:allStudyCards.filter((card) => !card.legal_basis?.trim()).length,
     potentialDuplicates:possibleDuplicates,
     contentKeyCollisions:collisions,
     safeMappings:candidates,
     missingTopics,
-    requiresHumanReview: Math.max(0, allStudyCards.filter((card) => card.topic_id && !officialIds.has(card.topic_id)).length - candidates.reduce((sum, candidate) => sum + candidate.cardIds.length, 0)),
+    requiresHumanReview: Math.max(0, coreStudyCards.filter((card) => card.topic_id && !officialIds.has(card.topic_id)).length - candidates.reduce((sum, candidate) => sum + candidate.cardIds.length, 0)),
   };
 }
 
