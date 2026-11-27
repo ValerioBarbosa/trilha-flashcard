@@ -755,6 +755,114 @@
       "back": "Cinco dias, sem preparo, em regra interrompendo o prazo para interposição de recurso. Os embargos não possuem efeito suspensivo automático.",
       "legalBasis": "CPC, arts. 219, 1.023 e 1.026",
       "trap": "Interrupção do prazo recursal não se confunde com suspensão da eficácia da decisão."
+    },
+    {
+      "id": "cp-013",
+      "disciplineId": "civil-procedure",
+      "number": 20,
+      "front": "O juiz profere decisão interlocutória que versa sobre tutela provisória. Qual recurso o CPC prevê expressamente contra essa decisão?",
+      "back": "Agravo de instrumento. As decisões interlocutórias sobre tutelas provisórias integram as hipóteses expressas de cabimento desse recurso.",
+      "legalBasis": "CPC, art. 1.015, I",
+      "trap": "Não aguardar necessariamente a sentença para impugnar essa decisão."
+    },
+    {
+      "id": "cp-014",
+      "disciplineId": "civil-procedure",
+      "number": 20,
+      "front": "Uma parte interpõe apelação contra sentença que condena ao pagamento de alimentos. O recurso impede automaticamente a eficácia da sentença?",
+      "back": "Não. Embora a apelação tenha efeito suspensivo como regra, a sentença que condena a pagar alimentos começa a produzir efeitos imediatamente após a publicação, sem prejuízo de eventual suspensão judicial.",
+      "legalBasis": "CPC, art. 1.012, caput, § 1º, II, e §§ 3º e 4º",
+      "trap": "O efeito suspensivo da apelação não é absoluto."
+    },
+    {
+      "id": "cp-015",
+      "disciplineId": "civil-procedure",
+      "number": 20,
+      "front": "Um recorrente pretende discutir ofensa direta à Constituição Federal e demonstrar a repercussão geral da questão constitucional. Qual recurso é próprio para essa hipótese, preenchidos os demais requisitos?",
+      "back": "Recurso extraordinário ao Supremo Tribunal Federal. O recorrente deve demonstrar a repercussão geral das questões constitucionais discutidas, nos termos legais.",
+      "legalBasis": "CF, art. 102, III e § 3º; CPC, art. 1.035",
+      "trap": "Repercussão geral não se confunde com a relevância da questão federal infraconstitucional."
+    },
+    {
+      "id": "cp-016",
+      "disciplineId": "civil-procedure",
+      "number": 19,
+      "front": "Uma parte pretende ajuizar ação rescisória fundada em violação manifesta de norma jurídica. Qual é o prazo decadencial geral e seu marco inicial?",
+      "back": "Dois anos contados do trânsito em julgado da última decisão proferida no processo, observadas as hipóteses especiais previstas em lei.",
+      "legalBasis": "CPC, arts. 966, V, e 975, caput",
+      "trap": "Não contar necessariamente do trânsito em julgado da primeira decisão de mérito."
+    },
+    {
+      "id": "cp-017",
+      "disciplineId": "civil-procedure",
+      "number": 19,
+      "front": "No cumprimento de sentença por quantia certa, expirou o prazo para pagamento voluntário. O executado precisa aguardar penhora ou nova intimação para apresentar impugnação?",
+      "back": "Não. Inicia-se o prazo de quinze dias para impugnação nos próprios autos, independentemente de penhora ou nova intimação.",
+      "legalBasis": "CPC, art. 525, caput",
+      "trap": "Não exigir garantia do juízo como condição geral para apresentar impugnação."
+    },
+    {
+      "id": "cp-018",
+      "disciplineId": "civil-procedure",
+      "number": 22,
+      "front": "O executado é citado em execução de título extrajudicial e deseja apresentar embargos. É indispensável penhora, depósito ou caução para o oferecimento dos embargos?",
+      "back": "Não. O executado pode opor embargos à execução independentemente de penhora, depósito ou caução.",
+      "legalBasis": "CPC, art. 914, caput",
+      "trap": "A garantia pode ser requisito para atribuição de efeito suspensivo, não para o simples oferecimento dos embargos."
+    },
+    {
+      "id": "cp-019",
+      "disciplineId": "civil-procedure",
+      "number": 22,
+      "front": "O executado apresentou embargos à execução. A oposição dos embargos suspende automaticamente os atos executivos?",
+      "back": "Não. Os embargos não terão efeito suspensivo como regra. O juiz pode atribuí-lo a requerimento do embargante, se presentes os requisitos da tutela provisória e garantida a execução por penhora, depósito ou caução suficientes.",
+      "legalBasis": "CPC, art. 919, caput e § 1º",
+      "trap": "Distinguir cabimento dos embargos e concessão de efeito suspensivo."
+    },
+    {
+      "id": "cp-020",
+      "disciplineId": "civil-procedure",
+      "number": 24,
+      "front": "Uma pessoa que não integra o processo sofre penhora sobre bem de sua propriedade. Qual instrumento processual é adequado para pedir o desfazimento da constrição?",
+      "back": "Embargos de terceiro, cabíveis para quem, não sendo parte no processo, sofre constrição ou ameaça de constrição sobre bens que possua ou sobre os quais tenha direito incompatível com o ato constritivo.",
+      "legalBasis": "CPC, art. 674, caput",
+      "trap": "A medida também protege contra ameaça de constrição, não apenas penhora consumada."
+    },
+    {
+      "id": "cp-021",
+      "disciplineId": "civil-procedure",
+      "number": 24,
+      "front": "Um credor possui prova escrita de dívida, mas o documento não tem eficácia de título executivo. Qual procedimento especial pode utilizar para exigir pagamento?",
+      "back": "A ação monitória, desde que preenchidos os requisitos legais, permite exigir pagamento de quantia em dinheiro com base em prova escrita sem eficácia de título executivo.",
+      "legalBasis": "CPC, art. 700, caput e I",
+      "trap": "Prova escrita sem eficácia executiva não impede a utilização da via monitória."
+    },
+    {
+      "id": "cp-022",
+      "disciplineId": "civil-procedure",
+      "number": 25,
+      "front": "O interessado tomou ciência do ato impugnado e pretende impetrar mandado de segurança repressivo. Qual é o prazo legal geral para exercer esse direito?",
+      "back": "Cento e vinte dias, contados da ciência, pelo interessado, do ato impugnado.",
+      "legalBasis": "Lei 12.016/2009, art. 23",
+      "trap": "Trata-se de prazo decadencial para impetração, não de prazo recursal."
+    },
+    {
+      "id": "cp-023",
+      "disciplineId": "civil-procedure",
+      "number": 27,
+      "front": "Uma pessoa capaz propõe demanda de natureza admitida pelo Juizado Especial Cível no valor de quinze salários mínimos. É obrigatória a assistência de advogado em primeiro grau?",
+      "back": "Não. Nas causas de valor até vinte salários mínimos, as partes comparecerão pessoalmente, podendo ser assistidas por advogado. Acima desse valor, a assistência é obrigatória; na fase recursal, a representação por advogado é obrigatória.",
+      "legalBasis": "Lei 9.099/1995, arts. 9º e 41, § 2º",
+      "trap": "O limite de vinte salários mínimos refere-se à assistência de advogado, não ao teto geral de competência."
+    },
+    {
+      "id": "cp-024",
+      "disciplineId": "civil-procedure",
+      "number": 27,
+      "front": "Uma parte pretende interpor recurso contra sentença recorrível do Juizado Especial Cível. Qual o prazo legal e a exigência de representação?",
+      "back": "Dez dias úteis, contados da ciência da sentença, mediante petição escrita com razões e pedido, sendo obrigatória a representação por advogado.",
+      "legalBasis": "Lei 9.099/1995, arts. 12-A, 41, § 2º, e 42",
+      "trap": "Não aplicar automaticamente o prazo de quinze dias da apelação do CPC."
     }
   ]
 }
