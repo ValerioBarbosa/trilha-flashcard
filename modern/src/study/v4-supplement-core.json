@@ -924,6 +924,237 @@
       "front": "A LGPD exige consentimento para toda operação de tratamento de dados pessoais?",
       "back": "Não. O consentimento é uma das bases legais; outras incluem obrigação legal, execução de políticas públicas e exercício regular de direitos, conforme a hipótese.",
       "legalBasis": "Lei 13.709/2018, art. 7º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 4,
+      "front": "Qual a finalidade legal do trabalho temporário prestado a uma empresa tomadora?",
+      "back": "Atender à substituição transitória de pessoal permanente ou à demanda complementar de serviços, mediante contratação pela empresa de trabalho temporário.",
+      "legalBasis": "Lei 6.019/1974, art. 2º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 6,
+      "front": "Quem assume os riscos da atividade econômica na relação de emprego?",
+      "back": "O empregador, que admite, remunera e dirige a prestação pessoal de serviços. O risco empresarial não é ordinariamente transferido ao empregado.",
+      "legalBasis": "CLT, arts. 2º e 3º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 7,
+      "front": "A identidade de sócios basta para caracterizar grupo econômico trabalhista?",
+      "back": "Não. Exigem-se interesse integrado, efetiva comunhão de interesses e atuação conjunta das empresas integrantes.",
+      "legalBasis": "CLT, art. 2º, § 3º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 8,
+      "front": "Qual a diferença entre responsabilidade solidária e subsidiária?",
+      "back": "Na solidariedade, pode-se exigir a dívida integral de qualquer codevedor; na subsidiariedade, a responsabilidade do segundo devedor é acionada diante do inadimplemento do principal, conforme o título e a disciplina aplicável.",
+      "legalBasis": "CC, art. 275; CLT, art. 2º, § 2º; Lei 6.019/1974, art. 5º-A, § 5º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 9,
+      "front": "Qual o prazo máximo ordinário do contrato de experiência?",
+      "back": "Noventa dias no total. Mais de uma prorrogação de contrato a termo implica sua conversão em contrato por prazo indeterminado.",
+      "legalBasis": "CLT, arts. 445, parágrafo único, e 451"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 10,
+      "front": "O consentimento do empregado torna válida uma alteração contratual que lhe cause prejuízo?",
+      "back": "Não. A alteração bilateral exige também ausência de prejuízo direto ou indireto ao empregado, ressalvadas hipóteses legais específicas.",
+      "legalBasis": "CLT, art. 468"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 12,
+      "front": "O descumprimento das obrigações contratuais pelo empregador pode fundamentar rescisão indireta?",
+      "back": "Sim. É uma das hipóteses legais em que o empregado pode pleitear a ruptura contratual e as indenizações correspondentes.",
+      "legalBasis": "CLT, art. 483, d"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 13,
+      "front": "A dispensa coletiva exige autorização prévia do sindicato?",
+      "back": "Não exige autorização sindical nem celebração de instrumento coletivo, mas o STF exige intervenção sindical prévia como requisito procedimental.",
+      "legalBasis": "STF, Tema 638; CLT, art. 477-A"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 14,
+      "front": "Qual o período da garantia de emprego do empregado eleito para direção da CIPA?",
+      "back": "Do registro da candidatura até um ano após o término do mandato, conforme a garantia constitucional contra dispensa arbitrária ou sem justa causa.",
+      "legalBasis": "ADCT, art. 10, II, a"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 15,
+      "front": "Qual o descanso mínimo entre duas jornadas de trabalho?",
+      "back": "Onze horas consecutivas, conforme a regra geral da CLT, sem prejuízo de regimes especiais aplicáveis.",
+      "legalBasis": "CLT, art. 66"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 17,
+      "front": "Qual a duração ordinária do repouso semanal remunerado?",
+      "back": "Vinte e quatro horas consecutivas, preferencialmente aos domingos, observadas as regras especiais.",
+      "legalBasis": "CF, art. 7º, XV; Lei 605/1949, art. 1º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 19,
+      "front": "Qual o período máximo do banco de horas ajustado por acordo individual escrito?",
+      "back": "Seis meses. Por negociação coletiva, a compensação pode alcançar um ano; a compensação no mesmo mês admite ajuste individual inclusive tácito.",
+      "legalBasis": "CLT, art. 59, §§ 2º, 5º e 6º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 20,
+      "front": "A redução do salário contratual pode ser imposta unilateralmente pelo empregador?",
+      "back": "Não. A Constituição assegura a irredutibilidade salarial, ressalvada negociação mediante convenção ou acordo coletivo, dentro dos limites jurídicos aplicáveis.",
+      "legalBasis": "CF, art. 7º, VI"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 21,
+      "front": "Quantos dias de férias são assegurados ao empregado com até cinco faltas injustificadas no período aquisitivo?",
+      "back": "Trinta dias corridos. A duração diminui nas faixas legais de faltas injustificadas superiores a cinco.",
+      "legalBasis": "CLT, art. 130"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 22,
+      "front": "Quais os limites do fracionamento das férias individuais mediante concordância do empregado?",
+      "back": "Até três períodos, sendo um de pelo menos quatorze dias corridos e os demais de pelo menos cinco dias corridos cada.",
+      "legalBasis": "CLT, art. 134, § 1º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 23,
+      "front": "Até quando o empregado deve requerer a conversão de um terço das férias em abono pecuniário?",
+      "back": "Até quinze dias antes do término do período aquisitivo, observada a disciplina própria das férias coletivas.",
+      "legalBasis": "CLT, art. 143, §§ 1º e 2º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 24,
+      "front": "As gorjetas integram a remuneração ou o salário pago diretamente pelo empregador?",
+      "back": "Integram a remuneração do empregado, além do salário devido e pago diretamente pelo empregador.",
+      "legalBasis": "CLT, art. 457, caput"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 25,
+      "front": "Qual fração de mês conta como mês integral no cálculo do décimo terceiro salário?",
+      "back": "A fração igual ou superior a quinze dias de trabalho, para cálculo de um doze avos por mês de serviço.",
+      "legalBasis": "Lei 4.090/1962, art. 1º, §§ 1º e 2º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 27,
+      "front": "Em que hipótese a CLT admite cláusula compromissória de arbitragem no contrato individual?",
+      "back": "Quando a remuneração supera duas vezes o teto dos benefícios do RGPS, por iniciativa do empregado ou mediante sua concordância expressa, nos termos legais.",
+      "legalBasis": "CLT, art. 507-A"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 29,
+      "front": "Qual a denominação legal atual da CIPA?",
+      "back": "Comissão Interna de Prevenção de Acidentes e de Assédio. Sua constituição observa as instruções e requisitos aplicáveis aos estabelecimentos.",
+      "legalBasis": "CLT, art. 163; Lei 14.457/2022"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 30,
+      "front": "Qual a alíquota legal ordinária do adicional de periculosidade?",
+      "back": "Trinta por cento sobre o salário, sem os acréscimos resultantes de gratificações, prêmios ou participações nos lucros, ressalvados regimes específicos.",
+      "legalBasis": "CLT, art. 193, § 1º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 31,
+      "front": "Qual o intervalo constitucional de proteção contra dispensa arbitrária da gestante?",
+      "back": "Da confirmação da gravidez até cinco meses após o parto, independentemente do conhecimento prévio do empregador, conforme a jurisprudência aplicável.",
+      "legalBasis": "ADCT, art. 10, II, b; STF, Tema 497"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 32,
+      "front": "A Convenção 87 da OIT sobre liberdade sindical foi ratificada pelo Brasil?",
+      "back": "Não. Seu estudo não deve ser confundido com a afirmação de que o tratado foi incorporado ao direito brasileiro; a Constituição disciplina a organização sindical nacional.",
+      "legalBasis": "OIT, Convenção 87; CF, art. 8º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 33,
+      "front": "O que caracteriza uma categoria profissional diferenciada?",
+      "back": "Profissão ou função com estatuto profissional especial ou condições de vida singulares, distinguindo-se da categoria profissional comum.",
+      "legalBasis": "CLT, art. 511, § 3º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 34,
+      "front": "Quem celebra acordo coletivo de trabalho e quem celebra convenção coletiva?",
+      "back": "O acordo envolve sindicato profissional e uma ou mais empresas; a convenção é celebrada entre sindicatos representativos das categorias profissional e econômica.",
+      "legalBasis": "CLT, art. 611, caput e § 1º"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 35,
+      "front": "A submissão prévia de conflito à Comissão de Conciliação Prévia é condição obrigatória para ajuizar reclamação?",
+      "back": "Não. O STF conferiu interpretação conforme à disciplina legal para preservar o acesso direto à Justiça do Trabalho.",
+      "legalBasis": "CLT, art. 625-D; STF, ADIs 2139 e 2160"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 37,
+      "front": "Danos materiais e extrapatrimoniais decorrentes do mesmo fato podem ser cumulados?",
+      "back": "Sim. A CLT admite a cumulação, devendo os valores das indenizações ser discriminados na decisão.",
+      "legalBasis": "CLT, art. 223-F"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 38,
+      "front": "O julgamento de IRDR produz efeitos apenas entre as partes do processo originário?",
+      "back": "Não. A tese aplica-se aos processos abrangidos pela jurisdição do tribunal, inclusive futuros, observadas as regras de revisão e eventual julgamento pelos tribunais superiores.",
+      "legalBasis": "CPC, arts. 985 a 987"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 39,
+      "front": "O TST admite equiparação salarial apenas com base na nomenclatura dos cargos?",
+      "back": "Não. A identidade das funções efetivamente exercidas é relevante, independentemente da denominação dos cargos, além dos requisitos atuais da CLT.",
+      "legalBasis": "TST, Súmula 6, III; CLT, art. 461"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 40,
+      "front": "A Súmula Vinculante 4 autoriza o juiz a substituir livremente o salário mínimo por outra base de cálculo de vantagem?",
+      "back": "Não. O verbete veda, ressalvadas hipóteses constitucionais, o uso do mínimo como indexador e também impede sua substituição por decisão judicial.",
+      "legalBasis": "STF, Súmula Vinculante 4"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 41,
+      "front": "Qual o papel de uma instrução normativa do TST diante de lei trabalhista hierarquicamente superior?",
+      "back": "Orientar ou disciplinar a aplicação da legislação dentro da competência do tribunal, sem revogar nem contrariar a lei. Deve-se conferir seu objeto e vigência.",
+      "legalBasis": "CF, art. 96, I, a; TST, IN 41/2018 (exemplo de disciplina processual da Reforma)"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 42,
+      "front": "Como são pagas as verbas rescisórias na extinção do contrato por acordo entre empregado e empregador?",
+      "back": "Metade do aviso prévio indenizado e da indenização sobre o FGTS; demais verbas integralmente. O saque do FGTS limita-se a 80% e não há seguro-desemprego.",
+      "legalBasis": "CLT, art. 484-A"
+    },
+    {
+      "disciplineId": "labor-law",
+      "number": 43,
+      "front": "Segundo o Tema 1046 do STF, a negociação coletiva pode limitar direitos trabalhistas sem indicar vantagens compensatórias específicas?",
+      "back": "Sim, desde que respeitados os direitos absolutamente indisponíveis e os limites da adequação setorial negociada.",
+      "legalBasis": "STF, Tema 1046"
     }
   ]
 }
