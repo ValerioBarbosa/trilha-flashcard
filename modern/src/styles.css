@@ -791,3 +791,9 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .law-flashcard-editor small,.law-flashcard-editor p { color:var(--muted); font-size:13px; }
 .law-flashcard-actions { display:flex; flex-wrap:wrap; gap:8px; }
 .law-flashcard-actions button { flex:1; min-height:44px; }
+
+.law-source-panel { display:grid; gap:8px; padding:12px; margin:12px 0 18px; border:1px solid var(--line); border-radius:10px; font-size:14px; }
+.law-source-panel small { color:var(--muted); line-height:1.5; }
+.law-source-panel > div { display:flex; flex-wrap:wrap; gap:8px 16px; }
+.law-source-panel a { color:var(--green); text-decoration:underline; overflow-wrap:anywhere; }
+.law-source-panel button { min-height:44px; white-space:normal; }
