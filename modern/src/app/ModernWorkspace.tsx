@@ -108,7 +108,7 @@ export function ModernWorkspace({ user, onSignOut }: Props) {
           <div className="page-wrap"><div className="notice">Nenhum perfil de estudos disponível.</div></div>
         ) : (
           <>
-            {workspace.warning ? <div className="page-wrap workspace-warning"><div className="notice"><strong>Modo offline ativo.</strong><span>{workspace.warning}</span><button onClick={() => void workspace.refresh()}>Tentar reconectar</button></div></div> : null}
+            {workspace.warning ? <div className="page-wrap workspace-warning"><div className="notice"><strong>{workspace.offline ? 'Modo offline ativo.' : 'Atenção à sincronização.'}</strong><span>{workspace.warning}</span><button onClick={() => void workspace.refresh()}>Tentar reconectar</button></div></div> : null}
             {page === 'home' ? <HomePage user={user} workspace={workspace} onNavigate={selectPage} onStudySubject={(subjectId) => focusStudyTopic(subjectId, 'all')} onReviewDue={startDueReview} /> : null}
             {['learn','practice','cases'].includes(page) ? <LearningPage mode={page === 'practice' ? 'practice' : page === 'cases' ? 'cases' : 'learn'} user={user} profileId={workspace.profile.id} subjects={workspace.subjects} initialSubject={practiceSubject} onReview={(discipline, name) => { const subject = workspace.subjects.find((row) => row.name === DISCIPLINES[discipline]); const topic = workspace.topics.find((row) => row.subject_id === subject?.id && row.name === name); if (subject) focusStudyTopic(subject.id, topic?.id || 'all'); }} /> : null}
             {page === 'study' ? <StudyPage user={user} profileId={workspace.profile.id} subjects={workspace.subjects} topics={workspace.topics} decks={workspace.decks} focus={studyFocus} /> : null}
