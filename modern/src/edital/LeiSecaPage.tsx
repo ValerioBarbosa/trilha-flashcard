@@ -5,7 +5,7 @@ import { listCardsByType, listStudyCardCountsByTopic, setCardReadAt, type CardRo
 import { getSupabaseClient } from '../lib/supabase-client';
 import { PageHeader } from '../shared/PageHeader';
 import { MetricTile } from '../shared/MetricTile';
-import { importCards, markImportDuplicates, type ImportCandidate } from '../cards/card-manager-repository';
+import { createCard, importCards, markImportDuplicates, type ImportCandidate, type CardDraft } from '../cards/card-manager-repository';
 import { parseLeiSecaPdfImport } from '../cards/pdf-import';
 import '../cards/card-manager.css';
 import '../cards/pdf-import.css';
@@ -48,6 +48,9 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const [showFavorites, setShowFavorites] = useState(false);
   const [favoriteVersion, setFavoriteVersion] = useState(0);
   const [readerNote, setReaderNote] = useState('');
+  const [draft, setDraft] = useState<CardDraft | null>(null);
+  const [draftBusy, setDraftBusy] = useState(false);
+  const [draftStatus, setDraftStatus] = useState('');
   const [readerFont, setReaderFont] = useState(19);
   const [immersive, setImmersive] = useState(false);
   const [highlights, setHighlights] = useState(false);
@@ -226,11 +229,40 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
     loadReaderMeta(cards[nextIndex].id);
   }
 
+  function beginFlashcard(card: CardRow, topic: TopicRow) {
+    const deck = decks.find((entry) => entry.id === card.deck_id && entry.subject_id === topic.subject_id) || decks.find((entry) => entry.subject_id === topic.subject_id);
+    if (!deck) { setDraftStatus('Nenhum baralho desta disciplina está disponível.'); return; }
+    setDraftStatus('');
+    setDraft({
+      deckId: deck.id, subjectId: topic.subject_id, topicId: topic.id,
+      front: '', back: card.back, legalBasis: card.legal_basis || topic.legal_basis || '',
+      source: 'Criação manual a partir da Lei Seca: ' + card.front,
+      cardType: 'Pergunta e resposta', tags: ['lei-seca', 'criação-manual'],
+    });
+  }
+  async function saveFlashcard() {
+    if (!draft || draftBusy || !draft.front.trim() || !draft.back.trim()) return;
+    setDraftBusy(true); setDraftStatus('');
+    try {
+      await createCard(getSupabaseClient(), user, profileId, draft);
+      setDraft(null);
+      setDraftStatus('Flashcard criado no baralho da disciplina.');
+      setStudyTopicIds((ids) => new Set([...ids, draft.topicId!]));
+    } catch (cause) {
+      setDraftStatus(cause instanceof Error && cause.message === 'card-duplicate'
+        ? 'Já existe um cartão com esta pergunta e resposta na disciplina.'
+        : 'Não foi possível salvar. Confira a conexão e tente novamente.');
+    } finally { setDraftBusy(false); }
+  }
   function closeReader() {
+    if (draftBusy) return;
+    setDraft(null); setDraftStatus('');
     setReader(null);
   }
 
   function moveReader(delta: number) {
+    if (draft || draftBusy) return;
+    setDraftStatus('');
     setReader((current) => {
       if (!current) return current;
       const cards = cardsByTopic.get(current.topicId) ?? [];
@@ -386,7 +418,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                 <button type="button" className="secondary-outline" disabled={readerFont <= 16} onClick={() => setReaderFont((size) => Math.max(16, size - 2))} aria-label="Diminuir fonte">A−</button>
                 <span aria-live="polite">{readerFont}px</span>
                 <button type="button" className="secondary-outline" disabled={readerFont >= 29} onClick={() => setReaderFont((size) => Math.min(29, size + 2))} aria-label="Aumentar fonte">A+</button>
-                <button type="button" className="secondary-outline" aria-pressed={immersive} onClick={() => setImmersive((value) => !value)}>{immersive ? 'Mostrar anotações' : 'Leitura focada'}</button>
+                <button type="button" className="secondary-outline" disabled={!!draft || draftBusy} aria-pressed={immersive} onClick={() => setImmersive((value) => !value)}>{immersive ? 'Mostrar anotações' : 'Leitura focada'}</button>
                 <button type="button" className="secondary-outline" aria-pressed={highlights} onClick={() => setHighlights((value) => !value)}>{highlights ? 'Ocultar destaques' : 'Destacar expressões'}</button>
               </div>
               {highlights ? <div className="law-highlight-legend"><small>Indícios por palavras-chave; não substituem a interpretação jurídica.</small><div>{Object.entries(LAW_HIGHLIGHT_LABELS).map(([kind, label]) => <span key={kind} className={'law-highlight law-highlight-' + kind}>{label}</span>)}</div></div> : null}
@@ -398,12 +430,26 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                 <div className="law-reader-text" style={{ fontSize: readerFont }}>{card.back.split(/(?<=\n)/).map((line, index) => <span key={index} className={`law-block ${/^\s*(?:Art\.\s*\d|§\s*\d|Parágrafo único)/i.test(line) ? 'law-block-heading' : /^\s*[IVXLCDM]+\s*[-–—]/.test(line) ? 'law-block-inciso' : /^\s*[a-z]\)/.test(line) ? 'law-block-alinea' : ''}`}>{highlights ? highlightLawText(line).map((segment, i) => segment.kind ? <mark key={i} className={'law-highlight law-highlight-' + segment.kind} title={LAW_HIGHLIGHT_LABELS[segment.kind]}>{segment.text}</mark> : <span key={i}>{segment.text}</span>) : line}</span>)}</div>
                 {!immersive && card.complement ? <aside className="law-reader-note"><strong>Observação</strong><p>{card.complement}</p></aside> : null}
                 {!immersive ? <label className="law-personal-note"><strong>Minha anotação neste dispositivo</strong><textarea rows={3} value={readerNote} onChange={(event) => saveReaderNote(card.id, event.target.value)} placeholder="Escreva uma observação, exceção ou macete pessoal…" /></label> : null}
+                {!immersive ? <div className="law-flashcard-editor">
+                  {!draft ? <button type="button" className="secondary-outline" onClick={() => beginFlashcard(card, topic)}>+ Criar flashcard deste trecho</button> : <>
+                    <strong>Novo flashcard de revisão</strong>
+                    <small>Edite a pergunta e a resposta. O trecho de origem não será alterado.</small>
+                    <label>Pergunta<textarea rows={2} value={draft.front} disabled={draftBusy} onChange={(event) => setDraft({ ...draft, front: event.target.value })} placeholder="O que devo lembrar deste dispositivo?" /></label>
+                    <label>Resposta<textarea rows={5} value={draft.back} disabled={draftBusy} onChange={(event) => setDraft({ ...draft, back: event.target.value })} /></label>
+                    <label>Fundamento legal<input value={draft.legalBasis || ''} disabled={draftBusy} onChange={(event) => setDraft({ ...draft, legalBasis: event.target.value })} /></label>
+                    <div className="law-flashcard-actions">
+                      <button type="button" className="secondary-outline" disabled={draftBusy} onClick={() => { setDraft(null); setDraftStatus(''); }}>Cancelar</button>
+                      <button type="button" className="primary-action" disabled={draftBusy || !draft.front.trim() || !draft.back.trim()} onClick={() => void saveFlashcard()}>{draftBusy ? 'Salvando…' : 'Salvar flashcard'}</button>
+                    </div>
+                  </>}
+                  {draftStatus ? <p role="status">{draftStatus}</p> : null}
+                </div> : null}
               </article>
 
               <footer className="law-reader-footer">
-                <button className="secondary-outline" onClick={() => moveReader(-1)} disabled={cards.length < 2}>← Anterior</button>
+                <button className="secondary-outline" onClick={() => moveReader(-1)} disabled={cards.length < 2 || !!draft || draftBusy}>← Anterior</button>
                 <button className={`read-toggle law-reader-read ${card.read_at ? 'is-read' : ''}`} onClick={() => toggleRead(card)}>{card.read_at ? '✓ Lido' : 'Marcar como lido'}</button>
-                <button className="primary-action" onClick={() => moveReader(1)} disabled={cards.length < 2}>Próximo →</button>
+                <button className="primary-action" onClick={() => moveReader(1)} disabled={cards.length < 2 || !!draft || draftBusy}>Próximo →</button>
               </footer>
             </section>
           </div>
