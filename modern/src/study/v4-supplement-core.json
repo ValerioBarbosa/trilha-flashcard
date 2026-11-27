@@ -438,16 +438,16 @@
     {
       "disciplineId": "labor-procedure",
       "number": 3,
-      "front": "Quem responde pela secretaria de uma Vara do Trabalho?",
-      "back": "A secretaria tem um diretor, designado pelo presidente do TRT, mediante proposta do juiz titular, observada a organização legal.",
-      "legalBasis": "CLT, art. 710"
+      "front": "Quais tarefas processuais competem à secretaria da Vara do Trabalho, segundo a disciplina da CLT?",
+      "back": "Receber, autuar, movimentar e guardar processos, manter o protocolo, registrar decisões, prestar informações e expedir certidões, entre outras atribuições legais.",
+      "legalBasis": "CLT, art. 711"
     },
     {
       "disciplineId": "labor-procedure",
       "number": 4,
-      "front": "Se o oficial de justiça avaliador não cumprir o mandado no prazo legal, pode haver redistribuição?",
-      "back": "Sim. Se não houver motivo justificado, o juiz pode atribuir o ato a outro oficial; o prazo previsto para a realização do ato é de nove dias.",
-      "legalBasis": "CLT, art. 721, §§ 2º e 3º"
+      "front": "Quando a CLT prevê transferência de diligência a outro oficial de justiça por atraso injustificado?",
+      "back": "Nas localidades com mais de uma Vara, observada a regra de distribuição, quando decorrerem nove dias sem cumprimento e sem justificativa. A avaliação tem prazo específico.",
+      "legalBasis": "CLT, art. 721, §§ 1º a 3º"
     },
     {
       "disciplineId": "labor-procedure",
@@ -473,9 +473,9 @@
     {
       "disciplineId": "labor-procedure",
       "number": 26,
-      "front": "Na execução de prestações sucessivas por tempo determinado, quais parcelas são abrangidas inicialmente?",
-      "back": "As prestações devidas até a data do ingresso na execução, conforme a regra específica da CLT.",
-      "legalBasis": "CLT, art. 891"
+      "front": "Como se distinguem as prestações sucessivas por prazo determinado e indeterminado na execução trabalhista?",
+      "back": "Se o prazo é determinado, a execução da parcela inadimplida abrange também as subsequentes. Se indeterminado, inicialmente abrange as parcelas devidas até o ingresso na execução.",
+      "legalBasis": "CLT, arts. 891 e 892"
     },
     {
       "disciplineId": "labor-procedure",
@@ -510,7 +510,7 @@
       "number": 6,
       "front": "Quem chefia o Ministério Público do Trabalho?",
       "back": "O Procurador-Geral do Trabalho, escolhido conforme o procedimento previsto na Lei Complementar 75/1993.",
-      "legalBasis": "LC 75/1993, arts. 85 e 87"
+      "legalBasis": "LC 75/1993, arts. 87 e 88"
     },
     {
       "disciplineId": "labor-procedure",
