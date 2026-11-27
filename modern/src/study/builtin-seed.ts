@@ -3,6 +3,7 @@ import { qualifyCatalog, JURISPRUDENCE_NOTES } from '../learning/catalog-quality
 import legacyDecks from '../generated/legacy-decks.json';
 import { OFFICIAL_EDITAL_2026, OFFICIAL_EDITAL_SOURCE } from '../edital/official-edital-2026';
 import { V4_NEW_CONTENT_CARDS } from './v4-supplement';
+import { V43_ADVANCED_CARDS } from './v43-advanced';
 
 type LegacyCard = Record<string, unknown> & {
   id?: string; front?: string; back?: string; topic?: string; subtopic?: string;
@@ -172,7 +173,7 @@ export async function loadStudyCatalogCards(): Promise<CompleteCatalogCard[]> {
   }));
   const parsed = JSON.parse(chunks.join('\n')) as CompleteCatalogFile;
   const base = parsed.cards || [];
-  return [...qualifyCatalog(base), ...buildLayer4Cards(base)];
+  return [...qualifyCatalog(base), ...buildLayer4Cards(base), ...V43_ADVANCED_CARDS];
 }
 
 async function loadCompleteCatalogDecks(): Promise<LegacyDeck[]> {
