@@ -44,6 +44,8 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const [query, setQuery] = useState('');
   const [onlyMissing, setOnlyMissing] = useState(false);
   const [onlyUnread, setOnlyUnread] = useState(false);
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [favoriteVersion, setFavoriteVersion] = useState(0);
   const [readerNote, setReaderNote] = useState('');
   const [readerFont, setReaderFont] = useState(19);
   const [immersive, setImmersive] = useState(false);
@@ -78,6 +80,19 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
     }
     return result;
   }, [baseRows, onlyMissing, onlyUnread, cardsByTopic]);
+
+  const favoriteCards = useMemo(() => {
+    const allowed = new Set(baseRows.flatMap((subject) => subject.rootTopics.map((topic) => topic.id)));
+    return [...cardsByTopic.entries()].flatMap(([topicId, cards]) => {
+      if (!allowed.has(topicId)) return [];
+      return cards.flatMap((card, index) => {
+        try {
+          return window.localStorage.getItem(`trilha-law-favorite:${profileId}:${card.id}`) === '1' && (!onlyUnread || !card.read_at)
+            ? [{ card, topicId, index }] : [];
+        } catch { return []; }
+      });
+    });
+  }, [baseRows, cardsByTopic, profileId, favoriteVersion, onlyUnread]);
 
   const coverage = useMemo(() => {
     let totalTopics = 0;
@@ -194,8 +209,11 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   }
   function toggleFavorite(cardId: string) {
     const next = !readerFavorite;
-    setReaderFavorite(next);
-    try { next ? window.localStorage.setItem(favoriteStorageKey(cardId), '1') : window.localStorage.removeItem(favoriteStorageKey(cardId)); } catch { /* local-only */ }
+    try {
+      next ? window.localStorage.setItem(favoriteStorageKey(cardId), '1') : window.localStorage.removeItem(favoriteStorageKey(cardId));
+      setReaderFavorite(next);
+      setFavoriteVersion((version) => version + 1);
+    } catch { setLoadError('Não foi possível salvar o favorito neste dispositivo.'); }
   }
 
   function openReader(topicId: string, startIndex = 0) {
@@ -243,12 +261,13 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         action={
           <div className="lei-seca-header-actions">
             <div className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar norma ou assunto" /></div>
-            <button type="button" className={`missing-toggle ${onlyMissing ? 'active' : ''}`} onClick={() => setOnlyMissing((current) => !current)}>
+            <button type="button" className={`missing-toggle ${onlyMissing ? 'active' : ''}`} onClick={() => { setShowFavorites(false); setOnlyMissing((current) => !current); }}>
               {onlyMissing ? '✓ ' : ''}Sem Lei Seca
             </button>
             <button type="button" className={`missing-toggle ${onlyUnread ? 'active' : ''}`} onClick={() => setOnlyUnread((current) => !current)}>
               {onlyUnread ? '✓ ' : ''}Não lidos
             </button>
+            <button type="button" className={`missing-toggle ${showFavorites ? 'active' : ''}`} aria-pressed={showFavorites} onClick={() => { setOnlyMissing(false); setShowFavorites((value) => !value); }}>★ Favoritos ({favoriteCards.length})</button>
           </div>
         }
       />
@@ -260,7 +279,16 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         <MetricTile label="Trechos lidos" value={`${coverage.readCards}/${coverage.totalCards}`} helper="marcados como lidos" />
         <MetricTile label="Cobertura geral" value={coverage.totalTopics ? `${Math.round((coverage.coveredTopics / coverage.totalTopics) * 100)}%` : '0%'} helper="dos assuntos com roteiro ou trecho vinculado" />
       </div>
-      {!rows.length ? (
+      {showFavorites ? (
+        <section className="law-favorites-list" aria-label="Trechos favoritos neste dispositivo">
+          <p>Favoritos salvos neste dispositivo. A busca e o filtro Não lidos também se aplicam.</p>
+          {!favoriteCards.length ? <div className="study-empty">Nenhum favorito corresponde aos filtros.</div> : favoriteCards.map(({ card, topicId, index }) => (
+            <button type="button" className="law-favorites-item" key={card.id} onClick={() => openReader(topicId, index)}>
+              <strong>{card.front}</strong><small>{topics.find((topic) => topic.id === topicId)?.name}</small><span>{card.read_at ? 'Lido' : 'Não lido'} · Abrir →</span>
+            </button>
+          ))}
+        </section>
+      ) : !rows.length ? (
         <div className="study-empty">
           <strong>{onlyMissing ? 'Tudo coberto por aqui! 🎉' : 'Nenhum artigo cadastrado ainda.'}</strong>
           <span>{onlyMissing ? 'Todos os assuntos com base legal já têm ao menos um trecho de Lei Seca.' : 'Quando os assuntos tiverem base legal registrada, eles aparecerão aqui por matéria.'}</span>
@@ -363,7 +391,7 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
                   <span>{card.front}</span>
                   <button className={`law-favorite ${readerFavorite ? 'active' : ''}`} onClick={() => toggleFavorite(card.id)} aria-label={readerFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}>{readerFavorite ? '★' : '☆'}</button>
                 </div>
-                <div className="law-reader-text" style={{ fontSize: readerFont }}>{card.back}</div>
+                <div className="law-reader-text" style={{ fontSize: readerFont }}>{card.back.split(/(?<=\n)/).map((line, index) => <span key={index} className={`law-block ${/^\s*(?:Art\.\s*\d|§\s*\d|Parágrafo único)/i.test(line) ? 'law-block-heading' : /^\s*[IVXLCDM]+\s*[-–—]/.test(line) ? 'law-block-inciso' : /^\s*[a-z]\)/.test(line) ? 'law-block-alinea' : ''}`}>{line}</span>)}</div>
                 {!immersive && card.complement ? <aside className="law-reader-note"><strong>Observação</strong><p>{card.complement}</p></aside> : null}
                 {!immersive ? <label className="law-personal-note"><strong>Minha anotação neste dispositivo</strong><textarea rows={3} value={readerNote} onChange={(event) => saveReaderNote(card.id, event.target.value)} placeholder="Escreva uma observação, exceção ou macete pessoal…" /></label> : null}
               </article>
