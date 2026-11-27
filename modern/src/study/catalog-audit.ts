@@ -158,7 +158,7 @@ export function buildCatalogAudit(
     const topic = card.topic_id ? topicsById.get(card.topic_id) : null;
     return !topic || (topic.name !== 'Jurisprudência prioritária STF/TST' && topic.name !== 'Estudo de Caso Jurídico - protocolo de treino');
   });
-  const covered = new Set(allStudyCards.map((card) => card.topic_id).filter((id): id is string => Boolean(id) && officialIds.has(id)));
+  const covered = new Set(allStudyCards.map((card) => card.topic_id).filter((id): id is string => id !== null && officialIds.has(id)));
   const distinctByFingerprint = new Set<string>();
   const distinctRelaxed = new Set<string>();
   let possibleDuplicates = 0, collisions = 0;
