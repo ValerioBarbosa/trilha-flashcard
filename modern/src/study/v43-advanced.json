@@ -1,0 +1,976 @@
+{
+  "entries": [
+    {
+      "id": "lp-001",
+      "disciplineId": "labor-procedure",
+      "number": 7,
+      "front": "O juiz determinou que o exequente indique bens penhoráveis. Ele descumpriu a determinação na execução. Qual o prazo da prescrição intercorrente e seu marco inicial?",
+      "back": "Dois anos, contados do momento em que o exequente deixa de cumprir determinação judicial no curso da execução.",
+      "legalBasis": "CLT, art. 11-A, caput e § 1º",
+      "trap": "Não contar automaticamente do trânsito em julgado."
+    },
+    {
+      "id": "lp-002",
+      "disciplineId": "labor-procedure",
+      "number": 8,
+      "front": "Em prazo processual trabalhista de cinco dias, o sábado intermediário é dia útil para contagem?",
+      "back": "Não, em regra. A contagem é em dias úteis, excluindo o dia do começo e incluindo o do vencimento.",
+      "legalBasis": "CLT, art. 775",
+      "trap": "Não confundir prazo processual com prazo material."
+    },
+    {
+      "id": "lp-003",
+      "disciplineId": "labor-procedure",
+      "number": 15,
+      "front": "Uma irregularidade processual não causou prejuízo às partes. A CLT exige que seja declarada a nulidade?",
+      "back": "Não. A nulidade depende de manifesto prejuízo às partes litigantes.",
+      "legalBasis": "CLT, art. 794",
+      "trap": "A mera irregularidade não basta."
+    },
+    {
+      "id": "lp-004",
+      "disciplineId": "labor-procedure",
+      "number": 15,
+      "front": "A parte percebe nulidade relativa em audiência, mas permanece silenciosa. Pode guardá-la para alegar somente no recurso?",
+      "back": "Em regra, não. Deve arguir a nulidade na primeira oportunidade em que tiver de falar em audiência ou nos autos.",
+      "legalBasis": "CLT, art. 795",
+      "trap": "Não confundir com nulidades cognoscíveis de ofício."
+    },
+    {
+      "id": "lp-005",
+      "disciplineId": "labor-procedure",
+      "number": 16,
+      "front": "O reclamado não comparece à audiência, mas seu advogado está presente. A contestação e os documentos podem ser recebidos?",
+      "back": "Sim. A ausência do reclamado não impede o recebimento da contestação e dos documentos apresentados pelo advogado presente.",
+      "legalBasis": "CLT, art. 844, § 5º",
+      "trap": "Recebimento da defesa não significa afastamento automático da revelia."
+    },
+    {
+      "id": "lp-006",
+      "disciplineId": "labor-procedure",
+      "number": 20,
+      "front": "Uma reclamação de valor equivalente a 30 salários mínimos tem como réu município. Deve seguir o rito sumaríssimo?",
+      "back": "Não. As demandas envolvendo a Administração Pública direta, autárquica e fundacional estão excluídas desse procedimento.",
+      "legalBasis": "CLT, art. 852-A, parágrafo único",
+      "trap": "O valor da causa não é o único critério."
+    },
+    {
+      "id": "lp-007",
+      "disciplineId": "labor-procedure",
+      "number": 20,
+      "front": "No rito sumaríssimo, cada parte pretende ouvir três testemunhas. É esse o limite legal?",
+      "back": "Não. O limite é de duas testemunhas por parte no procedimento sumaríssimo.",
+      "legalBasis": "CLT, art. 852-H, § 2º",
+      "trap": "Não confundir com o limite geral de três."
+    },
+    {
+      "id": "lp-008",
+      "disciplineId": "labor-procedure",
+      "number": 23,
+      "front": "Na liquidação, o credor pretende incluir parcela não deferida na sentença. É possível modificar a decisão liquidanda?",
+      "back": "Não. Na liquidação não se pode modificar ou inovar a sentença liquidanda nem discutir matéria pertinente à causa principal.",
+      "legalBasis": "CLT, art. 879, § 1º",
+      "trap": "Liquidação não é nova fase de conhecimento."
+    },
+    {
+      "id": "lp-009",
+      "disciplineId": "labor-procedure",
+      "number": 23,
+      "front": "Elaborada a conta de liquidação, qual prazo comum para impugnação fundamentada dos cálculos?",
+      "back": "Oito dias, com indicação dos itens e valores objeto da discordância, sob pena de preclusão.",
+      "legalBasis": "CLT, art. 879, § 2º",
+      "trap": "Não confundir com o prazo de embargos à execução."
+    },
+    {
+      "id": "lp-010",
+      "disciplineId": "labor-procedure",
+      "number": 25,
+      "front": "O recurso trabalhista possui, como regra, efeito suspensivo automático?",
+      "back": "Não. Em regra, os recursos têm efeito meramente devolutivo, permitindo execução provisória até a penhora.",
+      "legalBasis": "CLT, art. 899, caput",
+      "trap": "A regra não exclui hipóteses excepcionais de suspensão."
+    },
+    {
+      "id": "lp-011",
+      "disciplineId": "labor-procedure",
+      "number": 29,
+      "front": "Na fase de execução, qual recurso cabe contra a decisão que resolve o incidente de desconsideração da personalidade jurídica?",
+      "back": "Agravo de petição, independentemente de garantia do juízo.",
+      "legalBasis": "CLT, art. 855-A, § 1º, II",
+      "trap": "Na fase de conhecimento, a regra recursal é diferente."
+    },
+    {
+      "id": "lp-012",
+      "disciplineId": "labor-procedure",
+      "number": 35,
+      "front": "A parte opõe embargos de declaração tempestivos, assinados e com representação regular. O prazo dos demais recursos fica apenas suspenso?",
+      "back": "Não. Os embargos de declaração interrompem o prazo para outros recursos por qualquer das partes, ressalvadas as hipóteses legais.",
+      "legalBasis": "CLT, art. 897-A, § 3º",
+      "trap": "Interrupção reinicia a contagem; suspensão apenas conserva o saldo."
+    },
+    {
+      "id": "lp-013",
+      "disciplineId": "labor-procedure",
+      "number": 8,
+      "front": "A parte pretende praticar ato processual em prazo que corre entre 20 de dezembro e 20 de janeiro. O prazo continua fluindo nesse intervalo?",
+      "back": "Não. O curso dos prazos processuais fica suspenso nesse período, incluídas as duas datas.",
+      "legalBasis": "CLT, art. 775-A",
+      "trap": "Suspensão não é interrupção."
+    },
+    {
+      "id": "lp-014",
+      "disciplineId": "labor-procedure",
+      "number": 15,
+      "front": "O réu pretende apresentar exceção de incompetência territorial antes da audiência. Qual prazo e requisito formal deve observar?",
+      "back": "Cinco dias da notificação, antes da audiência, em peça que sinalize a existência da exceção.",
+      "legalBasis": "CLT, art. 800",
+      "trap": "Não esperar necessariamente a contestação na audiência."
+    },
+    {
+      "id": "lp-015",
+      "disciplineId": "labor-procedure",
+      "number": 16,
+      "front": "Uma empresa designa como preposto pessoa que não integra seu quadro de empregados. Isso impede sua representação em audiência?",
+      "back": "Não. O preposto não precisa ser empregado da parte reclamada, mas deve conhecer os fatos.",
+      "legalBasis": "CLT, art. 843, §§ 1º e 3º",
+      "trap": "Conhecimento dos fatos não se confunde com vínculo empregatício."
+    },
+    {
+      "id": "lp-016",
+      "disciplineId": "labor-procedure",
+      "number": 16,
+      "front": "O reclamante falta à audiência inicial. Qual a consequência processual prevista na CLT, em regra?",
+      "back": "Arquivamento da reclamação. A ausência do reclamado, por sua vez, enseja revelia e confissão quanto aos fatos, observadas as exceções legais.",
+      "legalBasis": "CLT, art. 844",
+      "trap": "Não inverter as consequências das ausências."
+    },
+    {
+      "id": "lp-017",
+      "disciplineId": "labor-procedure",
+      "number": 20,
+      "front": "No procedimento sumaríssimo, o autor desconhece o endereço do réu e pede citação por edital. A CLT admite essa modalidade nesse rito?",
+      "back": "Não. Cabe ao autor indicar corretamente nome e endereço do reclamado; a inobservância enseja arquivamento e custas.",
+      "legalBasis": "CLT, art. 852-B, II e § 1º",
+      "trap": "Não transportar automaticamente regras do rito ordinário."
+    },
+    {
+      "id": "lp-018",
+      "disciplineId": "labor-procedure",
+      "number": 18,
+      "front": "Na reclamação escrita, o autor formula pedido genérico sem indicação de valor, fora das exigências legais. Qual a consequência prevista para o pedido irregular?",
+      "back": "A CLT prevê extinção sem resolução do mérito dos pedidos que não atendam aos requisitos do art. 840, § 1º.",
+      "legalBasis": "CLT, art. 840, §§ 1º e 3º",
+      "trap": "Distinguir extinção do pedido irregular de improcedência."
+    },
+    {
+      "id": "lp-019",
+      "disciplineId": "labor-procedure",
+      "number": 29,
+      "front": "O incidente de desconsideração é instaurado na fase de conhecimento. Cabe recurso imediato contra a decisão interlocutória que o resolve?",
+      "back": "Não, conforme a regra específica da CLT para a fase de conhecimento, sem prejuízo da impugnação no recurso da decisão final.",
+      "legalBasis": "CLT, art. 855-A, § 1º, I",
+      "trap": "Na execução, cabe agravo de petição."
+    },
+    {
+      "id": "lp-020",
+      "disciplineId": "labor-procedure",
+      "number": 30,
+      "front": "O executado é citado para cumprir condenação trabalhista em dinheiro. Qual prazo legal para pagar ou garantir a execução?",
+      "back": "Quarenta e oito horas, sob pena de penhora.",
+      "legalBasis": "CLT, art. 880",
+      "trap": "Não confundir com os quinze dias do CPC."
+    },
+    {
+      "id": "lp-021",
+      "disciplineId": "labor-procedure",
+      "number": 33,
+      "front": "Após garantir a execução trabalhista, o devedor pretende apresentar embargos. Qual o prazo legal?",
+      "back": "Cinco dias após a garantia da execução ou penhora, cabendo igual prazo ao exequente para impugnação.",
+      "legalBasis": "CLT, art. 884",
+      "trap": "Não confundir com os oito dias para impugnar cálculos."
+    },
+    {
+      "id": "lp-022",
+      "disciplineId": "labor-procedure",
+      "number": 35,
+      "front": "A parte deseja recorrer de decisão definitiva de Vara do Trabalho. Qual recurso ordinário e prazo são previstos pela CLT?",
+      "back": "Recurso ordinário no prazo de oito dias, também cabível contra decisões terminativas das Varas e Juízos do Trabalho.",
+      "legalBasis": "CLT, art. 895, I",
+      "trap": "Não aplicar o prazo geral de apelação do CPC."
+    },
+    {
+      "id": "lp-023",
+      "disciplineId": "labor-procedure",
+      "number": 35,
+      "front": "O juízo de origem denega seguimento a recurso trabalhista. Qual recurso é previsto para impugnar esse despacho?",
+      "back": "Agravo de instrumento, no prazo de oito dias.",
+      "legalBasis": "CLT, art. 897, b",
+      "trap": "Não confundir com agravo de petição, próprio da execução."
+    },
+    {
+      "id": "lp-024",
+      "disciplineId": "labor-procedure",
+      "number": 35,
+      "front": "A parte interpõe agravo de petição sem delimitar os valores e matérias impugnados. Qual requisito específico foi desatendido?",
+      "back": "Deve delimitar justificadamente matérias e valores impugnados, permitindo a execução imediata da parte remanescente.",
+      "legalBasis": "CLT, art. 897, § 1º",
+      "trap": "O requisito específico não se resume à indicação genérica do inconformismo."
+    },
+    {
+      "id": "ll-001",
+      "disciplineId": "labor-law",
+      "number": 3,
+      "front": "Uma pessoa física presta serviços não eventuais, remunerados, pessoalmente e sob dependência do empregador. A denominação contratual de autônomo é suficiente para afastar o vínculo?",
+      "back": "Não. A caracterização da relação de emprego depende dos requisitos legais efetivamente presentes, e não apenas do nome atribuído ao contrato.",
+      "legalBasis": "CLT, arts. 2º, 3º e 9º",
+      "trap": "A denominação contratual não prevalece automaticamente sobre os fatos."
+    },
+    {
+      "id": "ll-002",
+      "disciplineId": "labor-law",
+      "number": 7,
+      "front": "Duas empresas possuem os mesmos sócios. Esse fato isolado basta para caracterizar grupo econômico trabalhista?",
+      "back": "Não. Exige-se demonstração de interesse integrado, efetiva comunhão de interesses e atuação conjunta das empresas integrantes.",
+      "legalBasis": "CLT, art. 2º, § 3º",
+      "trap": "Identidade de sócios, isoladamente, não é suficiente."
+    },
+    {
+      "id": "ll-003",
+      "disciplineId": "labor-law",
+      "number": 9,
+      "front": "Um empregador celebra contrato de experiência por 120 dias. Esse prazo respeita o limite legal?",
+      "back": "Não. O contrato de experiência não poderá exceder noventa dias.",
+      "legalBasis": "CLT, art. 445, parágrafo único",
+      "trap": "O limite geral de dois anos dos contratos a termo não vale para experiência."
+    },
+    {
+      "id": "ll-004",
+      "disciplineId": "labor-law",
+      "number": 10,
+      "front": "Empregado aceita alteração contratual que lhe causa prejuízo direto. O consentimento torna a alteração válida?",
+      "back": "Não. A alteração exige mútuo consentimento e ausência de prejuízo direto ou indireto ao empregado, ressalvadas as hipóteses legais.",
+      "legalBasis": "CLT, art. 468, caput",
+      "trap": "Consentimento não basta."
+    },
+    {
+      "id": "ll-005",
+      "disciplineId": "labor-law",
+      "number": 12,
+      "front": "O empregador exige serviços proibidos por lei. O empregado pode pleitear rescisão indireta?",
+      "back": "Sim. A exigência de serviços defesos por lei é uma das hipóteses previstas para rescisão indireta do contrato.",
+      "legalBasis": "CLT, art. 483, a",
+      "trap": "Rescisão indireta decorre de falta patronal, não de pedido de demissão comum."
+    },
+    {
+      "id": "ll-006",
+      "disciplineId": "labor-law",
+      "number": 13,
+      "front": "Na extinção contratual por acordo, o empregado pode sacar integralmente o FGTS e receber seguro-desemprego?",
+      "back": "Não. A movimentação da conta do FGTS fica limitada a 80% dos depósitos, e a extinção por acordo não autoriza ingresso no programa de seguro-desemprego.",
+      "legalBasis": "CLT, art. 484-A, §§ 1º e 2º",
+      "trap": "Não confundir acordo com dispensa sem justa causa."
+    },
+    {
+      "id": "ll-007",
+      "disciplineId": "labor-law",
+      "number": 15,
+      "front": "Ao terminar sua jornada, um empregado retorna ao trabalho oito horas depois. Qual é o intervalo mínimo legal geral entre jornadas?",
+      "back": "Onze horas consecutivas de descanso entre duas jornadas de trabalho.",
+      "legalBasis": "CLT, art. 66",
+      "trap": "Não confundir intervalo interjornada com intrajornada."
+    },
+    {
+      "id": "ll-008",
+      "disciplineId": "labor-law",
+      "number": 16,
+      "front": "Em jornada de oito horas, sem norma coletiva ou hipótese especial aplicável, o empregador concede apenas 40 minutos de intervalo. Qual parcela prevê a CLT pela supressão?",
+      "back": "Pagamento apenas dos vinte minutos suprimidos, de natureza indenizatória, com acréscimo de 50% sobre a remuneração da hora normal, no regime posterior à Reforma Trabalhista.",
+      "legalBasis": "CLT, art. 71, caput e § 4º",
+      "trap": "Não pagar automaticamente a hora integral para fatos posteriores à reforma."
+    },
+    {
+      "id": "ll-009",
+      "disciplineId": "labor-law",
+      "number": 18,
+      "front": "Um empregado urbano trabalha às 23 horas. Qual é o adicional noturno mínimo e a duração legal da hora noturna urbana?",
+      "back": "Adicional de pelo menos 20% sobre a hora diurna; a hora noturna é computada como 52 minutos e 30 segundos.",
+      "legalBasis": "CLT, art. 73, caput e § 1º",
+      "trap": "Não aplicar automaticamente os parâmetros do trabalho rural."
+    },
+    {
+      "id": "ll-010",
+      "disciplineId": "labor-law",
+      "number": 19,
+      "front": "Empregado e empregador pactuam banco de horas por acordo individual escrito para compensação em seis meses. A CLT admite essa modalidade?",
+      "back": "Sim. O banco de horas pode ser pactuado por acordo individual escrito, desde que a compensação ocorra no período máximo de seis meses.",
+      "legalBasis": "CLT, art. 59, § 5º",
+      "trap": "Distinguir acordo individual de negociação coletiva anual."
+    },
+    {
+      "id": "ll-011",
+      "disciplineId": "labor-law",
+      "number": 22,
+      "front": "Um empregado deseja dividir as férias em três períodos, de 14, 10 e 6 dias corridos. Respeita os limites legais, havendo sua concordância?",
+      "back": "Sim. Um período deve ter pelo menos quatorze dias corridos e os demais pelo menos cinco dias corridos cada, com concordância do empregado.",
+      "legalBasis": "CLT, art. 134, § 1º",
+      "trap": "Não exigir que todos os períodos tenham quatorze dias."
+    },
+    {
+      "id": "ll-012",
+      "disciplineId": "labor-law",
+      "number": 24,
+      "front": "A gorjeta recebida pelo empregado integra salário pago diretamente pelo empregador ou remuneração?",
+      "back": "Integra a remuneração, que abrange o salário devido e pago diretamente pelo empregador e as gorjetas recebidas.",
+      "legalBasis": "CLT, art. 457, caput",
+      "trap": "Salário e remuneração não são conceitos idênticos."
+    },
+    {
+      "id": "ll-013",
+      "disciplineId": "labor-law",
+      "number": 29,
+      "front": "O representante dos empregados eleito para cargo de direção da CIPA pode ser dispensado arbitrariamente durante a candidatura e o mandato?",
+      "back": "A dispensa arbitrária ou sem justa causa é vedada desde o registro da candidatura até um ano após o final do mandato do empregado eleito para cargo de direção da CIPA.",
+      "legalBasis": "ADCT, art. 10, II, a; CLT, art. 165",
+      "trap": "Não estender automaticamente a garantia aos representantes indicados pelo empregador."
+    },
+    {
+      "id": "ll-014",
+      "disciplineId": "labor-law",
+      "number": 31,
+      "front": "Uma empregada engravida durante o aviso prévio indenizado. A gravidez ocorrida nesse período pode gerar garantia provisória de emprego?",
+      "back": "Sim. A confirmação do estado de gravidez durante o contrato de trabalho, inclusive no prazo do aviso prévio trabalhado ou indenizado, garante a estabilidade provisória prevista no ADCT.",
+      "legalBasis": "CLT, art. 391-A; ADCT, art. 10, II, b",
+      "trap": "Aviso prévio indenizado não afasta por si só a proteção à gestante."
+    },
+    {
+      "id": "ll-015",
+      "disciplineId": "labor-law",
+      "number": 31,
+      "front": "Uma empregada gestante solicita licença-maternidade. Qual é a duração constitucional ordinária da licença, sem prejuízo do emprego e do salário?",
+      "back": "Cento e vinte dias, ressalvadas as hipóteses legais de prorrogação ou regimes especiais.",
+      "legalBasis": "CF, art. 7º, XVIII; CLT, art. 392",
+      "trap": "Distinguir duração da licença e período de garantia provisória de emprego."
+    },
+    {
+      "id": "ll-016",
+      "disciplineId": "labor-law",
+      "number": 26,
+      "front": "Dois empregados exercem função idêntica com trabalho de igual valor para o mesmo empregador e estabelecimento. Um possui cinco anos a mais de serviço para o empregador. O requisito temporal da equiparação está satisfeito?",
+      "back": "Não. A diferença de tempo de serviço para o mesmo empregador não pode ser superior a quatro anos, nem a diferença de tempo na função superior a dois anos.",
+      "legalBasis": "CLT, art. 461, caput e § 1º",
+      "trap": "Os limites temporais são cumulativos."
+    },
+    {
+      "id": "ll-017",
+      "disciplineId": "labor-law",
+      "number": 24,
+      "front": "O empregador concede prêmio genuíno por desempenho superior ao ordinariamente esperado. A habitualidade, por si só, torna a parcela integrante da remuneração?",
+      "back": "Não. Os prêmios que atendem à definição legal não integram a remuneração, ainda que habituais; a mera denominação de prêmio não basta.",
+      "legalBasis": "CLT, art. 457, §§ 2º e 4º",
+      "trap": "Distinguir prêmio verdadeiro de salário disfarçado."
+    },
+    {
+      "id": "ll-018",
+      "disciplineId": "labor-law",
+      "number": 28,
+      "front": "Em contrato comum de emprego regido pela CLT, qual é o percentual ordinário do depósito mensal do FGTS devido pelo empregador?",
+      "back": "Oito por cento da remuneração paga ou devida no mês anterior, observadas as parcelas integrantes da base legal e os regimes especiais.",
+      "legalBasis": "Lei 8.036/1990, art. 15, caput",
+      "trap": "Não confundir depósito mensal com indenização rescisória."
+    },
+    {
+      "id": "ll-019",
+      "disciplineId": "labor-law",
+      "number": 28,
+      "front": "Uma empresa contrata aprendiz. Aplica-se a mesma alíquota ordinária de depósito do FGTS de 8%?",
+      "back": "Não. Nos contratos de aprendizagem, a alíquota legal do FGTS é de dois por cento.",
+      "legalBasis": "Lei 8.036/1990, art. 15, § 7º",
+      "trap": "O contrato de aprendizagem tem alíquota especial."
+    },
+    {
+      "id": "ll-020",
+      "disciplineId": "labor-law",
+      "number": 30,
+      "front": "Em atividade classificada como insalubre, quais são os percentuais legais correspondentes aos graus máximo, médio e mínimo?",
+      "back": "Quarenta, vinte e dez por cento, respectivamente. A questão da base de cálculo exige análise própria e não se confunde com os percentuais.",
+      "legalBasis": "CLT, art. 192",
+      "trap": "Não aplicar os 30% da periculosidade à insalubridade."
+    },
+    {
+      "id": "ll-021",
+      "disciplineId": "labor-law",
+      "number": 30,
+      "front": "Um empregado sujeito a atividade perigosa, enquadrada na legislação, pergunta qual o percentual geral do adicional de periculosidade previsto na CLT.",
+      "back": "Trinta por cento sobre o salário, sem acréscimos resultantes de gratificações, prêmios ou participações nos lucros da empresa, observados regimes especiais.",
+      "legalBasis": "CLT, art. 193, § 1º",
+      "trap": "Não confundir a base legal da periculosidade com a da insalubridade."
+    },
+    {
+      "id": "ll-022",
+      "disciplineId": "labor-law",
+      "number": 36,
+      "front": "Um trabalhador em teletrabalho comparece habitualmente ao estabelecimento para atividades específicas que exigem sua presença. Isso descaracteriza necessariamente o teletrabalho?",
+      "back": "Não. O comparecimento, ainda que habitual, para atividades específicas que exijam a presença no estabelecimento não descaracteriza o regime de teletrabalho ou trabalho remoto.",
+      "legalBasis": "CLT, art. 75-B, § 1º",
+      "trap": "Teletrabalho não exige ausência absoluta do estabelecimento."
+    },
+    {
+      "id": "ll-023",
+      "disciplineId": "labor-law",
+      "number": 36,
+      "front": "Todo empregado em teletrabalho está automaticamente excluído do regime de duração do trabalho?",
+      "back": "Não. A exclusão legal do art. 62, III, alcança os empregados em teletrabalho que prestam serviço por produção ou tarefa.",
+      "legalBasis": "CLT, arts. 62, III, e 75-B, §§ 2º e 3º",
+      "trap": "Distinguir teletrabalho por jornada de teletrabalho por produção ou tarefa."
+    },
+    {
+      "id": "ll-024",
+      "disciplineId": "labor-law",
+      "number": 34,
+      "front": "Uma convenção coletiva pretende reduzir o número de dias de férias devidos ao empregado. A CLT admite essa redução como objeto de negociação coletiva?",
+      "back": "Não. A supressão ou redução do número de dias de férias devidos ao empregado constitui objeto ilícito de convenção ou acordo coletivo.",
+      "legalBasis": "CLT, art. 611-B, XI",
+      "trap": "A prevalência do negociado não é ilimitada."
+    },
+    {
+      "id": "ad-001",
+      "disciplineId": "administrative",
+      "number": 3,
+      "front": "Um prefeito insere seu nome e fotografia em publicidade institucional de obras públicas com finalidade de promoção pessoal. A Constituição permite essa prática?",
+      "back": "Não. A publicidade oficial deve ter caráter educativo, informativo ou de orientação social, sem nomes, símbolos ou imagens que caracterizem promoção pessoal de autoridades ou servidores.",
+      "legalBasis": "CF, art. 37, § 1º",
+      "trap": "Publicidade institucional não autoriza promoção pessoal."
+    },
+    {
+      "id": "ad-002",
+      "disciplineId": "administrative",
+      "number": 5,
+      "front": "Uma autoridade fundamenta decisão administrativa exclusivamente em valores jurídicos abstratos, sem considerar consequências práticas. A LINDB admite essa fundamentação isolada?",
+      "back": "Não. Nas esferas administrativa, controladora e judicial, não se decidirá com base em valores jurídicos abstratos sem considerar as consequências práticas da decisão.",
+      "legalBasis": "LINDB, art. 20",
+      "trap": "Não confundir consideração das consequências com autorização para descumprir a lei."
+    },
+    {
+      "id": "ad-003",
+      "disciplineId": "administrative",
+      "number": 7,
+      "front": "Um agente competente pratica ato visando finalidade pessoal, diversa daquela prevista na lei. Qual modalidade de abuso de poder está caracterizada?",
+      "back": "Desvio de finalidade (ou desvio de poder). O agente utiliza sua competência para atingir finalidade diversa da prevista explícita ou implicitamente na regra de competência.",
+      "legalBasis": "Lei 4.717/1965, art. 2º, parágrafo único, e",
+      "trap": "Excesso de poder relaciona-se aos limites da competência; desvio, à finalidade."
+    },
+    {
+      "id": "ad-004",
+      "disciplineId": "administrative",
+      "number": 12,
+      "front": "A Administração identifica ato válido que deixou de ser conveniente. Deve anulá-lo ou revogá-lo?",
+      "back": "Pode revogá-lo por conveniência ou oportunidade, respeitados os direitos adquiridos e os limites legais. A anulação decorre de vício de legalidade.",
+      "legalBasis": "Lei 9.784/1999, art. 53",
+      "trap": "Revogação não é sanção por ilegalidade."
+    },
+    {
+      "id": "ad-005",
+      "disciplineId": "administrative",
+      "number": 12,
+      "front": "Um ato administrativo federal apresenta defeito sanável. A Administração pode convalidá-lo mesmo que haja prejuízo a terceiros?",
+      "back": "Não. A convalidação de defeitos sanáveis pressupõe que não haja lesão ao interesse público nem prejuízo a terceiros.",
+      "legalBasis": "Lei 9.784/1999, art. 55",
+      "trap": "Nem todo vício admite convalidação."
+    },
+    {
+      "id": "ad-006",
+      "disciplineId": "administrative",
+      "number": 13,
+      "front": "Em processo administrativo federal, a autoridade pretende delegar a edição de atos normativos a outro órgão. A Lei 9.784/1999 admite essa delegação?",
+      "back": "Não. A edição de atos de caráter normativo, a decisão de recursos administrativos e as matérias de competência exclusiva não podem ser objeto de delegação.",
+      "legalBasis": "Lei 9.784/1999, art. 13",
+      "trap": "Delegação é admitida em geral, mas há proibições expressas."
+    },
+    {
+      "id": "ad-007",
+      "disciplineId": "administrative",
+      "number": 13,
+      "front": "A Administração federal identifica ato favorável ao destinatário praticado há seis anos, sem má-fé demonstrada. Qual é a regra geral do prazo decadencial para anulação?",
+      "back": "Cinco anos, contados da prática do ato, salvo comprovada má-fé. Em efeitos patrimoniais contínuos, conta-se da percepção do primeiro pagamento.",
+      "legalBasis": "Lei 9.784/1999, art. 54",
+      "trap": "Não tratar o poder de anulação como ilimitado; considerar regimes e exceções específicas."
+    },
+    {
+      "id": "ad-008",
+      "disciplineId": "administrative",
+      "number": 17,
+      "front": "O Tribunal de Contas da União julga as contas anuais prestadas pelo Presidente da República?",
+      "back": "Não. O TCU aprecia essas contas mediante parecer prévio, elaborado em sessenta dias do recebimento; compete ao Congresso Nacional julgá-las.",
+      "legalBasis": "CF, arts. 49, IX, e 71, I",
+      "trap": "Distinguir apreciar com parecer prévio de julgar contas de administradores."
+    },
+    {
+      "id": "ad-009",
+      "disciplineId": "administrative",
+      "number": 34,
+      "front": "Um candidato é nomeado para cargo público federal. A nomeação, por si só, constitui a investidura no cargo?",
+      "back": "Não. A investidura em cargo público ocorre com a posse, conforme o regime dos servidores federais.",
+      "legalBasis": "Lei 8.112/1990, art. 7º",
+      "trap": "Nomeação é forma de provimento; posse é investidura."
+    },
+    {
+      "id": "ad-010",
+      "disciplineId": "administrative",
+      "number": 35,
+      "front": "Servidor federal empossado pretende iniciar suas atribuições após vinte dias. Qual é o prazo legal geral para entrar em exercício?",
+      "back": "Quinze dias, contados da data da posse. O servidor será exonerado do cargo se não entrar em exercício no prazo legal.",
+      "legalBasis": "Lei 8.112/1990, art. 15, §§ 1º e 2º",
+      "trap": "Não confundir com o prazo de trinta dias para posse."
+    },
+    {
+      "id": "ad-011",
+      "disciplineId": "administrative",
+      "number": 39,
+      "front": "Servidor federal é absolvido criminalmente porque ficou comprovado que não foi o autor do fato. Qual efeito sobre a responsabilidade administrativa pelo mesmo fato?",
+      "back": "A responsabilidade administrativa será afastada no caso de absolvição criminal que negue a existência do fato ou sua autoria.",
+      "legalBasis": "Lei 8.112/1990, art. 126",
+      "trap": "Nem toda absolvição criminal produz esse efeito na esfera administrativa."
+    },
+    {
+      "id": "ad-012",
+      "disciplineId": "administrative",
+      "number": 41,
+      "front": "Um agente público, nessa qualidade, causa dano a terceiro. A Constituição exige que a vítima demonstre dolo ou culpa do agente para responsabilizar a pessoa jurídica?",
+      "back": "Não, na hipótese de responsabilidade objetiva do art. 37, § 6º, demonstrados seus pressupostos. O direito de regresso contra o agente exige dolo ou culpa.",
+      "legalBasis": "CF, art. 37, § 6º",
+      "trap": "Distinguir responsabilidade da pessoa jurídica e responsabilidade regressiva do agente."
+    },
+    {
+      "id": "ad-013",
+      "disciplineId": "administrative",
+      "number": 20,
+      "front": "A Administração pretende contratar bens comuns cujos padrões de desempenho e qualidade podem ser objetivamente definidos por especificações usuais de mercado. Qual modalidade é obrigatória?",
+      "back": "Pregão, observadas as hipóteses legais de exclusão, como serviços técnicos especializados de natureza predominantemente intelectual e obras, ressalvados os serviços comuns de engenharia.",
+      "legalBasis": "Lei 14.133/2021, arts. 6º, XLI, e 29",
+      "trap": "Não confundir bem comum com contratação necessariamente de pequeno valor."
+    },
+    {
+      "id": "ad-014",
+      "disciplineId": "administrative",
+      "number": 20,
+      "front": "Uma autoridade pretende criar modalidade licitatória que combine elementos do pregão e da concorrência. A lei admite essa inovação?",
+      "back": "Não. É vedada a criação de outras modalidades de licitação ou a combinação das modalidades previstas no art. 28.",
+      "legalBasis": "Lei 14.133/2021, art. 28, § 2º",
+      "trap": "Modalidade não se confunde com critério de julgamento."
+    },
+    {
+      "id": "ad-015",
+      "disciplineId": "administrative",
+      "number": 21,
+      "front": "A Administração precisa contratar objeto que somente pode ser fornecido por produtor, empresa ou representante comercial exclusivo. Qual hipótese de contratação direta se aplica?",
+      "back": "Inexigibilidade, quando demonstrada a inviabilidade de competição e comprovada a exclusividade por documento idôneo, vedada a preferência por marca específica.",
+      "legalBasis": "Lei 14.133/2021, art. 74, I e § 1º",
+      "trap": "Inexigibilidade pressupõe inviabilidade de competição; dispensa possui hipóteses legais próprias."
+    },
+    {
+      "id": "ad-016",
+      "disciplineId": "administrative",
+      "number": 21,
+      "front": "Uma contratação direta dispensa a instauração de processo administrativo e a justificativa de preço?",
+      "back": "Não. O processo de contratação direta deve conter os elementos exigidos pelo art. 72, incluindo justificativa de preço e razão da escolha do contratado.",
+      "legalBasis": "Lei 14.133/2021, art. 72",
+      "trap": "Contratação direta não significa ausência de formalização."
+    },
+    {
+      "id": "ad-017",
+      "disciplineId": "administrative",
+      "number": 22,
+      "front": "Após o julgamento e a habilitação, a autoridade identifica ilegalidade insanável no procedimento licitatório. Qual providência deve adotar?",
+      "back": "Deve anular a licitação, de ofício ou mediante provocação de terceiros, quando presente ilegalidade insanável, assegurada a prévia manifestação dos interessados.",
+      "legalBasis": "Lei 14.133/2021, art. 71, III e § 3º",
+      "trap": "Revogação exige motivo de conveniência e oportunidade decorrente de fato superveniente devidamente comprovado."
+    },
+    {
+      "id": "ad-018",
+      "disciplineId": "administrative",
+      "number": 23,
+      "front": "Uma empresa recebe sanção de impedimento de licitar e contratar com base na Lei 14.133/2021. Qual o alcance territorial institucional e prazo máximo dessa sanção?",
+      "back": "Impede licitar ou contratar no âmbito da Administração direta e indireta do ente federativo que aplicou a sanção, pelo prazo máximo de três anos.",
+      "legalBasis": "Lei 14.133/2021, art. 156, § 4º",
+      "trap": "Não confundir com declaração de inidoneidade, que alcança todos os entes federativos."
+    },
+    {
+      "id": "ad-019",
+      "disciplineId": "administrative",
+      "number": 23,
+      "front": "Qual o prazo legal da declaração de inidoneidade para licitar ou contratar e seu alcance?",
+      "back": "Prazo mínimo de três e máximo de seis anos, impedindo licitar ou contratar no âmbito da Administração direta e indireta de todos os entes federativos.",
+      "legalBasis": "Lei 14.133/2021, art. 156, § 5º",
+      "trap": "Não inverter o alcance e os prazos das duas sanções."
+    },
+    {
+      "id": "ad-020",
+      "disciplineId": "administrative",
+      "number": 26,
+      "front": "Em alteração unilateral de contrato administrativo de reforma de edifício, qual limite especial o contratado deve aceitar para acréscimos?",
+      "back": "Até cinquenta por cento do valor inicial atualizado do contrato, nas mesmas condições contratuais. O limite especial não se estende às supressões.",
+      "legalBasis": "Lei 14.133/2021, art. 125",
+      "trap": "O limite ordinário de acréscimos ou supressões é de 25%; a exceção refere-se aos acréscimos em reforma."
+    },
+    {
+      "id": "ad-021",
+      "disciplineId": "administrative",
+      "number": 40,
+      "front": "A comissão de PAD federal é composta por três servidores, mas um deles não possui estabilidade. A composição atende à regra legal?",
+      "back": "Não. O processo disciplinar será conduzido por comissão composta de três servidores estáveis designados pela autoridade competente, observados os requisitos legais para a presidência.",
+      "legalBasis": "Lei 8.112/1990, art. 149",
+      "trap": "Não confundir servidor efetivo com servidor necessariamente estável."
+    },
+    {
+      "id": "ad-022",
+      "disciplineId": "administrative",
+      "number": 40,
+      "front": "A comissão de PAD federal necessita de mais tempo para concluir a instrução. Qual é o prazo geral de conclusão do processo disciplinar e sua possível prorrogação?",
+      "back": "Sessenta dias, contados da publicação do ato que constituir a comissão, admitida prorrogação por igual prazo quando as circunstâncias o exigirem.",
+      "legalBasis": "Lei 8.112/1990, art. 152",
+      "trap": "Não confundir o prazo da comissão com o prazo de julgamento da autoridade."
+    },
+    {
+      "id": "ad-023",
+      "disciplineId": "administrative",
+      "number": 31,
+      "front": "O poder concedente decide retomar serviço concedido durante o prazo da concessão por motivo de interesse público. Qual instituto se aplica e quais são seus requisitos?",
+      "back": "Encampação, mediante lei autorizativa específica e prévio pagamento da indenização, na forma da legislação.",
+      "legalBasis": "Lei 8.987/1995, art. 37",
+      "trap": "Caducidade decorre de inadimplemento da concessionária, não de mera conveniência pública."
+    },
+    {
+      "id": "ad-024",
+      "disciplineId": "administrative",
+      "number": 32,
+      "front": "O ente público pretende celebrar parceria público-privada com prazo de prestação de serviço de quatro anos. A lei admite esse prazo?",
+      "back": "Não. É vedada PPP com período de prestação de serviço inferior a cinco anos; o prazo contratual deve ser compatível com a amortização dos investimentos e não pode superar trinta e cinco anos, incluindo prorrogação.",
+      "legalBasis": "Lei 11.079/2004, arts. 2º, § 4º, II, e 5º, I",
+      "trap": "Não confundir o prazo das PPPs com o das concessões comuns."
+    },
+    {
+      "id": "cp-001",
+      "disciplineId": "civil-procedure",
+      "number": 9,
+      "front": "O réu apresenta contestação sem alegar incompetência relativa do juízo. Qual é a consequência em regra?",
+      "back": "Prorroga-se a competência relativa se o réu não alegar a incompetência em preliminar de contestação, ressalvadas as hipóteses legais.",
+      "legalBasis": "CPC, arts. 64 e 65",
+      "trap": "Não confundir com incompetência absoluta, cognoscível de ofício."
+    },
+    {
+      "id": "cp-002",
+      "disciplineId": "civil-procedure",
+      "number": 9,
+      "front": "O juiz reconhece incompetência absoluta após já ter proferido decisão interlocutória. Essa decisão perde automaticamente seus efeitos?",
+      "back": "Não. Salvo decisão judicial em sentido contrário, conservam-se os efeitos da decisão proferida pelo juízo incompetente até que outra seja proferida pelo juízo competente, se for o caso.",
+      "legalBasis": "CPC, art. 64, § 4º",
+      "trap": "Incompetência não implica automaticamente nulidade de todos os atos decisórios."
+    },
+    {
+      "id": "cp-003",
+      "disciplineId": "civil-procedure",
+      "number": 6,
+      "front": "Em litisconsórcio unitário, a omissão de um litisconsorte pode prejudicar os demais?",
+      "back": "Não. Os atos e omissões de um litisconsorte não prejudicam os outros, mas poderão beneficiá-los, quando unitário o litisconsórcio.",
+      "legalBasis": "CPC, art. 117",
+      "trap": "Distinguir os efeitos dos atos no litisconsórcio unitário e no simples."
+    },
+    {
+      "id": "cp-004",
+      "disciplineId": "civil-procedure",
+      "number": 10,
+      "front": "As partes possuem advogados de escritórios distintos em processo com autos eletrônicos. O prazo em dobro do art. 229 é aplicável?",
+      "back": "Não. O prazo em dobro dos litisconsortes com procuradores de escritórios distintos não se aplica aos processos em autos eletrônicos.",
+      "legalBasis": "CPC, art. 229, caput e § 2º",
+      "trap": "A existência de procuradores diferentes não basta nos autos eletrônicos."
+    },
+    {
+      "id": "cp-005",
+      "disciplineId": "civil-procedure",
+      "number": 12,
+      "front": "O juiz identifica defeito sanável na petição inicial. Antes de indeferi-la por esse motivo, qual providência deve adotar?",
+      "back": "Determinar que o autor a emende ou complete em quinze dias, indicando com precisão o que deve ser corrigido ou completado.",
+      "legalBasis": "CPC, art. 321",
+      "trap": "Não indeferir imediatamente por defeito sanável sem oportunizar a correção."
+    },
+    {
+      "id": "cp-006",
+      "disciplineId": "civil-procedure",
+      "number": 13,
+      "front": "O réu pretende apresentar pretensão própria conexa com a ação principal. Deve ajuizar necessariamente demanda autônoma?",
+      "back": "Não. Na contestação, é lícito ao réu propor reconvenção para manifestar pretensão própria, conexa com a ação principal ou com o fundamento da defesa.",
+      "legalBasis": "CPC, art. 343, caput",
+      "trap": "Reconvenção não se confunde com mera defesa contra o pedido do autor."
+    },
+    {
+      "id": "cp-007",
+      "disciplineId": "civil-procedure",
+      "number": 13,
+      "front": "Um autor demonstra probabilidade do direito e perigo de dano, mas a tutela de urgência antecipada requerida apresenta perigo de irreversibilidade dos efeitos. Qual é a regra legal?",
+      "back": "A tutela de urgência de natureza antecipada não será concedida quando houver perigo de irreversibilidade dos efeitos da decisão, sem prejuízo da análise das particularidades e da jurisprudência aplicável.",
+      "legalBasis": "CPC, art. 300, caput e § 3º",
+      "trap": "Probabilidade e perigo de dano não são os únicos requisitos relevantes."
+    },
+    {
+      "id": "cp-008",
+      "disciplineId": "civil-procedure",
+      "number": 14,
+      "front": "O juiz redistribui o ônus da prova em razão de maior facilidade da parte contrária para produzir a prova. Pode fazê-lo sem fundamentação e sem oportunidade de cumprimento?",
+      "back": "Não. A distribuição diversa exige decisão fundamentada e oportunidade para a parte se desincumbir do ônus atribuído; não pode gerar encargo impossível ou excessivamente difícil.",
+      "legalBasis": "CPC, art. 373, §§ 1º e 2º",
+      "trap": "Distribuição dinâmica não significa inversão arbitrária."
+    },
+    {
+      "id": "cp-009",
+      "disciplineId": "civil-procedure",
+      "number": 16,
+      "front": "Em causa que admite autocomposição, somente o autor manifesta desinteresse na audiência de conciliação. Isso basta, por si só, para dispensá-la?",
+      "back": "Não. Na hipótese de desinteresse, ambas as partes devem manifestá-lo expressamente; também não haverá audiência quando não se admitir autocomposição.",
+      "legalBasis": "CPC, art. 334, § 4º",
+      "trap": "O desinteresse unilateral não equivale ao desinteresse de ambas as partes."
+    },
+    {
+      "id": "cp-010",
+      "disciplineId": "civil-procedure",
+      "number": 17,
+      "front": "Os motivos da sentença fazem coisa julgada material apenas porque foram importantes para determinar o alcance da parte dispositiva?",
+      "back": "Não. Os motivos, ainda que importantes para determinar o alcance da parte dispositiva, não fazem coisa julgada. A questão prejudicial decidida expressamente pode ficar abrangida se preenchidos os requisitos legais.",
+      "legalBasis": "CPC, arts. 503, § 1º, e 504, I",
+      "trap": "Distinguir motivos da sentença e questão prejudicial submetida aos requisitos do art. 503."
+    },
+    {
+      "id": "cp-011",
+      "disciplineId": "civil-procedure",
+      "number": 18,
+      "front": "No cumprimento de sentença por quantia certa, o devedor paga apenas parte do débito no prazo legal. Sobre qual valor incidem a multa e os honorários do art. 523?",
+      "back": "Sobre o restante não pago. A multa de 10% e os honorários de advogado de 10% incidem sobre o saldo remanescente quando há pagamento parcial tempestivo.",
+      "legalBasis": "CPC, art. 523, §§ 1º e 2º",
+      "trap": "Não calcular os acréscimos sobre a parcela paga tempestivamente."
+    },
+    {
+      "id": "cp-012",
+      "disciplineId": "civil-procedure",
+      "number": 20,
+      "front": "Uma parte pretende opor embargos de declaração contra decisão judicial. Qual é o prazo e o efeito sobre o prazo dos demais recursos?",
+      "back": "Cinco dias, sem preparo, em regra interrompendo o prazo para interposição de recurso. Os embargos não possuem efeito suspensivo automático.",
+      "legalBasis": "CPC, arts. 219, 1.023 e 1.026",
+      "trap": "Interrupção do prazo recursal não se confunde com suspensão da eficácia da decisão."
+    },
+    {
+      "id": "cp-013",
+      "disciplineId": "civil-procedure",
+      "number": 20,
+      "front": "O juiz profere decisão interlocutória que versa sobre tutela provisória. Qual recurso o CPC prevê expressamente contra essa decisão?",
+      "back": "Agravo de instrumento. As decisões interlocutórias sobre tutelas provisórias integram as hipóteses expressas de cabimento desse recurso.",
+      "legalBasis": "CPC, art. 1.015, I",
+      "trap": "Não aguardar necessariamente a sentença para impugnar essa decisão."
+    },
+    {
+      "id": "cp-014",
+      "disciplineId": "civil-procedure",
+      "number": 20,
+      "front": "Uma parte interpõe apelação contra sentença que condena ao pagamento de alimentos. O recurso impede automaticamente a eficácia da sentença?",
+      "back": "Não. Embora a apelação tenha efeito suspensivo como regra, a sentença que condena a pagar alimentos começa a produzir efeitos imediatamente após a publicação, sem prejuízo de eventual suspensão judicial.",
+      "legalBasis": "CPC, art. 1.012, caput, § 1º, II, e §§ 3º e 4º",
+      "trap": "O efeito suspensivo da apelação não é absoluto."
+    },
+    {
+      "id": "cp-015",
+      "disciplineId": "civil-procedure",
+      "number": 20,
+      "front": "Um recorrente pretende discutir ofensa direta à Constituição Federal e demonstrar a repercussão geral da questão constitucional. Qual recurso é próprio para essa hipótese, preenchidos os demais requisitos?",
+      "back": "Recurso extraordinário ao Supremo Tribunal Federal. O recorrente deve demonstrar a repercussão geral das questões constitucionais discutidas, nos termos legais.",
+      "legalBasis": "CF, art. 102, III e § 3º; CPC, art. 1.035",
+      "trap": "Repercussão geral não se confunde com a relevância da questão federal infraconstitucional."
+    },
+    {
+      "id": "cp-016",
+      "disciplineId": "civil-procedure",
+      "number": 19,
+      "front": "Uma parte pretende ajuizar ação rescisória fundada em violação manifesta de norma jurídica. Qual é o prazo decadencial geral e seu marco inicial?",
+      "back": "Dois anos contados do trânsito em julgado da última decisão proferida no processo, observadas as hipóteses especiais previstas em lei.",
+      "legalBasis": "CPC, arts. 966, V, e 975, caput",
+      "trap": "Não contar necessariamente do trânsito em julgado da primeira decisão de mérito."
+    },
+    {
+      "id": "cp-017",
+      "disciplineId": "civil-procedure",
+      "number": 19,
+      "front": "No cumprimento de sentença por quantia certa, expirou o prazo para pagamento voluntário. O executado precisa aguardar penhora ou nova intimação para apresentar impugnação?",
+      "back": "Não. Inicia-se o prazo de quinze dias para impugnação nos próprios autos, independentemente de penhora ou nova intimação.",
+      "legalBasis": "CPC, art. 525, caput",
+      "trap": "Não exigir garantia do juízo como condição geral para apresentar impugnação."
+    },
+    {
+      "id": "cp-018",
+      "disciplineId": "civil-procedure",
+      "number": 22,
+      "front": "O executado é citado em execução de título extrajudicial e deseja apresentar embargos. É indispensável penhora, depósito ou caução para o oferecimento dos embargos?",
+      "back": "Não. O executado pode opor embargos à execução independentemente de penhora, depósito ou caução.",
+      "legalBasis": "CPC, art. 914, caput",
+      "trap": "A garantia pode ser requisito para atribuição de efeito suspensivo, não para o simples oferecimento dos embargos."
+    },
+    {
+      "id": "cp-019",
+      "disciplineId": "civil-procedure",
+      "number": 22,
+      "front": "O executado apresentou embargos à execução. A oposição dos embargos suspende automaticamente os atos executivos?",
+      "back": "Não. Os embargos não terão efeito suspensivo como regra. O juiz pode atribuí-lo a requerimento do embargante, se presentes os requisitos da tutela provisória e garantida a execução por penhora, depósito ou caução suficientes.",
+      "legalBasis": "CPC, art. 919, caput e § 1º",
+      "trap": "Distinguir cabimento dos embargos e concessão de efeito suspensivo."
+    },
+    {
+      "id": "cp-020",
+      "disciplineId": "civil-procedure",
+      "number": 24,
+      "front": "Uma pessoa que não integra o processo sofre penhora sobre bem de sua propriedade. Qual instrumento processual é adequado para pedir o desfazimento da constrição?",
+      "back": "Embargos de terceiro, cabíveis para quem, não sendo parte no processo, sofre constrição ou ameaça de constrição sobre bens que possua ou sobre os quais tenha direito incompatível com o ato constritivo.",
+      "legalBasis": "CPC, art. 674, caput",
+      "trap": "A medida também protege contra ameaça de constrição, não apenas penhora consumada."
+    },
+    {
+      "id": "cp-021",
+      "disciplineId": "civil-procedure",
+      "number": 24,
+      "front": "Um credor possui prova escrita de dívida, mas o documento não tem eficácia de título executivo. Qual procedimento especial pode utilizar para exigir pagamento?",
+      "back": "A ação monitória, desde que preenchidos os requisitos legais, permite exigir pagamento de quantia em dinheiro com base em prova escrita sem eficácia de título executivo.",
+      "legalBasis": "CPC, art. 700, caput e I",
+      "trap": "Prova escrita sem eficácia executiva não impede a utilização da via monitória."
+    },
+    {
+      "id": "cp-022",
+      "disciplineId": "civil-procedure",
+      "number": 25,
+      "front": "O interessado tomou ciência do ato impugnado e pretende impetrar mandado de segurança repressivo. Qual é o prazo legal geral para exercer esse direito?",
+      "back": "Cento e vinte dias, contados da ciência, pelo interessado, do ato impugnado.",
+      "legalBasis": "Lei 12.016/2009, art. 23",
+      "trap": "Trata-se de prazo decadencial para impetração, não de prazo recursal."
+    },
+    {
+      "id": "cp-023",
+      "disciplineId": "civil-procedure",
+      "number": 27,
+      "front": "Uma pessoa capaz propõe demanda de natureza admitida pelo Juizado Especial Cível no valor de quinze salários mínimos. É obrigatória a assistência de advogado em primeiro grau?",
+      "back": "Não. Nas causas de valor até vinte salários mínimos, as partes comparecerão pessoalmente, podendo ser assistidas por advogado. Acima desse valor, a assistência é obrigatória; na fase recursal, a representação por advogado é obrigatória.",
+      "legalBasis": "Lei 9.099/1995, arts. 9º e 41, § 2º",
+      "trap": "O limite de vinte salários mínimos refere-se à assistência de advogado, não ao teto geral de competência."
+    },
+    {
+      "id": "cp-024",
+      "disciplineId": "civil-procedure",
+      "number": 27,
+      "front": "Uma parte pretende interpor recurso contra sentença recorrível do Juizado Especial Cível. Qual o prazo legal e a exigência de representação?",
+      "back": "Dez dias úteis, contados da ciência da sentença, mediante petição escrita com razões e pedido, sendo obrigatória a representação por advogado.",
+      "legalBasis": "Lei 9.099/1995, arts. 12-A, 41, § 2º, e 42",
+      "trap": "Não aplicar automaticamente o prazo de quinze dias da apelação do CPC."
+    },
+    {
+      "id": "co-001",
+      "disciplineId": "constitutional",
+      "number": 6,
+      "front": "Uma autoridade pretende ingressar em residência sem consentimento do morador, exclusivamente por determinação judicial, durante a noite. A Constituição autoriza essa entrada?",
+      "back": "Não. A entrada por determinação judicial sem consentimento é admitida durante o dia. Flagrante delito, desastre ou prestação de socorro constituem hipóteses distintas.",
+      "legalBasis": "CF, art. 5º, XI",
+      "trap": "Não estender a limitação diurna às outras exceções constitucionais."
+    },
+    {
+      "id": "co-002",
+      "disciplineId": "constitutional",
+      "number": 6,
+      "front": "Um cidadão deseja conhecer dados referentes à sua própria pessoa constantes de banco de dados de entidade governamental. Qual remédio constitucional é adequado, observados os requisitos legais?",
+      "back": "Habeas data, que assegura o conhecimento de informações relativas à pessoa do impetrante e permite sua retificação nas hipóteses constitucionais.",
+      "legalBasis": "CF, art. 5º, LXXII",
+      "trap": "Não confundir acesso a dados pessoais com acesso geral a informações públicas."
+    },
+    {
+      "id": "co-003",
+      "disciplineId": "constitutional",
+      "number": 6,
+      "front": "Uma associação regularmente constituída e em funcionamento há oito meses pretende impetrar mandado de segurança coletivo na condição de associação. Satisfaz o requisito temporal constitucional?",
+      "back": "Não. A associação deve estar legalmente constituída e em funcionamento há pelo menos um ano, para defesa dos interesses de seus membros ou associados.",
+      "legalBasis": "CF, art. 5º, LXX, b",
+      "trap": "O requisito temporal não se estende indistintamente a todos os legitimados."
+    },
+    {
+      "id": "co-004",
+      "disciplineId": "constitutional",
+      "number": 7,
+      "front": "Um brasileiro alfabetizado de dezessete anos pretende votar. O alistamento eleitoral e o voto são obrigatórios nessa idade?",
+      "back": "Não. O alistamento e o voto são facultativos para os maiores de dezesseis e menores de dezoito anos, conforme a Constituição.",
+      "legalBasis": "CF, art. 14, § 1º, II, c",
+      "trap": "Não confundir capacidade eleitoral ativa com requisitos de elegibilidade."
+    },
+    {
+      "id": "co-005",
+      "disciplineId": "constitutional",
+      "number": 8,
+      "front": "Um Estado pretende legislar sobre matéria de competência legislativa privativa da União. Qual instrumento pode autorizá-lo a legislar sobre questões específicas dessa matéria?",
+      "back": "Lei complementar federal poderá autorizar os Estados a legislar sobre questões específicas das matérias de competência privativa da União.",
+      "legalBasis": "CF, art. 22, parágrafo único",
+      "trap": "Não confundir competência privativa com competência legislativa concorrente."
+    },
+    {
+      "id": "co-006",
+      "disciplineId": "constitutional",
+      "number": 8,
+      "front": "Em matéria de competência concorrente, inexiste lei federal sobre normas gerais. Os Estados podem exercer competência legislativa plena?",
+      "back": "Sim, para atender a suas peculiaridades. A superveniência de lei federal sobre normas gerais suspende a eficácia da lei estadual no que lhe for contrário.",
+      "legalBasis": "CF, art. 24, §§ 3º e 4º",
+      "trap": "A Constituição prevê suspensão da eficácia, e não revogação automática da lei estadual."
+    },
+    {
+      "id": "co-007",
+      "disciplineId": "constitutional",
+      "number": 9,
+      "front": "Um candidato aprovado em concurso público questiona a possibilidade de prorrogação do prazo de validade originalmente fixado em dois anos. Qual é o limite constitucional?",
+      "back": "O prazo de validade do concurso será de até dois anos, prorrogável uma vez, por igual período.",
+      "legalBasis": "CF, art. 37, III",
+      "trap": "A prorrogação não pode ocorrer sucessivas vezes."
+    },
+    {
+      "id": "co-008",
+      "disciplineId": "constitutional",
+      "number": 12,
+      "front": "Uma proposta de emenda constitucional é rejeitada. Pode ser reapresentada com a mesma matéria na mesma sessão legislativa?",
+      "back": "Não. A matéria constante de proposta de emenda rejeitada ou havida por prejudicada não pode ser objeto de nova proposta na mesma sessão legislativa.",
+      "legalBasis": "CF, art. 60, § 5º",
+      "trap": "Não confundir com a regra constitucional de reapresentação de projetos de lei rejeitados."
+    },
+    {
+      "id": "co-009",
+      "disciplineId": "constitutional",
+      "number": 3,
+      "front": "Um órgão fracionário de tribunal pretende declarar a inconstitucionalidade de uma lei. Qual quórum a Constituição exige para essa declaração pelo tribunal?",
+      "back": "Maioria absoluta dos membros do tribunal ou dos membros do respectivo órgão especial, observadas as hipóteses de dispensa de nova submissão previstas na legislação processual.",
+      "legalBasis": "CF, art. 97; CPC, art. 949, parágrafo único",
+      "trap": "Reserva de plenário não se confunde com maioria simples do órgão fracionário."
+    },
+    {
+      "id": "co-010",
+      "disciplineId": "constitutional",
+      "number": 4,
+      "front": "Uma entidade de classe de âmbito nacional pretende propor ação direta de inconstitucionalidade perante o STF. Integra o rol constitucional de legitimados?",
+      "back": "Sim. Confederação sindical ou entidade de classe de âmbito nacional integra o rol de legitimados, observados os demais requisitos, inclusive pertinência temática quando exigida.",
+      "legalBasis": "CF, art. 103, IX",
+      "trap": "A abrangência nacional não dispensa os demais requisitos de legitimidade."
+    },
+    {
+      "id": "co-011",
+      "disciplineId": "constitutional",
+      "number": 15,
+      "front": "O Conselho Nacional de Justiça pode reformar uma sentença judicial simplesmente por discordar da interpretação jurídica adotada pelo magistrado?",
+      "back": "Não. O CNJ exerce controle da atuação administrativa e financeira do Poder Judiciário e do cumprimento dos deveres funcionais dos juízes, não funciona como instância recursal jurisdicional.",
+      "legalBasis": "CF, art. 103-B, § 4º",
+      "trap": "Controle administrativo e disciplinar não equivale à revisão jurisdicional de sentenças."
+    },
+    {
+      "id": "co-012",
+      "disciplineId": "constitutional",
+      "number": 17,
+      "front": "Um trabalhador ajuíza ação de indenização por dano moral decorrente de relação de trabalho. Qual ramo do Judiciário possui competência constitucional para a hipótese?",
+      "back": "A Justiça do Trabalho, nos termos da competência constitucional para ações de indenização por dano moral ou patrimonial decorrentes da relação de trabalho, observadas as delimitações jurisprudenciais aplicáveis.",
+      "legalBasis": "CF, art. 114, VI",
+      "trap": "A natureza indenizatória do pedido não desloca, por si só, a competência para a Justiça comum."
+    }
+  ]
+}
