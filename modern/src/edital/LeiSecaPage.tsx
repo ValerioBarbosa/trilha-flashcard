@@ -12,12 +12,13 @@ import '../cards/pdf-import.css';
 
 type LeiSecaSubject = SubjectRow & { rootTopics: TopicRow[] };
 
-const LEI_SECA_EXCLUDED_SUBJECTS = new Set(['português']);
+const LEI_SECA_EXCLUDED_SUBJECTS = new Set(['portugues', 'lingua portuguesa', 'matematica e raciocinio logico', 'matematica rlm', 'raciocinio logico', 'nocoes de informatica', 'informatica']);
+const normalizeSearch = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
 
 function buildLeiSecaSubjects(subjects: SubjectRow[], topics: TopicRow[], query: string): LeiSecaSubject[] {
-  const normalized = query.trim().toLowerCase();
+  const normalized = normalizeSearch(query);
   return subjects
-    .filter((subject) => !LEI_SECA_EXCLUDED_SUBJECTS.has(subject.name.trim().toLowerCase()))
+    .filter((subject) => !LEI_SECA_EXCLUDED_SUBJECTS.has(normalizeSearch(subject.name)))
     .map((subject) => ({
       ...subject,
       rootTopics: topics.filter((topic) => topic.subject_id === subject.id && !topic.parent_id && topic.legal_basis),
@@ -25,8 +26,8 @@ function buildLeiSecaSubjects(subjects: SubjectRow[], topics: TopicRow[], query:
     .filter((subject) => subject.rootTopics.length > 0)
     .filter((subject) => {
       if (!normalized) return true;
-      return subject.name.toLowerCase().includes(normalized)
-        || subject.rootTopics.some((topic) => `${topic.name} ${topic.legal_basis ?? ''}`.toLowerCase().includes(normalized));
+      return normalizeSearch(subject.name).includes(normalized)
+        || subject.rootTopics.some((topic) => normalizeSearch(`${topic.name} ${topic.legal_basis ?? ''}`).includes(normalized));
     });
 }
 
@@ -44,6 +45,8 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
   const [onlyMissing, setOnlyMissing] = useState(false);
   const [onlyUnread, setOnlyUnread] = useState(false);
   const [readerNote, setReaderNote] = useState('');
+  const [readerFont, setReaderFont] = useState(19);
+  const [immersive, setImmersive] = useState(false);
   const [readerFavorite, setReaderFavorite] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [reader, setReader] = useState<{ topicId: string; index: number } | null>(null);
@@ -331,10 +334,10 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
         const card = cards[reader.index];
         if (!topic || !card) return null;
         const readCount = cards.filter((entry) => entry.read_at).length;
-        const pct = cards.length ? Math.round(((reader.index + 1) / cards.length) * 100) : 0;
+        const pct = cards.length ? Math.round((readCount / cards.length) * 100) : 0;
         return (
           <div className="law-reader-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeReader()}>
-            <section className="law-reader" role="dialog" aria-modal="true" aria-label={`Leitura de ${topic.name}`}>
+            <section className={`law-reader${immersive ? ' law-reader-immersive' : ''}`} role="dialog" aria-modal="true" aria-label={`Leitura de ${topic.name}`}>
               <header className="law-reader-header">
                 <div>
                   <span className="page-eyebrow">{subject?.name || 'LEI SECA'}</span>
@@ -346,17 +349,23 @@ export function LeiSecaPage({ user, profileId, subjects, topics, decks, onStudyT
 
               <div className="law-reader-progress">
                 <div><span style={{ width: `${pct}%` }} /></div>
-                <small>Trecho {reader.index + 1} de {cards.length} · {readCount} lidos</small>
+                <small>Trecho {reader.index + 1} de {cards.length} · {readCount} lidos · {pct}% concluído</small>
               </div>
 
-              <article className={`law-reader-paper ${card.read_at ? 'is-read' : ''}`}>
+              <div className="law-reader-controls" aria-label="Opções de leitura">
+                <button type="button" className="secondary-outline" disabled={readerFont <= 16} onClick={() => setReaderFont((size) => Math.max(16, size - 2))} aria-label="Diminuir fonte">A−</button>
+                <span aria-live="polite">{readerFont}px</span>
+                <button type="button" className="secondary-outline" disabled={readerFont >= 29} onClick={() => setReaderFont((size) => Math.min(29, size + 2))} aria-label="Aumentar fonte">A+</button>
+                <button type="button" className="secondary-outline" aria-pressed={immersive} onClick={() => setImmersive((value) => !value)}>{immersive ? 'Mostrar anotações' : 'Leitura focada'}</button>
+              </div>
+              <article key={card.id} className={`law-reader-paper ${card.read_at ? 'is-read' : ''}`}>
                 <div className="law-reader-citation">
                   <span>{card.front}</span>
                   <button className={`law-favorite ${readerFavorite ? 'active' : ''}`} onClick={() => toggleFavorite(card.id)} aria-label={readerFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}>{readerFavorite ? '★' : '☆'}</button>
                 </div>
-                <div className="law-reader-text">{card.back}</div>
-                {card.complement ? <aside className="law-reader-note"><strong>Observação</strong><p>{card.complement}</p></aside> : null}
-                <label className="law-personal-note"><strong>Minha anotação neste dispositivo</strong><textarea rows={3} value={readerNote} onChange={(event) => saveReaderNote(card.id, event.target.value)} placeholder="Escreva uma observação, exceção ou macete pessoal…" /></label>
+                <div className="law-reader-text" style={{ fontSize: readerFont }}>{card.back}</div>
+                {!immersive && card.complement ? <aside className="law-reader-note"><strong>Observação</strong><p>{card.complement}</p></aside> : null}
+                {!immersive ? <label className="law-personal-note"><strong>Minha anotação neste dispositivo</strong><textarea rows={3} value={readerNote} onChange={(event) => saveReaderNote(card.id, event.target.value)} placeholder="Escreva uma observação, exceção ou macete pessoal…" /></label> : null}
               </article>
 
               <footer className="law-reader-footer">
