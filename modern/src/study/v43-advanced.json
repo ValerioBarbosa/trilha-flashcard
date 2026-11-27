@@ -107,6 +107,114 @@
       "back": "Não. Os embargos de declaração interrompem o prazo para outros recursos por qualquer das partes, ressalvadas as hipóteses legais.",
       "legalBasis": "CLT, art. 897-A, § 3º",
       "trap": "Interrupção reinicia a contagem; suspensão apenas conserva o saldo."
+    },
+    {
+      "id": "lp-013",
+      "disciplineId": "labor-procedure",
+      "number": 8,
+      "front": "A parte pretende praticar ato processual em prazo que corre entre 20 de dezembro e 20 de janeiro. O prazo continua fluindo nesse intervalo?",
+      "back": "Não. O curso dos prazos processuais fica suspenso nesse período, incluídas as duas datas.",
+      "legalBasis": "CLT, art. 775-A",
+      "trap": "Suspensão não é interrupção."
+    },
+    {
+      "id": "lp-014",
+      "disciplineId": "labor-procedure",
+      "number": 15,
+      "front": "O réu pretende apresentar exceção de incompetência territorial antes da audiência. Qual prazo e requisito formal deve observar?",
+      "back": "Cinco dias da notificação, antes da audiência, em peça que sinalize a existência da exceção.",
+      "legalBasis": "CLT, art. 800",
+      "trap": "Não esperar necessariamente a contestação na audiência."
+    },
+    {
+      "id": "lp-015",
+      "disciplineId": "labor-procedure",
+      "number": 16,
+      "front": "Uma empresa designa como preposto pessoa que não integra seu quadro de empregados. Isso impede sua representação em audiência?",
+      "back": "Não. O preposto não precisa ser empregado da parte reclamada, mas deve conhecer os fatos.",
+      "legalBasis": "CLT, art. 843, §§ 1º e 3º",
+      "trap": "Conhecimento dos fatos não se confunde com vínculo empregatício."
+    },
+    {
+      "id": "lp-016",
+      "disciplineId": "labor-procedure",
+      "number": 16,
+      "front": "O reclamante falta à audiência inicial. Qual a consequência processual prevista na CLT, em regra?",
+      "back": "Arquivamento da reclamação. A ausência do reclamado, por sua vez, enseja revelia e confissão quanto aos fatos, observadas as exceções legais.",
+      "legalBasis": "CLT, art. 844",
+      "trap": "Não inverter as consequências das ausências."
+    },
+    {
+      "id": "lp-017",
+      "disciplineId": "labor-procedure",
+      "number": 20,
+      "front": "No procedimento sumaríssimo, o autor desconhece o endereço do réu e pede citação por edital. A CLT admite essa modalidade nesse rito?",
+      "back": "Não. Cabe ao autor indicar corretamente nome e endereço do reclamado; a inobservância enseja arquivamento e custas.",
+      "legalBasis": "CLT, art. 852-B, II e § 1º",
+      "trap": "Não transportar automaticamente regras do rito ordinário."
+    },
+    {
+      "id": "lp-018",
+      "disciplineId": "labor-procedure",
+      "number": 18,
+      "front": "Na reclamação escrita, o autor formula pedido genérico sem indicação de valor, fora das exigências legais. Qual a consequência prevista para o pedido irregular?",
+      "back": "A CLT prevê extinção sem resolução do mérito dos pedidos que não atendam aos requisitos do art. 840, § 1º.",
+      "legalBasis": "CLT, art. 840, §§ 1º e 3º",
+      "trap": "Distinguir extinção do pedido irregular de improcedência."
+    },
+    {
+      "id": "lp-019",
+      "disciplineId": "labor-procedure",
+      "number": 29,
+      "front": "O incidente de desconsideração é instaurado na fase de conhecimento. Cabe recurso imediato contra a decisão interlocutória que o resolve?",
+      "back": "Não, conforme a regra específica da CLT para a fase de conhecimento, sem prejuízo da impugnação no recurso da decisão final.",
+      "legalBasis": "CLT, art. 855-A, § 1º, I",
+      "trap": "Na execução, cabe agravo de petição."
+    },
+    {
+      "id": "lp-020",
+      "disciplineId": "labor-procedure",
+      "number": 30,
+      "front": "O executado é citado para cumprir condenação trabalhista em dinheiro. Qual prazo legal para pagar ou garantir a execução?",
+      "back": "Quarenta e oito horas, sob pena de penhora.",
+      "legalBasis": "CLT, art. 880",
+      "trap": "Não confundir com os quinze dias do CPC."
+    },
+    {
+      "id": "lp-021",
+      "disciplineId": "labor-procedure",
+      "number": 33,
+      "front": "Após garantir a execução trabalhista, o devedor pretende apresentar embargos. Qual o prazo legal?",
+      "back": "Cinco dias após a garantia da execução ou penhora, cabendo igual prazo ao exequente para impugnação.",
+      "legalBasis": "CLT, art. 884",
+      "trap": "Não confundir com os oito dias para impugnar cálculos."
+    },
+    {
+      "id": "lp-022",
+      "disciplineId": "labor-procedure",
+      "number": 35,
+      "front": "A parte deseja recorrer de decisão definitiva de Vara do Trabalho. Qual recurso ordinário e prazo são previstos pela CLT?",
+      "back": "Recurso ordinário no prazo de oito dias, também cabível contra decisões terminativas das Varas e Juízos do Trabalho.",
+      "legalBasis": "CLT, art. 895, I",
+      "trap": "Não aplicar o prazo geral de apelação do CPC."
+    },
+    {
+      "id": "lp-023",
+      "disciplineId": "labor-procedure",
+      "number": 35,
+      "front": "O juízo de origem denega seguimento a recurso trabalhista. Qual recurso é previsto para impugnar esse despacho?",
+      "back": "Agravo de instrumento, no prazo de oito dias.",
+      "legalBasis": "CLT, art. 897, b",
+      "trap": "Não confundir com agravo de petição, próprio da execução."
+    },
+    {
+      "id": "lp-024",
+      "disciplineId": "labor-procedure",
+      "number": 35,
+      "front": "A parte interpõe agravo de petição sem delimitar os valores e matérias impugnados. Qual requisito específico foi desatendido?",
+      "back": "Deve delimitar justificadamente matérias e valores impugnados, permitindo a execução imediata da parte remanescente.",
+      "legalBasis": "CLT, art. 897, § 1º",
+      "trap": "O requisito específico não se resume à indicação genérica do inconformismo."
     }
   ]
 }
