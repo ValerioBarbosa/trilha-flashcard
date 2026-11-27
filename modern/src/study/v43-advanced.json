@@ -215,6 +215,114 @@
       "back": "Deve delimitar justificadamente matérias e valores impugnados, permitindo a execução imediata da parte remanescente.",
       "legalBasis": "CLT, art. 897, § 1º",
       "trap": "O requisito específico não se resume à indicação genérica do inconformismo."
+    },
+    {
+      "id": "ll-001",
+      "disciplineId": "labor-law",
+      "number": 3,
+      "front": "Uma pessoa física presta serviços não eventuais, remunerados, pessoalmente e sob dependência do empregador. A denominação contratual de autônomo é suficiente para afastar o vínculo?",
+      "back": "Não. A caracterização da relação de emprego depende dos requisitos legais efetivamente presentes, e não apenas do nome atribuído ao contrato.",
+      "legalBasis": "CLT, arts. 2º, 3º e 9º",
+      "trap": "A denominação contratual não prevalece automaticamente sobre os fatos."
+    },
+    {
+      "id": "ll-002",
+      "disciplineId": "labor-law",
+      "number": 7,
+      "front": "Duas empresas possuem os mesmos sócios. Esse fato isolado basta para caracterizar grupo econômico trabalhista?",
+      "back": "Não. Exige-se demonstração de interesse integrado, efetiva comunhão de interesses e atuação conjunta das empresas integrantes.",
+      "legalBasis": "CLT, art. 2º, § 3º",
+      "trap": "Identidade de sócios, isoladamente, não é suficiente."
+    },
+    {
+      "id": "ll-003",
+      "disciplineId": "labor-law",
+      "number": 9,
+      "front": "Um empregador celebra contrato de experiência por 120 dias. Esse prazo respeita o limite legal?",
+      "back": "Não. O contrato de experiência não poderá exceder noventa dias.",
+      "legalBasis": "CLT, art. 445, parágrafo único",
+      "trap": "O limite geral de dois anos dos contratos a termo não vale para experiência."
+    },
+    {
+      "id": "ll-004",
+      "disciplineId": "labor-law",
+      "number": 10,
+      "front": "Empregado aceita alteração contratual que lhe causa prejuízo direto. O consentimento torna a alteração válida?",
+      "back": "Não. A alteração exige mútuo consentimento e ausência de prejuízo direto ou indireto ao empregado, ressalvadas as hipóteses legais.",
+      "legalBasis": "CLT, art. 468, caput",
+      "trap": "Consentimento não basta."
+    },
+    {
+      "id": "ll-005",
+      "disciplineId": "labor-law",
+      "number": 12,
+      "front": "O empregador exige serviços proibidos por lei. O empregado pode pleitear rescisão indireta?",
+      "back": "Sim. A exigência de serviços defesos por lei é uma das hipóteses previstas para rescisão indireta do contrato.",
+      "legalBasis": "CLT, art. 483, a",
+      "trap": "Rescisão indireta decorre de falta patronal, não de pedido de demissão comum."
+    },
+    {
+      "id": "ll-006",
+      "disciplineId": "labor-law",
+      "number": 13,
+      "front": "Na extinção contratual por acordo, o empregado pode sacar integralmente o FGTS e receber seguro-desemprego?",
+      "back": "Não. A movimentação da conta do FGTS fica limitada a 80% dos depósitos, e a extinção por acordo não autoriza ingresso no programa de seguro-desemprego.",
+      "legalBasis": "CLT, art. 484-A, §§ 1º e 2º",
+      "trap": "Não confundir acordo com dispensa sem justa causa."
+    },
+    {
+      "id": "ll-007",
+      "disciplineId": "labor-law",
+      "number": 15,
+      "front": "Ao terminar sua jornada, um empregado retorna ao trabalho oito horas depois. Qual é o intervalo mínimo legal geral entre jornadas?",
+      "back": "Onze horas consecutivas de descanso entre duas jornadas de trabalho.",
+      "legalBasis": "CLT, art. 66",
+      "trap": "Não confundir intervalo interjornada com intrajornada."
+    },
+    {
+      "id": "ll-008",
+      "disciplineId": "labor-law",
+      "number": 16,
+      "front": "Em jornada de oito horas, sem norma coletiva ou hipótese especial aplicável, o empregador concede apenas 40 minutos de intervalo. Qual parcela prevê a CLT pela supressão?",
+      "back": "Pagamento apenas dos vinte minutos suprimidos, de natureza indenizatória, com acréscimo de 50% sobre a remuneração da hora normal, no regime posterior à Reforma Trabalhista.",
+      "legalBasis": "CLT, art. 71, caput e § 4º",
+      "trap": "Não pagar automaticamente a hora integral para fatos posteriores à reforma."
+    },
+    {
+      "id": "ll-009",
+      "disciplineId": "labor-law",
+      "number": 18,
+      "front": "Um empregado urbano trabalha às 23 horas. Qual é o adicional noturno mínimo e a duração legal da hora noturna urbana?",
+      "back": "Adicional de pelo menos 20% sobre a hora diurna; a hora noturna é computada como 52 minutos e 30 segundos.",
+      "legalBasis": "CLT, art. 73, caput e § 1º",
+      "trap": "Não aplicar automaticamente os parâmetros do trabalho rural."
+    },
+    {
+      "id": "ll-010",
+      "disciplineId": "labor-law",
+      "number": 19,
+      "front": "Empregado e empregador pactuam banco de horas por acordo individual escrito para compensação em seis meses. A CLT admite essa modalidade?",
+      "back": "Sim. O banco de horas pode ser pactuado por acordo individual escrito, desde que a compensação ocorra no período máximo de seis meses.",
+      "legalBasis": "CLT, art. 59, § 5º",
+      "trap": "Distinguir acordo individual de negociação coletiva anual."
+    },
+    {
+      "id": "ll-011",
+      "disciplineId": "labor-law",
+      "number": 22,
+      "front": "Um empregado deseja dividir as férias em três períodos, de 14, 10 e 6 dias corridos. Respeita os limites legais, havendo sua concordância?",
+      "back": "Sim. Um período deve ter pelo menos quatorze dias corridos e os demais pelo menos cinco dias corridos cada, com concordância do empregado.",
+      "legalBasis": "CLT, art. 134, § 1º",
+      "trap": "Não exigir que todos os períodos tenham quatorze dias."
+    },
+    {
+      "id": "ll-012",
+      "disciplineId": "labor-law",
+      "number": 24,
+      "front": "A gorjeta recebida pelo empregado integra salário pago diretamente pelo empregador ou remuneração?",
+      "back": "Integra a remuneração, que abrange o salário devido e pago diretamente pelo empregador e as gorjetas recebidas.",
+      "legalBasis": "CLT, art. 457, caput",
+      "trap": "Salário e remuneração não são conceitos idênticos."
     }
   ]
 }
