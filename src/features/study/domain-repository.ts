@@ -184,7 +184,7 @@ export type EditalTopicProgress = {
   leiSecaCount: number;
   reviewedCount: number;
   masteredCount: number;
-  status: 'Não iniciado' | 'Em estudo' | 'Revisado' | 'Recuperado';
+  status: 'Sem material' | 'Não iniciado' | 'Em estudo' | 'Revisado' | 'Recuperado';
 };
 
 export async function listEditalTopicProgress(client: SupabaseClient, profileId: string): Promise<Map<string, EditalTopicProgress>> {
@@ -222,7 +222,7 @@ export async function listEditalTopicProgress(client: SupabaseClient, profileId:
     const reviewedCount = ratings.length;
     const masteredCount = ratings.filter((rating) => rating >= 3).length;
     const studyCardCount = group.studyCards.length;
-    let status: EditalTopicProgress['status'] = 'Não iniciado';
+    let status: EditalTopicProgress['status'] = studyCardCount > 0 ? 'Não iniciado' : 'Sem material';
     if (reviewedCount > 0 && reviewedCount < studyCardCount) status = 'Em estudo';
     else if (studyCardCount > 0 && reviewedCount >= studyCardCount && masteredCount < studyCardCount) status = 'Revisado';
     else if (studyCardCount > 0 && masteredCount >= studyCardCount) status = 'Recuperado';
